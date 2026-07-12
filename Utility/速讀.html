@@ -1,0 +1,1827 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>速讀 · 訓練</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,500&family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root{
+  --ink:#121315;
+  --ink-soft:#1a1b1e;
+  --ink-card:#1e1f23;
+  --vermilion:#942525;
+  --gold:#bd8b2a;
+  --correct-green:#3c7a4e;
+  --paper:#fcfbfa;
+  --paper-70:rgba(252,251,250,.7);
+  --paper-45:rgba(252,251,250,.45);
+  --paper-25:rgba(252,251,250,.25);
+  --font-zh:'Noto Serif TC',serif;
+  --font-en:'Cormorant Garamond',serif;
+  --font-ui:'Inter',sans-serif;
+  --font-scale:1;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--ink);
+  color:var(--paper);
+  font-family:var(--font-zh);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:640px;margin:0 auto;min-height:100vh;position:relative;display:flex;flex-direction:column;}
+.screen{display:none;flex-direction:column;flex:1;padding:28px 22px 40px;animation:fadein .35s ease;}
+.screen.active{display:flex;}
+@keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.eyebrow{
+  font-family:var(--font-ui);
+  font-size:11px;
+  letter-spacing:.28em;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:8px;
+}
+h1.title{
+  font-size:clamp(26px,7vw,34px);
+  font-weight:600;
+  margin:0 0 4px;
+  line-height:1.3;
+}
+.subtitle{color:var(--paper-70);font-size:14px;margin-bottom:26px;}
+
+/* ---------- Library screen ---------- */
+#screen-library .eyebrow{font-size:16.5px;}
+#screen-library .title{font-size:clamp(39px,10.5vw,51px);}
+#screen-library .subtitle{font-size:21px;}
+.chapter-list{display:flex;flex-direction:column;gap:14px;}
+.chapter-card{
+  background:var(--ink-card);
+  border:1px solid rgba(252,251,250,.08);
+  border-radius:2px;
+  padding:18px 20px;
+  cursor:pointer;
+  transition:border-color .2s ease, transform .2s ease;
+  position:relative;
+}
+.chapter-card:active{transform:scale(.99);}
+.chapter-card:hover{border-color:var(--gold);}
+.chapter-card .ch-num{
+  font-family:var(--font-ui);
+  font-size:18px;
+  color:var(--gold);
+  letter-spacing:.12em;
+}
+.chapter-card h3{margin:6px 0 8px;font-size:28.5px;font-weight:600;}
+.ch-meta{
+  display:flex;gap:16px;flex-wrap:wrap;
+  font-family:var(--font-ui);font-size:18.75px;color:var(--paper-45);
+}
+.ch-meta span{display:flex;align-items:center;gap:4px;}
+.ch-progress{
+  margin-top:10px;padding-top:10px;border-top:1px solid rgba(252,251,250,.08);
+  font-family:var(--font-ui);font-size:18px;color:var(--paper-70);
+  display:flex;justify-content:space-between;
+}
+.ch-progress b{color:var(--gold);font-weight:600;}
+.badge-done{
+  position:absolute;top:16px;right:18px;
+  width:8px;height:8px;border-radius:50%;background:var(--gold);
+}
+
+.overall-btn{
+  margin-top:22px;padding:16px 20px;border:1px solid var(--vermilion);
+  border-radius:2px;background:transparent;color:var(--paper);
+  font-family:var(--font-zh);font-size:22.5px;cursor:pointer;
+  display:flex;justify-content:space-between;align-items:center;
+}
+.overall-btn:disabled{opacity:.3;cursor:not-allowed;}
+.overall-btn span.arrow{color:var(--vermilion);font-family:var(--font-ui);}
+
+.back-to-builtin-btn{
+  margin-top:16px;padding:12px;background:none;border:1px solid rgba(252,251,250,.2);
+  color:var(--paper-70);border-radius:2px;font-family:var(--font-ui);font-size:16.5px;cursor:pointer;
+}
+
+.paste-section{margin-top:28px;padding-top:22px;border-top:1px solid rgba(252,251,250,.08);}
+#paste-textarea{
+  width:100%;min-height:110px;padding:12px 14px;background:var(--ink-card);color:var(--paper);
+  border:1px solid rgba(252,251,250,.16);border-radius:2px;
+  font-family:var(--font-zh);font-size:16.5px;line-height:1.6;resize:vertical;
+}
+.paste-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
+.paste-btn{
+  flex:1;padding:12px 14px;border:1px solid rgba(252,251,250,.25);background:none;color:var(--paper);
+  border-radius:2px;font-family:var(--font-ui);font-size:15px;cursor:pointer;
+}
+.paste-btn-clipboard{border-color:var(--gold);color:var(--gold);}
+.paste-btn-primary{background:var(--vermilion);border-color:var(--vermilion);}
+.paste-btn-upload{
+  width:100%;margin-top:10px;border-color:rgba(252,251,250,.25);
+}
+.paste-hint{margin-top:10px;font-family:var(--font-ui);font-size:13px;color:var(--paper-45);line-height:1.6;}
+.whole-book-btn{border-color:var(--gold);margin-top:22px;margin-bottom:0;}
+.whole-book-btn span.arrow{color:var(--gold);}
+
+/* ---------- Setup screen ---------- */
+#screen-setup{height:100vh;overflow:hidden;}
+#screen-setup .eyebrow{font-size:16.5px;flex-shrink:0;}
+#screen-setup .title{font-size:clamp(26px,7vw,34px);flex-shrink:0;}
+#screen-setup .subtitle{font-size:21px;flex-shrink:0;}
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:22px;cursor:pointer;color:var(--paper-70);font-family:var(--font-ui);font-size:19.5px;flex-shrink:0;}
+.back-row:hover{color:var(--gold);}
+.setup-section{margin-bottom:28px;flex-shrink:0;}
+.setup-label{
+  font-family:var(--font-ui);font-size:16.5px;letter-spacing:.18em;text-transform:uppercase;
+  color:var(--paper-45);margin-bottom:12px;
+}
+.setup-fixed-row{display:flex;gap:10px;align-items:stretch;margin-bottom:22px;flex-shrink:0;}
+.setup-fixed-row .section-select{flex:0 0 84px;width:auto;text-align:center;}
+.setup-fixed-row .start-btn{flex:1;margin-top:0;}
+.mode-scroll-section{
+  flex:1;min-height:0;overflow-y:auto;padding-bottom:24px;
+}
+.mode-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.mode-option{
+  border:1px solid rgba(252,251,250,.14);border-radius:2px;padding:14px 16px;
+  cursor:pointer;transition:.2s;
+}
+.mode-option h4{margin:0 0 4px;font-size:23.25px;font-weight:600;}
+.mode-option p{margin:0;font-size:18.75px;color:var(--paper-45);font-family:var(--font-ui);line-height:1.5;}
+.mode-option.selected{border-color:var(--gold);background:rgba(189,139,42,.08);}
+
+.wpm-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;}
+.wpm-value{font-family:var(--font-ui);font-size:28px;font-weight:600;color:var(--gold);}
+.wpm-value sub{font-size:13px;color:var(--paper-45);font-weight:400;}
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:2px;background:rgba(252,251,250,.2);outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;}
+
+.chunk-size-row{display:flex;gap:8px;margin-top:14px;}
+.section-select{
+  width:100%;padding:12px 14px;background:var(--ink-card);color:var(--paper);
+  border:1px solid rgba(252,251,250,.16);border-radius:2px;
+  font-family:var(--font-ui);font-size:16.5px;cursor:pointer;text-align:center;
+}
+.chunk-btn{
+  flex:1;padding:10px 0;text-align:center;border:1px solid rgba(252,251,250,.14);
+  font-family:var(--font-ui);font-size:21px;cursor:pointer;border-radius:2px;
+}
+.chunk-btn.selected{border-color:var(--gold);color:var(--gold);}
+
+.start-btn{
+  margin-top:auto;padding:12px;background:var(--vermilion);color:var(--paper);
+  border:none;border-radius:2px;font-family:var(--font-zh);font-size:17px;font-weight:600;
+  letter-spacing:.05em;cursor:pointer;
+}
+.start-btn:active{opacity:.85;}
+
+/* ---------- Reading screen ---------- */
+.reading-screen{padding:0;justify-content:space-between;}
+.reading-top{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:20px 22px;font-family:var(--font-ui);font-size:13px;color:var(--paper-45);
+}
+.reading-top button{background:none;border:1px solid var(--vermilion);color:var(--vermilion);font-size:19.5px;padding:8px 14px;border-radius:16px;cursor:pointer;font-family:var(--font-ui);}
+.reading-main{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:20px 28px;text-align:center;overflow:hidden;
+}
+#rsvp-display, #chunk-display{
+  font-size:clamp(calc(34px*var(--font-scale)), calc(10vw*var(--font-scale)), calc(52px*var(--font-scale)));
+  font-weight:600;letter-spacing:.02em;
+}
+#window-pane{
+  font-size:clamp(calc(28.5px*var(--font-scale)), calc(7.8vw*var(--font-scale)), calc(36px*var(--font-scale)));
+  line-height:2.15;text-align:left;
+  max-height:56vh;overflow-y:auto;
+}
+#clause-pane{
+  position:relative;width:100%;height:62vh;
+}
+.clause-text{
+  position:absolute;left:50%;
+  transform:translate(-50%,-50%);
+  width:92%;max-width:640px;
+  font-size:clamp(calc(34px*var(--font-scale)), calc(10vw*var(--font-scale)), calc(52px*var(--font-scale)));
+  font-weight:600;line-height:1.4;
+  text-align:center;transition:top .12s linear;
+}
+.clause-text .tok-odd{text-decoration:underline;text-decoration-color:var(--gold);text-underline-offset:5px;}
+.clause-text .clause-punct{opacity:.45;font-family:var(--font-ui);}
+.tok{opacity:.28;transition:opacity .18s ease,color .18s ease;padding:0 1px;}
+.tok.tok-read{opacity:.62;}
+.tok.tok-active-clause{opacity:1;border-bottom:2px solid var(--vermilion);}
+.tok.tok-current{color:var(--gold);border-bottom-color:var(--gold);}
+.punct{opacity:.4;font-family:var(--font-ui);}
+
+.reading-bottom{padding:18px 22px 30px;}
+.progress-track{height:2px;background:rgba(252,251,250,.14);border-radius:2px;overflow:hidden;margin-bottom:12px;}
+.progress-fill{height:100%;background:var(--gold);width:0%;transition:width .15s linear;}
+.reading-controls{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--font-ui);font-size:12px;color:var(--paper-45);}
+.reading-controls .left-controls{display:flex;gap:8px;}
+.pause-btn{
+  border:1px solid var(--gold);background:none;color:var(--gold);
+  padding:10px 20px;border-radius:20px;font-family:var(--font-ui);font-size:19.5px;cursor:pointer;
+}
+
+.font-size-control{
+  display:none;align-items:center;justify-content:center;gap:14px;
+  margin-top:14px;padding:12px 16px;border:1px solid rgba(252,251,250,.14);border-radius:20px;
+  font-family:var(--font-ui);
+}
+.font-size-label{font-size:12px;color:var(--paper-45);letter-spacing:.08em;}
+.font-size-btn{
+  width:34px;height:34px;border-radius:50%;border:1px solid var(--gold);background:none;color:var(--gold);
+  font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.font-size-value{font-size:14px;color:var(--paper-70);min-width:42px;text-align:center;}
+
+/* ---------- Quiz screen ---------- */
+.quiz-q{margin-bottom:26px;padding-bottom:22px;border-bottom:1px solid rgba(252,251,250,.08);}
+.quiz-q:last-of-type{border-bottom:none;}
+.quiz-q-title{font-size:24px;font-weight:600;margin-bottom:14px;line-height:1.6;}
+.quiz-num{color:var(--gold);font-family:var(--font-ui);font-size:12px;margin-right:6px;}
+.opt-list{display:flex;flex-direction:column;gap:9px;}
+.opt{
+  border:1px solid rgba(252,251,250,.16);padding:12px 14px;border-radius:2px;cursor:pointer;
+  font-size:21.75px;transition:.15s;
+}
+.opt.selected{border-color:var(--gold);background:rgba(189,139,42,.08);}
+.opt.correct{border-color:var(--correct-green);background:rgba(60,122,78,.16);}
+.opt.incorrect{border-color:var(--vermilion);background:rgba(148,37,37,.14);}
+.tf-row{display:flex;gap:10px;}
+.tf-row .opt{flex:1;text-align:center;}
+.explanation{
+  margin-top:12px;padding:12px 14px;background:rgba(252,251,250,.04);
+  font-family:var(--font-ui);font-size:18.75px;color:var(--paper-70);line-height:1.6;border-radius:2px;
+}
+.submit-quiz-btn{
+  margin-top:6px;padding:16px;background:var(--vermilion);color:var(--paper);border:none;
+  border-radius:2px;font-family:var(--font-zh);font-size:24px;font-weight:600;cursor:pointer;
+}
+.submit-quiz-btn:disabled{opacity:.3;cursor:not-allowed;}
+
+/* ---------- Results screen ---------- */
+.result-score{
+  text-align:center;padding:34px 0 26px;
+}
+.result-score .big{
+  font-family:var(--font-ui);font-size:52px;font-weight:700;color:var(--gold);line-height:1;
+}
+.result-score .label{font-family:var(--font-ui);font-size:18px;color:var(--paper-45);letter-spacing:.12em;text-transform:uppercase;margin-top:8px;}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(252,251,250,.08);margin-bottom:30px;}
+.stat-cell{background:var(--ink);padding:16px;text-align:center;}
+.stat-cell .v{font-family:var(--font-ui);font-size:33px;font-weight:600;color:var(--paper);}
+.stat-cell .l{font-family:var(--font-ui);font-size:16.5px;color:var(--paper-45);margin-top:4px;}
+.result-actions{display:flex;flex-direction:column;gap:10px;margin-top:auto;}
+.result-actions button{
+  padding:16px;border-radius:2px;font-family:var(--font-zh);font-size:22.5px;cursor:pointer;
+}
+.btn-primary{background:var(--vermilion);color:var(--paper);border:none;font-weight:600;}
+.btn-secondary{background:none;border:1px solid rgba(252,251,250,.2);color:var(--paper);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:rgba(252,251,250,.15);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== Library ===== -->
+  <section class="screen active" id="screen-library">
+    <div class="eyebrow">速讀訓練 · Speed Reading</div>
+    <h1 class="title" id="lib-article-title"></h1>
+    <div class="subtitle" id="lib-article-meta"></div>
+
+    <div class="paste-section">
+      <div class="setup-label">或使用你自己的文章</div>
+      <textarea id="paste-textarea" placeholder="在此貼上文章內容（可直接長按貼上），或點下方按鈕從剪貼簿讀取"></textarea>
+      <div class="paste-actions">
+        <button class="paste-btn paste-btn-clipboard" id="paste-clipboard-btn">從剪貼簿貼上</button>
+        <button class="paste-btn paste-btn-primary" id="paste-use-btn">開始練習這篇文章</button>
+      </div>
+      <div class="paste-hint">會自動依標點切成分句；沒有作者預先設計的章測驗，但仍會有節間隨機抽問。</div>
+
+      <input type="file" id="file-upload-input" accept=".epub,.txt,.json" style="display:none;">
+      <button class="paste-btn paste-btn-upload" id="file-upload-btn">上傳 EPUB／TXT／JSON 檔案</button>
+      <div class="paste-hint">EPUB／TXT 會自動切章、不斷詞；若上傳已符合本系統格式的 JSON（見規劃文件 3.2／3.4 節），會直接照原有章節、測驗題目匯入。</div>
+      <div class="paste-hint" id="file-upload-status"></div>
+    </div>
+
+    <button class="back-to-builtin-btn" id="back-to-builtin-btn" style="display:none;">← 回到內建文章</button>
+
+    <button class="overall-btn whole-book-btn" id="read-whole-book-btn" style="display:none;">
+      <span>速讀全書（依序讀完所有章節）</span><span class="arrow">→</span>
+    </button>
+
+    <div class="chapter-list" id="lib-chapter-list"></div>
+    <button class="overall-btn" id="lib-overall-btn">
+      <span>整篇文章總測驗</span><span class="arrow">→</span>
+    </button>
+  </section>
+
+  <!-- ===== Setup ===== -->
+  <section class="screen" id="screen-setup">
+    <div class="back-row" id="setup-back">← 返回章節列表</div>
+    <div class="eyebrow" id="setup-eyebrow"></div>
+    <h1 class="title" id="setup-title"></h1>
+    <div class="subtitle" id="setup-subtitle"></div>
+
+    <div class="setup-fixed-row">
+      <select class="section-select" id="start-section-select"></select>
+      <button class="start-btn" id="start-btn">開始練習</button>
+    </div>
+
+    <div class="setup-section">
+      <div class="wpm-row">
+        <div class="setup-label" style="margin-bottom:0;">閱讀速度</div>
+        <div class="wpm-value" id="wpm-value">280 <sub>WPM</sub></div>
+      </div>
+      <input type="range" id="wpm-slider" min="100" max="600" step="10" value="280">
+    </div>
+
+    <div class="mode-scroll-section">
+      <div class="setup-label">訓練模式</div>
+      <div class="mode-grid" id="mode-grid"></div>
+
+      <div class="setup-section" id="chunk-size-section" style="display:none;">
+        <div class="setup-label">每次顯示詞數</div>
+        <div class="chunk-size-row" id="chunk-size-row"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Reading ===== -->
+  <section class="screen reading-screen" id="screen-reading">
+    <div class="reading-top">
+      <span id="reading-chapter-label"></span>
+      <button id="exit-reading-btn">回首頁</button>
+    </div>
+    <div class="reading-main">
+      <div id="rsvp-display" style="display:none;"></div>
+      <div id="chunk-display" style="display:none;"></div>
+      <div id="clause-pane" style="display:none;"></div>
+      <div id="window-pane" style="display:none;"></div>
+    </div>
+    <div class="reading-bottom">
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="reading-controls">
+        <span id="progress-label">0 / 0</span>
+        <button class="pause-btn" id="pause-btn">暫停</button>
+      </div>
+      <div class="font-size-control" id="font-size-control">
+        <span class="font-size-label">字體大小</span>
+        <button class="font-size-btn" id="font-size-minus">A－</button>
+        <span class="font-size-value" id="font-scale-value">100%</span>
+        <button class="font-size-btn" id="font-size-plus">A＋</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Section Check (讀完一節，暫停問一題) ===== -->
+  <section class="screen" id="screen-section-check">
+    <div class="eyebrow" id="section-check-eyebrow">本節小測驗</div>
+    <h1 class="title" id="section-check-title" style="font-size:22px;"></h1>
+    <div class="subtitle">回答這一題，確認你剛剛讀懂了。</div>
+    <div id="section-check-question"></div>
+    <button class="submit-quiz-btn" id="section-continue-btn" style="display:none;">繼續閱讀</button>
+  </section>
+
+  <!-- ===== Quiz ===== -->
+  <section class="screen" id="screen-quiz">
+    <div class="eyebrow" id="quiz-eyebrow">閱讀理解測驗</div>
+    <h1 class="title" id="quiz-title" style="font-size:22px;"></h1>
+    <div class="subtitle">讀完後立即作答，才能真實反映理解程度。</div>
+    <div id="quiz-questions"></div>
+    <button class="submit-quiz-btn" id="submit-quiz-btn">提交答案</button>
+  </section>
+
+  <!-- ===== Results ===== -->
+  <section class="screen" id="screen-results">
+    <div class="result-score">
+      <div class="big" id="result-score-big">0/0</div>
+      <div class="label">測驗結果</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="v" id="stat-wpm">-</div><div class="l">實際 WPM</div></div>
+      <div class="stat-cell"><div class="v" id="stat-time">-</div><div class="l">閱讀時間</div></div>
+      <div class="stat-cell"><div class="v" id="stat-accuracy">-</div><div class="l">正確率</div></div>
+      <div class="stat-cell"><div class="v" id="stat-mode">-</div><div class="l">訓練模式</div></div>
+    </div>
+    <div class="result-actions">
+      <button class="btn-primary" id="retry-btn">重新練習本章</button>
+      <button class="btn-secondary" id="next-btn" style="display:none;">前往下一章</button>
+      <button class="btn-secondary" id="lib-btn">返回章節列表</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ============ 資料 ============ */
+const DATA = {"articles": [{"id": "art_alice_001", "title": "愛麗絲夢遊仙境", "author": "路易斯．卡洛爾", "language": "zh-Hant", "category": "童話", "difficulty": "簡單", "recommendedWPM": 300, "content": {"chapters": [{"id": "ch1", "title": "第一章：鑽進兔子洞", "order": 1, "estimatedReadingTimeSec": 420, "sections": [{"id": "ch1_sec1", "title": "第一節", "order": 1, "paragraphs": [{"id": "ch1_sec1_p1", "clauses": [{"id": "ch1_sec1_p1_c1", "text": "阿麗思陪著她姊姊閒坐在河邊上沒有事做", "punctuation": "，", "tokens": ["阿麗思", "陪著", "她", "姊姊", "閒坐", "在", "河邊", "上", "沒有", "事做"]}, {"id": "ch1_sec1_p1_c2", "text": "坐得好不耐煩", "punctuation": "。", "tokens": ["坐得", "好不", "耐煩"]}, {"id": "ch1_sec1_p1_c3", "text": "她有時候偷偷地瞧她姊姊看的是什麼書", "punctuation": "，", "tokens": ["她", "有時候", "偷偷地", "瞧", "她", "姊姊", "看", "的", "是", "什麼", "書"]}, {"id": "ch1_sec1_p1_c4", "text": "可是書裏又沒有畫儿", "punctuation": "，", "tokens": ["可是", "書裏", "又", "沒有", "畫儿"]}, {"id": "ch1_sec1_p1_c5", "text": "又沒有說話", "punctuation": "，", "tokens": ["又", "沒有", "說話"]}, {"id": "ch1_sec1_p1_c6", "text": "她就想道", "punctuation": "：", "tokens": ["她", "就", "想道"]}, {"id": "ch1_sec1_p1_c7", "text": "一本書裏又沒有畫儿", "punctuation": "，", "tokens": ["一本", "書裏", "又", "沒有", "畫儿"]}, {"id": "ch1_sec1_p1_c8", "text": "又沒有說話", "punctuation": "，", "tokens": ["又", "沒有", "說話"]}, {"id": "ch1_sec1_p1_c9", "text": "那樣書要它幹什麼呢", "punctuation": "？", "tokens": ["那樣", "書", "要", "它", "幹什麼", "呢"]}]}, {"id": "ch1_sec1_p2", "clauses": [{"id": "ch1_sec1_p2_c1", "text": "所以她就無精打彩地自己在心裏盤算", "punctuation": "──", "tokens": ["所以", "她", "就", "無精打彩", "地", "自己", "在", "心裏", "盤算"]}, {"id": "ch1_sec1_p2_c2", "text": "她亦不過勉強地醒著", "punctuation": "，", "tokens": ["她", "亦", "不過", "勉強地", "醒著"]}, {"id": "ch1_sec1_p2_c3", "text": "因為這熱天熱得她昏昏地要睡", "punctuation": "──", "tokens": ["因為", "這", "熱天", "熱得", "她", "昏昏地", "要睡"]}, {"id": "ch1_sec1_p2_c4", "text": "到底還是做一枝野菊花圈儿好呢", "punctuation": "？", "tokens": ["到底", "還是", "做", "一枝", "野菊花", "圈儿", "好", "呢"]}, {"id": "ch1_sec1_p2_c5", "text": "還是為著這種頑意儿不值得站起來去找花的麻煩呢", "punctuation": "？", "tokens": ["還是", "為著", "這種", "頑意儿", "不值得", "站起來", "去", "找花", "的", "麻煩", "呢"]}, {"id": "ch1_sec1_p2_c6", "text": "她正在納悶的時候", "punctuation": "，", "tokens": ["她", "正在", "納悶", "的", "時候"]}, {"id": "ch1_sec1_p2_c7", "text": "忽然來了一隻淡紅眼睛的白兔子", "punctuation": "，", "tokens": ["忽然", "來了", "一隻", "淡紅", "眼睛", "的", "白兔子"]}, {"id": "ch1_sec1_p2_c8", "text": "在她旁邊跑過", "punctuation": "。", "tokens": ["在", "她", "旁邊", "跑過"]}]}, {"id": "ch1_sec1_p3", "clauses": [{"id": "ch1_sec1_p3_c1", "text": "就是看見一隻淡紅眼睛的白兔子", "punctuation": "，", "tokens": ["就是", "看見", "一隻", "淡紅", "眼睛", "的", "白兔子"]}, {"id": "ch1_sec1_p3_c2", "text": "本來亦不是件怎麼大了不得的事情", "punctuation": "，", "tokens": ["本來", "亦", "不是", "件", "怎麼", "大了不得", "的", "事情"]}, {"id": "ch1_sec1_p3_c3", "text": "並且就是阿麗思聽見那兔子自言自語地說", "punctuation": "，", "tokens": ["並且", "就是", "阿麗思", "聽見", "那", "兔子", "自言自語", "地", "說"]}, {"id": "ch1_sec1_p3_c4", "text": "噯呀", "punctuation": "，", "tokens": ["噯呀"]}, {"id": "ch1_sec1_p3_c5", "text": "啊噫呀", "punctuation": "！", "tokens": ["啊噫呀"]}, {"id": "ch1_sec1_p3_c6", "text": "我一定要去晚了", "punctuation": "！", "tokens": ["我", "一定", "要", "去晚了"]}, {"id": "ch1_sec1_p3_c7", "text": "她亦不覺得這算什麼十二分出奇的事情", "punctuation": "──", "tokens": ["她", "亦", "不覺得", "這", "算", "什麼", "十二分", "出奇", "的", "事情"]}, {"id": "ch1_sec1_p3_c8", "text": "事後想起來她才覺得這是應當詫異的事", "punctuation": "，", "tokens": ["事後", "想起來", "她", "才", "覺得", "這", "是", "應當", "詫異", "的", "事"]}, {"id": "ch1_sec1_p3_c9", "text": "不過當時她覺得樣樣事情都像很平常似的", "punctuation": "──", "tokens": ["不過", "當時", "她", "覺得", "樣樣", "事情", "都", "像", "很", "平常", "似的"]}, {"id": "ch1_sec1_p3_c10", "text": "但是等到那兔子當真在牠背心袋裏掐出一隻錶來", "punctuation": "，", "tokens": ["但是", "等到", "那", "兔子", "當真", "在", "牠", "背心", "袋裏", "掐出", "一隻", "錶來"]}, {"id": "ch1_sec1_p3_c11", "text": "看了一看時間", "punctuation": "，", "tokens": ["看了", "一看", "時間"]}, {"id": "ch1_sec1_p3_c12", "text": "連忙又往前走", "punctuation": "，", "tokens": ["連忙", "又", "往前走"]}, {"id": "ch1_sec1_p3_c13", "text": "阿麗思想道", "punctuation": "：", "tokens": ["阿麗思", "想道"]}, {"id": "ch1_sec1_p3_c14", "text": "那不行", "punctuation": "！", "tokens": ["那", "不行"]}, {"id": "ch1_sec1_p3_c15", "text": "登時就站了起來", "punctuation": "，", "tokens": ["登時", "就", "站了", "起來"]}, {"id": "ch1_sec1_p3_c16", "text": "因為阿麗思心裏忽然記得她從來沒有見過兔子有背心袋的", "punctuation": "，", "tokens": ["因為", "阿麗思", "心裏", "忽然", "記得", "她", "從來", "沒有", "見過", "兔子", "有", "背心袋", "的"]}, {"id": "ch1_sec1_p3_c17", "text": "並且有隻錶可以從袋裏掐出來的", "punctuation": "。", "tokens": ["並且", "有隻", "錶", "可以", "從", "袋裏", "掐", "出來", "的"]}, {"id": "ch1_sec1_p3_c18", "text": "她忍不住好奇的心了", "punctuation": "，", "tokens": ["她", "忍不住", "好奇", "的", "心", "了"]}, {"id": "ch1_sec1_p3_c19", "text": "就緊追著那兔子", "punctuation": "，", "tokens": ["就", "緊追", "著", "那", "兔子"]}, {"id": "ch1_sec1_p3_c20", "text": "快快地跑過一片田場", "punctuation": "，", "tokens": ["快快地", "跑過", "一片", "田場"]}, {"id": "ch1_sec1_p3_c21", "text": "剛剛趕得上看見牠從一個籬笆底下的一個大洞裏鑽進去", "punctuation": "。", "tokens": ["剛剛", "趕得上", "看見", "牠", "從", "一個", "籬笆", "底下", "的", "一個", "大洞裏", "鑽進去"]}]}]}, {"id": "ch1_sec2", "title": "第二節", "order": 2, "paragraphs": [{"id": "ch1_sec2_p1", "clauses": [{"id": "ch1_sec2_p1_c1", "text": "不管四七二十八", "punctuation": "，", "tokens": ["不管", "四七", "二十八"]}, {"id": "ch1_sec2_p1_c2", "text": "阿麗思立刻就跟進洞去", "punctuation": "，", "tokens": ["阿麗思", "立刻", "就", "跟進", "洞去"]}, {"id": "ch1_sec2_p1_c3", "text": "再亦不想想這輩子怎麼能再出來", "punctuation": "。", "tokens": ["再", "亦", "不想想", "這輩子", "怎麼", "能", "再", "出來"]}, {"id": "ch1_sec2_p1_c4", "text": "那個兔子洞先一段是一直往前的", "punctuation": "，", "tokens": ["那個", "兔子洞", "先一段", "是", "一直", "往前", "的"]}, {"id": "ch1_sec2_p1_c5", "text": "到了一個地方", "punctuation": "，", "tokens": ["到了", "一個", "地方"]}, {"id": "ch1_sec2_p1_c6", "text": "忽然直住下拐", "punctuation": "，", "tokens": ["忽然", "直", "住下", "拐"]}, {"id": "ch1_sec2_p1_c7", "text": "下去的那麼快", "punctuation": "，", "tokens": ["下去", "的", "那麼", "快"]}, {"id": "ch1_sec2_p1_c8", "text": "阿麗思跑的又那麼急", "punctuation": "，", "tokens": ["阿麗思", "跑", "的", "又", "那麼", "急"]}, {"id": "ch1_sec2_p1_c9", "text": "連想停都沒來得及想亦就順著洞往一個好像很深的深井裏掉了下去", "punctuation": "。", "tokens": ["連", "想停", "都", "沒", "來得及", "想", "亦", "就", "順著", "洞", "往", "一個", "好像", "很深的", "深井裏", "掉了", "下去"]}]}, {"id": "ch1_sec2_p2", "clauses": [{"id": "ch1_sec2_p2_c1", "text": "那口井要不是非常地深", "punctuation": "，", "tokens": ["那口井", "要是", "不", "非常地", "深"]}, {"id": "ch1_sec2_p2_c2", "text": "那就定是她掉得很慢", "punctuation": "，", "tokens": ["那", "就", "定", "是", "她", "掉得", "很慢"]}, {"id": "ch1_sec2_p2_c3", "text": "何以呢", "punctuation": "？", "tokens": ["何以", "呢"]}, {"id": "ch1_sec2_p2_c4", "text": "因為她掉了半天還掉不完", "punctuation": "，", "tokens": ["因為", "她", "掉了", "半天", "還", "掉不完"]}, {"id": "ch1_sec2_p2_c5", "text": "倒有工夫四面望望", "punctuation": "；", "tokens": ["倒", "有", "工夫", "四面", "望望"]}, {"id": "ch1_sec2_p2_c6", "text": "還有空自己問問", "punctuation": "：", "tokens": ["還有", "空", "自己", "問問"]}, {"id": "ch1_sec2_p2_c7", "text": "等一會儿又有什麼來了", "punctuation": "，", "tokens": ["等", "一會儿", "又", "有", "什麼", "來了"]}, {"id": "ch1_sec2_p2_c8", "text": "等一會儿要碰見什麼了", "punctuation": "。", "tokens": ["等", "一會儿", "要", "碰見", "什麼", "了"]}, {"id": "ch1_sec2_p2_c9", "text": "她先還往下瞧瞧", "punctuation": "，", "tokens": ["她", "先", "還", "往下", "瞧瞧"]}, {"id": "ch1_sec2_p2_c10", "text": "要看看到底會掉在什麼上頭", "punctuation": "，", "tokens": ["要", "看看", "到底", "會", "掉", "在", "什麼", "上頭"]}, {"id": "ch1_sec2_p2_c11", "text": "可是底下漆黑的", "punctuation": "，", "tokens": ["可是", "底下", "漆黑的"]}, {"id": "ch1_sec2_p2_c12", "text": "什麼都看不見", "punctuation": "；", "tokens": ["什麼", "都", "看不見"]}, {"id": "ch1_sec2_p2_c13", "text": "於是乎她就回頭瞧瞧井壁的四周", "punctuation": "，", "tokens": ["於是乎", "她", "就", "回頭", "瞧瞧", "井壁", "的", "四周"]}, {"id": "ch1_sec2_p2_c14", "text": "看見都是些櫃子和書架子", "punctuation": "：", "tokens": ["看見", "都是", "些", "櫃子", "和", "書架子"]}, {"id": "ch1_sec2_p2_c15", "text": "有時候又看見這裏那裏有些地圖和畫掛在釘子上", "punctuation": "。", "tokens": ["有時候", "又", "看見", "這裏", "那裏", "有些", "地圖", "和", "畫", "掛", "在", "釘子", "上"]}, {"id": "ch1_sec2_p2_c16", "text": "她經過一個架子的時候就伸手把一個小瓶子拿了出來", "punctuation": "；", "tokens": ["她", "經過", "一個", "架子", "的", "時候", "就", "伸手", "把", "一個", "小瓶子", "拿了", "出來"]}, {"id": "ch1_sec2_p2_c17", "text": "瓶上寫的是橙子瑪瑪醬", "punctuation": "，", "tokens": ["瓶上", "寫", "的", "是", "橙子", "瑪瑪醬"]}, {"id": "ch1_sec2_p2_c18", "text": "可是裏頭都空了", "punctuation": "，", "tokens": ["可是", "裏頭", "都", "空了"]}, {"id": "ch1_sec2_p2_c19", "text": "好個失望", "punctuation": "：", "tokens": ["好個", "失望"]}, {"id": "ch1_sec2_p2_c20", "text": "她不肯把瓶扔掉", "punctuation": "，", "tokens": ["她", "不肯", "把", "瓶", "扔掉"]}, {"id": "ch1_sec2_p2_c21", "text": "因為怕掉到底下去砸死了人", "punctuation": "，", "tokens": ["因為", "怕", "掉到", "底下", "去", "砸死", "了", "人"]}, {"id": "ch1_sec2_p2_c22", "text": "所以想法子等再經過底下一個櫃口", "punctuation": "，", "tokens": ["所以", "想法子", "等", "再", "經過", "底下", "一個", "櫃口"]}, {"id": "ch1_sec2_p2_c23", "text": "巧巧的把它又放了進去", "punctuation": "。", "tokens": ["巧巧的", "把", "它", "又", "放了", "進去"]}]}, {"id": "ch1_sec2_p3", "clauses": [{"id": "ch1_sec2_p3_c1", "text": "呵", "punctuation": "！", "tokens": ["呵"]}, {"id": "ch1_sec2_p3_c2", "text": "阿麗思自己想道", "punctuation": "：", "tokens": ["阿麗思", "自己", "想道"]}, {"id": "ch1_sec2_p3_c3", "text": "我摔過了這麼一大回跤", "punctuation": "。", "tokens": ["我", "摔過了", "這麼", "一大回", "跤"]}, {"id": "ch1_sec2_p3_c4", "text": "那再從梯子上滾下去可算不得什麼事啦", "punctuation": "！", "tokens": ["那", "再", "從", "梯子", "上", "滾下去", "可", "算不得", "什麼事", "啦"]}, {"id": "ch1_sec2_p3_c5", "text": "家裏他們一定看我膽子真好大啦", "punctuation": "！", "tokens": ["家裏", "他們", "一定", "看", "我", "膽子", "真好大", "啦"]}, {"id": "ch1_sec2_p3_c6", "text": "哼", "punctuation": "，", "tokens": ["哼"]}, {"id": "ch1_sec2_p3_c7", "text": "哪怕我從房頂上掉下來", "punctuation": "，", "tokens": ["哪怕", "我", "從", "房頂", "上", "掉下來"]}, {"id": "ch1_sec2_p3_c8", "text": "我亦會一句都不提的", "punctuation": "！", "tokens": ["我", "亦", "會", "一句", "都", "不提", "的"]}, {"id": "ch1_sec2_p3_c9", "text": "這倒怕猜得不錯", "punctuation": "，", "tokens": ["這", "倒怕", "猜得", "不錯"]}, {"id": "ch1_sec2_p3_c10", "text": "那樣摔下來", "punctuation": "，", "tokens": ["那樣", "摔下來"]}, {"id": "ch1_sec2_p3_c11", "text": "自然不做聲了", "punctuation": "！", "tokens": ["自然", "不", "做聲", "了"]}]}, {"id": "ch1_sec2_p4", "clauses": [{"id": "ch1_sec2_p4_c1", "text": "掉啊", "punctuation": "！", "tokens": ["掉啊"]}, {"id": "ch1_sec2_p4_c2", "text": "掉啊", "punctuation": "！", "tokens": ["掉啊"]}, {"id": "ch1_sec2_p4_c3", "text": "掉啊", "punctuation": "！", "tokens": ["掉啊"]}, {"id": "ch1_sec2_p4_c4", "text": "這一跤怎麼一輩子摔不完了呢", "punctuation": "？", "tokens": ["這", "一跤", "怎麼", "一輩子", "摔不完", "了", "呢"]}, {"id": "ch1_sec2_p4_c5", "text": "她出聲道", "punctuation": "：", "tokens": ["她", "出聲", "道"]}, {"id": "ch1_sec2_p4_c6", "text": "我不曉得現在掉了幾哩路勒勒", "punctuation": "，", "tokens": ["我", "不曉得", "現在", "掉了", "幾哩路", "勒勒"]}, {"id": "ch1_sec2_p4_c7", "text": "我一定快近地心勒", "punctuation": "。", "tokens": ["我", "一定", "快近", "地心", "勒"]}, {"id": "ch1_sec2_p4_c8", "text": "讓我看", "punctuation": "：", "tokens": ["讓", "我", "看"]}, {"id": "ch1_sec2_p4_c9", "text": "那是有四千哩深呢", "punctuation": "，", "tokens": ["那", "是", "有", "四千哩", "深", "呢"]}, {"id": "ch1_sec2_p4_c10", "text": "我想有呢", "punctuation": "！", "tokens": ["我", "想", "有", "呢"]}, {"id": "ch1_sec2_p4_c11", "text": "你想這些事情是阿麗思從學堂裏學著背的", "punctuation": "，", "tokens": ["你", "想", "這些", "事情", "是", "阿麗思", "從", "學堂裏", "學著", "背", "的"]}, {"id": "ch1_sec2_p4_c12", "text": "現在可惜沒有人在旁邊聽著誇她", "punctuation": "，", "tokens": ["現在", "可惜", "沒有", "人", "在", "旁邊", "聽著", "誇", "她"]}, {"id": "ch1_sec2_p4_c13", "text": "都白說掉了", "punctuation": "，", "tokens": ["都", "白說", "掉", "了"]}, {"id": "ch1_sec2_p4_c14", "text": "可是練練說說亦好", "punctuation": "──", "tokens": ["可是", "練練", "說說", "亦", "好"]}, {"id": "ch1_sec2_p4_c15", "text": "是啊", "punctuation": "，", "tokens": ["是啊"]}, {"id": "ch1_sec2_p4_c16", "text": "是差不多這麼遠", "punctuation": "──", "tokens": ["是", "差不多", "這麼", "遠"]}, {"id": "ch1_sec2_p4_c17", "text": "但是我的緯度是多少勒", "punctuation": "?", "tokens": ["但是", "我的", "緯度", "是", "多少", "勒"]}, {"id": "ch1_sec2_p4_c18", "text": "我的經度到了哪儿勒", "punctuation": "?", "tokens": ["我的", "經度", "到了", "哪儿", "勒"]}, {"id": "ch1_sec2_p4_c19", "text": "其實阿麗思一點亦不懂得緯度是什麼件東西", "punctuation": "，", "tokens": ["其實", "阿麗思", "一點", "亦", "不懂得", "緯度", "是", "什麼件", "東西"]}, {"id": "ch1_sec2_p4_c20", "text": "經度是怎麼回事", "punctuation": "，", "tokens": ["經度", "是", "怎麼", "回事"]}, {"id": "ch1_sec2_p4_c21", "text": "但是她想那兩個名詞說在嘴裏一定很好聽的", "punctuation": "。", "tokens": ["但是", "她", "想", "那", "兩個", "名詞", "說", "在", "嘴裏", "一定", "很", "好聽", "的"]}]}, {"id": "ch1_sec2_p5", "clauses": [{"id": "ch1_sec2_p5_c1", "text": "一會儿她又說話了", "punctuation": "。", "tokens": ["一會儿", "她", "又", "說話", "了"]}, {"id": "ch1_sec2_p5_c2", "text": "她道", "punctuation": "：", "tokens": ["她", "道"]}, {"id": "ch1_sec2_p5_c3", "text": "我倒不知道會不會一直掉穿了地球勒", "punctuation": "，", "tokens": ["我", "倒", "不知道", "會不會", "一直", "掉穿", "了", "地球", "勒"]}, {"id": "ch1_sec2_p5_c4", "text": "那怎麼呢", "punctuation": "？", "tokens": ["那", "怎麼", "呢"]}, {"id": "ch1_sec2_p5_c5", "text": "掉到那邊", "punctuation": "，", "tokens": ["掉到", "那邊"]}, {"id": "ch1_sec2_p5_c6", "text": "遇見了許多倒著站的人", "punctuation": "，", "tokens": ["遇見", "了", "許多", "倒著站", "的", "人"]}, {"id": "ch1_sec2_p5_c7", "text": "一定很好頑儿", "punctuation": "！", "tokens": ["一定", "很", "好頑儿"]}, {"id": "ch1_sec2_p5_c8", "text": "叫倒豬世界", "punctuation": "，", "tokens": ["叫", "倒豬", "世界"]}, {"id": "ch1_sec2_p5_c9", "text": "不是嗎", "punctuation": "？", "tokens": ["不是", "嗎"]}, {"id": "ch1_sec2_p5_c10", "text": "她這回倒覺得幸虧沒有人聽著", "punctuation": "，", "tokens": ["她", "這回", "倒", "覺得", "幸虧", "沒有", "人", "聽著"]}, {"id": "ch1_sec2_p5_c11", "text": "因為她想不起來書裏那個倒足世界的名字", "punctuation": "，", "tokens": ["因為", "她", "想不起來", "書裏", "那個", "倒足", "世界", "的", "名字"]}, {"id": "ch1_sec2_p5_c12", "text": "又覺倒豬世界又不大像", "punctuation": "──", "tokens": ["又", "覺", "倒豬", "世界", "又", "不大像"]}, {"id": "ch1_sec2_p5_c13", "text": "但是你想我不是得要問他們貴國的名字叫什麼嗎", "punctuation": "？", "tokens": ["但是", "你", "想", "我", "不是", "得要", "問", "他們", "貴國", "的", "名字", "叫", "什麼", "嗎"]}, {"id": "ch1_sec2_p5_c14", "text": "潑里寺、麻達姆", "punctuation": "?", "tokens": ["潑里寺", "麻達姆"]}, {"id": "ch1_sec2_p5_c15", "text": "這是紐西蘭啊", "punctuation": "，", "tokens": ["這", "是", "紐西蘭", "啊"]}, {"id": "ch1_sec2_p5_c16", "text": "還是澳大利亞啊", "punctuation": "？", "tokens": ["還是", "澳大利亞", "啊"]}, {"id": "ch1_sec2_p5_c17", "text": "說著就一頭向空中請安", "punctuation": "──", "tokens": ["說著", "就", "一頭", "向", "空中", "請安"]}, {"id": "ch1_sec2_p5_c18", "text": "你想想看", "punctuation": "，", "tokens": ["你", "想想", "看"]}, {"id": "ch1_sec2_p5_c19", "text": "在半空中一頭住下掉", "punctuation": "，", "tokens": ["在", "半空中", "一頭", "住下掉"]}, {"id": "ch1_sec2_p5_c20", "text": "一頭又要請安", "punctuation": "，", "tokens": ["一頭", "又", "要", "請安"]}, {"id": "ch1_sec2_p5_c21", "text": "你能辦得到嗎", "punctuation": "？", "tokens": ["你", "能", "辦得到", "嗎"]}, {"id": "ch1_sec2_p5_c22", "text": "可是要這樣問", "punctuation": "，", "tokens": ["可是", "要", "這樣", "問"]}, {"id": "ch1_sec2_p5_c23", "text": "他們一定把我當個傻孩子", "punctuation": "，", "tokens": ["他們", "一定", "把", "我", "當個", "傻孩子"]}, {"id": "ch1_sec2_p5_c24", "text": "連自己在什麼國裏都會不知道", "punctuation": "。", "tokens": ["連", "自己", "在", "什麼", "國裏", "都會", "不知道"]}, {"id": "ch1_sec2_p5_c25", "text": "不行", "punctuation": "，", "tokens": ["不行"]}, {"id": "ch1_sec2_p5_c26", "text": "這個一定不好意思問人的", "punctuation": "；", "tokens": ["這個", "一定", "不好意思", "問人", "的"]}, {"id": "ch1_sec2_p5_c27", "text": "或者我會看見在哪儿牆上或是柱上寫著", "punctuation": "：", "tokens": ["或者", "我", "會", "看見", "在", "哪儿", "牆上", "或是", "柱上", "寫著"]}, {"id": "ch1_sec2_p5_c28", "text": "這是紐西蘭", "punctuation": "，", "tokens": ["這是", "紐西蘭"]}, {"id": "ch1_sec2_p5_c29", "text": "或者這是澳大利亞", "punctuation": "。", "tokens": ["或者", "這是", "澳大利亞"]}]}, {"id": "ch1_sec2_p6", "clauses": [{"id": "ch1_sec2_p6_c1", "text": "掉下去呀", "punctuation": "！", "tokens": ["掉下去", "呀"]}, {"id": "ch1_sec2_p6_c2", "text": "掉下去呀", "punctuation": "！", "tokens": ["掉下去", "呀"]}, {"id": "ch1_sec2_p6_c3", "text": "掉下去呀", "punctuation": "！", "tokens": ["掉下去", "呀"]}, {"id": "ch1_sec2_p6_c4", "text": "阿麗思又沒有別的事做", "punctuation": "，", "tokens": ["阿麗思", "又", "沒有", "別的", "事做"]}, {"id": "ch1_sec2_p6_c5", "text": "所以又自己咕咕叨叨地說話頑", "punctuation": "。", "tokens": ["所以", "又", "自己", "咕咕叨叨", "地", "說話", "頑"]}, {"id": "ch1_sec2_p6_c6", "text": "啊呀", "punctuation": "，", "tokens": ["啊呀"]}, {"id": "ch1_sec2_p6_c7", "text": "我猜今儿晚上我的黛那一定要想我勒", "punctuation": "！", "tokens": ["我猜", "今儿晚上", "我的", "黛那", "一定", "要", "想", "我", "勒"]}, {"id": "ch1_sec2_p6_c8", "text": "黛那是她的貓", "punctuation": "。", "tokens": ["黛那", "是", "她的", "貓"]}, {"id": "ch1_sec2_p6_c9", "text": "我盼望他們開晚茶tea-time〔下午茶〕的時候", "punctuation": "，", "tokens": ["我", "盼望", "他們", "開", "晚茶", "tea-time", "的", "時候"]}, {"id": "ch1_sec2_p6_c10", "text": "會記得黛那的牛奶", "punctuation": "。", "tokens": ["會", "記得", "黛那", "的", "牛奶"]}, {"id": "ch1_sec2_p6_c11", "text": "我的乖黛那呀", "punctuation": "，", "tokens": ["我的", "乖黛那", "呀"]}, {"id": "ch1_sec2_p6_c12", "text": "我真想現在你跟我在一塊儿呀", "punctuation": "。", "tokens": ["我", "真", "想", "現在", "你", "跟", "我", "在", "一塊儿", "呀"]}, {"id": "ch1_sec2_p6_c13", "text": "可是我怕半空中沒有耗子", "punctuation": "，", "tokens": ["可是", "我", "怕", "半空中", "沒有", "耗子"]}, {"id": "ch1_sec2_p6_c14", "text": "那末捉個蝙蝠子亦好的", "punctuation": "，", "tokens": ["那末", "捉個", "蝙蝠子", "亦", "好", "的"]}, {"id": "ch1_sec2_p6_c15", "text": "蝙蝠子同耗子亦差不多的", "punctuation": "，", "tokens": ["蝙蝠子", "同", "耗子", "亦", "差不多", "的"]}, {"id": "ch1_sec2_p6_c16", "text": "黛那", "punctuation": "，", "tokens": ["黛那"]}, {"id": "ch1_sec2_p6_c17", "text": "你想可不是嗎", "punctuation": "？", "tokens": ["你", "想", "可不是", "嗎"]}, {"id": "ch1_sec2_p6_c18", "text": "但是我倒不曉得", "punctuation": "？", "tokens": ["但是", "我", "倒", "不曉得"]}, {"id": "ch1_sec2_p6_c19", "text": "貓吃蝙蝠子不吃的", "punctuation": "？", "tokens": ["貓", "吃", "蝙蝠子", "不", "吃", "的"]}]}, {"id": "ch1_sec2_p7", "clauses": [{"id": "ch1_sec2_p7_c1", "text": "阿麗思覺得有點睡得慌了", "punctuation": "，", "tokens": ["阿麗思", "覺得", "有點", "睡得", "慌了"]}, {"id": "ch1_sec2_p7_c2", "text": "就自言自語地半醒半夢地咕叨", "punctuation": "：", "tokens": ["就", "自言自語", "地", "半醒半夢", "地", "咕叨"]}, {"id": "ch1_sec2_p7_c3", "text": "貓子吃蝙蝠子嗎", "punctuation": "？", "tokens": ["貓子", "吃", "蝙蝠子", "嗎"]}, {"id": "ch1_sec2_p7_c4", "text": "貓子吃蝙蝠子嗎", "punctuation": "？", "tokens": ["貓子", "吃", "蝙蝠子", "嗎"]}, {"id": "ch1_sec2_p7_c5", "text": "有時候說說說亂了", "punctuation": "，", "tokens": ["有時候", "說說", "說亂", "了"]}, {"id": "ch1_sec2_p7_c6", "text": "變成", "punctuation": "：", "tokens": ["變成"]}, {"id": "ch1_sec2_p7_c7", "text": "蝙子吃貓蝠子嗎", "punctuation": "？", "tokens": ["蝙子", "吃", "貓蝠子", "嗎"]}, {"id": "ch1_sec2_p7_c8", "text": "吃子蝙貓蝠子嗎", "punctuation": "？", "tokens": ["吃子", "蝙貓蝠子", "嗎"]}, {"id": "ch1_sec2_p7_c9", "text": "你想她橫豎答不出來這話", "punctuation": "，", "tokens": ["你", "想", "她", "橫豎", "答不出來", "這話"]}, {"id": "ch1_sec2_p7_c10", "text": "所以順著問", "punctuation": "，", "tokens": ["所以", "順著", "問"]}, {"id": "ch1_sec2_p7_c11", "text": "倒著問亦還不是一樣", "punctuation": "。", "tokens": ["倒著", "問", "亦", "還", "不是", "一樣"]}, {"id": "ch1_sec2_p7_c12", "text": "她覺得好像睡著了", "punctuation": "。", "tokens": ["她", "覺得", "好像", "睡著", "了"]}, {"id": "ch1_sec2_p7_c13", "text": "才夢見和黛那手挽手地同行", "punctuation": "，", "tokens": ["才", "夢見", "和", "黛那", "手挽手", "地", "同行"]}, {"id": "ch1_sec2_p7_c14", "text": "正在那裏很懇切地問牠", "punctuation": "：", "tokens": ["正在", "那裏", "很", "懇切", "地", "問", "牠"]}, {"id": "ch1_sec2_p7_c15", "text": "你來", "punctuation": "，", "tokens": ["你", "來"]}, {"id": "ch1_sec2_p7_c16", "text": "黛那", "punctuation": "，", "tokens": ["黛那"]}, {"id": "ch1_sec2_p7_c17", "text": "告愬我老實話", "punctuation": "：", "tokens": ["告愬", "我", "老實話"]}, {"id": "ch1_sec2_p7_c18", "text": "你到底曾經吃過蝙蝠子沒有", "punctuation": "？", "tokens": ["你", "到底", "曾經", "吃過", "蝙蝠子", "沒有"]}, {"id": "ch1_sec2_p7_c19", "text": "正說著那時間忽然地噴吞〔撲通〕", "punctuation": "！", "tokens": ["正說著", "那時間", "忽然地", "噴吞"]}, {"id": "ch1_sec2_p7_c20", "text": "噴吞〔撲通〕", "punctuation": "！", "tokens": ["噴吞"]}, {"id": "ch1_sec2_p7_c21", "text": "她身子一掉", "punctuation": "，", "tokens": ["她", "身子", "一掉"]}, {"id": "ch1_sec2_p7_c22", "text": "掉在一大堆樹枝子和乾葉子上", "punctuation": "，", "tokens": ["掉", "在", "一大堆", "樹枝子", "和", "乾葉子", "上"]}, {"id": "ch1_sec2_p7_c23", "text": "這一跤就此跌完了", "punctuation": "。", "tokens": ["這", "一跤", "就此", "跌完", "了"]}]}]}, {"id": "ch1_sec3", "title": "第三節", "order": 3, "paragraphs": [{"id": "ch1_sec3_p1", "clauses": [{"id": "ch1_sec3_p1_c1", "text": "阿麗思一點都沒有跌痛", "punctuation": "，", "tokens": ["阿麗思", "一點", "都", "沒有", "跌痛"]}, {"id": "ch1_sec3_p1_c2", "text": "馬上一跳就站了起來", "punctuation": "：", "tokens": ["馬上", "一跳", "就", "站了", "起來"]}, {"id": "ch1_sec3_p1_c3", "text": "她回頭往山（上）頭瞧瞧", "punctuation": "，", "tokens": ["她", "回頭", "往", "山頭", "瞧瞧"]}, {"id": "ch1_sec3_p1_c4", "text": "都是漆黑的", "punctuation": "；", "tokens": ["都是", "漆黑的"]}, {"id": "ch1_sec3_p1_c5", "text": "她前面又是一條長夾道", "punctuation": "，", "tokens": ["她", "前面", "又", "是", "一條", "長夾道"]}, {"id": "ch1_sec3_p1_c6", "text": "還看見前頭那個白兔子順著那條道快快地走", "punctuation": "。", "tokens": ["還", "看見", "前頭", "那個", "白兔子", "順著", "那條", "道", "快快地", "走"]}, {"id": "ch1_sec3_p1_c7", "text": "那是一刻亦不能緩", "punctuation": "；", "tokens": ["那", "是", "一刻", "亦", "不能", "緩"]}, {"id": "ch1_sec3_p1_c8", "text": "嗖地像一陣風似的阿麗思亦跟著跑去了", "punctuation": "，", "tokens": ["嗖地", "像", "一陣風", "似的", "阿麗思", "亦", "跟著", "跑去", "了"]}, {"id": "ch1_sec3_p1_c9", "text": "恰恰來得及聽得那兔子在轉角上說", "punctuation": "：", "tokens": ["恰恰", "來得及", "聽得", "那", "兔子", "在", "轉角", "上", "說"]}, {"id": "ch1_sec3_p1_c10", "text": "乖乖", "punctuation": "！", "tokens": ["乖乖"]}, {"id": "ch1_sec3_p1_c11", "text": "真該（提手＋朵ˇㄉㄨㄛ）我的耳朵鬍子", "punctuation": "，", "tokens": ["真", "該", "我的", "耳朵", "鬍子"]}, {"id": "ch1_sec3_p1_c12", "text": "這多晚呀", "punctuation": "！", "tokens": ["這", "多晚", "呀"]}, {"id": "ch1_sec3_p1_c13", "text": "那免子轉彎的時候", "punctuation": "，", "tokens": ["那", "免子", "轉彎", "的", "時候"]}, {"id": "ch1_sec3_p1_c14", "text": "她追上得已經很近", "punctuation": "，", "tokens": ["她", "追上", "得", "已經", "很近"]}, {"id": "ch1_sec3_p1_c15", "text": "但是她自己一到了那個角上", "punctuation": "，", "tokens": ["但是", "她", "自己", "一到", "了", "那個", "角上"]}, {"id": "ch1_sec3_p1_c16", "text": "那兔子可就不見了", "punctuation": "：", "tokens": ["那", "兔子", "可", "就", "不見", "了"]}, {"id": "ch1_sec3_p1_c17", "text": "她覺得走進了一間長而低的廳房", "punctuation": "，", "tokens": ["她", "覺得", "走進", "了", "一間", "長", "而", "低", "的", "廳房"]}, {"id": "ch1_sec3_p1_c18", "text": "頂上掛著一長排的燈盞", "punctuation": "。", "tokens": ["頂上", "掛著", "一長排", "的", "燈盞"]}, {"id": "ch1_sec3_p1_c19", "text": "廳的兩面都有門", "punctuation": "，", "tokens": ["廳", "的", "兩面", "都", "有", "門"]}, {"id": "ch1_sec3_p1_c20", "text": "但是門都是鎖的", "punctuation": "；", "tokens": ["但是", "門", "都是", "鎖", "的"]}, {"id": "ch1_sec3_p1_c21", "text": "阿麗思沿著一邊走下去", "punctuation": "，", "tokens": ["阿麗思", "沿著", "一邊", "走下去"]}, {"id": "ch1_sec3_p1_c22", "text": "再沿著那邊走回來", "punctuation": "，", "tokens": ["再", "沿著", "那邊", "走回來"]}, {"id": "ch1_sec3_p1_c23", "text": "一個一個門都試過來", "punctuation": "，", "tokens": ["一個", "一個", "門", "都", "試過來"]}, {"id": "ch1_sec3_p1_c24", "text": "一個亦開不開", "punctuation": "，", "tokens": ["一個", "亦", "開不開"]}, {"id": "ch1_sec3_p1_c25", "text": "她就愁著臉走回到當中", "punctuation": "，", "tokens": ["她", "就", "愁著臉", "走回", "到", "當中"]}, {"id": "ch1_sec3_p1_c26", "text": "不曉得怎麼再能有出去的日子", "punctuation": "。", "tokens": ["不曉得", "怎麼", "再", "能", "有", "出去", "的", "日子"]}]}, {"id": "ch1_sec3_p2", "clauses": [{"id": "ch1_sec3_p2_c1", "text": "忽然間她發現一個三腳的桌子", "punctuation": "，", "tokens": ["忽然間", "她", "發現", "一個", "三腳", "的", "桌子"]}, {"id": "ch1_sec3_p2_c2", "text": "全是玻璃磚做的", "punctuation": "；", "tokens": ["全是", "玻璃磚", "做", "的"]}, {"id": "ch1_sec3_p2_c3", "text": "桌上沒有別的東西", "punctuation": "，", "tokens": ["桌上", "沒有", "別的", "東西"]}, {"id": "ch1_sec3_p2_c4", "text": "就是一個小小的金鑰匙", "punctuation": "，", "tokens": ["就是", "一個", "小小的", "金鑰匙"]}, {"id": "ch1_sec3_p2_c5", "text": "阿麗思第一個念頭就是想這把鑰匙在那些門上許有一個配得上的", "punctuation": "；", "tokens": ["阿麗思", "第一個", "念頭", "就是", "想", "這把", "鑰匙", "在", "那些", "門上", "許", "有", "一個", "配得上", "的"]}, {"id": "ch1_sec3_p2_c6", "text": "可是真倒霉", "punctuation": "！", "tokens": ["可是", "真", "倒霉"]}, {"id": "ch1_sec3_p2_c7", "text": "不是鎖太大", "punctuation": "，", "tokens": ["不是", "鎖", "太大"]}, {"id": "ch1_sec3_p2_c8", "text": "就是鑰匙太小", "punctuation": "，", "tokens": ["就是", "鑰匙", "太小"]}, {"id": "ch1_sec3_p2_c9", "text": "無論怎樣", "punctuation": "，", "tokens": ["無論", "怎樣"]}, {"id": "ch1_sec3_p2_c10", "text": "試了一周", "punctuation": "，", "tokens": ["試了", "一周"]}, {"id": "ch1_sec3_p2_c11", "text": "一個亦開不開", "punctuation": "。", "tokens": ["一個", "亦", "開不開"]}, {"id": "ch1_sec3_p2_c12", "text": "可是再第二回試的時候", "punctuation": "，", "tokens": ["可是", "再", "第二回", "試", "的", "時候"]}, {"id": "ch1_sec3_p2_c13", "text": "她看見了一個上回沒有看見的低簾子", "punctuation": "，", "tokens": ["她", "看見", "了", "一個", "上回", "沒有", "看見", "的", "低簾子"]}, {"id": "ch1_sec3_p2_c14", "text": "簾子後頭有一個小門", "punctuation": "，", "tokens": ["簾子", "後頭", "有", "一個", "小門"]}, {"id": "ch1_sec3_p2_c15", "text": "只不過一尺多高", "punctuation": "：", "tokens": ["只不過", "一尺多", "高"]}, {"id": "ch1_sec3_p2_c16", "text": "她把那金鑰匙放在鎖裏試試", "punctuation": "，", "tokens": ["她", "把", "那", "金鑰匙", "放在", "鎖裏", "試試"]}, {"id": "ch1_sec3_p2_c17", "text": "果然真配得上", "punctuation": "，", "tokens": ["果然", "真", "配得上"]}, {"id": "ch1_sec3_p2_c18", "text": "好個高興呀", "punctuation": "！", "tokens": ["好個", "高興", "呀"]}]}, {"id": "ch1_sec3_p3", "clauses": [{"id": "ch1_sec3_p3_c1", "text": "阿麗思就把那小門開開", "punctuation": "，", "tokens": ["阿麗思", "就", "把", "那", "小門", "開開"]}, {"id": "ch1_sec3_p3_c2", "text": "看見裏頭有一條小道通進去", "punctuation": "，", "tokens": ["看見", "裏頭", "有", "一條", "小道", "通進去"]}, {"id": "ch1_sec3_p3_c3", "text": "只不過像老鼠洞那麼大小", "punctuation": "：", "tokens": ["只不過", "像", "老鼠洞", "那麼", "大小"]}, {"id": "ch1_sec3_p3_c4", "text": "她跪了下來", "punctuation": "，", "tokens": ["她", "跪了", "下來"]}, {"id": "ch1_sec3_p3_c5", "text": "側著頭往裏頭一瞧", "punctuation": "，", "tokens": ["側著頭", "往", "裏頭", "一瞧"]}, {"id": "ch1_sec3_p3_c6", "text": "噯呀", "punctuation": "，", "tokens": ["噯呀"]}, {"id": "ch1_sec3_p3_c7", "text": "好一個可愛的小花園儿呀", "punctuation": "！", "tokens": ["好", "一個", "可愛", "的", "小花園儿", "呀"]}, {"id": "ch1_sec3_p3_c8", "text": "她真想能走出這間大暗廳", "punctuation": "，", "tokens": ["她", "真", "想", "能", "走出", "這間", "大暗廳"]}, {"id": "ch1_sec3_p3_c9", "text": "走到那些鮮花清泉裏遊頑", "punctuation": "。", "tokens": ["走到", "那些", "鮮花", "清泉", "裏", "遊頑"]}, {"id": "ch1_sec3_p3_c10", "text": "可是那小門裏她連頭亦都鑽不進去", "punctuation": "，", "tokens": ["可是", "那", "小門裏", "她", "連", "頭", "亦", "都", "鑽不進去"]}, {"id": "ch1_sec3_p3_c11", "text": "而且阿麗思想道", "punctuation": "：", "tokens": ["而且", "阿麗思", "想道"]}, {"id": "ch1_sec3_p3_c12", "text": "就是我的頭鑽了進去", "punctuation": "，", "tokens": ["就是", "我的", "頭", "鑽了", "進去"]}, {"id": "ch1_sec3_p3_c13", "text": "要是沒有肩膀子", "punctuation": "，", "tokens": ["要是", "沒有", "肩膀子"]}, {"id": "ch1_sec3_p3_c14", "text": "那亦不見得有什麼大用處", "punctuation": "。", "tokens": ["那", "亦", "不見得", "有", "什麼", "大用處"]}, {"id": "ch1_sec3_p3_c15", "text": "唉", "punctuation": "，", "tokens": ["唉"]}, {"id": "ch1_sec3_p3_c16", "text": "我願意我會像個望遠鏡似的", "punctuation": "，", "tokens": ["我", "願意", "我", "會", "像個", "望遠鏡", "似的"]}, {"id": "ch1_sec3_p3_c17", "text": "一縮就縮小", "punctuation": "，", "tokens": ["一縮", "就", "縮小"]}, {"id": "ch1_sec3_p3_c18", "text": "那就好勒", "punctuation": "！", "tokens": ["那", "就", "好勒"]}, {"id": "ch1_sec3_p3_c19", "text": "我想我會的", "punctuation": "，", "tokens": ["我", "想", "我", "會", "的"]}, {"id": "ch1_sec3_p3_c20", "text": "只要有誰教我怎麼樣起頭", "punctuation": "，", "tokens": ["只要", "有", "誰", "教", "我", "怎麼樣", "起頭"]}, {"id": "ch1_sec3_p3_c21", "text": "我就會的", "punctuation": "。", "tokens": ["我", "就", "會", "的"]}]}, {"id": "ch1_sec3_p4", "clauses": [{"id": "ch1_sec3_p4_c1", "text": "你想", "punctuation": "，", "tokens": ["你", "想"]}, {"id": "ch1_sec3_p4_c2", "text": "阿麗思近來遇見了這麼些出奇的事情", "punctuation": "，", "tokens": ["阿麗思", "近來", "遇見", "了", "這麼些", "出奇", "的", "事情"]}, {"id": "ch1_sec3_p4_c3", "text": "她簡直覺得天下沒有真做不到的事情了", "punctuation": "。", "tokens": ["她", "簡直", "覺得", "天下", "沒有", "真", "做不到", "的", "事情", "了"]}, {"id": "ch1_sec3_p4_c4", "text": "白等著在那小門那裏", "punctuation": "，", "tokens": ["白", "等著", "在", "那", "小門", "那裏"]}, {"id": "ch1_sec3_p4_c5", "text": "似乎沒有什麼好處", "punctuation": "，", "tokens": ["似乎", "沒有", "什麼", "好處"]}, {"id": "ch1_sec3_p4_c6", "text": "所以她又走回桌子那裏", "punctuation": "，", "tokens": ["所以", "她", "又", "走回", "桌子", "那裏"]}, {"id": "ch1_sec3_p4_c7", "text": "一半亦希望再找著一個別的鑰匙", "punctuation": "，", "tokens": ["一半", "亦", "希望", "再", "找著", "一個", "別的", "鑰匙"]}, {"id": "ch1_sec3_p4_c8", "text": "不然或者亦許找到一本什麼書", "punctuation": "，", "tokens": ["不然", "或者", "亦許", "找到", "一本", "什麼", "書"]}, {"id": "ch1_sec3_p4_c9", "text": "裏頭有教人怎麼像望遠鏡似的變小的訣竅", "punctuation": "：", "tokens": ["裏頭", "有", "教人", "怎麼", "像", "望遠鏡", "似的", "變小", "的", "訣竅"]}, {"id": "ch1_sec3_p4_c10", "text": "這會她找到一個瓶子", "punctuation": "（", "tokens": ["這會", "她", "找到", "一個", "瓶子"]}, {"id": "ch1_sec3_p4_c11", "text": "我剛才一定是沒看見在這儿的", "punctuation": "，", "tokens": ["我", "剛才", "一定", "是", "沒", "看見", "在", "这儿", "的"]}, {"id": "ch1_sec3_p4_c12", "text": "阿麗思說", "punctuation": "，", "tokens": ["阿麗思", "說"]}, {"id": "ch1_sec3_p4_c13", "text": "）瓶頸上繫著一個紙條子", "punctuation": "，", "tokens": ["瓶頸", "上", "繫著", "一個", "紙條子"]}, {"id": "ch1_sec3_p4_c14", "text": "上頭寫著很好看的大字喝我", "punctuation": "。", "tokens": ["上頭", "寫著", "很好看", "的", "大字", "喝我"]}]}, {"id": "ch1_sec3_p5", "clauses": [{"id": "ch1_sec3_p5_c1", "text": "說喝我還不好嗎", "punctuation": "？", "tokens": ["說", "喝我", "還", "不好", "嗎"]}, {"id": "ch1_sec3_p5_c2", "text": "但是那個聰明的小阿麗思決不會這樣地冒率（冒失）", "punctuation": "。", "tokens": ["但是", "那個", "聰明", "的", "小", "阿麗思", "決", "不會", "這樣地", "冒率"]}, {"id": "ch1_sec3_p5_c3", "text": "她說", "punctuation": "：", "tokens": ["她", "說"]}, {"id": "ch1_sec3_p5_c4", "text": "我不", "punctuation": "！", "tokens": ["我", "不"]}, {"id": "ch1_sec3_p5_c5", "text": "我要先看看瓶上有沒有毒藥的字樣在上再說", "punctuation": "。", "tokens": ["我", "要", "先", "看看", "瓶上", "有", "沒有", "毒藥", "的", "字樣", "在", "上", "再說"]}, {"id": "ch1_sec3_p5_c6", "text": "因為她曾經在書裏看過好幾件好故事", "punctuation": "，", "tokens": ["因為", "她", "曾經", "在", "書裏", "看過", "好幾件", "好", "故事"]}, {"id": "ch1_sec3_p5_c7", "text": "講小孩子們怎樣不乖就燙了手", "punctuation": "，", "tokens": ["講", "小孩子們", "怎樣", "不乖", "就", "燙了", "手"]}, {"id": "ch1_sec3_p5_c8", "text": "怎麼被野獸吃掉", "punctuation": "，", "tokens": ["怎麼", "被", "野獸", "吃掉"]}, {"id": "ch1_sec3_p5_c9", "text": "還有別的可怕的事情", "punctuation": "，", "tokens": ["還有", "別的", "可怕", "的", "事情"]}, {"id": "ch1_sec3_p5_c10", "text": "都是因為他們總不肯記得大人交代的幾條很簡單的規矩", "punctuation": "：", "tokens": ["都是", "因為", "他們", "總", "不肯", "記得", "大人", "交代", "的", "幾條", "很", "簡單", "的", "規矩"]}, {"id": "ch1_sec3_p5_c11", "text": "例如", "punctuation": "，", "tokens": ["例如"]}, {"id": "ch1_sec3_p5_c12", "text": "你要把紅的火筷子捏得太長久", "punctuation": "，", "tokens": ["你", "要", "把", "紅", "的", "火筷子", "捏得", "太長久"]}, {"id": "ch1_sec3_p5_c13", "text": "手就會覺得太燙的", "punctuation": "；", "tokens": ["手", "就", "會", "覺得", "太燙", "的"]}, {"id": "ch1_sec3_p5_c14", "text": "假如弄刀的時候把刀口弄到皮裏太深了", "punctuation": "，", "tokens": ["假如", "弄刀", "的", "時候", "把", "刀口", "弄到", "皮裏", "太深", "了"]}, {"id": "ch1_sec3_p5_c15", "text": "就會有血出來的", "punctuation": "；", "tokens": ["就", "會", "有", "血", "出來", "的"]}, {"id": "ch1_sec3_p5_c16", "text": "她再亦不忘記有一條規矩說", "punctuation": "，", "tokens": ["她", "再", "亦", "不忘記", "有", "一條", "規矩", "說"]}, {"id": "ch1_sec3_p5_c17", "text": "假如你把上面寫著毒藥字樣的瓶子裏的水喝的稍微太多了一點", "punctuation": "，", "tokens": ["假如", "你", "把", "上面", "寫著", "毒藥", "字樣", "的", "瓶子", "裏", "的", "水", "喝", "的", "稍微", "太多", "了", "一點"]}, {"id": "ch1_sec3_p5_c18", "text": "那就早晚總會覺得那水於你不大相宜的", "punctuation": "。", "tokens": ["那", "就", "早晚", "總會", "覺得", "那", "水", "於", "你", "不大", "相宜", "的"]}]}, {"id": "ch1_sec3_p6", "clauses": [{"id": "ch1_sec3_p6_c1", "text": "然而這一回瓶子上並沒有毒藥的字樣在上", "punctuation": "，", "tokens": ["然而", "這", "一回", "瓶子", "上", "並", "沒有", "毒藥", "的", "字樣", "在", "上"]}, {"id": "ch1_sec3_p6_c2", "text": "所以阿麗思就大著膽嘗它一嘗", "punctuation": "，", "tokens": ["所以", "阿麗思", "就", "大著膽", "嘗", "它", "一嘗"]}, {"id": "ch1_sec3_p6_c3", "text": "那味儿倒很好吃", "punctuation": "（", "tokens": ["那", "味儿", "倒", "很", "好吃"]}, {"id": "ch1_sec3_p6_c4", "text": "有點像櫻桃餅", "punctuation": "，", "tokens": ["有點像", "櫻桃餅"]}, {"id": "ch1_sec3_p6_c5", "text": "又有點像雞蛋糕", "punctuation": "，", "tokens": ["又", "有點像", "雞蛋糕"]}, {"id": "ch1_sec3_p6_c6", "text": "有點像菠蘿蜜〔pinapple〕", "punctuation": "，", "tokens": ["有點像", "菠蘿蜜"]}, {"id": "ch1_sec3_p6_c7", "text": "又有點像烤火雞", "punctuation": "，", "tokens": ["又", "有點像", "烤火雞"]}, {"id": "ch1_sec3_p6_c8", "text": "有點像冰淇淋", "punctuation": "，", "tokens": ["有點像", "冰淇淋"]}, {"id": "ch1_sec3_p6_c9", "text": "又有點像芝麻醬〔toffy〕", "punctuation": "，", "tokens": ["又", "有點像", "芝麻醬"]}, {"id": "ch1_sec3_p6_c10", "text": "所以一會儿工夫就唏哩呼嚕地喝完了", "punctuation": "。", "tokens": ["所以", "一會儿", "工夫", "就", "唏哩呼嚕", "地", "喝完", "了"]}]}, {"id": "ch1_sec3_p7", "clauses": [{"id": "ch1_sec3_p7_c1", "text": "我身上覺得好古怪", "punctuation": "，", "tokens": ["我", "身上", "覺得", "好", "古怪"]}, {"id": "ch1_sec3_p7_c2", "text": "我一定像望遠鏡似的變小了", "punctuation": "。", "tokens": ["我", "一定", "像", "望遠鏡", "似的", "變小", "了"]}, {"id": "ch1_sec3_p7_c3", "text": "果不其然", "punctuation": "：", "tokens": ["果不其然"]}, {"id": "ch1_sec3_p7_c4", "text": "她現在不到一尺高了", "punctuation": "，", "tokens": ["她", "現在", "不到", "一尺", "高", "了"]}, {"id": "ch1_sec3_p7_c5", "text": "她臉上登時就現出喜色", "punctuation": "，", "tokens": ["她", "臉上", "登時", "就", "現出", "喜色"]}, {"id": "ch1_sec3_p7_c6", "text": "因為她就想到現在她的大小正好可以走進那個花園的小門了", "punctuation": "。", "tokens": ["因為", "她", "就", "想到", "現在", "她", "的", "大小", "正好", "可以", "走進", "那個", "花園", "的", "小門", "了"]}, {"id": "ch1_sec3_p7_c7", "text": "但是她先等幾分鐘看看她自己還再縮不再縮", "punctuation": "：", "tokens": ["但是", "她", "先", "等", "幾分鐘", "看看", "她", "自己", "還", "再", "縮", "不", "再縮"]}, {"id": "ch1_sec3_p7_c8", "text": "她對這層到有點擔心", "punctuation": "，", "tokens": ["她", "對", "這層", "到", "有點", "擔心"]}, {"id": "ch1_sec3_p7_c9", "text": "她道", "punctuation": "：", "tokens": ["她", "道"]}, {"id": "ch1_sec3_p7_c10", "text": "亦許我會儘縮縮縮到沒有了", "punctuation": "，", "tokens": ["亦許", "我", "會", "儘", "縮縮縮", "到", "沒有", "了"]}, {"id": "ch1_sec3_p7_c11", "text": "如同吹滅了的蠟燭的火苗一樣", "punctuation": "，", "tokens": ["如同", "吹滅", "了", "的", "蠟燭", "的", "火苗", "一樣"]}, {"id": "ch1_sec3_p7_c12", "text": "那時候我倒不知道覺得像什麼了", "punctuation": "？", "tokens": ["那時候", "我", "倒", "不知道", "覺得", "像", "什麼", "了"]}, {"id": "ch1_sec3_p7_c13", "text": "她說著就想摹擬一個吹滅了的蠟燭的火苗的樣子", "punctuation": "，", "tokens": ["她", "說著", "就", "想", "摹擬", "一個", "吹滅", "了", "的", "蠟燭", "的", "火苗", "的", "樣子"]}, {"id": "ch1_sec3_p7_c14", "text": "可是想了半天亦想不出來", "punctuation": "，", "tokens": ["可是", "想了", "半天", "亦", "想不出來"]}, {"id": "ch1_sec3_p7_c15", "text": "因為她記得從來沒有見過這麼件東西", "punctuation": "。", "tokens": ["因為", "她", "記得", "從來", "沒有", "見過", "這麼件", "東西"]}]}, {"id": "ch1_sec3_p8", "clauses": [{"id": "ch1_sec3_p8_c1", "text": "等了一會儿", "punctuation": "，", "tokens": ["等了", "一會儿"]}, {"id": "ch1_sec3_p8_c2", "text": "確實知道了沒有出什麼別的事", "punctuation": "，", "tokens": ["確實", "知道", "了", "沒有", "出", "什麼", "別的", "事"]}, {"id": "ch1_sec3_p8_c3", "text": "她就打定主意到花園裏去", "punctuation": "，", "tokens": ["她", "就", "打定主意", "到", "花園裏", "去"]}, {"id": "ch1_sec3_p8_c4", "text": "但是可憐的阿麗思呀", "punctuation": "！", "tokens": ["但是", "可憐", "的", "阿麗思", "呀"]}, {"id": "ch1_sec3_p8_c5", "text": "她走到那小門跟前", "punctuation": "，", "tokens": ["她", "走到", "那", "小門", "跟前"]}, {"id": "ch1_sec3_p8_c6", "text": "才想起剛才把那小金鑰匙忘記在桌上了", "punctuation": "，", "tokens": ["才", "想起", "剛才", "把", "那", "小", "金鑰匙", "忘記", "在", "桌上", "了"]}, {"id": "ch1_sec3_p8_c7", "text": "她回頭走到桌子這儿", "punctuation": "，", "tokens": ["她", "回頭", "走到", "桌子", "這儿"]}, {"id": "ch1_sec3_p8_c8", "text": "又太矮了", "punctuation": "，", "tokens": ["又", "太矮", "了"]}, {"id": "ch1_sec3_p8_c9", "text": "再亦彀ㄍㄡˋ〔搆〕不到桌子的上面", "punctuation": "：", "tokens": ["再", "亦", "彀", "不到", "桌子", "的", "上面"]}, {"id": "ch1_sec3_p8_c10", "text": "她從那透明的玻璃桌子底下", "punctuation": "，", "tokens": ["她", "從", "那", "透明", "的", "玻璃", "桌子", "底下"]}, {"id": "ch1_sec3_p8_c11", "text": "清清楚楚看見那鑰匙擺在桌上", "punctuation": "，", "tokens": ["清清楚楚", "看見", "那", "鑰匙", "擺", "在", "桌上"]}, {"id": "ch1_sec3_p8_c12", "text": "她就極力地想從一個桌子腿上扒〔爬〕上去", "punctuation": "，", "tokens": ["她", "就", "極力", "地", "想", "從", "一個", "桌子", "腿上", "扒", "上去"]}, {"id": "ch1_sec3_p8_c13", "text": "但是那玻璃真滑", "punctuation": "，", "tokens": ["但是", "那", "玻璃", "真", "滑"]}, {"id": "ch1_sec3_p8_c14", "text": "再亦上不去", "punctuation": "；", "tokens": ["再", "亦", "上不去"]}, {"id": "ch1_sec3_p8_c15", "text": "左試右試扒〔爬〕的又累又沒法子", "punctuation": "，", "tokens": ["左試右試", "扒", "的", "又累", "又", "沒法子"]}, {"id": "ch1_sec3_p8_c16", "text": "那可憐的孩子就坐在地上哭了起來", "punctuation": "。", "tokens": ["那", "可憐", "的", "孩子", "就", "坐在", "地上", "哭了", "起來"]}]}, {"id": "ch1_sec3_p9", "clauses": [{"id": "ch1_sec3_p9_c1", "text": "阿麗思一邊哭著一邊自己又說道", "punctuation": "：", "tokens": ["阿麗思", "一邊", "哭著", "一邊", "自己", "又", "說道"]}, {"id": "ch1_sec3_p9_c2", "text": "別哭啊", "punctuation": "，", "tokens": ["別哭", "啊"]}, {"id": "ch1_sec3_p9_c3", "text": "你這孩子", "punctuation": "，", "tokens": ["你", "這", "孩子"]}, {"id": "ch1_sec3_p9_c4", "text": "哭牠有什麼用", "punctuation": "？", "tokens": ["哭", "牠", "有", "什麼", "用"]}, {"id": "ch1_sec3_p9_c5", "text": "我勸你即刻就住聲", "punctuation": "！", "tokens": ["我", "勸", "你", "即刻", "就", "住聲"]}, {"id": "ch1_sec3_p9_c6", "text": "別哭", "punctuation": "！", "tokens": ["別哭"]}, {"id": "ch1_sec3_p9_c7", "text": "她平常自己常勸她（自己）很好的勸話", "punctuation": "（", "tokens": ["她", "平常", "自己", "常", "勸", "她", "很好", "的", "勸話"]}, {"id": "ch1_sec3_p9_c8", "text": "可是很少聽她自己的勸", "punctuation": "），", "tokens": ["可是", "很少", "聽", "她", "自己", "的", "勸"]}, {"id": "ch1_sec3_p9_c9", "text": "有時候她罵自己罵得利害到眼淚都罵出來了", "punctuation": "。", "tokens": ["有時候", "她", "罵", "自己", "罵得", "利害", "到", "眼淚", "都", "罵", "出來", "了"]}, {"id": "ch1_sec3_p9_c10", "text": "有一回她因為自己玩槌球的時候欺騙了自己", "punctuation": "，", "tokens": ["有", "一回", "她", "因為", "自己", "玩", "槌球", "的", "時候", "欺騙", "了", "自己"]}, {"id": "ch1_sec3_p9_c11", "text": "就打她自己的耳光", "punctuation": "；", "tokens": ["就", "打", "她", "自己", "的", "耳光"]}, {"id": "ch1_sec3_p9_c12", "text": "這個奇怪的孩子最愛裝做兩個人", "punctuation": "。", "tokens": ["這個", "奇怪", "的", "孩子", "最愛", "裝做", "兩個", "人"]}, {"id": "ch1_sec3_p9_c13", "text": "但是現在還裝什麼兩個人呢", "punctuation": "？", "tokens": ["但是", "現在", "還", "裝", "什麼", "兩個", "人", "呢"]}, {"id": "ch1_sec3_p9_c14", "text": "阿麗思道", "punctuation": "：", "tokens": ["阿麗思", "道"]}, {"id": "ch1_sec3_p9_c15", "text": "唉", "punctuation": "！", "tokens": ["唉"]}, {"id": "ch1_sec3_p9_c16", "text": "剩下來這點儿我", "punctuation": "，", "tokens": ["剩下來", "這點儿", "我"]}, {"id": "ch1_sec3_p9_c17", "text": "連一個像樣儿的人都不夠做了", "punctuation": "！", "tokens": ["連", "一個", "像樣儿", "的", "人", "都", "不夠", "做了"]}]}, {"id": "ch1_sec3_p10", "clauses": [{"id": "ch1_sec3_p10_c1", "text": "不久一會儿她又看見桌子底下放著一個小玻璃匣子", "punctuation": "：", "tokens": ["不久", "一會儿", "她", "又", "看見", "桌子", "底下", "放著", "一個", "小", "玻璃", "匣子"]}, {"id": "ch1_sec3_p10_c2", "text": "她打開它一看", "punctuation": "，", "tokens": ["她", "打開", "它", "一看"]}, {"id": "ch1_sec3_p10_c3", "text": "裏頭是一塊小糕", "punctuation": "，", "tokens": ["裏頭", "是", "一塊", "小糕"]}, {"id": "ch1_sec3_p10_c4", "text": "上頭有葡萄乾做成很好看的字樣", "punctuation": "，", "tokens": ["上頭", "有", "葡萄乾", "做成", "很好看", "的", "字樣"]}, {"id": "ch1_sec3_p10_c5", "text": "說吃我", "punctuation": "。", "tokens": ["說", "吃我"]}, {"id": "ch1_sec3_p10_c6", "text": "阿麗思道", "punctuation": "：", "tokens": ["阿麗思", "道"]}, {"id": "ch1_sec3_p10_c7", "text": "好", "punctuation": "，", "tokens": ["好"]}, {"id": "ch1_sec3_p10_c8", "text": "我就吃它", "punctuation": "，", "tokens": ["我", "就", "吃", "它"]}, {"id": "ch1_sec3_p10_c9", "text": "假如吃了它我會長大", "punctuation": "，", "tokens": ["假如", "吃了", "它", "我", "會", "長大"]}, {"id": "ch1_sec3_p10_c10", "text": "我就好彀到那把鑰匙", "punctuation": "；", "tokens": ["我", "就", "好", "彀到", "那把", "鑰匙"]}, {"id": "ch1_sec3_p10_c11", "text": "假如吃了會縮小", "punctuation": "，", "tokens": ["假如", "吃了", "會", "縮小"]}, {"id": "ch1_sec3_p10_c12", "text": "我就好打門底下的縫儿裏鑽進去", "punctuation": "；", "tokens": ["我", "就", "好", "打", "門", "底下", "的", "縫儿", "裏", "鑽進去"]}, {"id": "ch1_sec3_p10_c13", "text": "所以無論哪樣我總歸可以進去就是", "punctuation": "，", "tokens": ["所以", "無論", "哪樣", "我", "總歸", "可以", "進去", "就是"]}, {"id": "ch1_sec3_p10_c14", "text": "變大變小我都亦不在乎", "punctuation": "！", "tokens": ["變大", "變小", "我", "都", "亦", "不在乎"]}, {"id": "ch1_sec3_p10_c15", "text": "所以她就吃了一小塊", "punctuation": "，", "tokens": ["所以", "她", "就", "吃了", "一小塊"]}, {"id": "ch1_sec3_p10_c16", "text": "自己急著問道", "punctuation": "：", "tokens": ["自己", "急著", "問道"]}, {"id": "ch1_sec3_p10_c17", "text": "往哪一邊", "punctuation": "？", "tokens": ["往", "哪", "一邊"]}, {"id": "ch1_sec3_p10_c18", "text": "往哪一邊", "punctuation": "，", "tokens": ["往", "哪", "一邊"]}, {"id": "ch1_sec3_p10_c19", "text": "長勒嗎", "punctuation": "？", "tokens": ["長", "勒", "嗎"]}, {"id": "ch1_sec3_p10_c20", "text": "縮勒嗎", "punctuation": "？", "tokens": ["縮", "勒", "嗎"]}, {"id": "ch1_sec3_p10_c21", "text": "把手就撫著頭上", "punctuation": "，", "tokens": ["把", "手", "就", "撫著", "頭上"]}, {"id": "ch1_sec3_p10_c22", "text": "摸摸還是往上還是往下", "punctuation": "，", "tokens": ["摸摸", "還是", "往上", "還是", "往下"]}, {"id": "ch1_sec3_p10_c23", "text": "她真好詫異", "punctuation": "，", "tokens": ["她", "真", "好", "詫異"]}, {"id": "ch1_sec3_p10_c24", "text": "怎麼半天又不長大", "punctuation": "，", "tokens": ["怎麼", "半天", "又", "不", "長大"]}, {"id": "ch1_sec3_p10_c25", "text": "又不縮小", "punctuation": "，", "tokens": ["又", "不", "縮小"]}, {"id": "ch1_sec3_p10_c26", "text": "還是那樣大小", "punctuation": "：", "tokens": ["還是", "那樣", "大小"]}, {"id": "ch1_sec3_p10_c27", "text": "固然說起來呢", "punctuation": "，", "tokens": ["固然", "說起來", "呢"]}, {"id": "ch1_sec3_p10_c28", "text": "平常人吃了糕的時候", "punctuation": "，", "tokens": ["平常人", "吃了", "糕", "的", "時候"]}, {"id": "ch1_sec3_p10_c29", "text": "亦不過是這樣子", "punctuation": "，", "tokens": ["亦", "不過", "是", "這樣子"]}, {"id": "ch1_sec3_p10_c30", "text": "但是阿麗思遇見慣了這麼些出奇出怪的事情", "punctuation": "，", "tokens": ["但是", "阿麗思", "遇見", "慣了", "這麼些", "出奇出怪", "的", "事情"]}, {"id": "ch1_sec3_p10_c31", "text": "她竟覺得假如事情都是樣樣照常的那就又笨又無味了", "punctuation": "。", "tokens": ["她", "竟", "覺得", "假如", "事情", "都是", "樣樣", "照常", "的", "那", "就", "又笨", "又無味", "了"]}, {"id": "ch1_sec3_p10_c32", "text": "所以她就正正經經地一口一口地把那塊糕都吃完了", "punctuation": "。", "tokens": ["所以", "她", "就", "正正經經", "地", "一口", "一口", "地", "把", "那塊", "糕", "都", "吃完", "了"]}]}]}], "quiz": {"questions": [{"id": "ch1_q1", "type": "single_choice", "question": "阿麗思最初和誰一起坐在河邊？", "options": ["母親", "姊姊", "朋友", "老師"], "answerIndex": 1, "explanation": "故事開頭：阿麗思陪著她姊姊閒坐在河邊上。"}, {"id": "ch1_q2", "type": "single_choice", "question": "阿麗思覺得姊姊的書很無聊，是因為書裡沒有什麼？", "options": ["文字", "畫儿和說話", "封面", "頁數"], "answerIndex": 1, "explanation": "阿麗思想：一本書裏又沒有畫儿，又沒有說話，那樣書要它幹什麼呢？"}, {"id": "ch1_q3", "type": "single_choice", "question": "阿麗思看到的第一隻兔子有什麼特徵？", "options": ["藍色眼睛", "黃色眼睛", "淡紅眼睛", "黑色眼睛"], "answerIndex": 2, "explanation": "文中描述：一隻淡紅眼睛的白兔子，在她旁邊跑過。"}, {"id": "ch1_q4", "type": "single_choice", "question": "兔子從背心口袋裡拿出了什麼？", "options": ["一把扇子", "一朵花", "一把鑰匙", "一隻錶"], "answerIndex": 3, "explanation": "兔子在背心袋裏掐出一隻錶來，看了一看時間。"}, {"id": "ch1_q5", "type": "single_choice", "question": "阿麗思跟著兔子鑽進洞後，發生了什麼事？", "options": ["她立刻到了花園", "她掉進了一口深井", "她遇見了毛毛蟲", "她變小了"], "answerIndex": 1, "explanation": "兔子洞直住下拐，阿麗思順著洞往一個深井裏掉了下去。"}, {"id": "ch1_q6", "type": "single_choice", "question": "阿麗思在掉下去的過程中，從架子上拿了一個瓶子，瓶上寫的是什麼？", "options": ["喝我", "毒藥", "吃我", "橙子瑪瑪醬"], "answerIndex": 3, "explanation": "她經過一個架子的時候就伸手把一個小瓶子拿了出來；瓶上寫的是橙子瑪瑪醬。"}, {"id": "ch1_q7", "type": "single_choice", "question": "阿麗思掉到洞底後，發現自己在一間什麼樣的廳房裡？", "options": ["圓形的大廳", "長而低的廳房", "廚房", "花園"], "answerIndex": 1, "explanation": "她覺得走進了一間長而低的廳房，頂上掛著一長排的燈盞。"}, {"id": "ch1_q8", "type": "single_choice", "question": "阿麗思在玻璃桌上發現了什麼？", "options": ["一杯茶", "一把小金鑰匙", "一塊蛋糕", "一面鏡子"], "answerIndex": 1, "explanation": "桌上沒有別的東西，就是一個小小的金鑰匙。"}, {"id": "ch1_q9", "type": "true_false", "question": "阿麗思立刻就能用金鑰匙打開花園的小門走進去。", "answer": false, "explanation": "她喝了藥水縮小後，卻忘記拿鑰匙，搆不到桌子，進不去花園。"}, {"id": "ch1_q10", "type": "true_false", "question": "阿麗思吃了小糕之後，身體立刻縮小到可以進入花園。", "answer": false, "explanation": "吃了一小塊糕後沒有立刻變化，她只好整塊吃完，但故事在此停住，並未說她成功進入了花園。"}]}}]}, "quiz": {"questions": [{"id": "overall_q1", "type": "single_choice", "question": "阿麗思掉進兔子洞後，最先遇到的事情是什麼？", "options": ["遇見毛毛蟲", "掉進一口深井", "參加瘋茶會", "遇見紅心皇后"], "answerIndex": 1, "explanation": "她跟著兔子鑽進洞後，順著洞往一個深井裏掉了下去。"}, {"id": "overall_q2", "type": "true_false", "question": "阿麗思是因為好奇才跟著兔子跑進洞裡的。", "answer": true, "explanation": "她忍不住好奇的心了，就緊追著那兔子。"}]}}], "userProgress": {"userId": "local_user", "records": [], "stats": {"averageWPM": 0, "averageAccuracy": 0, "totalArticlesRead": 0}}};
+const BUILTIN_ARTICLE = DATA.articles[0];
+let ARTICLE = BUILTIN_ARTICLE;
+
+/* ============ 標點停頓設定（毫秒） ============ */
+const PUNCT_PAUSE = {'。':550,'！':550,'？':550,'，':180,'、':150,'；':350,'：':350};
+function pauseFor(p){ return PUNCT_PAUSE[p] || 200; }
+
+/* ============ 語言判斷：英文內容的 token 之間需要空格 ============ */
+function isSpaceDelimitedLanguage(){
+  return typeof ARTICLE.language === 'string' && ARTICLE.language.toLowerCase().startsWith('en');
+}
+function tokenSeparator(){
+  return isSpaceDelimitedLanguage() ? ' ' : '';
+}
+function joinTokensForDisplay(tokens){
+  return tokens.join(tokenSeparator());
+}
+
+const MODE_INFO = {
+  rsvp:   { label:'RSVP 單詞流', desc:'逐詞於畫面中央快速閃現，訓練視覺焦點集中。' },
+  chunk:  { label:'分塊閱讀', desc:'每次顯示 2–4 個詞為一組，訓練一次擷取多字。' },
+  clause: { label:'分句閱讀', desc:'每次顯示一句完整文字，出現位置由上而下循環，訓練垂直掃視能力。' },
+  window: { label:'移動視窗', desc:'保留上下文，當前片語紅線標示、當前詞金線標示。' }
+};
+
+/* ============ 進度儲存 ============ */
+let STORAGE_KEY = 'sudu_progress_' + ARTICLE.id;
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){}
+  return { userId:'local_user', records:[], stats:{ averageWPM:0, averageAccuracy:0, totalArticlesRead:0 } };
+}
+function saveProgress(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+function recomputeStats(){
+  const recs = progress.records;
+  if(recs.length===0){ progress.stats = { averageWPM:0, averageAccuracy:0, totalArticlesRead:0 }; return; }
+  const avgWpm = recs.reduce((a,r)=>a+(r.wpm||0),0)/recs.length;
+  const scored = recs.filter(r=>typeof r.quizScore === 'number');
+  const avgAcc = scored.length ? scored.reduce((a,r)=>a+r.quizScore,0)/scored.length : 0;
+  const chapterIds = new Set(ARTICLE.content.chapters.map(c=>c.id));
+  const doneChapterIds = new Set(recs.filter(r=>r.quizScope==='chapter').map(r=>r.chapterId));
+  const allDone = [...chapterIds].every(id=>doneChapterIds.has(id));
+  progress.stats = {
+    averageWPM: Math.round(avgWpm),
+    averageAccuracy: Math.round(avgAcc*100)/100,
+    totalArticlesRead: allDone ? 1 : 0
+  };
+}
+let progress = loadProgress();
+function switchArticle(article){
+  ARTICLE = article;
+  STORAGE_KEY = 'sudu_progress_' + article.id;
+  progress = loadProgress();
+  renderLibrary();
+  showScreen('screen-library');
+}
+
+/* ============ 狀態機 ============ */
+const state = {
+  chapterIndex: 0,
+  mode: 'rsvp',
+  wpm: ARTICLE.recommendedWPM || 280,
+  chunkSize: 2,
+  steps: [],
+  paragraphs: [],
+  stepIndex: 0,
+  timer: null,
+  paused: false,
+  lastParaIdx: -1,
+  startTime: null,
+  totalTokens: 0,
+  quizScope: null,   // 'chapter' | 'article'
+  quizChapterIndex: null,
+  quizAnswers: {}
+};
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ============ 手機返回鍵攔截：不離開瀏覽器，改為在App內返回 ============ */
+function getActiveScreenId(){
+  const el = document.querySelector('.screen.active');
+  return el ? el.id : 'screen-library';
+}
+function trapBackButton(){
+  history.pushState({ screen: getActiveScreenId() }, '');
+}
+window.addEventListener('popstate', ()=>{
+  const current = getActiveScreenId();
+  if(current === 'screen-setup'){
+    renderLibrary(); showScreen('screen-library');
+  } else if(current === 'screen-reading' || current === 'screen-section-check'){
+    clearTimeout(state.timer);
+    renderLibrary(); showScreen('screen-library');
+  } else if(current === 'screen-quiz'){
+    renderLibrary(); showScreen('screen-library');
+  } else if(current === 'screen-results'){
+    renderLibrary(); showScreen('screen-library');
+  }
+  // 無論如何都重新推入一筆歷史紀錄，讓下一次按返回鍵繼續被攔截，而不會離開頁面
+  trapBackButton();
+});
+trapBackButton();
+
+/* ============ 章節資料輔助 ============ */
+function chapterStats(chapter){
+  let paraCount=0, clauseCount=0, tokenCount=0;
+  chapter.sections.forEach(sec=>sec.paragraphs.forEach(p=>{
+    paraCount++;
+    p.clauses.forEach(c=>{
+      clauseCount++;
+      tokenCount += (c.tokens && c.tokens.length) ? c.tokens.length : estimateWordCount(c.text);
+    });
+  }));
+  return {paraCount, clauseCount, tokenCount};
+}
+function flattenChapter(chapter){
+  const paragraphs = [];
+  const sections = [];
+  chapter.sections.forEach((sec, sIdx)=>{
+    const clauses = [];
+    sec.paragraphs.forEach(p=>{ clauses.push(...p.clauses); });
+    sections.push({ id: sec.id, title: sec.title, quiz: sec.quiz || null, clauses });
+    sec.paragraphs.forEach(p=>{
+      paragraphs.push({ paraId:p.id, sectionIdx:sIdx, clauses:p.clauses });
+    });
+  });
+  return { paragraphs, sections };
+}
+function bestRecordFor(chapterId){
+  const recs = progress.records.filter(r=>r.chapterId===chapterId && r.quizScope==='chapter');
+  if(recs.length===0) return null;
+  return recs.reduce((best,r)=> (r.wpm>best.wpm ? r : best), recs[0]);
+}
+
+/* ============ 剪貼簿文章：只切分句，不做語意斷詞 ============ */
+const CLAUSE_END_CHARS_ZH = ['，','。','！','？','；','：','、'];
+const CLAUSE_END_CHARS_EN = [',','.','!','?',';',':'];
+function detectPastedLanguage(text){
+  const latinCount = (text.match(/[A-Za-z]/g) || []).length;
+  const cjkCount = (text.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
+  return (latinCount > 10 && latinCount > cjkCount * 2) ? 'en' : 'zh-Hant';
+}
+function splitIntoClauses(text, paraId, lang){
+  const isEnglish = lang === 'en';
+  const endChars = isEnglish ? CLAUSE_END_CHARS_EN : CLAUSE_END_CHARS_ZH;
+  const pattern = isEnglish ? /([,.!?;:])/ : /([，。！？；：、])/;
+  const parts = text.split(pattern).filter(s => s.length > 0);
+  const clauses = [];
+  let buffer = '';
+  let cIdx = 0;
+  // 不論中英文都不斷詞，tokens 一律留空 —— 由播放引擎統一 fallback 成「整句視為一個 token」
+  parts.forEach(part=>{
+    if(endChars.includes(part)){
+      if(buffer.trim().length > 0){
+        cIdx++;
+        clauses.push({ id: paraId + '_c' + cIdx, text: buffer.trim(), punctuation: part, tokens: [] });
+      }
+      buffer = '';
+    } else {
+      buffer += part;
+    }
+  });
+  if(buffer.trim().length > 0){
+    cIdx++;
+    clauses.push({ id: paraId + '_c' + cIdx, text: buffer.trim(), punctuation: isEnglish ? '.' : '。', tokens: [] });
+  }
+  return clauses;
+}
+function buildArticleFromText(rawText){
+  const lang = detectPastedLanguage(rawText);
+  const paraTexts = rawText.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const paragraphs = paraTexts.map((ptext, pIdx)=>{
+    const paraId = 'custom_p' + (pIdx + 1);
+    return { id: paraId, clauses: splitIntoClauses(ptext, paraId, lang) };
+  }).filter(p => p.clauses.length > 0);
+
+  const title = (paraTexts[0] || '我的文章').slice(0, 24);
+  let totalTokens = 0;
+  paragraphs.forEach(p => p.clauses.forEach(c => totalTokens += (c.tokens && c.tokens.length) ? c.tokens.length : estimateWordCount(c.text)));
+  const recommendedWPM = 280;
+
+  return {
+    id: 'custom_' + Date.now(),
+    title: title,
+    author: '',
+    language: lang,
+    category: '自訂內容',
+    difficulty: '-',
+    recommendedWPM: recommendedWPM,
+    content: {
+      chapters: [{
+        id: 'custom_ch1',
+        title: title,
+        order: 1,
+        estimatedReadingTimeSec: Math.round(totalTokens / (recommendedWPM / 60)),
+        sections: [{
+          id: 'custom_ch1_sec1',
+          title: '全文',
+          order: 1,
+          paragraphs: paragraphs
+        }]
+      }]
+    },
+    quiz: { questions: [] }
+  };
+}
+function buildParagraphsForSection(paraTexts, sectionId, lang){
+  return paraTexts.map((ptext, pIdx)=>{
+    const paraId = sectionId + '_p' + (pIdx + 1);
+    return { id: paraId, clauses: splitIntoClauses(ptext, paraId, lang) };
+  }).filter(p => p.clauses.length > 0);
+}
+const PARAGRAPHS_PER_SECTION = 5;
+function buildSectionsFromParagraphTexts(paraTexts, chapterId, lang, perSection){
+  perSection = perSection || PARAGRAPHS_PER_SECTION;
+  const sections = [];
+  for(let i = 0; i < paraTexts.length; i += perSection){
+    const secIdx = sections.length + 1;
+    const sectionId = chapterId + '_sec' + secIdx;
+    const chunkTexts = paraTexts.slice(i, i + perSection);
+    const paragraphs = buildParagraphsForSection(chunkTexts, sectionId, lang);
+    if(paragraphs.length === 0) continue;
+    sections.push({ id: sectionId, title: '第 ' + secIdx + ' 節', order: secIdx, paragraphs: paragraphs });
+  }
+  return sections;
+}
+function estimateReadingTimeSec(paragraphs, wpm){
+  let tokens = 0;
+  paragraphs.forEach(p => p.clauses.forEach(c => tokens += (c.tokens && c.tokens.length) ? c.tokens.length : estimateWordCount(c.text)));
+  return Math.round(tokens / (wpm / 60));
+}
+
+/* ============ 純文字書籍：依標題列偵測切章 ============ */
+const CHAPTER_MARKER_REGEX = /^(第[0-9〇一二三四五六七八九十百千]+[章回節部]|chapter\s+\d+|CHAPTER\s+\d+|Chapter\s+\d+)/;
+function splitPlainTextIntoChapters(rawText){
+  const lines = rawText.split(/\r?\n/);
+  const blocks = [];
+  let currentTitle = null;
+  let currentLines = [];
+  function pushBlock(){
+    const joined = currentLines.join('\n').trim();
+    if(joined.length > 0 || currentTitle !== null){
+      blocks.push({ title: currentTitle, lines: currentLines });
+    }
+  }
+  lines.forEach(line=>{
+    const trimmed = line.trim();
+    if(trimmed.length > 0 && trimmed.length < 40 && CHAPTER_MARKER_REGEX.test(trimmed)){
+      pushBlock();
+      currentTitle = trimmed;
+      currentLines = [];
+    } else {
+      currentLines.push(line);
+    }
+  });
+  pushBlock();
+
+  if(blocks.length === 0){
+    return [{ title: null, lines: lines }];
+  }
+  if(blocks.length === 1 && blocks[0].title === null){
+    return blocks; // 沒偵測到任何章節標記，整份文字當作一章
+  }
+  if(blocks[0].title === null){
+    blocks[0].title = '前言'; // 第一個標題前的內容獨立成「前言」章
+  }
+  return blocks;
+}
+function buildArticleFromPlainText(rawText, filename){
+  const lang = detectPastedLanguage(rawText);
+  const blocks = splitPlainTextIntoChapters(rawText);
+  const recommendedWPM = 280;
+
+  const chapters = blocks.map((blk, idx)=>{
+    const chapterId = 'ch' + (idx + 1);
+    const paraTexts = blk.lines.join('\n').split(/\n\s*\n+/).map(s=>s.replace(/[ \t]+/g,' ').trim()).filter(Boolean);
+    const finalParaTexts = paraTexts.length > 0 ? paraTexts : blk.lines.map(l=>l.trim()).filter(Boolean);
+    const sections = buildSectionsFromParagraphTexts(finalParaTexts, chapterId, lang);
+    const allParagraphs = sections.reduce((a,s)=>a.concat(s.paragraphs), []);
+    return {
+      id: chapterId,
+      title: blk.title || ('第 ' + (idx + 1) + ' 章'),
+      order: idx + 1,
+      estimatedReadingTimeSec: estimateReadingTimeSec(allParagraphs, recommendedWPM),
+      sections: sections
+    };
+  }).filter(ch => ch.sections.length > 0);
+
+  const title = (filename || '我的書').replace(/\.(txt|epub)$/i, '');
+  return {
+    id: 'custom_' + Date.now(),
+    title: title,
+    author: '',
+    language: lang,
+    category: '自訂內容',
+    difficulty: '-',
+    recommendedWPM: recommendedWPM,
+    content: { chapters: chapters },
+    quiz: { questions: [] }
+  };
+}
+
+/* ============ EPUB 書籍：解壓縮、讀取 OPF／TOC、抽取章節文字 ============ */
+function extractParagraphsFromHTML(htmlStr){
+  let doc = null;
+  try{
+    const parsed = new DOMParser().parseFromString(htmlStr, 'application/xhtml+xml');
+    if(!parsed.querySelector('parsererror')) doc = parsed;
+  }catch(e){}
+  if(!doc){
+    doc = new DOMParser().parseFromString(htmlStr, 'text/html');
+  }
+  const body = doc.body || doc.documentElement;
+  if(!body) return [];
+  const blocks = body.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li');
+  const paragraphs = [];
+  blocks.forEach(el=>{
+    const t = el.textContent.replace(/\s+/g, ' ').trim();
+    if(t.length > 0) paragraphs.push(t);
+  });
+  if(paragraphs.length === 0){
+    const raw = body.textContent || '';
+    raw.split(/\n+/).map(s=>s.replace(/\s+/g,' ').trim()).filter(Boolean).forEach(t=>paragraphs.push(t));
+  }
+  return paragraphs;
+}
+async function buildArticleFromEpub(arrayBuffer, filename){
+  if(typeof JSZip === 'undefined'){
+    throw new Error('EPUB 解析元件載入失敗，請檢查網路連線');
+  }
+  const zip = await JSZip.loadAsync(arrayBuffer);
+
+  const containerFile = zip.file('META-INF/container.xml');
+  if(!containerFile) throw new Error('這不是有效的 EPUB 檔案（找不到 container.xml）');
+  const containerXml = await containerFile.async('text');
+  const containerDoc = new DOMParser().parseFromString(containerXml, 'application/xml');
+  const rootfileEl = containerDoc.querySelector('rootfile');
+  const opfPath = rootfileEl ? rootfileEl.getAttribute('full-path') : null;
+  if(!opfPath) throw new Error('找不到 EPUB 的內容清單（OPF）');
+  const opfDir = opfPath.includes('/') ? opfPath.slice(0, opfPath.lastIndexOf('/') + 1) : '';
+
+  const opfFile = zip.file(opfPath);
+  const opfXml = await opfFile.async('text');
+  const opfDoc = new DOMParser().parseFromString(opfXml, 'application/xml');
+
+  const titleEl = opfDoc.querySelector('metadata title');
+  const bookTitle = (titleEl ? titleEl.textContent.trim() : '') || (filename || '我的書').replace(/\.epub$/i, '');
+  const authorEl = opfDoc.querySelector('metadata creator');
+  const bookAuthor = authorEl ? authorEl.textContent.trim() : '';
+
+  const manifestItems = {};
+  opfDoc.querySelectorAll('manifest item').forEach(item=>{
+    manifestItems[item.getAttribute('id')] = {
+      href: item.getAttribute('href'),
+      mediaType: item.getAttribute('media-type') || '',
+      properties: item.getAttribute('properties') || ''
+    };
+  });
+  const spineIds = [];
+  opfDoc.querySelectorAll('spine itemref').forEach(ir=>{
+    spineIds.push(ir.getAttribute('idref'));
+  });
+
+  // 嘗試從 EPUB3 nav 或 EPUB2 toc.ncx 取得章節標題
+  let hrefToTitle = {};
+  const navItem = Object.values(manifestItems).find(it => it.properties.includes('nav'));
+  if(navItem){
+    try{
+      const navPath = opfDir + navItem.href;
+      const navXml = await zip.file(navPath).async('text');
+      const navDoc = new DOMParser().parseFromString(navXml, 'application/xhtml+xml');
+      navDoc.querySelectorAll('a[href]').forEach(a=>{
+        const href = a.getAttribute('href').split('#')[0];
+        if(href && !hrefToTitle[href]) hrefToTitle[href] = a.textContent.trim();
+      });
+    }catch(e){ /* 忽略，稍後用預設章名 */ }
+  }
+  if(Object.keys(hrefToTitle).length === 0){
+    const ncxItem = Object.values(manifestItems).find(it => it.mediaType === 'application/x-dtbncx+xml');
+    if(ncxItem){
+      try{
+        const ncxPath = opfDir + ncxItem.href;
+        const ncxXml = await zip.file(ncxPath).async('text');
+        const ncxDoc = new DOMParser().parseFromString(ncxXml, 'application/xml');
+        ncxDoc.querySelectorAll('navPoint').forEach(np=>{
+          const label = np.querySelector('navLabel text');
+          const content = np.querySelector('content');
+          if(label && content){
+            const src = (content.getAttribute('src') || '').split('#')[0];
+            if(src && !hrefToTitle[src]) hrefToTitle[src] = label.textContent.trim();
+          }
+        });
+      }catch(e){ /* 忽略，稍後用預設章名 */ }
+    }
+  }
+
+  const chapterEntries = [];
+  for(let i = 0; i < spineIds.length; i++){
+    const item = manifestItems[spineIds[i]];
+    if(!item || !/html/i.test(item.mediaType)) continue;
+    const path = opfDir + item.href;
+    const file = zip.file(path);
+    if(!file) continue;
+    const html = await file.async('text');
+    const paras = extractParagraphsFromHTML(html);
+    if(paras.length === 0) continue; // 跳過封面等空白頁
+    const title = hrefToTitle[item.href] || ('第 ' + (chapterEntries.length + 1) + ' 章');
+    chapterEntries.push({ title, paras });
+  }
+  if(chapterEntries.length === 0){
+    throw new Error('無法從這個 EPUB 檔案解析出任何章節內容');
+  }
+
+  const sampleText = chapterEntries.slice(0, 2).map(c=>c.paras.join(' ')).join(' ');
+  const lang = detectPastedLanguage(sampleText);
+  const recommendedWPM = 280;
+
+  const chapters = chapterEntries.map((entry, idx)=>{
+    const chapterId = 'ch' + (idx + 1);
+    const sections = buildSectionsFromParagraphTexts(entry.paras, chapterId, lang);
+    const allParagraphs = sections.reduce((a,s)=>a.concat(s.paragraphs), []);
+    return {
+      id: chapterId,
+      title: entry.title,
+      order: idx + 1,
+      estimatedReadingTimeSec: estimateReadingTimeSec(allParagraphs, recommendedWPM),
+      sections: sections
+    };
+  }).filter(ch => ch.sections.length > 0);
+
+  if(chapters.length === 0){
+    throw new Error('章節內容都無法切出有效的分句');
+  }
+
+  return {
+    id: 'custom_' + Date.now(),
+    title: bookTitle,
+    author: bookAuthor,
+    language: lang,
+    category: '自訂內容（EPUB）',
+    difficulty: '-',
+    recommendedWPM: recommendedWPM,
+    content: { chapters: chapters },
+    quiz: { questions: [] }
+  };
+}
+
+document.getElementById('paste-clipboard-btn').addEventListener('click', async ()=>{
+  try{
+    const text = await navigator.clipboard.readText();
+    document.getElementById('paste-textarea').value = text;
+  }catch(e){
+    alert('無法自動讀取剪貼簿，請直接在下方欄位長按貼上。');
+  }
+});
+document.getElementById('paste-use-btn').addEventListener('click', ()=>{
+  const text = document.getElementById('paste-textarea').value.trim();
+  if(!text){ alert('請先貼上或輸入文章內容'); return; }
+  const article = buildArticleFromText(text);
+  if(article.content.chapters[0].sections[0].paragraphs.length === 0){
+    alert('無法從這段文字切出任何段落，請確認內容不是空白。');
+    return;
+  }
+  switchArticle(article);
+  openSetup(0);
+});
+/* ============ 已符合格式的 JSON 檔案：直接讀取，只做基本驗證與補齊可選欄位 ============ */
+function validateAndNormalizeArticleJSON(data){
+  let article = null;
+  let multiCount = 0;
+  if(data && Array.isArray(data.articles) && data.articles.length > 0){
+    article = data.articles[0];
+    multiCount = data.articles.length;
+  } else if(data && data.content && Array.isArray(data.content.chapters)){
+    article = data;
+  }
+  if(!article){
+    throw new Error('這不是速讀文章格式的 JSON（找不到 articles 陣列，也不是單一文章物件）');
+  }
+  if(!article.content || !Array.isArray(article.content.chapters) || article.content.chapters.length === 0){
+    throw new Error('文章沒有任何章節（content.chapters 是空的或缺少）');
+  }
+  const hasValidStructure = article.content.chapters.some(ch =>
+    Array.isArray(ch.sections) && ch.sections.some(sec =>
+      Array.isArray(sec.paragraphs) && sec.paragraphs.some(p =>
+        Array.isArray(p.clauses) && p.clauses.length > 0
+      )
+    )
+  );
+  if(!hasValidStructure){
+    throw new Error('章節內找不到任何分句（clauses），請確認章／節／段／分句的巢狀結構是否正確');
+  }
+
+  // 補齊可選欄位的預設值，避免後續程式因缺欄位而出錯
+  article.id = article.id || ('uploaded_' + Date.now());
+  article.title = article.title || '匯入的文章';
+  article.language = article.language || 'zh-Hant';
+  article.category = article.category || '自訂內容';
+  article.recommendedWPM = article.recommendedWPM || 280;
+  article.quiz = article.quiz || { questions: [] };
+  article.content.chapters.forEach((ch, idx)=>{
+    ch.id = ch.id || ('ch' + (idx + 1));
+    ch.title = ch.title || ('第 ' + (idx + 1) + ' 章');
+    ch.order = (typeof ch.order === 'number') ? ch.order : (idx + 1);
+    ch.sections = ch.sections || [];
+    if(typeof ch.estimatedReadingTimeSec !== 'number'){
+      let tokens = 0;
+      ch.sections.forEach(sec=>(sec.paragraphs||[]).forEach(p=>(p.clauses||[]).forEach(c=>{
+        tokens += (c.tokens && c.tokens.length) ? c.tokens.length : estimateWordCount(c.text);
+      })));
+      ch.estimatedReadingTimeSec = Math.round(tokens / (article.recommendedWPM / 60));
+    }
+    ch.sections.forEach((sec, sIdx)=>{
+      sec.id = sec.id || (ch.id + '_sec' + (sIdx + 1));
+      sec.title = sec.title || ('第 ' + (sIdx + 1) + ' 節');
+      sec.order = (typeof sec.order === 'number') ? sec.order : (sIdx + 1);
+      sec.paragraphs = sec.paragraphs || [];
+      sec.paragraphs.forEach((p, pIdx)=>{
+        p.id = p.id || (sec.id + '_p' + (pIdx + 1));
+        p.clauses = p.clauses || [];
+        p.clauses.forEach((c, cIdx)=>{
+          c.id = c.id || (p.id + '_c' + (cIdx + 1));
+          c.tokens = c.tokens || [];
+          c.punctuation = c.punctuation || '。';
+        });
+      });
+    });
+  });
+
+  article._importedMultiCount = multiCount;
+  return article;
+}
+
+document.getElementById('file-upload-btn').addEventListener('click', ()=>{
+  document.getElementById('file-upload-input').click();
+});
+document.getElementById('file-upload-input').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const statusEl = document.getElementById('file-upload-status');
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+  statusEl.textContent = '正在讀取「' + file.name + '」…';
+  try{
+    let article;
+    if(ext === 'epub'){
+      const buf = await file.arrayBuffer();
+      article = await buildArticleFromEpub(buf, file.name);
+    } else if(ext === 'txt'){
+      const text = await file.text();
+      article = buildArticleFromPlainText(text, file.name);
+    } else if(ext === 'json'){
+      const text = await file.text();
+      let data;
+      try{ data = JSON.parse(text); }
+      catch(parseErr){ throw new Error('JSON 語法錯誤，無法解析：' + parseErr.message); }
+      article = validateAndNormalizeArticleJSON(data);
+    } else {
+      statusEl.textContent = '';
+      alert('目前只支援 .epub、.txt 或 .json 檔案');
+      return;
+    }
+    statusEl.textContent = (article._importedMultiCount > 1)
+      ? ('此 JSON 內有 ' + article._importedMultiCount + ' 本書，已匯入第一本：' + article.title)
+      : '';
+    switchArticle(article);
+  }catch(err){
+    console.error(err);
+    statusEl.textContent = '';
+    alert('讀取檔案時發生問題：' + (err.message || err));
+  } finally {
+    e.target.value = '';
+  }
+});
+document.getElementById('back-to-builtin-btn').addEventListener('click', ()=>{
+  switchArticle(BUILTIN_ARTICLE);
+});
+
+/* ============ 圖書館畫面 ============ */
+function renderLibrary(){
+  document.getElementById('lib-article-title').textContent = ARTICLE.title;
+  document.getElementById('lib-article-meta').textContent =
+    (ARTICLE.author ? ARTICLE.author + ' · ' : '') + ARTICLE.category + ' · 建議 ' + ARTICLE.recommendedWPM + ' WPM';
+  document.getElementById('back-to-builtin-btn').style.display = (ARTICLE !== BUILTIN_ARTICLE) ? 'block' : 'none';
+
+  const list = document.getElementById('lib-chapter-list');
+  list.innerHTML = '';
+  ARTICLE.content.chapters.forEach((ch, idx)=>{
+    const st = chapterStats(ch);
+    const best = bestRecordFor(ch.id);
+    const card = document.createElement('div');
+    card.className = 'chapter-card';
+    card.innerHTML =
+      (best ? '<div class="badge-done"></div>' : '') +
+      '<div class="ch-num">第 ' + (idx+1) + ' 章</div>' +
+      '<h3>' + ch.title.replace(/^第[一二三四五六七八九十]+章[:：]?/,'') + '</h3>' +
+      '<div class="ch-meta">' +
+        '<span>' + st.clauseCount + ' 分句</span>' +
+        '<span>約 ' + Math.round(ch.estimatedReadingTimeSec/60) + ' 分鐘</span>' +
+        '<span>建議 ' + ARTICLE.recommendedWPM + ' WPM</span>' +
+      '</div>' +
+      (best ? '<div class="ch-progress"><span>已完成</span><span>最佳 <b>' + best.wpm + '</b> WPM · 正確率 <b>' + (typeof best.quizScore === 'number' ? Math.round(best.quizScore*100)+'%' : '—') + '</b></span></div>' : '');
+    card.addEventListener('click', ()=>openSetup(idx));
+    list.appendChild(card);
+  });
+
+  const chapterIds = ARTICLE.content.chapters.map(c=>c.id);
+  const doneIds = new Set(progress.records.filter(r=>r.quizScope==='chapter').map(r=>r.chapterId));
+  const allDone = chapterIds.every(id=>doneIds.has(id));
+  const hasArticleQuiz = !!(ARTICLE.quiz && ARTICLE.quiz.questions && ARTICLE.quiz.questions.length > 0);
+  const overallBtn = document.getElementById('lib-overall-btn');
+  overallBtn.style.display = hasArticleQuiz ? 'flex' : 'none';
+  overallBtn.disabled = !allDone;
+  overallBtn.onclick = (allDone && hasArticleQuiz) ? ()=>openOverallQuiz() : null;
+
+  const wholeBookBtn = document.getElementById('read-whole-book-btn');
+  wholeBookBtn.style.display = ARTICLE.content.chapters.length > 1 ? 'flex' : 'none';
+  wholeBookBtn.onclick = ()=>openWholeBookSetup();
+}
+
+/* ============ 設定畫面 ============ */
+function currentChapter(){
+  return state.wholeBookMode ? state.virtualChapter : ARTICLE.content.chapters[state.chapterIndex];
+}
+function buildWholeBookVirtualChapter(){
+  const chapters = ARTICLE.content.chapters;
+  const sections = [];
+  chapters.forEach(ch=>{ ch.sections.forEach(sec=> sections.push(sec)); });
+  const totalTime = chapters.reduce((a,ch)=>a+(ch.estimatedReadingTimeSec||0),0);
+  return {
+    id: '__whole_book__',
+    title: ARTICLE.title,
+    order: 0,
+    estimatedReadingTimeSec: totalTime,
+    sections: sections
+  };
+}
+function openWholeBookSetup(){
+  state.wholeBookMode = true;
+  state.virtualChapter = buildWholeBookVirtualChapter();
+  state.wpm = ARTICLE.recommendedWPM || 280;
+  state.mode = 'rsvp';
+  state.chunkSize = 2;
+  state.startSectionIdx = 0;
+  renderSetup();
+  showScreen('screen-setup');
+}
+function openSetup(chapterIndex){
+  state.wholeBookMode = false;
+  state.chapterIndex = chapterIndex;
+  const ch = ARTICLE.content.chapters[chapterIndex];
+  state.wpm = ARTICLE.recommendedWPM || 280;
+  state.mode = 'rsvp';
+  state.chunkSize = 2;
+  state.startSectionIdx = 0;
+  renderSetup();
+  showScreen('screen-setup');
+}
+function renderSetup(){
+  const ch = currentChapter();
+  const st = chapterStats(ch);
+  document.getElementById('setup-eyebrow').textContent = state.wholeBookMode
+    ? '全書朗讀 · 訓練設定'
+    : ('第 ' + (state.chapterIndex+1) + ' 章 · 訓練設定');
+  document.getElementById('setup-title').textContent = ch.title;
+  document.getElementById('setup-subtitle').textContent = st.clauseCount + ' 分句 · 約 ' + Math.round(ch.estimatedReadingTimeSec/60) + ' 分鐘';
+
+  const sectionSelect = document.getElementById('start-section-select');
+  sectionSelect.innerHTML = '';
+  ch.sections.forEach((sec, idx)=>{
+    const opt = document.createElement('option');
+    opt.value = idx;
+    opt.textContent = String(idx + 1);
+    sectionSelect.appendChild(opt);
+  });
+  sectionSelect.value = state.startSectionIdx;
+
+  const grid = document.getElementById('mode-grid');
+  grid.innerHTML = '';
+  // 剪貼簿貼上的文章一律不斷詞（不論中英文），因此都不提供分塊／分句閱讀
+  const lacksRealTokens = (ARTICLE !== BUILTIN_ARTICLE);
+  if(lacksRealTokens && (state.mode === 'chunk' || state.mode === 'clause')){
+    state.mode = 'rsvp';
+  }
+  Object.keys(MODE_INFO).forEach(key=>{
+    if(lacksRealTokens && (key === 'chunk' || key === 'clause')) return;
+    const info = MODE_INFO[key];
+    const el = document.createElement('div');
+    el.className = 'mode-option' + (state.mode===key ? ' selected' : '');
+    el.innerHTML = '<h4>' + info.label + '</h4><p>' + info.desc + '</p>';
+    el.addEventListener('click', ()=>{ state.mode = key; renderSetup(); });
+    grid.appendChild(el);
+  });
+
+  document.getElementById('chunk-size-section').style.display = state.mode==='chunk' ? 'block' : 'none';
+  const chunkRow = document.getElementById('chunk-size-row');
+  chunkRow.innerHTML = '';
+  [2,3,4].forEach(n=>{
+    const b = document.createElement('div');
+    b.className = 'chunk-btn' + (state.chunkSize===n ? ' selected' : '');
+    b.textContent = n + ' 詞';
+    b.addEventListener('click', ()=>{ state.chunkSize = n; renderSetup(); });
+    chunkRow.appendChild(b);
+  });
+
+  document.getElementById('wpm-slider').value = state.wpm;
+  document.getElementById('wpm-value').innerHTML = state.wpm + ' <sub>WPM</sub>';
+}
+document.getElementById('start-section-select').addEventListener('change', (e)=>{
+  state.startSectionIdx = parseInt(e.target.value);
+});
+document.getElementById('wpm-slider').addEventListener('input', (e)=>{
+  state.wpm = parseInt(e.target.value);
+  document.getElementById('wpm-value').innerHTML = state.wpm + ' <sub>WPM</sub>';
+});
+document.getElementById('setup-back').addEventListener('click', ()=>{ renderLibrary(); showScreen('screen-library'); });
+document.getElementById('start-btn').addEventListener('click', startReading);
+
+/* ============ 步驟建構 ============ */
+function estimateWordCount(text){
+  // 整句 fallback 成單一 token 時，用這個估算「這個 token 該算幾個字」，
+  // 避免整句只用一個 token 的時間播完，導致實際速度遠快於設定的 WPM。
+  const trimmed = (text || '').trim();
+  if(trimmed.length === 0) return 1;
+  if(/\s/.test(trimmed)){
+    // 英文等以空白分隔的語言：用空白數推估字數
+    return Math.max(1, trimmed.split(/\s+/).filter(Boolean).length);
+  }
+  // 中文等無空白語言：粗略以字元數估算
+  return Math.max(1, trimmed.length);
+}
+function buildTokenSteps(paragraphs){
+  const steps = [];
+  paragraphs.forEach((para, paraIdx)=>{
+    para.clauses.forEach((clause, clauseIdx)=>{
+      // tokens 為空時，視為只有一個 token，即整句
+      const hasRealTokens = clause.tokens && clause.tokens.length > 0;
+      const toks = hasRealTokens ? clause.tokens : [clause.text];
+      toks.forEach((tok, tokIdx)=>{
+        steps.push({
+          paraIdx, clauseIdx, tokIdx,
+          sectionIdx: para.sectionIdx,
+          text: tok,
+          isLastToken: tokIdx === toks.length-1,
+          punctuation: clause.punctuation,
+          // 真正的 token 每個算 1；fallback 整句則依估算字數給予對應的停留權重
+          tokenCount: hasRealTokens ? 1 : estimateWordCount(tok)
+        });
+      });
+    });
+  });
+  return steps;
+}
+function buildChunkSteps(tokenSteps, chunkSize){
+  const chunks = [];
+  let i=0;
+  while(i<tokenSteps.length){
+    const group = [];
+    let punctuation = null, isLast=false;
+    for(let k=0;k<chunkSize && i<tokenSteps.length;k++,i++){
+      const st = tokenSteps[i];
+      group.push(st);
+      if(st.isLastToken){ punctuation = st.punctuation; isLast = true; i++; break; }
+    }
+    chunks.push({
+      text: joinTokensForDisplay(group.map(g=>g.text)),
+      tokenCount: group.reduce((a,g)=>a+(g.tokenCount||1), 0),
+      isLastToken: isLast,
+      punctuation: punctuation,
+      sectionIdx: group[0].sectionIdx
+    });
+  }
+  return chunks;
+}
+function buildClauseSteps(tokenSteps){
+  const steps = [];
+  let i = 0;
+  while(i < tokenSteps.length){
+    const group = [];
+    while(i < tokenSteps.length){
+      const st = tokenSteps[i];
+      group.push(st);
+      i++;
+      if(st.isLastToken) break;
+    }
+    steps.push({
+      tokens: group.map(g=>g.text),
+      text: joinTokensForDisplay(group.map(g=>g.text)),
+      tokenCount: group.reduce((a,g)=>a+(g.tokenCount||1), 0),
+      isLastToken: true,
+      punctuation: group[group.length-1].punctuation,
+      sectionIdx: group[0].sectionIdx
+    });
+  }
+  return steps;
+}
+
+/* ============ 朗讀播放 ============ */
+function startReading(){
+  const ch = currentChapter();
+  const flat = flattenChapter(ch);
+  const startIdx = state.startSectionIdx || 0;
+  state.paragraphs = flat.paragraphs.filter(p => p.sectionIdx >= startIdx);
+  state.sections = flat.sections;
+  state.chapterSentenceList = buildChapterSentenceList(state.paragraphs);
+  const tokenSteps = buildTokenSteps(state.paragraphs);
+  state.totalTokens = tokenSteps.reduce((a,s)=>a+(s.tokenCount||1), 0);
+  if(state.mode === 'chunk') state.steps = buildChunkSteps(tokenSteps, state.chunkSize);
+  else if(state.mode === 'clause') state.steps = buildClauseSteps(tokenSteps);
+  else state.steps = tokenSteps;
+  state.stepIndex = 0;
+  state.paused = false;
+  state.lastParaIdx = -1;
+  state.clauseSlotIndex = 0;
+  state.startTime = Date.now();
+
+  document.getElementById('reading-chapter-label').textContent = ch.title;
+  document.getElementById('rsvp-display').style.display = state.mode==='rsvp' ? 'block' : 'none';
+  document.getElementById('chunk-display').style.display = state.mode==='chunk' ? 'block' : 'none';
+  document.getElementById('clause-pane').style.display = state.mode==='clause' ? 'block' : 'none';
+  document.getElementById('window-pane').style.display = state.mode==='window' ? 'block' : 'none';
+  document.getElementById('pause-btn').textContent = '暫停';
+  document.getElementById('font-size-control').style.display = 'none';
+
+  showScreen('screen-reading');
+  playStep();
+}
+
+function baseInterval(){ return 60000 / state.wpm; }
+
+function playStep(){
+  if(state.paused) return;
+  if(state.stepIndex >= state.steps.length){ finishReading(); return; }
+  const step = state.steps[state.stepIndex];
+  renderStep(step);
+  updateProgressBar();
+
+  let delay = baseInterval() * (step.tokenCount || 1);
+  if(step.isLastToken) delay += pauseFor(step.punctuation);
+
+  clearTimeout(state.timer);
+  state.timer = setTimeout(()=>{
+    const finishedSectionIdx = state.steps[state.stepIndex].sectionIdx;
+    state.stepIndex++;
+    const nextStep = state.steps[state.stepIndex];
+    const nextSectionIdx = nextStep ? nextStep.sectionIdx : null;
+    if(nextSectionIdx !== finishedSectionIdx){
+      triggerSectionCheck(finishedSectionIdx);
+    } else {
+      playStep();
+    }
+  }, delay);
+}
+
+/* ============ 節間即時檢核：讀完一節先暫停問一題 ============ */
+const SENTENCE_END_PUNCT = ['。','！','？'];
+function collectFullSentences(section){
+  // 完整句子：以句號／驚嘆號／問號結尾（不以逗號、頓號等結尾），且長度不少於 5 字
+  return section.clauses.filter(c =>
+    SENTENCE_END_PUNCT.includes(c.punctuation) && c.text.length >= 5
+  );
+}
+function buildChapterSentenceList(paragraphs){
+  // 依朗讀順序收集整章的「完整句子」，並標記所屬節，供上一句／下一句題型使用
+  const list = [];
+  paragraphs.forEach(para=>{
+    para.clauses.forEach(c=>{
+      if(SENTENCE_END_PUNCT.includes(c.punctuation) && c.text.length >= 5){
+        list.push({ text:c.text, punctuation:c.punctuation, sectionIdx:para.sectionIdx });
+      }
+    });
+  });
+  return list;
+}
+function shuffleArray(arr){
+  return arr.slice().sort(()=>Math.random()-0.5);
+}
+function generateAutoTrueFalseQuiz(sectionIdx){
+  const section = state.sections[sectionIdx];
+  const nextSection = state.sections[sectionIdx + 1] || null;
+  const ownPool = collectFullSentences(section);
+  const nextPool = nextSection ? collectFullSentences(nextSection) : [];
+  if(ownPool.length === 0 && nextPool.length === 0) return null;
+
+  let pickFromOwn;
+  if(ownPool.length > 0 && nextPool.length > 0) pickFromOwn = Math.random() < 0.5;
+  else pickFromOwn = ownPool.length > 0;
+
+  const pool = pickFromOwn ? ownPool : nextPool;
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  return {
+    autoGenerated: true,
+    questions: [{
+      id: 'auto_tf_' + section.id,
+      type: 'true_false',
+      question: '這句話出自本節：「' + picked.text + picked.punctuation + '」',
+      answer: pickFromOwn,
+      explanation: pickFromOwn ? '這句話確實出自本節。' : '這句話其實出自下一節，還沒讀到這裡。'
+    }]
+  };
+}
+function generateAutoNextSentenceQuiz(sectionIdx){
+  const list = state.chapterSentenceList;
+  const section = state.sections[sectionIdx];
+  // 候選：屬於本節、且在整章句子清單中「有下一句」的句子
+  const candidateIdx = [];
+  list.forEach((s, i)=>{ if(s.sectionIdx === sectionIdx && i + 1 < list.length) candidateIdx.push(i); });
+  if(candidateIdx.length === 0) return null;
+
+  const si = candidateIdx[Math.floor(Math.random() * candidateIdx.length)];
+  const target = list[si];
+  const correctNext = list[si + 1];
+  const prevSentence = si - 1 >= 0 ? list[si - 1] : null;
+
+  const usedTexts = new Set([target.text, correctNext.text]);
+  if(prevSentence) usedTexts.add(prevSentence.text);
+
+  const options = [];
+  options.push({ text: correctNext.text + correctNext.punctuation, isCorrect: true });
+  if(prevSentence) options.push({ text: prevSentence.text + prevSentence.punctuation, isCorrect: false });
+
+  // 本節其他任一句作為干擾選項，補到 4 個選項
+  const sectionOthers = shuffleArray(list.filter(s => s.sectionIdx === sectionIdx && !usedTexts.has(s.text)));
+  for(const s of sectionOthers){
+    if(options.length >= 4) break;
+    options.push({ text: s.text + s.punctuation, isCorrect: false });
+    usedTexts.add(s.text);
+  }
+  // 若本節句子不夠，從全章其餘句子補足
+  if(options.length < 4){
+    const fallback = shuffleArray(list.filter(s => !usedTexts.has(s.text)));
+    for(const s of fallback){
+      if(options.length >= 4) break;
+      options.push({ text: s.text + s.punctuation, isCorrect: false });
+      usedTexts.add(s.text);
+    }
+  }
+  if(options.length < 2) return null;
+
+  const shuffled = shuffleArray(options);
+  const answerIndex = shuffled.findIndex(o => o.isCorrect);
+
+  return {
+    autoGenerated: true,
+    questions: [{
+      id: 'auto_next_' + section.id,
+      type: 'single_choice',
+      question: '這句話的下一句是？「' + target.text + target.punctuation + '」',
+      options: shuffled.map(o => o.text),
+      answerIndex: answerIndex,
+      explanation: '下一句其實是：「' + correctNext.text + correctNext.punctuation + '」'
+    }]
+  };
+}
+function generateAutoSectionQuiz(sectionIdx){
+  const preferNextSentence = Math.random() < 0.5;
+  let quiz = preferNextSentence ? generateAutoNextSentenceQuiz(sectionIdx) : generateAutoTrueFalseQuiz(sectionIdx);
+  if(!quiz){
+    quiz = preferNextSentence ? generateAutoTrueFalseQuiz(sectionIdx) : generateAutoNextSentenceQuiz(sectionIdx);
+  }
+  return quiz;
+}
+
+/* ============ 整章自動出題（供沒有作者預先設計章測驗的文章使用，預設 3 題）============ */
+function buildNextSentenceQuestionAt(list, si, idSuffix){
+  const target = list[si];
+  const correctNext = list[si + 1];
+  if(!correctNext) return null;
+  const prevSentence = si - 1 >= 0 ? list[si - 1] : null;
+  const usedTexts = new Set([target.text, correctNext.text]);
+  if(prevSentence) usedTexts.add(prevSentence.text);
+
+  const options = [{ text: correctNext.text + correctNext.punctuation, isCorrect: true }];
+  if(prevSentence) options.push({ text: prevSentence.text + prevSentence.punctuation, isCorrect: false });
+  const others = shuffleArray(list.filter(s => !usedTexts.has(s.text)));
+  for(const s of others){
+    if(options.length >= 4) break;
+    options.push({ text: s.text + s.punctuation, isCorrect: false });
+    usedTexts.add(s.text);
+  }
+  if(options.length < 2) return null;
+
+  const shuffled = shuffleArray(options);
+  const answerIndex = shuffled.findIndex(o => o.isCorrect);
+  return {
+    id: 'auto_ch_q_' + idSuffix,
+    type: 'single_choice',
+    question: '這句話的下一句是？「' + target.text + target.punctuation + '」',
+    options: shuffled.map(o => o.text),
+    answerIndex: answerIndex,
+    explanation: '下一句其實是：「' + correctNext.text + correctNext.punctuation + '」'
+  };
+}
+function generateAutoChapterQuiz(count){
+  const list = state.chapterSentenceList;
+  if(!list || list.length < 2) return null;
+  const candidateIdx = [];
+  for(let i = 0; i < list.length - 1; i++) candidateIdx.push(i);
+  const shuffledIdx = shuffleArray(candidateIdx);
+  const questions = [];
+  for(const si of shuffledIdx){
+    if(questions.length >= count) break;
+    const q = buildNextSentenceQuestionAt(list, si, questions.length + 1);
+    if(q) questions.push(q);
+  }
+  if(questions.length === 0) return null;
+  return { autoGenerated: true, questions: questions };
+}
+function triggerSectionCheck(sectionIdx){
+  clearTimeout(state.timer);
+  const section = state.sections[sectionIdx];
+  state.pendingResume = (state.stepIndex >= state.steps.length) ? 'finish' : 'continue';
+  if(!section){
+    if(state.pendingResume === 'finish') finishReading(); else playStep();
+    return;
+  }
+  const quiz = section.quiz || generateAutoSectionQuiz(sectionIdx);
+  if(!quiz){
+    // 無法產生任何檢核題（本節與下節都沒有夠長的完整句子），直接接續播放
+    if(state.pendingResume === 'finish') finishReading(); else playStep();
+    return;
+  }
+  renderSectionCheck(section, quiz);
+  showScreen('screen-section-check');
+}
+function renderSectionCheck(section, quiz){
+  document.getElementById('section-check-eyebrow').textContent = quiz.autoGenerated ? '隨機抽問' : '本節小測驗';
+  document.getElementById('section-check-title').textContent = section.title;
+  const q = quiz.questions[0];
+  const container = document.getElementById('section-check-question');
+  let inner = '<div class="quiz-q"><div class="quiz-q-title">'+q.question+'</div>';
+  if(q.type === 'single_choice'){
+    inner += '<div class="opt-list">' + q.options.map((opt,oi)=>
+      '<div class="opt" data-value="'+oi+'">' + opt + '</div>'
+    ).join('') + '</div>';
+  } else {
+    inner += '<div class="tf-row">' +
+      '<div class="opt" data-value="true">對</div>' +
+      '<div class="opt" data-value="false">錯</div>' +
+    '</div>';
+  }
+  inner += '<div class="explanation" style="display:none;"></div></div>';
+  container.innerHTML = inner;
+
+  document.getElementById('section-continue-btn').style.display = 'none';
+
+  container.querySelectorAll('.opt').forEach(optEl=>{
+    optEl.addEventListener('click', ()=>{
+      if(optEl.parentElement.querySelector('.opt.correct, .opt.incorrect')) return;
+      if(q.type === 'single_choice'){
+        const selectedIdx = parseInt(optEl.dataset.value);
+        container.querySelectorAll('.opt').forEach((o,oi)=>{
+          if(oi === q.answerIndex) o.classList.add('correct');
+          else if(oi === selectedIdx) o.classList.add('incorrect');
+          o.style.pointerEvents = 'none';
+        });
+      } else {
+        const boolSelected = optEl.dataset.value === 'true';
+        container.querySelectorAll('.opt').forEach(o=>{
+          const val = o.dataset.value === 'true';
+          if(val === q.answer) o.classList.add('correct');
+          else if(o === optEl) o.classList.add('incorrect');
+          o.style.pointerEvents = 'none';
+        });
+      }
+      if(q.explanation){
+        const exp = container.querySelector('.explanation');
+        exp.textContent = q.explanation;
+        exp.style.display = 'block';
+      }
+      document.getElementById('section-continue-btn').style.display = 'block';
+    });
+  });
+}
+function resumeAfterSectionCheck(){
+  if(state.pendingResume === 'finish'){
+    finishReading();
+  } else {
+    showScreen('screen-reading');
+    playStep();
+  }
+}
+document.getElementById('section-continue-btn').addEventListener('click', resumeAfterSectionCheck);
+
+function renderStep(step){
+  if(state.mode === 'rsvp'){
+    document.getElementById('rsvp-display').textContent = step.text;
+  } else if(state.mode === 'chunk'){
+    document.getElementById('chunk-display').textContent = step.text;
+  } else if(state.mode === 'clause'){
+    renderClauseStep(step);
+  } else {
+    renderWindowStep(step);
+  }
+}
+
+function renderClauseStep(step){
+  const container = document.getElementById('clause-pane');
+  const totalSlots = 6;
+  const slot = state.clauseSlotIndex % totalSlots;
+  const topPct = 8 + slot * (84 / (totalSlots - 1));
+  state.clauseSlotIndex++;
+
+  const tokens = step.tokens && step.tokens.length ? step.tokens : [step.text];
+  const inner = tokens.map((tok, idx)=>{
+    const displayNum = idx + 1; // 1-indexed：奇數 = 1,3,5...
+    return displayNum % 2 === 1
+      ? '<span class="tok-odd">' + tok + '</span>'
+      : '<span>' + tok + '</span>';
+  }).join(tokenSeparator()) + '<span class="clause-punct">' + step.punctuation + '</span>';
+
+  container.innerHTML = '<div class="clause-text" style="top:' + topPct + '%;">' + inner + '</div>';
+}
+
+function renderWindowParagraph(paraIdx){
+  const para = state.paragraphs[paraIdx];
+  const container = document.getElementById('window-pane');
+  const sep = tokenSeparator();
+  container.innerHTML = para.clauses.map((clause, cIdx)=>{
+    const toks = (clause.tokens && clause.tokens.length > 0) ? clause.tokens : [clause.text];
+    return toks.map((tok, tIdx)=>
+      '<span class="tok" data-clause="'+cIdx+'" data-tok="'+tIdx+'">'+tok+'</span>'
+    ).join(sep) + '<span class="punct">'+clause.punctuation+'</span>' + (sep ? ' ' : '');
+  }).join('');
+}
+function renderWindowStep(step){
+  if(state.lastParaIdx !== step.paraIdx){
+    renderWindowParagraph(step.paraIdx);
+    state.lastParaIdx = step.paraIdx;
+  }
+  const container = document.getElementById('window-pane');
+  container.querySelectorAll('.tok').forEach(el=>{
+    const cIdx = parseInt(el.dataset.clause), tIdx = parseInt(el.dataset.tok);
+    el.classList.toggle('tok-read', cIdx < step.clauseIdx || (cIdx===step.clauseIdx && tIdx < step.tokIdx));
+    el.classList.toggle('tok-active-clause', cIdx === step.clauseIdx);
+    el.classList.toggle('tok-current', cIdx===step.clauseIdx && tIdx===step.tokIdx);
+  });
+  const current = container.querySelector('.tok-current');
+  if(current) current.scrollIntoView({block:'center', behavior:'smooth'});
+}
+
+function updateProgressBar(){
+  const pct = Math.round((state.stepIndex/state.steps.length)*100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = (state.stepIndex) + ' / ' + state.steps.length;
+}
+
+/* ============ 閱讀字型大小：暫停時可調整，並持久儲存供之後沿用 ============ */
+const FONT_SCALE_KEY = 'sudu_font_scale';
+function loadFontScale(){
+  const v = parseFloat(localStorage.getItem(FONT_SCALE_KEY));
+  return (!isNaN(v) && v > 0) ? v : 1;
+}
+function saveFontScale(v){
+  try{ localStorage.setItem(FONT_SCALE_KEY, String(v)); }catch(e){}
+}
+let readingFontScale = loadFontScale();
+function applyFontScale(){
+  document.documentElement.style.setProperty('--font-scale', readingFontScale);
+  const label = document.getElementById('font-scale-value');
+  if(label) label.textContent = Math.round(readingFontScale * 100) + '%';
+}
+function changeFontScale(delta){
+  readingFontScale = Math.min(2, Math.max(0.6, Math.round((readingFontScale + delta) * 100) / 100));
+  saveFontScale(readingFontScale);
+  applyFontScale();
+}
+applyFontScale(); // 一開始就套用上次儲存的字型大小
+
+document.getElementById('font-size-minus').addEventListener('click', ()=>changeFontScale(-0.1));
+document.getElementById('font-size-plus').addEventListener('click', ()=>changeFontScale(0.1));
+
+document.getElementById('pause-btn').addEventListener('click', ()=>{
+  state.paused = !state.paused;
+  document.getElementById('pause-btn').textContent = state.paused ? '繼續' : '暫停';
+  document.getElementById('font-size-control').style.display = state.paused ? 'flex' : 'none';
+  if(!state.paused) playStep();
+  else clearTimeout(state.timer);
+});
+document.getElementById('exit-reading-btn').addEventListener('click', ()=>{
+  clearTimeout(state.timer);
+  if(confirm('確定要離開本次練習嗎？進度將不會被記錄。')){
+    renderLibrary(); showScreen('screen-library');
+  } else {
+    if(!state.paused) playStep();
+  }
+});
+
+/* ============ 完成朗讀 → 進入測驗 ============ */
+function finishReading(){
+  const elapsedMs = Date.now() - state.startTime;
+  const actualWpm = Math.round(state.totalTokens / (elapsedMs/60000));
+  state.lastRun = {
+    wpm: actualWpm,
+    timeSpentSec: Math.round(elapsedMs/1000),
+    mode: state.mode
+  };
+  if(state.wholeBookMode){
+    state.quizScope = 'wholebook';
+    showResults(0, 0, null);
+    return;
+  }
+  state.quizScope = 'chapter';
+  state.quizChapterIndex = state.chapterIndex;
+  state.dynamicChapterQuiz = null;
+  const ch = ARTICLE.content.chapters[state.chapterIndex];
+  if(ch.quiz && ch.quiz.questions && ch.quiz.questions.length > 0){
+    renderQuiz();
+    showScreen('screen-quiz');
+  } else {
+    const autoQuiz = generateAutoChapterQuiz(3);
+    if(autoQuiz){
+      state.dynamicChapterQuiz = autoQuiz;
+      renderQuiz();
+      showScreen('screen-quiz');
+    } else {
+      showResults(0, 0, null);
+    }
+  }
+}
+
+/* ============ 整篇總測驗（不需重新朗讀） ============ */
+function openOverallQuiz(){
+  state.quizScope = 'article';
+  state.lastRun = { wpm: 0, timeSpentSec: 0, mode: '-' };
+  renderQuiz();
+  showScreen('screen-quiz');
+}
+
+/* ============ 測驗畫面 ============ */
+function currentQuiz(){
+  if(state.quizScope === 'chapter'){
+    if(state.dynamicChapterQuiz) return state.dynamicChapterQuiz;
+    return ARTICLE.content.chapters[state.quizChapterIndex].quiz;
+  }
+  return ARTICLE.quiz;
+}
+function renderQuiz(){
+  state.quizAnswers = {};
+  const quiz = currentQuiz();
+  document.getElementById('quiz-title').textContent =
+    state.quizScope==='chapter' ? ARTICLE.content.chapters[state.quizChapterIndex].title + ' · 測驗' : '整篇文章 · 總測驗';
+
+  const container = document.getElementById('quiz-questions');
+  container.innerHTML = '';
+  quiz.questions.forEach((q, qi)=>{
+    const block = document.createElement('div');
+    block.className = 'quiz-q';
+    block.dataset.qid = q.id;
+    let inner = '<div class="quiz-q-title"><span class="quiz-num">Q' + (qi+1) + '</span>' + q.question + '</div>';
+    if(q.type === 'single_choice'){
+      inner += '<div class="opt-list">' + q.options.map((opt,oi)=>
+        '<div class="opt" data-value="'+oi+'">' + opt + '</div>'
+      ).join('') + '</div>';
+    } else if(q.type === 'true_false'){
+      inner += '<div class="tf-row">' +
+        '<div class="opt" data-value="true">對</div>' +
+        '<div class="opt" data-value="false">錯</div>' +
+      '</div>';
+    }
+    inner += '<div class="explanation" style="display:none;"></div>';
+    block.innerHTML = inner;
+    container.appendChild(block);
+  });
+
+  container.querySelectorAll('.opt').forEach(optEl=>{
+    optEl.addEventListener('click', ()=>{
+      const block = optEl.closest('.quiz-q');
+      block.querySelectorAll('.opt').forEach(o=>o.classList.remove('selected'));
+      optEl.classList.add('selected');
+      state.quizAnswers[block.dataset.qid] = optEl.dataset.value;
+      updateSubmitEnabled();
+    });
+  });
+  document.getElementById('submit-quiz-btn').disabled = true;
+  document.getElementById('submit-quiz-btn').textContent = '提交答案';
+  document.getElementById('submit-quiz-btn').onclick = submitQuiz;
+}
+function updateSubmitEnabled(){
+  const quiz = currentQuiz();
+  const answered = quiz.questions.every(q => state.quizAnswers[q.id] !== undefined);
+  document.getElementById('submit-quiz-btn').disabled = !answered;
+}
+
+function submitQuiz(){
+  const quiz = currentQuiz();
+  let correctCount = 0;
+  quiz.questions.forEach(q=>{
+    const block = document.querySelector('.quiz-q[data-qid="'+q.id+'"]');
+    const selected = state.quizAnswers[q.id];
+    let isCorrect = false;
+    if(q.type === 'single_choice'){
+      isCorrect = parseInt(selected) === q.answerIndex;
+      block.querySelectorAll('.opt').forEach((o,oi)=>{
+        if(oi === q.answerIndex) o.classList.add('correct');
+        else if(String(oi) === selected) o.classList.add('incorrect');
+        o.style.pointerEvents = 'none';
+      });
+    } else {
+      const boolSelected = selected === 'true';
+      isCorrect = boolSelected === q.answer;
+      block.querySelectorAll('.opt').forEach(o=>{
+        const val = o.dataset.value === 'true';
+        if(val === q.answer) o.classList.add('correct');
+        else if(o.dataset.value === selected) o.classList.add('incorrect');
+        o.style.pointerEvents = 'none';
+      });
+    }
+    if(isCorrect) correctCount++;
+    const expEl = block.querySelector('.explanation');
+    if(q.explanation){ expEl.textContent = q.explanation; expEl.style.display = 'block'; }
+  });
+
+  const score = Math.round((correctCount/quiz.questions.length)*100)/100;
+  document.getElementById('submit-quiz-btn').textContent = '查看結果';
+  document.getElementById('submit-quiz-btn').disabled = false;
+  document.getElementById('submit-quiz-btn').onclick = ()=>showResults(correctCount, quiz.questions.length, score);
+}
+
+/* ============ 結果畫面 ============ */
+function showResults(correctCount, totalQ, score){
+  if(score === null){
+    document.getElementById('result-score-big').textContent = '完成';
+    document.getElementById('stat-accuracy').textContent = '—';
+  } else {
+    document.getElementById('result-score-big').textContent = correctCount + '/' + totalQ;
+    document.getElementById('stat-accuracy').textContent = Math.round(score*100) + '%';
+  }
+
+  if(state.quizScope === 'chapter'){
+    document.getElementById('stat-wpm').textContent = state.lastRun.wpm;
+    document.getElementById('stat-time').textContent = state.lastRun.timeSpentSec + ' 秒';
+    document.getElementById('stat-mode').textContent = MODE_INFO[state.lastRun.mode].label;
+
+    const ch = ARTICLE.content.chapters[state.quizChapterIndex];
+    progress.records.push({
+      articleId: ARTICLE.id,
+      chapterId: ch.id,
+      date: new Date().toISOString().slice(0,10),
+      mode: state.lastRun.mode,
+      wpm: state.lastRun.wpm,
+      timeSpentSec: state.lastRun.timeSpentSec,
+      quizScope: 'chapter',
+      quizScore: score
+    });
+    recomputeStats();
+    saveProgress();
+
+    const hasNext = state.quizChapterIndex < ARTICLE.content.chapters.length - 1;
+    document.getElementById('next-btn').style.display = hasNext ? 'block' : 'none';
+    document.getElementById('retry-btn').textContent = '重新練習本章';
+    document.getElementById('retry-btn').onclick = ()=>{ openSetup(state.quizChapterIndex); };
+    document.getElementById('next-btn').onclick = ()=>{ openSetup(state.quizChapterIndex+1); };
+  } else if(state.quizScope === 'wholebook'){
+    document.getElementById('stat-wpm').textContent = state.lastRun.wpm;
+    document.getElementById('stat-time').textContent = state.lastRun.timeSpentSec + ' 秒';
+    document.getElementById('stat-mode').textContent = MODE_INFO[state.lastRun.mode].label;
+
+    progress.records.push({
+      articleId: ARTICLE.id,
+      chapterId: '__whole_book__',
+      date: new Date().toISOString().slice(0,10),
+      mode: state.lastRun.mode,
+      wpm: state.lastRun.wpm,
+      timeSpentSec: state.lastRun.timeSpentSec,
+      quizScope: 'wholebook',
+      quizScore: score
+    });
+    recomputeStats();
+    saveProgress();
+
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('retry-btn').textContent = '重新朗讀全書';
+    document.getElementById('retry-btn').onclick = ()=>{ openWholeBookSetup(); };
+  } else {
+    document.getElementById('stat-wpm').textContent = '-';
+    document.getElementById('stat-time').textContent = '-';
+    document.getElementById('stat-mode').textContent = '總測驗';
+    document.getElementById('next-btn').style.display = 'none';
+    document.getElementById('retry-btn').textContent = '重新測驗';
+    document.getElementById('retry-btn').onclick = ()=>{ openOverallQuiz(); };
+  }
+  document.getElementById('lib-btn').onclick = ()=>{ renderLibrary(); showScreen('screen-library'); };
+  showScreen('screen-results');
+}
+
+/* ============ 初始化 ============ */
+renderLibrary();
+</script>
+</body>
+</html>
