@@ -1,0 +1,709 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>新制多益必考單字互動學習網 (錯題重測優化版)</title>
+   <style>
+       :root {
+           --primary: #2c3e50;
+           --accent: #e67e22; /* 多益橘色調 */
+           --success: #2ecc71;
+           --error: #e74c3c;
+           --bg: #f8f9fa;
+           --dark: #34495e;
+           --blue-btn: #3498db;
+       }
+       body {
+           font-family: 'Helvetica Neue', Arial, sans-serif;
+           background-color: var(--bg);
+           margin: 0;
+           padding: 0;
+           color: #333;
+       }
+       
+       /* 模式切換導覽列 */
+       .nav-bar {
+           background-color: var(--primary);
+           display: flex;
+           justify-content: center;
+           gap: 10px;
+           padding: 10px;
+           position: sticky;
+           top: 0;
+           z-index: 100;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+       }
+       .nav-btn {
+           background: none;
+           border: 2px solid white;
+           color: white;
+           padding: 8px 20px;
+           font-size: 16px;
+           font-weight: bold;
+           cursor: pointer;
+           border-radius: 20px;
+           transition: all 0.3s;
+       }
+       .nav-btn.active-mode {
+           background-color: white;
+           color: var(--primary);
+       }
+
+       .main-container {
+           max-width: 700px;
+           margin: 20px auto;
+           padding: 0 15px;
+       }
+
+       /* 共通隱藏樣式 */
+       .mode-section {
+           display: none;
+       }
+       .mode-section.active {
+           display: block;
+       }
+
+       /* ==================== 1. 學習模式樣式 ==================== */
+       .sticky-panel {
+           background-color: var(--dark);
+           color: white;
+           padding: 15px;
+           border-radius: 12px;
+           position: sticky;
+           top: 60px;
+           z-index: 90;
+           box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+           margin-bottom: 20px;
+           text-align: center;
+       }
+       .sticky-panel select {
+           width: 100%;
+           padding: 8px;
+           margin-bottom: 10px;
+           border-radius: 6px;
+           border: none;
+           font-size: 16px;
+       }
+       .display-en {
+           font-size: 24px;
+           font-weight: bold;
+           margin-bottom: 5px;
+           min-height: 32px;
+           color: #fff;
+           letter-spacing: 0.5px;
+       }
+       .display-zh {
+           font-size: 16px;
+           color: #bdc3c7;
+           min-height: 22px;
+       }
+       .cards-grid {
+           display: grid;
+           grid-template-columns: 1fr;
+           gap: 12px;
+       }
+       .learn-card {
+           background: white;
+           padding: 15px;
+           border-radius: 8px;
+           box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           cursor: pointer;
+           border: 2px solid transparent;
+           transition: all 0.2s;
+       }
+       .learn-card:hover {
+           border-color: var(--blue-btn);
+           background-color: #e8f4fd;
+       }
+       .card-text {
+           font-size: 18px;
+           font-weight: bold;
+           color: var(--primary);
+       }
+       .speaker-btn {
+           background-color: var(--blue-btn);
+           color: white;
+           border: none;
+           width: 40px;
+           height: 40px;
+           border-radius: 50%;
+           font-size: 16px;
+           cursor: pointer;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           transition: transform 0.1s;
+       }
+       .speaker-btn:active {
+           transform: scale(0.9);
+       }
+
+       /* ==================== 2. 測驗模式樣式 ==================== */
+       .quiz-container {
+           background: white;
+           padding: 25px;
+           border-radius: 12px;
+           box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+       }
+       .config-section, .quiz-panel, .result-section {
+           display: none;
+       }
+       .config-section.sub-active, .quiz-panel.sub-active, .result-section.sub-active {
+           display: block;
+       }
+       .form-group {
+           margin-bottom: 15px;
+       }
+       .form-group label {
+           display: block;
+           font-weight: bold;
+           margin-bottom: 8px;
+           color: #555;
+       }
+       .form-group select {
+           width: 100%;
+           padding: 10px;
+           border: 1px solid #ddd;
+           border-radius: 6px;
+           font-size: 16px;
+       }
+       .primary-btn {
+           width: 100%;
+           padding: 12px;
+           background-color: var(--accent);
+           color: white;
+           border: none;
+           border-radius: 6px;
+           font-size: 16px;
+           cursor: pointer;
+           font-weight: bold;
+       }
+       .primary-btn:hover {
+           background-color: #d35400;
+       }
+       .progress {
+           font-size: 14px;
+           color: #7f8c8d;
+           margin-bottom: 10px;
+           text-align: right;
+       }
+       .question-card {
+           background: #f1f2f6;
+           padding: 20px;
+           border-radius: 8px;
+           font-size: 22px;
+           font-weight: bold;
+           text-align: center;
+           margin-bottom: 20px;
+           cursor: pointer;
+           border: 2px solid transparent;
+       }
+       .question-card.clickable-en:hover {
+           border-color: var(--blue-btn);
+           background: #e8f4fd;
+       }
+       .options-grid {
+           display: grid;
+           grid-template-columns: 1fr;
+           gap: 12px;
+           margin-bottom: 20px;
+       }
+       .option-btn {
+           padding: 14px 15px;
+           background: white;
+           border: 2px solid #e0e0e0;
+           border-radius: 8px;
+           font-size: 16px;
+           text-align: left;
+           cursor: pointer;
+           transition: all 0.2s;
+           display: flex;
+           align-items: center;
+           justify-content: space-between;
+       }
+       .option-btn:hover {
+           border-color: var(--accent);
+           background: #f7f9fa;
+       }
+       .score-display {
+           font-size: 48px;
+           font-weight: bold;
+           text-align: center;
+           color: var(--accent);
+           margin: 20px 0;
+       }
+       .wrong-list {
+           margin-top: 20px;
+           border-top: 2px solid #eee;
+           padding-top: 15px;
+       }
+       .wrong-item {
+           background: #fdf2f2;
+           padding: 12px;
+           border-radius: 6px;
+           margin-bottom: 10px;
+           border-left: 4px solid var(--error);
+       }
+       .clickable-en {
+           cursor: pointer;
+           text-decoration: underline dotted var(--blue-btn);
+       }
+       .clickable-en:hover {
+           color: var(--blue-btn);
+       }
+       .btn-group {
+           display: grid;
+           grid-template-columns: 1fr 1fr;
+           gap: 10px;
+           margin-top: 20px;
+       }
+       .quiz-speaker {
+           color: var(--blue-btn);
+           font-size: 14px;
+       }
+   </style>
+</head>
+<body>
+
+<nav class="nav-bar">
+   <button id="navLearn" class="nav-btn active-mode" onclick="switchMode('learn')">📖 學習模式</button>
+   <button id="navQuiz" class="nav-btn" onclick="switchMode('quiz')">📝 測驗模式</button>
+</nav>
+
+<div class="main-container">
+
+   <div id="learnModeSection" class="mode-section active">
+       <div class="sticky-panel">
+           <select id="learnSectionSelect" onchange="renderLearnCards()">
+               <option value="all">全部核心範疇</option>
+               <option value="1">① 人物與辦公室 (Personnel & Office)</option>
+               <option value="2">② 人事管理 (Human Resources)</option>
+               <option value="3">③ 薪資金錢 (Compensation & Money)</option>
+               <option value="4">④ 業務與財務 (Business & Finance)</option>
+               <option value="5">⑤ 貿易與會議 (Trade & Meetings)</option>
+               <option value="6">⑥ 核心高頻同義詞組 (TOEIC Synonyms)</option>
+           </select>
+           <div id="panelEn" class="display-en">請點擊下方字卡開始學習</div>
+           <div id="panelZh" class="display-zh">點擊字卡會連續發音 3 次喔！</div>
+       </div>
+       
+       <div id="cardsGrid" class="cards-grid"></div>
+   </div>
+
+
+   <div id="quizModeSection" class="mode-section">
+       <div class="quiz-container">
+           
+           <div id="quizConfig" class="config-section sub-active">
+               <h2 style="text-align:center; margin-top:0; color:var(--primary);">🎯 多益 4選1 模擬測驗設定</h2>
+               <div class="form-group">
+                   <label for="quizSectionSelect">選擇出題範圍：</label>
+                   <select id="quizSectionSelect">
+                       <option value="all">全部核心範疇</option>
+                       <option value="1">① 人物與辦公室 (Personnel & Office)</option>
+                       <option value="2">② 人事管理 (Human Resources)</option>
+                       <option value="3">③ 薪資金錢 (Compensation & Money)</option>
+                       <option value="4">④ 業務與財務 (Business & Finance)</option>
+                       <option value="5">⑤ 貿易與會議 (Trade & Meetings)</option>
+                       <option value="6">⑥ 核心高頻同義詞組 (TOEIC Synonyms)</option>
+                   </select>
+               </div>
+               <div class="form-group">
+                   <label for="quizTypeSelect">選擇出題模式：</label>
+                   <select id="quizTypeSelect">
+                       <option value="en-zh">英文出題 ➔ 選擇中文</option>
+                       <option value="zh-en">中文出題 ➔ 選擇英文</option>
+                   </select>
+               </div>
+               <button class="primary-btn" onclick="startQuiz(true)">開始模擬測驗</button>
+           </div>
+
+           <div id="quizPanel" class="quiz-panel">
+               <div class="progress" id="quizProgress">題目：0 / 10</div>
+               <div id="questionCard" class="question-card"></div>
+               <div class="options-grid" id="optionsGrid"></div>
+           </div>
+
+           <div id="quizResult" class="result-section">
+               <h2 style="text-align:center; margin-top:0;" id="resultTitle">測驗結束</h2>
+               <div class="score-display" id="scoreDisplay">0 / 100</div>
+               <div id="wrongReport" class="wrong-list"></div>
+               <div class="btn-group">
+                   <button class="primary-btn" onclick="restartWrongOnlyQuiz()" style="background-color: #34495e;" id="btnWrongOnly">重測錯題</button>
+                   <button class="primary-btn" onclick="nextTenQuiz()" id="btnNextTen">下個 10 題</button>
+               </div>
+               <button class="primary-btn" onclick="backToQuizConfig()" style="margin-top: 10px; background-color: var(--accent);">返回測驗選單</button>
+           </div>
+
+       </div>
+   </div>
+
+</div>
+
+<script>
+// 多益高頻單字資料庫
+const rawData = [
+   // ① 人物與辦公室
+   { id: 1, sec: 1, en: "colleague", zh: "同事" },
+   { id: 2, sec: 1, en: "supervisor", zh: "主管；監督者" },
+   { id: 3, sec: 1, en: "executive", zh: "高階主管；執行官" },
+   { id: 4, sec: 1, en: "receptionist", zh: "櫃檯接待員" },
+   { id: 5, sec: 1, en: "representative", zh: "代表；專員" },
+   { id: 6, sec: 1, en: "headquarters", zh: "總部" },
+   { id: 7, sec: 1, en: "department", zh: "部門" },
+   { id: 8, sec: 1, en: "inventory", zh: "庫存；盤點" },
+   { id: 9, sec: 1, en: "stationery", zh: "辦公文具" },
+   { id: 10, sec: 1, en: "maintenance", zh: "維修；保養" },
+   
+   // ② 人事管理
+   { id: 11, sec: 2, en: "recruit", zh: "招募；聘用" },
+   { id: 12, sec: 2, en: "applicant", zh: "求職者；申請人" },
+   { id: 13, sec: 2, en: "resume", zh: "履歷表" },
+   { id: 14, sec: 2, en: "vacancy", zh: "職缺；空缺" },
+   { id: 15, sec: 2, en: "pension", zh: "退休金" },
+   { id: 16, sec: 2, en: "promote", zh: "升職；促銷" },
+   { id: 17, sec: 2, en: "resign", zh: "辭職" },
+   { id: 18, sec: 2, en: "terminate", zh: "終止；解僱" },
+   { id: 19, sec: 2, en: "evaluation", zh: "考核；評估" },
+   { id: 20, sec: 2, en: "qualification", zh: "資格；能力證明" },
+   
+   // ③ 薪資金錢
+   { id: 21, sec: 3, en: "salary", zh: "薪水 (通常指月薪/年薪)" },
+   { id: 22, sec: 3, en: "bonus", zh: "獎金；紅利" },
+   { id: 23, sec: 3, en: "allowance", zh: "津貼；零用金" },
+   { id: 24, sec: 3, en: "reimburse", zh: "核銷；報支費用" },
+   { id: 25, sec: 3, en: "compensation", zh: "補償金；薪酬總額" },
+   { id: 26, sec: 3, en: "budget", zh: "預算" },
+   { id: 27, sec: 3, en: "expense", zh: "開支；費用" },
+   { id: 28, sec: 3, en: "invoice", zh: "費用清單；發票" },
+   { id: 29, sec: 3, en: "subsidy", zh: "政府補貼；補助金" },
+   { id: 30, sec: 3, en: "revenue", zh: "營收；稅收" },
+   
+   // ④ 業務與財務
+   { id: 31, sec: 4, en: "marketing", zh: "行銷；市場推廣" },
+   { id: 32, sec: 4, en: "strategy", zh: "策略；戰略" },
+   { id: 33, sec: 4, en: "merchandise", zh: "商品；貨物" },
+   { id: 34, sec: 4, en: "monopoly", zh: "壟斷；獨佔" },
+   { id: 35, sec: 4, en: "audit", zh: "審計；查帳" },
+   { id: 36, sec: 4, en: "bankruptcy", zh: "破產" },
+   { id: 37, sec: 4, en: "deficit", zh: "赤字；虧損" },
+   { id: 38, sec: 4, en: "investment", zh: "投資" },
+   { id: 39, sec: 4, en: "profit", zh: "利潤；收益" },
+   { id: 40, sec: 4, en: "shareholder", zh: "股東" },
+   
+   // ⑤ 貿易與會議
+   { id: 41, sec: 5, en: "negotiation", zh: "談判；協商" },
+   { id: 42, sec: 5, en: "contract", zh: "合約；契約" },
+   { id: 43, sec: 5, en: "shipping", zh: "運輸；船運" },
+   { id: 44, sec: 5, en: "customs", zh: "海關；關稅" },
+   { id: 45, sec: 5, en: "tariff", zh: "關稅" },
+   { id: 46, sec: 5, en: "agenda", zh: "會議議程" },
+   { id: 47, sec: 5, en: "minutes", zh: "會議記錄" },
+   { id: 48, sec: 5, en: "postpone", zh: "延期；延後" },
+   { id: 49, sec: 5, en: "unanimous", zh: "全體一致的" },
+   { id: 50, sec: 5, en: "conference", zh: "大型研討會；會議" },
+
+   // ⑥ 核心高頻同義詞組
+   { id: 51, sec: 6, en: "cancel / call off", zh: "取消" },
+   { id: 52, sec: 6, en: "postpone / put off", zh: "延期" },
+   { id: 53, sec: 6, en: "execute / carry out", zh: "執行" },
+   { id: 54, sec: 6, en: "résumé / curriculum vitae", zh: "履歷" },
+   { id: 55, sec: 6, en: "comply with / adhere to", zh: "遵守" }
+];
+
+let loopTimeout = null;
+
+// 原生英文發音函數
+function speak(text, callback = null) {
+   if ('speechSynthesis' in window) {
+       window.speechSynthesis.cancel();
+       const utterance = new SpeechSynthesisUtterance(text);
+       utterance.lang = 'en-US'; // 多益設定為美式英文
+       utterance.rate = 0.85;
+       if (callback) {
+           utterance.onend = callback;
+       }
+       window.speechSynthesis.speak(utterance);
+   }
+}
+
+// 連續發音 3 次
+function speakThreeTimes(text) {
+   window.speechSynthesis.cancel();
+   if(loopTimeout) clearTimeout(loopTimeout);
+   
+   let count = 0;
+   function run() {
+       if (count < 3) {
+           speak(text, () => {
+               count++;
+               if (count < 3) {
+                   loopTimeout = setTimeout(run, 1000); 
+               }
+           });
+       }
+   }
+   run();
+}
+
+// 洗牌函數
+function shuffle(array) {
+   let currentIdx = array.length, randomIdx;
+   while (currentIdx != 0) {
+       randomIdx = Math.floor(Math.random() * currentIdx);
+       currentIdx--;
+       [array[currentIdx], array[randomIdx]] = [array[randomIdx], array[currentIdx]];
+   }
+   return array;
+}
+
+// 導覽切換
+function switchMode(mode) {
+   window.speechSynthesis.cancel();
+   if(loopTimeout) clearTimeout(loopTimeout);
+
+   document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active-mode'));
+   document.querySelectorAll('.mode-section').forEach(sec => sec.classList.remove('active'));
+
+   if (mode === 'learn') {
+       document.getElementById('navLearn').classList.add('active-mode');
+       document.getElementById('learnModeSection').classList.add('active');
+       renderLearnCards();
+   } else {
+       document.getElementById('navQuiz').classList.add('active-mode');
+       document.getElementById('quizModeSection').classList.add('active');
+       backToQuizConfig();
+   }
+}
+
+// ==================== 1. 學習模式功能 ====================
+function renderLearnCards() {
+   const section = document.getElementById("learnSectionSelect").value;
+   const grid = document.getElementById("cardsGrid");
+   grid.innerHTML = "";
+
+   const filtered = section === "all" ? rawData : rawData.filter(item => item.sec == parseInt(section));
+
+   filtered.forEach(item => {
+       const card = document.createElement("div");
+       card.className = "learn-card";
+       
+       card.onclick = (e) => {
+           document.getElementById("panelEn").innerText = item.en;
+           document.getElementById("panelZh").innerText = item.zh;
+           speakThreeTimes(item.en);
+       };
+
+       card.innerHTML = `
+           <div class="card-text">${item.en}</div>
+           <button class="speaker-btn" title="單次發音">🔊</button>
+       `;
+
+       card.querySelector('.speaker-btn').onclick = (e) => {
+           e.stopPropagation(); 
+           document.getElementById("panelEn").innerText = item.en;
+           document.getElementById("panelZh").innerText = item.zh;
+           speak(item.en);
+       };
+
+       grid.appendChild(card);
+   });
+}
+
+
+// ==================== 2. 測驗模式功能 ====================
+let quizPool = [];         
+let currentQuiz = [];  
+let quizIndex = 0;  
+let quizScore = 0;         
+let wrongAnswers = []; 
+let lastRoundWrongAnswers = []; 
+let isWrongOnlyMode = false;    
+let currentQuizType = "en-zh"; 
+let quizSection = "all";
+let nextQuizStartIndex = 0; 
+
+function backToQuizConfig() {
+   document.getElementById("quizPanel").classList.remove("sub-active");
+   document.getElementById("quizResult").classList.remove("sub-active");
+   document.getElementById("quizConfig").classList.add("sub-active");
+}
+
+function startQuiz(isInitial = true) {
+   isWrongOnlyMode = false; 
+   if (isInitial) {
+       quizSection = document.getElementById("quizSectionSelect").value;
+       currentQuizType = document.getElementById("quizTypeSelect").value;
+       
+       if (quizSection === "all") {
+           quizPool = [...rawData];
+       } else {
+           quizPool = rawData.filter(item => item.sec == parseInt(quizSection));
+       }
+       shuffle(quizPool); 
+       nextQuizStartIndex = 0;
+   }
+
+   currentQuiz = quizPool.slice(nextQuizStartIndex, nextQuizStartIndex + 10);
+   
+   if (currentQuiz.length === 0) {
+       alert("此範疇單字已全部測驗完畢！將重新隨機出題。");
+       nextQuizStartIndex = 0;
+       shuffle(quizPool);
+       currentQuiz = quizPool.slice(nextQuizStartIndex, nextQuizStartIndex + 10);
+   }
+
+   nextQuizStartIndex += currentQuiz.length;
+   quizIndex = 0;
+   quizScore = 0;
+   wrongAnswers = [];
+
+   document.getElementById("quizConfig").classList.remove("sub-active");
+   document.getElementById("quizResult").classList.remove("sub-active");
+   document.getElementById("quizPanel").classList.add("sub-active");
+
+   showQuizQuestion();
+}
+
+// 錯題重測核心邏輯
+function restartWrongOnlyQuiz() {
+   if (lastRoundWrongAnswers.length === 0) return;
+   
+   isWrongOnlyMode = true;
+   currentQuiz = [...lastRoundWrongAnswers]; 
+   shuffle(currentQuiz);                     
+   
+   quizIndex = 0;
+   quizScore = 0;
+   wrongAnswers = []; 
+
+   document.getElementById("quizResult").classList.remove("sub-active");
+   document.getElementById("quizPanel").classList.add("sub-active");
+   showQuizQuestion();
+}
+
+function showQuizQuestion() {
+   if (quizIndex >= currentQuiz.length) {
+       showQuizResult();
+       return;
+   }
+
+   document.getElementById("quizProgress").innerText = `題目：${quizIndex + 1} / ${currentQuiz.length}`;
+   const currentItem = currentQuiz[quizIndex];
+   const qCard = document.getElementById("questionCard");
+   
+   if (currentQuizType === "en-zh") {
+       qCard.innerHTML = `${currentItem.en} <span style="font-size:14px;color:#999;">🔊</span>`;
+       qCard.className = "question-card clickable-en";
+       qCard.onclick = () => speak(currentItem.en);
+       speak(currentItem.en); 
+   } else {
+       qCard.innerText = currentItem.zh;
+       qCard.className = "question-card";
+       qCard.onclick = null;
+   }
+
+   // 生成隨機干擾項
+   let otherOptions = rawData.filter(item => item.id !== currentItem.id);
+   shuffle(otherOptions);
+   let options = [currentItem, otherOptions[0], otherOptions[1], otherOptions[2]];
+   shuffle(options);
+
+   const grid = document.getElementById("optionsGrid");
+   grid.innerHTML = "";
+   
+   options.forEach(opt => {
+       const btn = document.createElement("button");
+       btn.className = "option-btn";
+       
+       if (currentQuizType === "en-zh") {
+           btn.innerText = opt.zh;
+           btn.onclick = () => checkQuizAnswer(opt.id, currentItem.id);
+       } else {
+           btn.innerHTML = `<span class="clickable-en">${opt.en}</span><span class="quiz-speaker">🔊 發音</span>`;
+           btn.onclick = (e) => {
+               if (e.target.classList.contains("quiz-speaker") || e.target.classList.contains("clickable-en")) {
+                   speak(opt.en);
+                   e.stopPropagation(); 
+               } else {
+                   checkQuizAnswer(opt.id, currentItem.id);
+               }
+           };
+       }
+       grid.appendChild(btn);
+   });
+}
+
+function checkQuizAnswer(selectedId, correctId) {
+   if (selectedId === correctId) {
+       quizScore++;
+   } else {
+       wrongAnswers.push(currentQuiz[quizIndex]);
+   }
+
+   quizIndex++;
+   showQuizQuestion();
+}
+
+function showQuizResult() {
+   document.getElementById("quizPanel").classList.remove("sub-active");
+   document.getElementById("quizResult").classList.add("sub-active");
+
+   lastRoundWrongAnswers = [...wrongAnswers];
+
+   const finalScore = Math.round((quizScore / currentQuiz.length) * 100);
+   document.getElementById("scoreDisplay").innerText = `${finalScore} 分`;
+
+   if (isWrongOnlyMode) {
+       document.getElementById("resultTitle").innerText = "錯題精準挑戰結束";
+   } else {
+       document.getElementById("resultTitle").innerText = "測驗結束";
+   }
+
+   const report = document.getElementById("wrongReport");
+   report.innerHTML = "";
+
+   const btnWrongOnly = document.getElementById("btnWrongOnly");
+   const btnNextTen = document.getElementById("btnNextTen");
+
+   if (wrongAnswers.length === 0) {
+       report.innerHTML = `<p style='color:var(--success); font-weight:bold; text-align:center; font-size:18px;'>
+           ${isWrongOnlyMode ? "🎉 太厲害了！錯題已全數消滅全對！" : "🎉 完美作答！全部答對！"}
+       </p>`;
+       btnWrongOnly.style.display = "none"; 
+   } else {
+       report.innerHTML = `<h3>❌ 共有 ${wrongAnswers.length} 個單字答錯，正確對照如下：</h3>`;
+       wrongAnswers.forEach(item => {
+           const div = document.createElement("div");
+           div.className = "wrong-item";
+           const escapedEn = item.en.replace(/'/g, "\\'");
+           div.innerHTML = `<span class="clickable-en" onclick="speak('${escapedEn}')"><b>${item.en}</b> 🔊</span> ➔ ${item.zh}`;
+           report.appendChild(div);
+       });
+       
+       btnWrongOnly.style.display = "block";
+       btnWrongOnly.innerText = `重測這 ${wrongAnswers.length} 題錯題`;
+   }
+
+   if (isWrongOnlyMode || nextQuizStartIndex >= quizPool.length) {
+       btnNextTen.style.display = "none";
+   } else {
+       btnNextTen.style.display = "block";
+   }
+}
+
+function nextTenQuiz() {
+   startQuiz(false);
+}
+
+window.onload = function() {
+   renderLearnCards();
+};
+</script>
+
+</body>
+</html>
