@@ -1,47 +1,285 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Web Pages</title>
+    <title>學習資源 | Learning-App</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&amp;family=Inter:wght@400;500;600&amp;family=Cormorant+Garamond:wght@400;500;600&amp;display=swap');
+
+        :root {
+            --bg: #121315;
+            --text: #fcfbfa;
+            --accent-red: #942525;
+            --accent-gold: #bd8b2a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f0f0f0;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .container {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            gap: 15px;
         }
-        a {
-            display: block;
-            padding: 20px;
-            background-color: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
+
+        header {
+            background: rgba(18, 19, 21, 0.98);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(189, 139, 42, 0.25);
+            padding: 1.6rem 0 1.4rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 2rem;
             text-align: center;
-            font-size: 18px;
-            transition: background-color 0.3s;
         }
-        a:hover {
-            background-color: #0056b3;
+
+        .logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.85rem;
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            color: var(--accent-gold);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.1rem;
+        }
+
+        .logo::before {
+            content: "⟡";
+            color: var(--accent-red);
+            font-size: 1.4rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .nav-button {
+            flex: 1;
+            max-width: 240px;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.08rem;
+            min-height: 52px;
+            border: 1px solid transparent;
+        }
+
+        .nav-button.language {
+            background: rgba(148, 37, 37, 0.14);
+            color: var(--accent-gold);           /* 改成金色 */
+            border-color: rgba(189, 139, 42, 0.5);
+        }
+
+        .nav-button.utility {
+            background: rgba(189, 139, 42, 0.14);
+            color: var(--accent-gold);
+            border-color: rgba(189, 139, 42, 0.4);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-3px);
+        }
+
+        .nav-button.language:hover {
+            background: rgba(148, 37, 37, 0.22);
+            border-color: var(--accent-gold);
+        }
+
+        .nav-button.utility:hover {
+            background: rgba(189, 139, 42, 0.25);
+            border-color: var(--accent-gold);
+        }
+
+        main {
+            flex: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+            width: 100%;
+        }
+
+        .sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .section {
+            background: rgba(18, 19, 21, 0.6);
+            border: 1px solid rgba(189, 139, 42, 0.15);
+            border-radius: 12px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-gold);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(148, 37, 37, 0.3);
+        }
+
+        .section-icon {
+            font-size: 2rem;
+            color: var(--accent-red);
+        }
+
+        .section-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.75rem;
+            color: var(--accent-gold);
+        }
+
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        .resource-card {
+            background: rgba(252, 251, 250, 0.05);
+            border: 1px solid rgba(189, 139, 42, 0.1);
+            border-radius: 8px;
+            padding: 1.3rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-card:hover {
+            background: rgba(189, 139, 42, 0.08);
+            border-color: var(--accent-gold);
+            transform: translateY(-4px);
+        }
+
+        .resource-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-desc {
+            font-size: 0.9rem;
+            color: rgba(252, 251, 250, 0.65);
+            flex: 1;
+        }
+
+        footer {
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(189, 139, 42, 0.15);
+            font-size: 0.9rem;
+            color: rgba(252, 251, 250, 0.5);
+        }
+
+        .accent-line {
+            height: 3px;
+            background: linear-gradient(to right, transparent, var(--accent-red), var(--accent-gold), transparent);
+            margin: 3rem auto;
+            max-width: 160px;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome! Choose a Page</h1>
-    
-    <div class="container">
-        <a href="Utility/速讀.html">📚 速讀</a>
-    </div>
+    <header>
+        <div class="header-content">
+            <a href="/" class="logo">學習資源</a>
+            
+            <div class="nav-buttons">
+                <a href="#language" class="nav-button language">
+                    🌐 語言
+                </a>
+                <a href="#utility" class="nav-button utility">
+                    🛠️ 工具
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="sections">
+            <div class="section" id="language">
+                <div class="section-header">
+                    <span class="section-icon">🌐</span>
+                    <h2 class="section-title">語言學習</h2>
+                </div>
+                <div class="resource-grid" id="language-grid"></div>
+            </div>
+
+            <div class="section" id="utility">
+                <div class="section-header">
+                    <span class="section-icon">🛠️</span>
+                    <h2 class="section-title">工具資源</h2>
+                </div>
+                <div class="resource-grid" id="utility-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 學習資源 • 墨玄 ⋅ 硃砂紅 ⋅ 耀日金</p>
+    </footer>
+
+    <script>
+        // 每個資料夾只留一個範例
+        const languageResources = [
+            { name: "TOEIC 學習", path: "Language/toeic.html", desc: "學習TOEIC字彙" }
+        ];
+
+        const utilityResources = [
+            { name: "速讀", path: "Utility/速讀.html", desc: "速讀工具內含愛麗絲夢遊仙境中英文第一章" }
+        ];
+
+        function createResourceCard(resource) {
+            const card = document.createElement('a');
+            card.href = resource.path;
+            card.className = 'resource-card';
+            card.innerHTML = `
+                <div class="resource-name">${resource.name}</div>
+                <div class="resource-desc">${resource.desc}</div>
+                <div class="resource-meta">HTML • 互動練習</div>
+            `;
+            return card;
+        }
+
+        document.getElementById('language-grid').append(...languageResources.map(createResourceCard));
+        document.getElementById('utility-grid').append(...utilityResources.map(createResourceCard));
+    </script>
 </body>
 </html>
