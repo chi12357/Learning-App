@@ -96,6 +96,11 @@ h1.title{
   font-family:var(--font-ui);font-size:11px;color:var(--vermilion);
   border:1px solid var(--vermilion);border-radius:10px;padding:2px 10px;
 }
+#build-version-tag{
+  position:fixed;bottom:4px;left:0;right:0;text-align:center;
+  font-family:var(--font-ui);font-size:9px;color:rgba(252,251,250,.2);
+  pointer-events:none;z-index:9999;
+}
 
 .overall-btn{
   margin-top:22px;padding:16px 20px;border:1px solid var(--vermilion);
@@ -135,6 +140,14 @@ h1.title{
 }
 .book-picker-item:hover{background:rgba(189,139,42,.08);}
 .book-picker-item.selected{background:var(--gold);color:var(--ink);font-weight:600;}
+.book-picker-item-removable{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:default;}
+.book-picker-item-label{flex:1;cursor:pointer;}
+.book-picker-remove-btn{
+  flex-shrink:0;width:26px;height:26px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--vermilion);color:var(--vermilion);font-size:16px;cursor:pointer;
+}
+.book-picker-remove-btn:hover{background:rgba(148,37,37,.15);}
 .whole-book-btn{border-color:var(--gold);margin-top:22px;margin-bottom:0;}
 .whole-book-btn span.arrow{color:var(--gold);}
 
@@ -456,6 +469,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
     </div>
   </section>
 
+  <div id="build-version-tag">build: 2026-07-14-epub-parse-fix</div>
 </div>
 
 <script>
@@ -533,6 +547,17 @@ function addUploadedArticle(article){
   if(idx >= 0) UPLOADED_ARTICLES[idx] = article;
   else UPLOADED_ARTICLES.push(article);
   saveUploadedArticles();
+}
+function removeUploadedArticle(articleId){
+  const wasActive = (ARTICLE.id === articleId);
+  UPLOADED_ARTICLES = UPLOADED_ARTICLES.filter(a => a.id !== articleId);
+  saveUploadedArticles();
+  try{ localStorage.removeItem('sudu_progress_' + articleId); }catch(e){}
+  if(wasActive){
+    switchArticle(BUILTIN_ARTICLE);
+  } else {
+    renderLibrary();
+  }
 }
 
 function switchArticle(article){
@@ -797,27 +822,44 @@ function buildArticleFromPlainText(rawText, filename){
 
 /* ============ EPUB 書籍：解壓縮、讀取 OPF／TOC、抽取章節文字 ============ */
 function extractParagraphsFromHTML(htmlStr){
-  let doc = null;
-  try{
-    const parsed = new DOMParser().parseFromString(htmlStr, 'application/xhtml+xml');
-    if(!parsed.querySelector('parsererror')) doc = parsed;
-  }catch(e){}
-  if(!doc){
-    doc = new DOMParser().parseFromString(htmlStr, 'text/html');
-  }
+  // 統一用 text/html 解析：比 application/xhtml+xml 寬容許多，
+  // 遇到 BOM、XML 宣告位置不正確等常見 EPUB 瑕疵也不會直接解析失敗。
+  const doc = new DOMParser().parseFromString(htmlStr, 'text/html');
   const body = doc.body || doc.documentElement;
   if(!body) return [];
-  const blocks = body.querySelectorAll('p, h1, h2, h3, h4, h5, h6, li');
-  const paragraphs = [];
-  blocks.forEach(el=>{
-    const t = el.textContent.replace(/\s+/g, ' ').trim();
-    if(t.length > 0) paragraphs.push(t);
-  });
-  if(paragraphs.length === 0){
-    const raw = body.textContent || '';
-    raw.split(/\n+/).map(s=>s.replace(/\s+/g,' ').trim()).filter(Boolean).forEach(t=>paragraphs.push(t));
+
+  // 有些 EPUB（尤其較舊或簡單製作的）整段內容只包在一個 <div> 裡，
+  // 段落之間純粹用 <br> 換行，完全不用 <p>。這裡統一走訪 DOM，
+  // 只要遇到區塊元素（p/div/hN/li…）結束或 <br>，就切一段，
+  // 這樣不論是用 <p> 或用 <br> 分段的文件都能正確抽出段落。
+  const BLOCK_TAGS = new Set(['p','div','h1','h2','h3','h4','h5','h6','li','tr','blockquote']);
+  const SKIP_TAGS = new Set(['script','style','title','link','meta','head']);
+  const segments = [];
+  let current = '';
+  function walk(node){
+    if(node.nodeType === 3){
+      current += node.textContent;
+    } else if(node.nodeType === 1){
+      const tag = node.tagName.toLowerCase();
+      if(SKIP_TAGS.has(tag)) return;
+      if(tag === 'br'){
+        segments.push(current);
+        current = '';
+        return;
+      }
+      node.childNodes.forEach(walk);
+      if(BLOCK_TAGS.has(tag)){
+        segments.push(current);
+        current = '';
+      }
+    }
   }
-  return paragraphs;
+  body.childNodes.forEach(walk);
+  segments.push(current);
+
+  return segments
+    .map(s => s.replace(/\s+/g, ' ').trim())
+    .filter(Boolean);
 }
 async function buildArticleFromEpub(arrayBuffer, filename){
   if(typeof JSZip === 'undefined'){
@@ -852,6 +894,8 @@ async function buildArticleFromEpub(arrayBuffer, filename){
     };
   });
   const spineIds = [];
+  const spineEl = opfDoc.querySelector('spine');
+  const spineTocId = spineEl ? spineEl.getAttribute('toc') : null;
   opfDoc.querySelectorAll('spine itemref').forEach(ir=>{
     spineIds.push(ir.getAttribute('idref'));
   });
@@ -871,7 +915,12 @@ async function buildArticleFromEpub(arrayBuffer, filename){
     }catch(e){ /* 忽略，稍後用預設章名 */ }
   }
   if(Object.keys(hrefToTitle).length === 0){
-    const ncxItem = Object.values(manifestItems).find(it => it.mediaType === 'application/x-dtbncx+xml');
+    // 找 NCX 檔案：優先看 <spine toc="..."> 指定的 id（最可靠，不依賴 media-type 是否標準），
+    // 其次才用標準 media-type，最後用副檔名 .ncx 保底——
+    // 因為有些 EPUB（例如本例）會把 toc.ncx 標成不標準的 media-type（如 text/xml）。
+    const ncxItem = (spineTocId && manifestItems[spineTocId])
+      || Object.values(manifestItems).find(it => it.mediaType === 'application/x-dtbncx+xml')
+      || Object.values(manifestItems).find(it => /\.ncx$/i.test(it.href || ''));
     if(ncxItem){
       try{
         const ncxPath = opfDir + ncxItem.href;
@@ -1142,10 +1191,23 @@ function renderLibrary(){
     uploadedList.innerHTML = '';
     UPLOADED_ARTICLES.forEach(book=>{
       const row = document.createElement('div');
-      row.className = 'book-picker-item' + (book.id === ARTICLE.id ? ' selected' : '');
+      row.className = 'book-picker-item book-picker-item-removable' + (book.id === ARTICLE.id ? ' selected' : '');
       const langTag = book.language ? '（' + book.language + '）' : '';
-      row.textContent = book.title + langTag;
-      row.addEventListener('click', ()=>{ switchArticle(book); });
+      const label = document.createElement('span');
+      label.textContent = book.title + langTag;
+      label.className = 'book-picker-item-label';
+      label.addEventListener('click', ()=>{ switchArticle(book); });
+      const removeBtn = document.createElement('span');
+      removeBtn.className = 'book-picker-remove-btn';
+      removeBtn.textContent = '×';
+      removeBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(confirm('確定要從書單移除「' + book.title + '」嗎？')){
+          removeUploadedArticle(book.id);
+        }
+      });
+      row.appendChild(label);
+      row.appendChild(removeBtn);
       uploadedList.appendChild(row);
     });
   } else {
