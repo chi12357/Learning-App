@@ -3,9 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學習資源 | Learning-App</title>
+    <title>學習資源</title>
+    
+    <!-- PWA 設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#121315">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/attachments/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/attachments/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/attachments/icon-512.png">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&amp;family=Inter:wght@400;500;600&amp;family=Cormorant+Garamond:wght@400;500;600&amp;display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
 
         :root {
             --bg: #121315;
@@ -14,17 +24,12 @@
             --accent-gold: #bd8b2a;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             background-color: var(--bg);
             color: var(--text);
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            line-height: 1.6;
+            font-family: 'Inter', system-ui, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -51,7 +56,6 @@
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.85rem;
             font-weight: 600;
-            letter-spacing: -0.03em;
             color: var(--accent-gold);
             text-decoration: none;
             display: inline-flex;
@@ -60,11 +64,7 @@
             margin-bottom: 1.1rem;
         }
 
-        .logo::before {
-            content: "⟡";
-            color: var(--accent-red);
-            font-size: 1.4rem;
-        }
+        .logo::before { content: "⟡"; color: var(--accent-red); font-size: 1.4rem; }
 
         .nav-buttons {
             display: flex;
@@ -75,13 +75,11 @@
         }
 
         .nav-button {
-            flex: 1;
-            max-width: 240px;
+            flex: 1; max-width: 240px;
             padding: 12px 32px;
             border-radius: 50px;
             font-weight: 500;
             text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -89,41 +87,15 @@
             font-size: 1.08rem;
             min-height: 52px;
             border: 1px solid transparent;
+            transition: all 0.3s ease;
         }
 
-        .nav-button.language {
-            background: rgba(148, 37, 37, 0.14);
-            color: var(--accent-gold);           /* 改成金色 */
-            border-color: rgba(189, 139, 42, 0.5);
-        }
+        .nav-button.language { background: rgba(148,37,37,0.14); color: var(--accent-gold); border-color: rgba(189,139,42,0.5); }
+        .nav-button.utility  { background: rgba(189,139,42,0.14); color: var(--accent-gold); border-color: rgba(189,139,42,0.4); }
 
-        .nav-button.utility {
-            background: rgba(189, 139, 42, 0.14);
-            color: var(--accent-gold);
-            border-color: rgba(189, 139, 42, 0.4);
-        }
+        .nav-button:hover { transform: translateY(-3px); }
 
-        .nav-button:hover {
-            transform: translateY(-3px);
-        }
-
-        .nav-button.language:hover {
-            background: rgba(148, 37, 37, 0.22);
-            border-color: var(--accent-gold);
-        }
-
-        .nav-button.utility:hover {
-            background: rgba(189, 139, 42, 0.25);
-            border-color: var(--accent-gold);
-        }
-
-        main {
-            flex: 1;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 3rem 2rem 5rem;
-            width: 100%;
-        }
+        main { flex: 1; max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; width: 100%; }
 
         .sections {
             display: grid;
@@ -133,86 +105,26 @@
         }
 
         .section {
-            background: rgba(18, 19, 21, 0.6);
-            border: 1px solid rgba(189, 139, 42, 0.15);
+            background: rgba(18,19,21,0.6);
+            border: 1px solid rgba(189,139,42,0.15);
             border-radius: 12px;
             padding: 2.5rem;
-            transition: all 0.4s ease;
-        }
-
-        .section:hover {
-            transform: translateY(-8px);
-            border-color: var(--accent-gold);
-        }
-
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(148, 37, 37, 0.3);
-        }
-
-        .section-icon {
-            font-size: 2rem;
-            color: var(--accent-red);
-        }
-
-        .section-title {
-            font-family: 'Noto Serif TC', serif;
-            font-size: 1.75rem;
-            color: var(--accent-gold);
-        }
-
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 1rem;
         }
 
         .resource-card {
-            background: rgba(252, 251, 250, 0.05);
-            border: 1px solid rgba(189, 139, 42, 0.1);
+            background: rgba(252,251,250,0.05);
+            border: 1px solid rgba(189,139,42,0.1);
             border-radius: 8px;
             padding: 1.3rem;
-            transition: all 0.3s ease;
             text-decoration: none;
             color: var(--text);
-            display: flex;
-            flex-direction: column;
+            display: block;
         }
 
         .resource-card:hover {
-            background: rgba(189, 139, 42, 0.08);
+            background: rgba(189,139,42,0.08);
             border-color: var(--accent-gold);
             transform: translateY(-4px);
-        }
-
-        .resource-name {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .resource-desc {
-            font-size: 0.9rem;
-            color: rgba(252, 251, 250, 0.65);
-            flex: 1;
-        }
-
-        footer {
-            padding: 3rem 2rem;
-            text-align: center;
-            border-top: 1px solid rgba(189, 139, 42, 0.15);
-            font-size: 0.9rem;
-            color: rgba(252, 251, 250, 0.5);
-        }
-
-        .accent-line {
-            height: 3px;
-            background: linear-gradient(to right, transparent, var(--accent-red), var(--accent-gold), transparent);
-            margin: 3rem auto;
-            max-width: 160px;
         }
     </style>
 </head>
@@ -220,14 +132,9 @@
     <header>
         <div class="header-content">
             <a href="/" class="logo">學習資源</a>
-            
             <div class="nav-buttons">
-                <a href="#language" class="nav-button language">
-                    🌐 語言
-                </a>
-                <a href="#utility" class="nav-button utility">
-                    🛠️ 工具
-                </a>
+                <a href="#language" class="nav-button language">🌐 語言</a>
+                <a href="#utility" class="nav-button utility">🛠️ 工具</a>
             </div>
         </div>
     </header>
@@ -235,51 +142,54 @@
     <main>
         <div class="sections">
             <div class="section" id="language">
-                <div class="section-header">
-                    <span class="section-icon">🌐</span>
-                    <h2 class="section-title">語言學習</h2>
-                </div>
-                <div class="resource-grid" id="language-grid"></div>
+                <h2 style="color:var(--accent-gold); margin-bottom:1.5rem;">語言學習</h2>
+                <div id="language-grid"></div>
             </div>
 
             <div class="section" id="utility">
-                <div class="section-header">
-                    <span class="section-icon">🛠️</span>
-                    <h2 class="section-title">工具資源</h2>
-                </div>
-                <div class="resource-grid" id="utility-grid"></div>
+                <h2 style="color:var(--accent-gold); margin-bottom:1.5rem;">工具資源</h2>
+                <div id="utility-grid"></div>
             </div>
         </div>
     </main>
 
-    <footer>
-        <p>© 2026 學習資源 • 墨玄 ⋅ 硃砂紅 ⋅ 耀日金</p>
+    <footer style="padding:2rem; text-align:center; color:rgba(252,251,250,0.5); font-size:0.9rem;">
+        © 2026 學習資源 • 墨玄 ⋅ 硃砂紅 ⋅ 耀日金
     </footer>
 
     <script>
-        // 每個資料夾只留一個範例
+        // === 資源定義 ===
         const languageResources = [
+            { name: "閱讀Brown Bear", path: "Language/閱讀.html", desc: "閱讀工具內含Brown bear" }
             { name: "TOEIC 學習", path: "Language/toeic.html", desc: "學習TOEIC字彙" }
         ];
 
         const utilityResources = [
+            { name: "閱讀", path: "Utility/閱讀.html", desc: "閱讀工具內含Brown bear" }
             { name: "速讀", path: "Utility/速讀.html", desc: "速讀工具內含愛麗絲夢遊仙境中英文第一章" }
         ];
 
-        function createResourceCard(resource) {
+        // 渲染卡片
+        function createCard(res) {
             const card = document.createElement('a');
-            card.href = resource.path;
+            card.href = res.path;
             card.className = 'resource-card';
             card.innerHTML = `
-                <div class="resource-name">${resource.name}</div>
-                <div class="resource-desc">${resource.desc}</div>
-                <div class="resource-meta">HTML • 互動練習</div>
+                <div style="font-weight:600; margin-bottom:0.5rem;">${res.name}</div>
+                <div style="font-size:0.9rem; color:rgba(252,251,250,0.65);">${res.desc}</div>
             `;
             return card;
         }
 
-        document.getElementById('language-grid').append(...languageResources.map(createResourceCard));
-        document.getElementById('utility-grid').append(...utilityResources.map(createResourceCard));
+        document.getElementById('language-grid').append(...languageResources.map(createCard));
+        document.getElementById('utility-grid').append(...utilityResources.map(createCard));
+
+        // === PWA Service Worker 註冊 ===
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(() => console.log('Service Worker 註冊成功'))
+                .catch(err => console.log('Service Worker 註冊失敗', err));
+        }
     </script>
 </body>
 </html>
