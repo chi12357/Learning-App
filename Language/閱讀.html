@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>學語言 · Brown Bear</title>
+<title>學語言</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700;900&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
@@ -72,50 +72,78 @@ header.app-header{
 
 .filter-bar{
   display:flex;gap:10px;align-items:center;
-  padding:10px 20px;max-width:900px;margin:0 auto;
-  border-top:1px solid var(--line);flex-wrap:wrap;
+  padding:10px 20px;
+  max-width:900px;margin:0 auto;
+  border-top:1px solid var(--line);
+  flex-wrap:wrap;
 }
 .filter-actions{
-  display:flex;gap:10px;align-items:center;width:100%;margin-bottom:8px;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  width:100%;
 }
 .filter-actions .spacer{flex:1;}
 .toggle-analysis-btn{
   background:var(--charcoal-3);color:var(--cream-dim);
   border:1px solid var(--line-strong);border-radius:10px;
-  padding:11px 16px;font-size:0.95rem;font-weight:600;white-space:nowrap;
+  padding:11px 16px;
+  font-size:0.95rem;font-weight:600;
+  white-space:nowrap;
 }
 .toggle-analysis-btn:active{transform:scale(0.97);}
 .quiz-filters .filter-actions{display:none;}
 .filter-bar select.chapter-select{
   background:var(--charcoal-3);color:var(--cream);
   border:1px solid var(--line-strong);border-radius:10px;
-  padding:11px 14px;font-size:1.05rem;font-family:'Noto Serif TC',serif;
-  -webkit-appearance:none;appearance:none;width:100%;flex:1 1 100%;
+  padding:11px 14px;
+  font-size:1.05rem;
+  font-family:'Noto Serif TC',serif;
+  -webkit-appearance:none;appearance:none;
+  width:100%;
+  flex:1 1 100%;
 }
 .sel-mode-learn{display:flex;gap:10px;width:100%;flex-wrap:wrap;}
 .sel-mode-learn select.chapter-select{flex:1 1 100%;}
 .quiz-filters{display:flex;gap:10px;width:100%;flex-wrap:wrap;}
 .quiz-filters select{flex:1 1 auto;}
+.quiz-filters .quiz-type-select{flex:0 0 auto;min-width:6.2em;}
 .quiz-filters .quiz-chapter-select-wrap{flex:1 1 100%;}
 .quiz-filters .quiz-chapter-select-wrap select{width:100%;}
 .hidden{display:none !important;}
 
-.sticky-wrapper{position:sticky;top:0;z-index:45;}
+.quiz-filters {
+  margin-bottom: 0;
+}
+
+.sticky-wrapper{
+  position:sticky;
+  top:0;
+  z-index:45;
+}
+
 .top-panel{
-  background:rgba(18,19,21,0.97);backdrop-filter:blur(10px);
-  padding:10px 20px 14px;border-bottom:1px solid var(--line);display:block;
+  background:rgba(18,19,21,0.97);
+  backdrop-filter:blur(10px);
+  padding:10px 20px 14px;
+  border-bottom:1px solid var(--line);
+  display:block;
 }
 .top-panel-inner{
-  background:var(--charcoal-2);border:1px solid var(--line);border-radius:14px;
-  padding:14px 18px;display:flex;align-items:flex-start;gap:12px;
-  min-height:100px;max-height:100px;overflow-y:auto;max-width:860px;margin:0 auto;
+  background:var(--charcoal-2);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:14px 18px;
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  min-height:100px;
+  max-height:100px;
+  overflow-y:auto;
+  max-width:860px;
+  margin:0 auto;
 }
-.top-panel-text{
-  flex:1;text-align:right;
-  font-size:1.8rem;  /* 原本 1.35rem，增加 1/3 變為 1.8rem */
-  line-height:1.55;
-  color:var(--cream-dim);
-}
+.top-panel-text{flex:1;text-align:right;font-size:1.8rem;line-height:1.55;color:var(--cream-dim);}
 .top-panel-text.placeholder{color:rgba(252,251,250,0.35);font-size:1.2rem;font-family:'Inter',sans-serif;}
 .translate-btn{
   flex:0 0 auto;background:var(--gold);color:var(--charcoal);
@@ -124,7 +152,12 @@ header.app-header{
 .translate-btn:active{transform:scale(0.97);}
 .top-panel.quiz-mode{display:none;}
 
-main{max-width:900px;margin:0 auto;padding:18px 20px 40px;}
+main{max-width:900px;margin:0 auto;padding:0 20px 40px;}
+
+main.quiz-mode{
+  padding-top:0;
+}
+
 .section-block{margin-bottom:34px;}
 .section-header{
   display:flex;align-items:center;justify-content:space-between;
@@ -138,22 +171,23 @@ main{max-width:900px;margin:0 auto;padding:18px 20px 40px;}
 .mark-read-btn.read{background:var(--green);border-color:var(--green);color:var(--charcoal);font-weight:700;}
 
 .sentence-card{
-  background:var(--charcoal-2);border:1px solid var(--line);
-  border-radius:14px;padding:18px 18px 14px;margin-bottom:14px;
+  background:var(--charcoal-2);
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:18px 18px 14px;
+  margin-bottom:14px;
+  cursor:pointer;
 }
+.sentence-card:active{transform:scale(0.99);}
 .sentence-row{display:flex;align-items:flex-start;gap:10px;}
-.speaker-btn{
-  flex:0 0 auto;background:transparent;border:1px solid var(--line-strong);
-  color:var(--gold-light);border-radius:50%;width:38px;height:38px;
-  font-size:1.1rem;display:flex;align-items:center;justify-content:center;
-}
-.speaker-btn:active{transform:scale(0.93);}
-.sentence-fr{font-size:1.51875rem;line-height:1.6;flex:1;word-wrap:break-word;}
+.sentence-fr{font-size:1.51875rem;line-height:1.6;flex:1;word-wrap:break-word;user-select:none;}
 .sentence-en{display:none;}
 .seg-phrase,.seg-word{
   text-decoration:underline;text-decoration-color:var(--gold);
   text-underline-offset:5px;text-decoration-thickness:1.5px;
-  cursor:pointer;border-radius:3px;padding:0 1px;
+  cursor:pointer;
+  border-radius:3px;
+  padding:0 1px;
   transition:background 0.15s;
 }
 .seg-phrase{text-decoration-color:var(--vermilion-light);}
@@ -171,38 +205,185 @@ main{max-width:900px;margin:0 auto;padding:18px 20px 40px;}
 .q-list{margin:4px 0 0 0;padding-left:20px;}
 .q-list li{margin-bottom:3px;}
 
-.quiz-wrap{max-width:640px;margin:0 auto;position:sticky;top:120px;z-index:30;}
-.quiz-card{background:var(--charcoal-2);border:1px solid var(--line);border-radius:18px;padding:22px 20px 20px;position:relative;min-height:280px;}
+/* ===== 測驗模式 ===== */
+.quiz-wrap{
+  max-width:640px;
+  margin:0 auto;
+  position:sticky;
+  top:0px;
+  z-index:30;
+  padding-top:6px;
+}
+.quiz-card{
+  background:var(--charcoal-2);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px 20px 14px;
+  position:relative;
+  min-height:280px;
+  display:flex;
+  flex-direction:column;
+}
 .quiz-card.correct{border-color:var(--green);box-shadow:0 0 0 2px rgba(76,175,109,0.35);}
 .quiz-card.wrong{border-color:var(--red);box-shadow:0 0 0 2px rgba(201,79,79,0.35);}
-.quiz-topbar{display:flex;align-items:center;justify-content:space-between;min-height:34px;margin-bottom:10px;}
-.quiz-progress{font-weight:700;color:var(--cream);font-size:1rem;}
-.quiz-correct-count{font-weight:700;color:var(--green);font-size:1.1rem;}
-.quiz-actions{position:absolute;left:50%;top:16px;transform:translateX(-50%);display:flex;gap:8px;}
-.quiz-actions button{border:none;border-radius:8px;padding:8px 14px;font-size:0.85rem;font-weight:600;}
-.quiz-actions .qa-translate{background:var(--gold);color:var(--charcoal);}
-.quiz-actions .qa-next{background:var(--vermilion);color:var(--cream);}
-.quiz-question{text-align:center;font-size:1.6875rem;line-height:1.35;margin:26px 0 24px;min-height:3.7em;max-height:3.7em;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;}
-.quiz-question-inner{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+
+/* 頂部欄 */
+.quiz-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:30px;
+  margin-bottom:6px;
+  gap:8px;
+  flex-wrap:wrap;
+  flex-shrink:0;
+}
+.quiz-progress{
+  font-weight:700;
+  color:var(--cream);
+  font-size:0.95rem;
+  flex:0 0 auto;
+}
+.quiz-correct-count{display:none;}
+
+/* 底部欄 - 複製頂部欄 */
+.quiz-bottombar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:30px;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid var(--line);
+  gap:8px;
+  flex-wrap:wrap;
+  flex-shrink:0;
+}
+.quiz-bottombar .quiz-progress{
+  font-weight:700;
+  color:var(--cream);
+  font-size:0.95rem;
+  flex:0 0 auto;
+}
+.quiz-bottombar .quiz-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1 1 auto;
+  justify-content:flex-end;
+}
+.quiz-bottombar .qa-translate,
+.quiz-bottombar .qa-next{
+  border:none;
+  border-radius:8px;
+  padding:8px 14px;
+  font-size:0.85rem;
+  font-weight:600;
+}
+.quiz-bottombar .qa-translate{background:var(--gold);color:var(--charcoal);}
+.quiz-bottombar .qa-next{background:var(--vermilion);color:var(--cream);}
+.quiz-bottombar .qa-score{
+  font-size:0.95rem;
+  font-weight:700;
+  color:var(--gold-light);
+  padding:0 4px;
+  white-space:nowrap;
+  min-width:44px;
+  text-align:center;
+}
+
+/* 頂部欄的 actions (與底部相同樣式) */
+.quiz-topbar .quiz-actions{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex:1 1 auto;
+  justify-content:flex-end;
+}
+.quiz-topbar .qa-translate,
+.quiz-topbar .qa-next{
+  border:none;
+  border-radius:8px;
+  padding:8px 14px;
+  font-size:0.85rem;
+  font-weight:600;
+}
+.quiz-topbar .qa-translate{background:var(--gold);color:var(--charcoal);}
+.quiz-topbar .qa-next{background:var(--vermilion);color:var(--cream);}
+.quiz-topbar .qa-score{
+  font-size:0.95rem;
+  font-weight:700;
+  color:var(--gold-light);
+  padding:0 4px;
+  white-space:nowrap;
+  min-width:44px;
+  text-align:center;
+}
+
+.quiz-question{
+  text-align:center;
+  font-size:1.6875rem;
+  line-height:1.35;
+  margin:10px 0 16px;
+  min-height:3.7em;
+  max-height:3.7em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  cursor:pointer;
+  flex:1 1 auto;
+}
+.quiz-question-inner{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  overflow:hidden;
+}
 .quiz-question .speaker-icon-big{font-size:2.4rem;}
 .quiz-question-inner .fr-text{font-size:var(--quiz-fr-size);}
 .quiz-opt-inner.fr-text{font-size:var(--quiz-fr-size);}
-.quiz-options{display:flex;flex-direction:column;gap:10px;}
+.quiz-options{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  flex-shrink:0;
+}
 .quiz-opt{
-  background:var(--charcoal-3);border:1px solid var(--line-strong);
-  border-radius:10px;padding:13px 16px;font-size:1.5525rem;text-align:left;color:var(--cream);
-  transition:background .15s,border-color .15s;display:flex;align-items:center;overflow:hidden;
+  background:var(--charcoal-3);
+  border:1px solid var(--line-strong);
+  border-radius:10px;
+  padding:13px 16px;
+  font-size:1.5525rem;
+  text-align:left;
+  color:var(--cream);
+  transition:background .15s,border-color .15s;
+  display:flex;
+  align-items:center;
+  overflow:hidden;
 }
 .quiz-opt.opt-line-1{min-height:2.9em;max-height:2.9em;}
 .quiz-opt.opt-line-2{min-height:4.6em;max-height:4.6em;}
-.quiz-opt-inner{display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;width:100%;line-height:1.3;}
+.quiz-opt-inner{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  width:100%;
+  line-height:1.3;
+}
 .quiz-opt.opt-line-1 .quiz-opt-inner{-webkit-line-clamp:1;}
 .quiz-opt.opt-line-2 .quiz-opt-inner{-webkit-line-clamp:2;}
 .quiz-opt:active{transform:scale(0.99);}
 .quiz-opt.correct-answer{border-color:var(--green);background:rgba(76,175,109,0.15);}
 .quiz-opt.wrong-answer{border-color:var(--red);background:rgba(201,79,79,0.15);}
 
-.quiz-summary{background:var(--charcoal-2);border:1px solid var(--line);border-radius:18px;padding:30px 22px;text-align:center;}
+.quiz-summary{
+  background:var(--charcoal-2);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:30px 22px;
+  text-align:center;
+}
 .quiz-score{font-size:3rem;font-weight:900;color:var(--gold-light);font-family:'Cormorant Garamond',serif;}
 .quiz-score-label{color:var(--cream-dim);font-size:0.95rem;margin-bottom:6px;}
 .wrong-list{text-align:left;margin:20px 0;padding:14px 16px;background:var(--charcoal-3);border-radius:12px;}
@@ -211,7 +392,13 @@ main{max-width:900px;margin:0 auto;padding:18px 20px 40px;}
 .wrong-list-item .wfr{font-family:'Cormorant Garamond',serif;font-size:1.2rem;cursor:pointer;color:var(--gold-light);}
 .wrong-list-item .wen{color:var(--cream-dim);font-size:0.9rem;font-family:'Inter',sans-serif;}
 .summary-actions{display:flex;gap:12px;justify-content:center;margin-top:10px;flex-wrap:wrap;}
-.summary-actions button{border:none;border-radius:10px;padding:12px 22px;font-size:1rem;font-weight:700;}
+.summary-actions button{
+  border:none;
+  border-radius:10px;
+  padding:12px 22px;
+  font-size:1rem;
+  font-weight:700;
+}
 .btn-retest{background:var(--vermilion);color:var(--cream);}
 .btn-next10{background:var(--gold);color:var(--charcoal);}
 .all-clear{color:var(--green);font-weight:700;font-size:1.1rem;margin:10px 0;}
@@ -260,420 +447,527 @@ main{max-width:900px;margin:0 auto;padding:18px 20px 40px;}
 
 <script>
 // ============================================================
-// 預設資料 - Brown Bear (包含 segments 斷句)
+// 預設資料 - Brown Bear (簡化版)
 // ============================================================
-const DEFAULT_DATA = {
-  "chapters": [{
-    "id": "ch1",
-    "title": "Brown Bear, Brown Bear, What Do You See?",
-    "sections": [{
-      "id": "ch1-s1",
-      "title": "Brown Bear and Friends",
-      "sentences": [
+{
+  "chapters": [
+    {
+      "id": "ch1",
+      "title": "Chapter 1 — Brown Bear, Brown Bear, What Do You See?",
+      "sections": [
         {
-          "id": "s1-1",
-          "en": "Brown Bear, Brown Bear, What do you see?",
-          "zh": "棕色的熊，棕色的熊，你看到了什麼？",
-          "segments": [
-            {"t": "Brown Bear, Brown Bear", "type": "phrase", "zh": "棕色的熊，棕色的熊", "note": "Repetition for emphasis and rhythm."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Question pattern used throughout the book."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative sentence with repeated vocative.",
-          "grammar": "Present tense question with 'do'.",
-          "culture": "Classic children's book by Bill Martin Jr. and Eric Carle.",
-          "questions": ["What does the brown bear see?", "Why is the animal name repeated?"],
-          "vocab": [{"en": "brown bear", "zh": "棕色的熊"}, {"en": "see", "zh": "看"}]
-        },
-        {
-          "id": "s1-2",
-          "en": "I see a red bird looking at me.",
-          "zh": "我看見一隻紅色的鳥看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "First-person response."},
-            {"t": " a red bird", "type": "phrase", "zh": "一隻紅色的鳥", "note": "Color + animal pattern."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle phrase describing the bird."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with present participle clause.",
-          "grammar": "Present tense; present participle for simultaneous action.",
-          "culture": "Color recognition and animal vocabulary.",
-          "questions": ["What animal does the bear see?", "What color is the bird?"],
-          "vocab": [{"en": "red bird", "zh": "紅色的鳥"}, {"en": "looking at", "zh": "看著"}]
-        },
-        {
-          "id": "s1-3",
-          "en": "Red Bird, Red Bird, What do you see?",
-          "zh": "紅色的鳥，紅色的鳥，你看到了什麼？",
-          "segments": [
-            {"t": "Red Bird, Red Bird", "type": "phrase", "zh": "紅色的鳥，紅色的鳥", "note": "Addressing the next animal."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question pattern."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with repeated vocative.",
-          "grammar": "Same question pattern as sentence 1.",
-          "culture": "Chain of questions and answers.",
-          "questions": ["Who is being asked now?", "What pattern do you notice?"],
-          "vocab": [{"en": "red bird", "zh": "紅色的鳥"}]
-        },
-        {
-          "id": "s1-4",
-          "en": "I see a yellow duck looking at me.",
-          "zh": "我看見一隻黃色的鴨子看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a yellow duck", "type": "phrase", "zh": "一隻黃色的鴨子", "note": "Next animal in sequence."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with present participle.",
-          "grammar": "Present tense; color + animal pattern.",
-          "culture": "Teaches colors and animal names.",
-          "questions": ["What does the red bird see?", "What color is the duck?"],
-          "vocab": [{"en": "yellow duck", "zh": "黃色的鴨子"}]
-        },
-        {
-          "id": "s1-5",
-          "en": "Yellow Duck, Yellow Duck, What do you see?",
-          "zh": "黃色的鴨子，黃色的鴨子，你看到了什麼？",
-          "segments": [
-            {"t": "Yellow Duck, Yellow Duck", "type": "phrase", "zh": "黃色的鴨子，黃色的鴨子", "note": "Addressing the duck."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with repeated vocative.",
-          "grammar": "Same as previous.",
-          "culture": "Predictable pattern helps language acquisition.",
-          "questions": ["What comes next in the pattern?"],
-          "vocab": [{"en": "yellow duck", "zh": "黃色的鴨子"}]
-        },
-        {
-          "id": "s1-6",
-          "en": "I see a blue horse looking at me.",
-          "zh": "我看見一匹藍色的馬看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a blue horse", "type": "phrase", "zh": "一匹藍色的馬", "note": "Color + animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Imagination and color naming.",
-          "questions": ["What animal does the duck see?", "Is a blue horse realistic?"],
-          "vocab": [{"en": "blue horse", "zh": "藍色的馬"}]
-        },
-        {
-          "id": "s1-7",
-          "en": "Blue Horse, Blue Horse, What do you see?",
-          "zh": "藍色的馬，藍色的馬，你看到了什麼？",
-          "segments": [
-            {"t": "Blue Horse, Blue Horse", "type": "phrase", "zh": "藍色的馬，藍色的馬", "note": "Addressing the horse."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same as previous.",
-          "culture": "Pattern continues.",
-          "questions": ["Who is asked next?"],
-          "vocab": [{"en": "blue horse", "zh": "藍色的馬"}]
-        },
-        {
-          "id": "s1-8",
-          "en": "I see a green frog looking at me.",
-          "zh": "我看見一隻綠色的青蛙看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a green frog", "type": "phrase", "zh": "一隻綠色的青蛙", "note": "Color + animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Frog is a common animal in children's books.",
-          "questions": ["What does the blue horse see?"],
-          "vocab": [{"en": "green frog", "zh": "綠色的青蛙"}]
-        },
-        {
-          "id": "s1-9",
-          "en": "Green Frog, Green Frog, What do you see?",
-          "zh": "綠色的青蛙，綠色的青蛙，你看到了什麼？",
-          "segments": [
-            {"t": "Green Frog, Green Frog", "type": "phrase", "zh": "綠色的青蛙，綠色的青蛙", "note": "Addressing the frog."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Pattern continues.",
-          "questions": ["What comes next?"],
-          "vocab": [{"en": "green frog", "zh": "綠色的青蛙"}]
-        },
-        {
-          "id": "s1-10",
-          "en": "I see a purple cat looking at me.",
-          "zh": "我看見一隻紫色的貓看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a purple cat", "type": "phrase", "zh": "一隻紫色的貓", "note": "Color + animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Purple is an unusual color for a cat.",
-          "questions": ["What does the frog see?"],
-          "vocab": [{"en": "purple cat", "zh": "紫色的貓"}]
-        },
-        {
-          "id": "s1-11",
-          "en": "Purple Cat, Purple Cat, What do you see?",
-          "zh": "紫色的貓，紫色的貓，你看到了什麼？",
-          "segments": [
-            {"t": "Purple Cat, Purple Cat", "type": "phrase", "zh": "紫色的貓，紫色的貓", "note": "Addressing the cat."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Pattern continues.",
-          "questions": ["Who is asked next?"],
-          "vocab": [{"en": "purple cat", "zh": "紫色的貓"}]
-        },
-        {
-          "id": "s1-12",
-          "en": "I see a white dog looking at me.",
-          "zh": "我看見一隻白色的狗看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a white dog", "type": "phrase", "zh": "一隻白色的狗", "note": "Color + animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Dog is a familiar animal.",
-          "questions": ["What does the purple cat see?"],
-          "vocab": [{"en": "white dog", "zh": "白色的狗"}]
-        },
-        {
-          "id": "s1-13",
-          "en": "White Dog, White Dog, What do you see?",
-          "zh": "白色的狗，白色的狗，你看到了什麼？",
-          "segments": [
-            {"t": "White Dog, White Dog", "type": "phrase", "zh": "白色的狗，白色的狗", "note": "Addressing the dog."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Pattern continues.",
-          "questions": ["What comes next?"],
-          "vocab": [{"en": "white dog", "zh": "白色的狗"}]
-        },
-        {
-          "id": "s1-14",
-          "en": "I see a black sheep looking at me.",
-          "zh": "我看見一隻黑色的羊看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a black sheep", "type": "phrase", "zh": "一隻黑色的羊", "note": "Color + animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "'Black sheep' is also an idiom.",
-          "questions": ["What does the white dog see?"],
-          "vocab": [{"en": "black sheep", "zh": "黑色的羊"}]
-        },
-        {
-          "id": "s1-15",
-          "en": "Black Sheep, Black Sheep, What do you see?",
-          "zh": "黑色的羊，黑色的羊，你看到了什麼？",
-          "segments": [
-            {"t": "Black Sheep, Black Sheep", "type": "phrase", "zh": "黑色的羊，黑色的羊", "note": "Addressing the sheep."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Pattern continues.",
-          "questions": ["Who is asked next?"],
-          "vocab": [{"en": "black sheep", "zh": "黑色的羊"}]
-        },
-        {
-          "id": "s1-16",
-          "en": "I see a goldfish looking at me.",
-          "zh": "我看見一隻金魚看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a goldfish", "type": "phrase", "zh": "一隻金魚", "note": "No color adjective for goldfish."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Goldfish is a common pet.",
-          "questions": ["What does the black sheep see?"],
-          "vocab": [{"en": "goldfish", "zh": "金魚"}]
-        },
-        {
-          "id": "s1-17",
-          "en": "Goldfish, Goldfish, What do you see?",
-          "zh": "金魚，金魚，你看到了什麼？",
-          "segments": [
-            {"t": "Goldfish, Goldfish", "type": "phrase", "zh": "金魚，金魚", "note": "Addressing the goldfish."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Pattern continues.",
-          "questions": ["What comes next?"],
-          "vocab": [{"en": "goldfish", "zh": "金魚"}]
-        },
-        {
-          "id": "s1-18",
-          "en": "I see a teacher looking at me.",
-          "zh": "我看見一位老師看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " a teacher", "type": "phrase", "zh": "一位老師", "note": "Human instead of animal."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense.",
-          "culture": "Teacher appears as a character.",
-          "questions": ["What does the goldfish see?", "What is different about this answer?"],
-          "vocab": [{"en": "teacher", "zh": "老師"}]
-        },
-        {
-          "id": "s1-19",
-          "en": "Teacher, Teacher, What do you see?",
-          "zh": "老師，老師，你看到了什麼？",
-          "segments": [
-            {"t": "Teacher, Teacher", "type": "phrase", "zh": "老師，老師", "note": "Addressing the teacher."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern.",
-          "culture": "Teacher as a central figure.",
-          "questions": ["Who is asked now?"],
-          "vocab": [{"en": "teacher", "zh": "老師"}]
-        },
-        {
-          "id": "s1-20",
-          "en": "I see children looking at me.",
-          "zh": "我看見孩子們看著我。",
-          "segments": [
-            {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
-            {"t": " children", "type": "phrase", "zh": "孩子們", "note": "Plural noun."},
-            {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with participle.",
-          "grammar": "Present tense; plural noun.",
-          "culture": "Children are the audience.",
-          "questions": ["What does the teacher see?"],
-          "vocab": [{"en": "children", "zh": "孩子們"}]
-        },
-        {
-          "id": "s1-21",
-          "en": "Children, Children, What do you see?",
-          "zh": "孩子們，孩子們，你（們）看到了什麼？",
-          "segments": [
-            {"t": "Children, Children", "type": "phrase", "zh": "孩子們，孩子們", "note": "Addressing the children."},
-            {"t": ",", "type": "plain"},
-            {"t": " What do you see", "type": "phrase", "zh": "你（們）看到了什麼", "note": "Question with plural 'you'."},
-            {"t": "?", "type": "plain"}
-          ],
-          "syntax": "Interrogative with vocative.",
-          "grammar": "Same pattern with plural subject.",
-          "culture": "Children reflect what they learned.",
-          "questions": ["Who is being asked?"],
-          "vocab": [{"en": "children", "zh": "孩子們"}]
-        },
-        {
-          "id": "s1-22",
-          "en": "a black sheep, a red bird, a green frog, a goldfish",
-          "zh": "一隻黑色的羊、一隻紅色的鳥、一隻綠色的青蛙、一隻金魚",
-          "segments": [
-            {"t": "a black sheep", "type": "phrase", "zh": "一隻黑色的羊", "note": "Animal listed."},
-            {"t": ",", "type": "plain"},
-            {"t": " a red bird", "type": "phrase", "zh": "一隻紅色的鳥", "note": "Animal listed."},
-            {"t": ",", "type": "plain"},
-            {"t": " a green frog", "type": "phrase", "zh": "一隻綠色的青蛙", "note": "Animal listed."},
-            {"t": ",", "type": "plain"},
-            {"t": " a goldfish", "type": "phrase", "zh": "一隻金魚", "note": "Animal listed."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "List of noun phrases.",
-          "grammar": "Series of nouns with articles and adjectives.",
-          "culture": "Review of animals learned.",
-          "questions": ["Which animals are listed?", "Why are these specific animals mentioned?"],
-          "vocab": [
-            {"en": "black sheep", "zh": "黑色的羊"},
-            {"en": "red bird", "zh": "紅色的鳥"},
-            {"en": "green frog", "zh": "綠色的青蛙"},
-            {"en": "goldfish", "zh": "金魚"}
+          "id": "ch1-s1",
+          "title": "Brown Bear and Friends",
+          "sentences": [
+            {
+              "id": "s1-1",
+              "en": "Brown Bear, Brown Bear, What do you see?",
+              "zh": "棕色的熊，棕色的熊，你看到了什麼？",
+              "segments": [
+                {"t": "Brown Bear, Brown Bear", "type": "phrase", "zh": "棕色的熊，棕色的熊", "note": "Repetition for emphasis and rhythm."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Question pattern used throughout the book."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative sentence with repeated vocative.",
+              "grammar": "Present tense question with 'do'.",
+              "culture": "Classic children's book by Bill Martin Jr. and Eric Carle.",
+              "questions": [
+                "What does the brown bear see?",
+                "Why is the animal name repeated?"
+              ],
+              "vocab": [
+                {"en": "brown bear", "zh": "棕色的熊"},
+                {"en": "see", "zh": "看"}
+              ]
+            },
+            {
+              "id": "s1-2",
+              "en": "I see a red bird looking at me.",
+              "zh": "我看見一隻紅色的鳥看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "First-person response."},
+                {"t": " a red bird", "type": "phrase", "zh": "一隻紅色的鳥", "note": "Color + animal pattern."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle phrase describing the bird."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with present participle clause.",
+              "grammar": "Present tense; present participle for simultaneous action.",
+              "culture": "Color recognition and animal vocabulary.",
+              "questions": [
+                "What animal does the bear see?",
+                "What color is the bird?"
+              ],
+              "vocab": [
+                {"en": "red bird", "zh": "紅色的鳥"},
+                {"en": "looking at", "zh": "看著"}
+              ]
+            },
+            {
+              "id": "s1-3",
+              "en": "Red Bird, Red Bird, What do you see?",
+              "zh": "紅色的鳥，紅色的鳥，你看到了什麼？",
+              "segments": [
+                {"t": "Red Bird, Red Bird", "type": "phrase", "zh": "紅色的鳥，紅色的鳥", "note": "Addressing the next animal."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question pattern."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with repeated vocative.",
+              "grammar": "Same question pattern as sentence 1.",
+              "culture": "Chain of questions and answers.",
+              "questions": [
+                "Who is being asked now?",
+                "What pattern do you notice?"
+              ],
+              "vocab": [
+                {"en": "red bird", "zh": "紅色的鳥"}
+              ]
+            },
+            {
+              "id": "s1-4",
+              "en": "I see a yellow duck looking at me.",
+              "zh": "我看見一隻黃色的鴨子看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a yellow duck", "type": "phrase", "zh": "一隻黃色的鴨子", "note": "Next animal in sequence."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with present participle.",
+              "grammar": "Present tense; color + animal pattern.",
+              "culture": "Teaches colors and animal names.",
+              "questions": [
+                "What does the red bird see?",
+                "What color is the duck?"
+              ],
+              "vocab": [
+                {"en": "yellow duck", "zh": "黃色的鴨子"}
+              ]
+            },
+            {
+              "id": "s1-5",
+              "en": "Yellow Duck, Yellow Duck, What do you see?",
+              "zh": "黃色的鴨子，黃色的鴨子，你看到了什麼？",
+              "segments": [
+                {"t": "Yellow Duck, Yellow Duck", "type": "phrase", "zh": "黃色的鴨子，黃色的鴨子", "note": "Addressing the duck."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with repeated vocative.",
+              "grammar": "Same as previous.",
+              "culture": "Predictable pattern helps language acquisition.",
+              "questions": [
+                "What comes next in the pattern?"
+              ],
+              "vocab": [
+                {"en": "yellow duck", "zh": "黃色的鴨子"}
+              ]
+            },
+            {
+              "id": "s1-6",
+              "en": "I see a blue horse looking at me.",
+              "zh": "我看見一匹藍色的馬看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a blue horse", "type": "phrase", "zh": "一匹藍色的馬", "note": "Color + animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Present participle."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Imagination and color naming.",
+              "questions": [
+                "What animal does the duck see?",
+                "Is a blue horse realistic?"
+              ],
+              "vocab": [
+                {"en": "blue horse", "zh": "藍色的馬"}
+              ]
+            },
+            {
+              "id": "s1-7",
+              "en": "Blue Horse, Blue Horse, What do you see?",
+              "zh": "藍色的馬，藍色的馬，你看到了什麼？",
+              "segments": [
+                {"t": "Blue Horse, Blue Horse", "type": "phrase", "zh": "藍色的馬，藍色的馬", "note": "Addressing the horse."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same as previous.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "Who is asked next?"
+              ],
+              "vocab": [
+                {"en": "blue horse", "zh": "藍色的馬"}
+              ]
+            },
+            {
+              "id": "s1-8",
+              "en": "I see a green frog looking at me.",
+              "zh": "我看見一隻綠色的青蛙看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a green frog", "type": "phrase", "zh": "一隻綠色的青蛙", "note": "Color + animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Frog is a common animal in children's books.",
+              "questions": [
+                "What does the blue horse see?"
+              ],
+              "vocab": [
+                {"en": "green frog", "zh": "綠色的青蛙"}
+              ]
+            },
+            {
+              "id": "s1-9",
+              "en": "Green Frog, Green Frog, What do you see?",
+              "zh": "綠色的青蛙，綠色的青蛙，你看到了什麼？",
+              "segments": [
+                {"t": "Green Frog, Green Frog", "type": "phrase", "zh": "綠色的青蛙，綠色的青蛙", "note": "Addressing the frog."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "What comes next?"
+              ],
+              "vocab": [
+                {"en": "green frog", "zh": "綠色的青蛙"}
+              ]
+            },
+            {
+              "id": "s1-10",
+              "en": "I see a purple cat looking at me.",
+              "zh": "我看見一隻紫色的貓看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a purple cat", "type": "phrase", "zh": "一隻紫色的貓", "note": "Color + animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Purple is an unusual color for a cat.",
+              "questions": [
+                "What does the frog see?"
+              ],
+              "vocab": [
+                {"en": "purple cat", "zh": "紫色的貓"}
+              ]
+            },
+            {
+              "id": "s1-11",
+              "en": "Purple Cat, Purple Cat, What do you see?",
+              "zh": "紫色的貓，紫色的貓，你看到了什麼？",
+              "segments": [
+                {"t": "Purple Cat, Purple Cat", "type": "phrase", "zh": "紫色的貓，紫色的貓", "note": "Addressing the cat."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "Who is asked next?"
+              ],
+              "vocab": [
+                {"en": "purple cat", "zh": "紫色的貓"}
+              ]
+            },
+            {
+              "id": "s1-12",
+              "en": "I see a white dog looking at me.",
+              "zh": "我看見一隻白色的狗看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a white dog", "type": "phrase", "zh": "一隻白色的狗", "note": "Color + animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Dog is a familiar animal.",
+              "questions": [
+                "What does the purple cat see?"
+              ],
+              "vocab": [
+                {"en": "white dog", "zh": "白色的狗"}
+              ]
+            },
+            {
+              "id": "s1-13",
+              "en": "White Dog, White Dog, What do you see?",
+              "zh": "白色的狗，白色的狗，你看到了什麼？",
+              "segments": [
+                {"t": "White Dog, White Dog", "type": "phrase", "zh": "白色的狗，白色的狗", "note": "Addressing the dog."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "What comes next?"
+              ],
+              "vocab": [
+                {"en": "white dog", "zh": "白色的狗"}
+              ]
+            },
+            {
+              "id": "s1-14",
+              "en": "I see a black sheep looking at me.",
+              "zh": "我看見一隻黑色的羊看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a black sheep", "type": "phrase", "zh": "一隻黑色的羊", "note": "Color + animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "'Black sheep' is also an idiom.",
+              "questions": [
+                "What does the white dog see?"
+              ],
+              "vocab": [
+                {"en": "black sheep", "zh": "黑色的羊"}
+              ]
+            },
+            {
+              "id": "s1-15",
+              "en": "Black Sheep, Black Sheep, What do you see?",
+              "zh": "黑色的羊，黑色的羊，你看到了什麼？",
+              "segments": [
+                {"t": "Black Sheep, Black Sheep", "type": "phrase", "zh": "黑色的羊，黑色的羊", "note": "Addressing the sheep."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "Who is asked next?"
+              ],
+              "vocab": [
+                {"en": "black sheep", "zh": "黑色的羊"}
+              ]
+            },
+            {
+              "id": "s1-16",
+              "en": "I see a goldfish looking at me.",
+              "zh": "我看見一隻金魚看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a goldfish", "type": "phrase", "zh": "一隻金魚", "note": "No color adjective for goldfish."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Goldfish is a common pet.",
+              "questions": [
+                "What does the black sheep see?"
+              ],
+              "vocab": [
+                {"en": "goldfish", "zh": "金魚"}
+              ]
+            },
+            {
+              "id": "s1-17",
+              "en": "Goldfish, Goldfish, What do you see?",
+              "zh": "金魚，金魚，你看到了什麼？",
+              "segments": [
+                {"t": "Goldfish, Goldfish", "type": "phrase", "zh": "金魚，金魚", "note": "Addressing the goldfish."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Pattern continues.",
+              "questions": [
+                "What comes next?"
+              ],
+              "vocab": [
+                {"en": "goldfish", "zh": "金魚"}
+              ]
+            },
+            {
+              "id": "s1-18",
+              "en": "I see a teacher looking at me.",
+              "zh": "我看見一位老師看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " a teacher", "type": "phrase", "zh": "一位老師", "note": "Human instead of animal."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense.",
+              "culture": "Teacher appears as a character.",
+              "questions": [
+                "What does the goldfish see?",
+                "What is different about this answer?"
+              ],
+              "vocab": [
+                {"en": "teacher", "zh": "老師"}
+              ]
+            },
+            {
+              "id": "s1-19",
+              "en": "Teacher, Teacher, What do you see?",
+              "zh": "老師，老師，你看到了什麼？",
+              "segments": [
+                {"t": "Teacher, Teacher", "type": "phrase", "zh": "老師，老師", "note": "Addressing the teacher."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你看到了什麼", "note": "Repeated question."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern.",
+              "culture": "Teacher as a central figure.",
+              "questions": [
+                "Who is asked now?"
+              ],
+              "vocab": [
+                {"en": "teacher", "zh": "老師"}
+              ]
+            },
+            {
+              "id": "s1-20",
+              "en": "I see children looking at me.",
+              "zh": "我看見孩子們看著我。",
+              "segments": [
+                {"t": "I see", "type": "phrase", "zh": "我看見", "note": "Response."},
+                {"t": " children", "type": "phrase", "zh": "孩子們", "note": "Plural noun."},
+                {"t": " looking at me", "type": "phrase", "zh": "看著我", "note": "Participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with participle.",
+              "grammar": "Present tense; plural noun.",
+              "culture": "Children are the audience.",
+              "questions": [
+                "What does the teacher see?"
+              ],
+              "vocab": [
+                {"en": "children", "zh": "孩子們"}
+              ]
+            },
+            {
+              "id": "s1-21",
+              "en": "Children, Children, What do you see?",
+              "zh": "孩子們，孩子們，你（們）看到了什麼？",
+              "segments": [
+                {"t": "Children, Children", "type": "phrase", "zh": "孩子們，孩子們", "note": "Addressing the children."},
+                {"t": ",", "type": "plain"},
+                {"t": " What do you see", "type": "phrase", "zh": "你（們）看到了什麼", "note": "Question with plural 'you'."},
+                {"t": "?", "type": "plain"}
+              ],
+              "syntax": "Interrogative with vocative.",
+              "grammar": "Same pattern with plural subject.",
+              "culture": "Children reflect what they learned.",
+              "questions": [
+                "Who is being asked?"
+              ],
+              "vocab": [
+                {"en": "children", "zh": "孩子們"}
+              ]
+            },
+            {
+              "id": "s1-22",
+              "en": "a black sheep, a red bird, a green frog, a goldfish",
+              "zh": "一隻黑色的羊、一隻紅色的鳥、一隻綠色的青蛙、一隻金魚",
+              "segments": [
+                {"t": "a black sheep", "type": "phrase", "zh": "一隻黑色的羊", "note": "Animal listed."},
+                {"t": ",", "type": "plain"},
+                {"t": " a red bird", "type": "phrase", "zh": "一隻紅色的鳥", "note": "Animal listed."},
+                {"t": ",", "type": "plain"},
+                {"t": " a green frog", "type": "phrase", "zh": "一隻綠色的青蛙", "note": "Animal listed."},
+                {"t": ",", "type": "plain"},
+                {"t": " a goldfish", "type": "phrase", "zh": "一隻金魚", "note": "Animal listed."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "List of noun phrases.",
+              "grammar": "Series of nouns with articles and adjectives.",
+              "culture": "Review of animals learned.",
+              "questions": [
+                "Which animals are listed?",
+                "Why are these specific animals mentioned?"
+              ],
+              "vocab": [
+                {"en": "black sheep", "zh": "黑色的羊"},
+                {"en": "red bird", "zh": "紅色的鳥"},
+                {"en": "green frog", "zh": "綠色的青蛙"},
+                {"en": "goldfish", "zh": "金魚"}
+              ]
+            },
+            {
+              "id": "s1-23",
+              "en": "a yellow duck, a blue horse, a white dog, and a teacher looking at us.",
+              "zh": "一隻黃色的鴨子、一匹藍色的馬、一隻白色的狗，還有一位老師看著我們。",
+              "segments": [
+                {"t": "a yellow duck", "type": "phrase", "zh": "一隻黃色的鴨子", "note": "Animal listed."},
+                {"t": ",", "type": "plain"},
+                {"t": " a blue horse", "type": "phrase", "zh": "一匹藍色的馬", "note": "Animal listed."},
+                {"t": ",", "type": "plain"},
+                {"t": " a white dog", "type": "phrase", "zh": "一隻白色的狗", "note": "Animal listed."},
+                {"t": ", and", "type": "plain"},
+                {"t": " a teacher looking at us", "type": "phrase", "zh": "一位老師看著我們", "note": "Final item with participle phrase."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "List with final item and participle phrase.",
+              "grammar": "Series with 'and'; 'looking at us' modifies teacher.",
+              "culture": "Summary of animals and teacher.",
+              "questions": [
+                "What animals are mentioned?",
+                "Who else is looking at them?"
+              ],
+              "vocab": [
+                {"en": "yellow duck", "zh": "黃色的鴨子"},
+                {"en": "blue horse", "zh": "藍色的馬"},
+                {"en": "white dog", "zh": "白色的狗"},
+                {"en": "teacher", "zh": "老師"}
+              ]
+            },
+            {
+              "id": "s1-24",
+              "en": "That's what we see.",
+              "zh": "那就是我們所看到的。",
+              "segments": [
+                {"t": "That's", "type": "phrase", "zh": "那就是", "note": "Contraction of 'That is'."},
+                {"t": " what we see", "type": "phrase", "zh": "我們所看到的", "note": "Noun clause as complement."},
+                {"t": ".", "type": "plain"}
+              ],
+              "syntax": "Simple sentence with noun clause.",
+              "grammar": "Present tense; 'what' clause as subject complement.",
+              "culture": "Final statement of the book.",
+              "questions": [
+                "What is the final sentence?",
+                "What does 'That's' refer to?"
+              ],
+              "vocab": [
+                {"en": "see", "zh": "看"}
+              ]
+            }
           ]
-        },
-        {
-          "id": "s1-23",
-          "en": "a yellow duck, a blue horse, a white dog, and a teacher looking at us.",
-          "zh": "一隻黃色的鴨子、一匹藍色的馬、一隻白色的狗，還有一位老師看著我們。",
-          "segments": [
-            {"t": "a yellow duck", "type": "phrase", "zh": "一隻黃色的鴨子", "note": "Animal listed."},
-            {"t": ",", "type": "plain"},
-            {"t": " a blue horse", "type": "phrase", "zh": "一匹藍色的馬", "note": "Animal listed."},
-            {"t": ",", "type": "plain"},
-            {"t": " a white dog", "type": "phrase", "zh": "一隻白色的狗", "note": "Animal listed."},
-            {"t": ", and", "type": "plain"},
-            {"t": " a teacher looking at us", "type": "phrase", "zh": "一位老師看著我們", "note": "Final item with participle phrase."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "List with final item and participle phrase.",
-          "grammar": "Series with 'and'; 'looking at us' modifies teacher.",
-          "culture": "Summary of animals and teacher.",
-          "questions": ["What animals are mentioned?", "Who else is looking at them?"],
-          "vocab": [
-            {"en": "yellow duck", "zh": "黃色的鴨子"},
-            {"en": "blue horse", "zh": "藍色的馬"},
-            {"en": "white dog", "zh": "白色的狗"},
-            {"en": "teacher", "zh": "老師"}
-          ]
-        },
-        {
-          "id": "s1-24",
-          "en": "That's what we see.",
-          "zh": "那就是我們所看到的。",
-          "segments": [
-            {"t": "That's", "type": "phrase", "zh": "那就是", "note": "Contraction of 'That is'."},
-            {"t": " what we see", "type": "phrase", "zh": "我們所看到的", "note": "Noun clause as complement."},
-            {"t": ".", "type": "plain"}
-          ],
-          "syntax": "Simple sentence with noun clause.",
-          "grammar": "Present tense; 'what' clause as subject complement.",
-          "culture": "Final statement of the book.",
-          "questions": ["What is the final sentence?", "What does 'That's' refer to?"],
-          "vocab": [{"en": "see", "zh": "看"}]
         }
       ]
-    }]
-  }]
+    }
+  ]
 };
 
 let DATA = null;
@@ -692,13 +986,17 @@ function setupFileInput(inputId) {
         let imported = JSON.parse(raw);
         if (imported.chapters && Array.isArray(imported.chapters)) {
           DATA = imported;
-          rebuildBanks(); populateChapterSelects();
-          state.learnChapterFilter = "all"; state.quizChapterFilter = "all";
+          rebuildBanks();
+          populateChapterSelects();
+          state.learnChapterFilter = "all";
+          state.quizChapterFilter = "all";
           document.getElementById("learn-chapter-select").value = "all";
           document.getElementById("quiz-chapter-select").value = "all";
           saveState();
-          if (mode === 'learn') renderLearn(); else renderQuiz();
-          quizRound = null; collapseAllAnalysis();
+          if (mode === 'learn') renderLearn();
+          else renderQuiz();
+          quizRound = null;
+          collapseAllAnalysis();
           alert("✅ 匯入成功！已載入 " + DATA.chapters.length + " 個章節。");
         } else alert("❌ 無效的 JSON 格式：缺少 chapters 陣列。");
       } catch(err) { alert("❌ JSON 解析錯誤：" + err.message); console.error(err); }
@@ -719,12 +1017,12 @@ function loadState(){
 function saveState(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }catch(e){} }
 let state = loadState();
 let mode = "learn";
-let currentTopPanel = { original:"", translation:"", lang:"" };
+let currentTopPanel = { original:"", translation:"", originalLang:"", translationLang:"" };
 
 // ============================================================
-// 語言偵測
+// 語言偵測 - fr 優先於 en
 // ============================================================
-const LANG_FIELDS = ['en', 'fr', 'zh', 'ja', 'es', 'de', 'it', 'pt', 'ru', 'ar', 'ko', 'vi', 'th'];
+const LANG_FIELDS = ['fr', 'en', 'zh', 'ja', 'es', 'de', 'it', 'pt', 'ru', 'ar', 'ko', 'vi', 'th'];
 
 function detectOriginalField(s) {
   for (const f of LANG_FIELDS) { if (s[f]) return f; }
@@ -738,9 +1036,29 @@ function getOriginalText(s) { const f = detectOriginalField(s); return s[f] || '
 function getTranslationText(s) {
   const orig = detectOriginalField(s);
   const trans = detectTranslationField(s, orig);
-  return s[trans] || s[orig] || '';
+  return s[trans] || '';
 }
 function getOriginalLang(s) { return detectOriginalField(s); }
+function getTranslationLang(s) {
+  const orig = detectOriginalField(s);
+  return detectTranslationField(s, orig);
+}
+
+// ============================================================
+// 檢查斷句是否為自動生成的
+// ============================================================
+function isAutoGeneratedSegment(seg, originalLang) {
+  let hasTranslation = false;
+  for (const f of LANG_FIELDS) {
+    if (f !== originalLang && seg[f] && seg[f].trim()) {
+      hasTranslation = true;
+      break;
+    }
+  }
+  if (hasTranslation) return false;
+  if (seg.note && seg.note.trim()) return false;
+  return true;
+}
 
 // ============================================================
 // 剪貼簿功能
@@ -766,40 +1084,88 @@ function fallbackCopy(text) {
 }
 
 // ============================================================
-// 確保 segments 存在（保留原始 segments，若無則自動生成）
+// Google 翻譯
 // ============================================================
-function ensureSegments(sentence) {
-  if (sentence.segments && sentence.segments.length > 0) {
-    return sentence;
+function openGoogleTranslate(text, targetLang) {
+  if (!text) return;
+  copyToClipboard(text);
+  const langMap = {
+    'fr': 'fr', 'en': 'en', 'zh': 'zh-TW',
+    'ja': 'ja', 'es': 'es', 'de': 'de', 'it': 'it',
+    'pt': 'pt', 'ru': 'ru', 'ar': 'ar', 'ko': 'ko',
+    'vi': 'vi', 'th': 'th'
+  };
+  const tl = langMap[targetLang] || 'en';
+  const encoded = encodeURIComponent(text);
+  const url = "https://translate.google.com/?sl=auto&tl=" + tl + "&text=" + encoded + "&op=translate";
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  if(isAndroid){
+    const intentUrl = "intent://translate.google.com/?sl=auto&tl=" + tl + "&text=" + encoded + "&op=translate"
+      + "#Intent;scheme=https;package=com.google.android.apps.translate;S.browser_fallback_url="
+      + encodeURIComponent(url) + ";end";
+    window.location.href = intentUrl;
+  } else {
+    window.open(url, "_blank");
   }
-  const lang = getOriginalLang(sentence);
-  const original = getOriginalText(sentence);
-  const segs = [];
+}
+
+// ============================================================
+// 自動生成斷句
+// ============================================================
+function generateSegments(text) {
+  if (!text) return [];
+  const segments = [];
   let buffer = '';
-  for (let i = 0; i < original.length; i++) {
-    const ch = original[i];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
     if (ch === ' ' || ch === ',' || ch === '.' || ch === '?' || ch === '!' || ch === ';' || ch === ':') {
       if (buffer.trim()) {
-        segs.push({ t: buffer.trim(), type: 'phrase', [lang]: buffer.trim() });
+        segments.push({ t: buffer.trim(), type: 'phrase' });
         buffer = '';
       }
       if (ch === ',' || ch === '.' || ch === '?' || ch === '!' || ch === ';' || ch === ':') {
-        segs.push({ t: ch, type: 'plain' });
+        segments.push({ t: ch, type: 'plain' });
       }
-      if (ch === ' ' && i < original.length - 1 && original[i+1] !== ' ') {
-        segs.push({ t: ' ', type: 'plain' });
+      if (ch === ' ' && i < text.length - 1 && text[i + 1] !== ' ') {
+        segments.push({ t: ' ', type: 'plain' });
       }
     } else {
       buffer += ch;
     }
   }
   if (buffer.trim()) {
-    segs.push({ t: buffer.trim(), type: 'phrase', [lang]: buffer.trim() });
+    segments.push({ t: buffer.trim(), type: 'phrase' });
   }
-  if (segs.length === 0) {
-    segs.push({ t: original.trim(), type: 'phrase', [lang]: original.trim() });
+  if (segments.length === 0) {
+    segments.push({ t: text.trim(), type: 'phrase' });
   }
-  return { ...sentence, segments: segs };
+  return segments;
+}
+
+function ensureSegments(sentence) {
+  if (sentence.segments && sentence.segments.length > 0) {
+    const origLang = getOriginalLang(sentence);
+    let hasAnyTranslationOrNote = false;
+    for (const seg of sentence.segments) {
+      if (seg.type === 'phrase' || seg.type === 'word') {
+        for (const f of LANG_FIELDS) {
+          if (f !== origLang && seg[f] && seg[f].trim()) {
+            hasAnyTranslationOrNote = true;
+            break;
+          }
+        }
+        if (seg.note && seg.note.trim()) hasAnyTranslationOrNote = true;
+        if (hasAnyTranslationOrNote) break;
+      }
+    }
+    if (!hasAnyTranslationOrNote) {
+      return { ...sentence, _autoSegments: true };
+    }
+    return sentence;
+  }
+  const original = getOriginalText(sentence);
+  const segs = generateSegments(original);
+  return { ...sentence, segments: segs, _autoSegments: true };
 }
 
 function allSections(){
@@ -813,7 +1179,7 @@ function allSections(){
 function isSectionRead(secId){ return !!state.readSections[secId]; }
 
 // ============================================================
-// 建立測驗題庫 - 包含句子和斷句
+// 建立測驗題庫
 // ============================================================
 function buildBanks(){
   const words = [], sentences = [], segments = [], seen = new Set();
@@ -822,13 +1188,15 @@ function buildBanks(){
       section.sentences.forEach(s => {
         const enriched = ensureSegments(s);
         const origLang = getOriginalLang(enriched);
+        const transLang = getTranslationLang(enriched);
         enriched.originalLang = origLang;
+        enriched.translationLang = transLang;
         enriched.original = getOriginalText(enriched);
         enriched.translation = getTranslationText(enriched);
         enriched.sectionId = section.id;
         enriched.kind = "sentence";
         sentences.push(enriched);
-        
+
         if (enriched.segments && enriched.segments.length > 0) {
           enriched.segments.forEach((seg, idx) => {
             if (seg.type === "phrase" || seg.type === "word") {
@@ -837,7 +1205,6 @@ function buildBanks(){
               for (const f of LANG_FIELDS) {
                 if (f !== origLang && seg[f]) { segTrans = seg[f]; break; }
               }
-              if (!segTrans) segTrans = seg.zh || seg.en || seg.fr || '';
               if (segText && segTrans) {
                 const key = segText + '|' + segTrans;
                 if (!seen.has(key)) {
@@ -847,6 +1214,7 @@ function buildBanks(){
                     original: segText,
                     translation: segTrans,
                     originalLang: origLang,
+                    translationLang: transLang,
                     sectionId: section.id,
                     kind: "segment",
                     sentenceId: s.id,
@@ -857,7 +1225,7 @@ function buildBanks(){
             }
           });
         }
-        
+
         (s.vocab||[]).forEach(v => {
           const o = detectOriginalField(v);
           const t = detectTranslationField(v, o);
@@ -884,7 +1252,7 @@ function rebuildBanks() { BANKS = buildBanks(); }
 let voiceMap = {};
 function pickVoices(){
   const voices = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-  const map = { 'en':'en-US','fr':'fr-FR','zh':'zh-TW','ja':'ja-JP','es':'es-ES','de':'de-DE','it':'it-IT','pt':'pt-PT','ru':'ru-RU','ar':'ar-SA','ko':'ko-KR','vi':'vi-VN','th':'th-TH' };
+  const map = { 'fr':'fr-FR', 'en':'en-US', 'zh':'zh-TW', 'ja':'ja-JP', 'es':'es-ES', 'de':'de-DE', 'it':'it-IT', 'pt':'pt-PT', 'ru':'ru-RU', 'ar':'ar-SA', 'ko':'ko-KR', 'vi':'vi-VN', 'th':'th-TH' };
   for (const [lang, tag] of Object.entries(map)) {
     voiceMap[lang] = voices.find(v => v.lang && v.lang.toLowerCase().startsWith(tag.toLowerCase().substring(0,2))) || null;
   }
@@ -895,7 +1263,7 @@ function speakText(text, lang){
   window.speechSynthesis.cancel();
   setTimeout(()=>{
     const u = new SpeechSynthesisUtterance(text);
-    const map = { 'en':'en-US','fr':'fr-FR','zh':'zh-TW','ja':'ja-JP','es':'es-ES','de':'de-DE','it':'it-IT','pt':'pt-PT','ru':'ru-RU','ar':'ar-SA','ko':'ko-KR','vi':'vi-VN','th':'th-TH' };
+    const map = { 'fr':'fr-FR', 'en':'en-US', 'zh':'zh-TW', 'ja':'ja-JP', 'es':'es-ES', 'de':'de-DE', 'it':'it-IT', 'pt':'pt-PT', 'ru':'ru-RU', 'ar':'ar-SA', 'ko':'ko-KR', 'vi':'vi-VN', 'th':'th-TH' };
     u.lang = map[lang] || 'en-US';
     if(voiceMap[lang]) u.voice = voiceMap[lang];
     u.rate = 0.92;
@@ -903,21 +1271,21 @@ function speakText(text, lang){
   }, 30);
 }
 
-function translateAndOpen(text){
-  if(!text) return;
-  const encoded = encodeURIComponent(text);
-  const url = "https://translate.google.com/?sl=auto&tl=zh-TW&text=" + encoded + "&op=translate";
-  window.open(url, "_blank");
-}
-
-function setTopPanel(original, translation, lang){
-  currentTopPanel = { original, translation, lang };
+// ============================================================
+// 設定頂部翻譯區
+// ============================================================
+function setTopPanel(original, translation, originalLang, translationLang){
+  currentTopPanel = { original, translation, originalLang, translationLang };
   const el = document.getElementById("top-panel-text");
   el.classList.remove("placeholder");
-  el.textContent = translation || original || " ";
+  el.textContent = translation || " ";
 }
+
 document.getElementById("top-translate-btn").addEventListener("click", ()=>{
-  if(currentTopPanel.original) translateAndOpen(currentTopPanel.original);
+  if(currentTopPanel.original) {
+    const targetLang = currentTopPanel.translationLang || 'en';
+    openGoogleTranslate(currentTopPanel.original, targetLang);
+  }
 });
 
 // ============================================================
@@ -940,11 +1308,17 @@ function switchMode(m){
   btnQuiz.classList.toggle("active", m==="quiz");
   mainLearn.classList.toggle("hidden", m!=="learn");
   mainQuiz.classList.toggle("hidden", m!=="quiz");
+  mainLearn.classList.toggle("quiz-mode", m==="quiz");
+  mainQuiz.classList.toggle("quiz-mode", m==="quiz");
   selModeLearn.classList.toggle("hidden", m!=="learn");
   selModeQuiz.classList.toggle("hidden", m!=="quiz");
   topPanel.classList.toggle("quiz-mode", m==="quiz");
-  if(m==="quiz"){ document.getElementById("quiz-chapter-select").value = state.quizChapterFilter || "all"; renderQuiz(); }
-  else renderLearn();
+  if(m==="quiz"){ 
+    document.getElementById("quiz-chapter-select").value = state.quizChapterFilter || "all"; 
+    renderQuiz(); 
+  } else {
+    renderLearn(); 
+  }
 }
 
 const toggleAnalysisBtn = document.getElementById("toggle-analysis-btn");
@@ -1003,6 +1377,7 @@ function renderLearn(){
       section.sentences.forEach(s => {
         if (!s.originalLang) {
           s.originalLang = getOriginalLang(s);
+          s.translationLang = getTranslationLang(s);
           s.original = getOriginalText(s);
           s.translation = getTranslationText(s);
         }
@@ -1021,16 +1396,22 @@ function renderLearn(){
 }
 
 function renderSentenceCard(s){
-  const card = document.createElement("div"); card.className = "sentence-card";
-  const row = document.createElement("div"); row.className = "sentence-row";
-  const speaker = document.createElement("button"); speaker.className = "speaker-btn"; speaker.innerHTML = "🔊";
-  speaker.title = "朗讀整句並複製原文";
-  speaker.addEventListener("click", (e)=>{
-    e.stopPropagation();
+  const card = document.createElement("div");
+  card.className = "sentence-card";
+  card.dataset.sentenceId = s.id;
+  
+  card.addEventListener("click", function(e) {
+    if (e.target.classList.contains('seg-phrase') || 
+        e.target.classList.contains('seg-word')) {
+      return;
+    }
     speakText(s.original, s.originalLang);
     copyToClipboard(s.original);
-    setTopPanel(s.original, s.translation, s.originalLang);
+    setTopPanel(s.original, s.translation, s.originalLang, s.translationLang);
   });
+  
+  const row = document.createElement("div"); row.className = "sentence-row";
+  
   const frDiv = document.createElement("div");
   const lang = s.originalLang;
   frDiv.className = "sentence-fr " + (lang === 'fr' ? 'fr-text' : (lang === 'en' ? 'en-text' : ''));
@@ -1055,18 +1436,37 @@ function renderSentenceCard(s){
     frDiv.textContent = s.original;
   }
   
-  row.appendChild(speaker); row.appendChild(frDiv); card.appendChild(row);
-  const enDiv = document.createElement("div"); enDiv.className = "sentence-en"; enDiv.textContent = s.translation; card.appendChild(enDiv);
-  const ac = document.createElement("div"); ac.className = "analysis-container"; card.appendChild(ac);
+  row.appendChild(frDiv); 
+  card.appendChild(row);
+  
+  const enDiv = document.createElement("div"); 
+  enDiv.className = "sentence-en"; 
+  enDiv.textContent = s.translation; 
+  card.appendChild(enDiv);
+  
+  const ac = document.createElement("div"); 
+  ac.className = "analysis-container"; 
+  card.appendChild(ac);
   return card;
 }
 
 function onSegmentClick(span, s, idx){
-  if(selectedSegmentEl){ selectedSegmentEl.classList.remove("selected"); }
-  span.classList.add("selected"); selectedSegmentEl = span;
   const seg = s.segments[idx];
-  const lang = s.originalLang;
   const segText = seg.t.trim();
+  
+  if (!segText) return;
+  
+  const lang = s.originalLang;
+  if (isAutoGeneratedSegment(seg, lang)) {
+    speakText(segText, lang);
+    copyToClipboard(segText);
+    setTopPanel(segText, '', lang, s.translationLang);
+    return;
+  }
+  
+  if(selectedSegmentEl){ selectedSegmentEl.classList.remove("selected"); }
+  span.classList.add("selected"); 
+  selectedSegmentEl = span;
   
   speakText(segText, lang);
   copyToClipboard(segText);
@@ -1075,14 +1475,15 @@ function onSegmentClick(span, s, idx){
   for (const f of LANG_FIELDS) {
     if (f !== lang && seg[f]) { segTrans = seg[f]; break; }
   }
-  if (!segTrans) segTrans = seg.zh || seg.en || seg.fr || '';
-  setTopPanel(segText, segTrans || s.translation || '', lang);
+  if (!segTrans) segTrans = '';
+  
+  setTopPanel(segText, segTrans || '', lang, s.translationLang);
   
   const card = span.closest(".sentence-card");
   const container = card.querySelector(".analysis-container");
   container.innerHTML = "";
   const panel = document.createElement("div"); panel.className = "analysis-panel";
-  panel.appendChild(analysisRow("片語 / 字詞", `<span style="font-size:1.1rem;">${escapeHtml(segText)}</span> — <span class="analysis-en">${escapeHtml(segTrans)}</span>`));
+  panel.appendChild(analysisRow("片語 / 字詞", `<span style="font-size:1.1rem;">${escapeHtml(segText)}</span>${segTrans ? ' — <span class="analysis-en">' + escapeHtml(segTrans) + '</span>' : ''}`));
   if(seg.note) panel.appendChild(analysisRow("說明", `<span class="analysis-en">${escapeHtml(seg.note)}</span>`));
   if(s.syntax) panel.appendChild(analysisRow("句法結構", `<span class="analysis-en">${escapeHtml(s.syntax)}</span>`));
   if(s.grammar) panel.appendChild(analysisRow("語法重點", `<span class="analysis-en">${escapeHtml(s.grammar)}</span>`));
@@ -1112,7 +1513,7 @@ function analysisRow(label, html){ const d=document.createElement("div"); d.clas
 function escapeHtml(str){ const d=document.createElement("div"); d.textContent=str; return d.innerHTML; }
 
 // ============================================================
-// 測驗模式 - 包含句子和斷句作為題目來源
+// 測驗模式
 // ============================================================
 let quizRound = null;
 
@@ -1140,30 +1541,31 @@ function pickQType(){
 function buildQuestion(item, poolSameKind){
   const qtype = pickQType();
   const origLang = item.originalLang || 'en';
+  const transLang = item.translationLang || 'en';
   const original = item.original || '';
   const translation = item.translation || '';
-  let question = { item, qtype, origLang, original, translation };
+  let question = { item, qtype, origLang, transLang, original, translation };
 
   if(qtype === "original_to_translation"){
     question.promptType = "text-original";
     question.promptText = original;
     const distractors = sample(poolSameKind.filter(x => x.id !== item.id), 3);
-    const opts = shuffle([item, ...distractors]).map(it => ({ text: it.translation, itemId: it.id }));
+    const opts = shuffle([item, ...distractors]).map(it => ({ text: it.translation || it.original, itemId: it.id }));
     question.options = opts;
     question.displayLang = origLang;
   } else if(qtype === "translation_to_original"){
     question.promptType = "text-translation";
-    question.promptText = translation;
+    question.promptText = translation || original;
     const distractors = sample(poolSameKind.filter(x => x.id !== item.id), 3);
     const opts = shuffle([item, ...distractors]).map(it => ({ text: it.original, itemId: it.id }));
     question.options = opts;
     question.displayLang = 'en';
-  } else { // listen
+  } else {
     question.promptType = "speaker";
     const showOriginal = Math.random() < 0.5;
     question.optShowOriginal = showOriginal;
     if (showOriginal) {
-      question.promptText = translation;
+      question.promptText = translation || original;
       const distractors = sample(poolSameKind.filter(x => x.id !== item.id), 3);
       const opts = shuffle([item, ...distractors]).map(it => ({ text: it.original, itemId: it.id }));
       question.options = opts;
@@ -1173,9 +1575,9 @@ function buildQuestion(item, poolSameKind){
     } else {
       question.promptText = original;
       const distractors = sample(poolSameKind.filter(x => x.id !== item.id), 3);
-      const opts = shuffle([item, ...distractors]).map(it => ({ text: it.translation, itemId: it.id }));
+      const opts = shuffle([item, ...distractors]).map(it => ({ text: it.translation || it.original, itemId: it.id }));
       question.options = opts;
-      question.answerDisplayText = translation;
+      question.answerDisplayText = translation || original;
       question.answerDisplayLang = 'en';
       question.displayLang = origLang;
     }
@@ -1203,7 +1605,8 @@ function renderQuiz(){
     const empty = document.createElement("div");
     empty.style.textAlign="center"; empty.style.color="var(--cream-dim)"; empty.style.padding="40px 0";
     empty.textContent = "此篩選條件下沒有可測驗的內容。";
-    mainQuiz.appendChild(empty); return;
+    mainQuiz.appendChild(empty);
+    return;
   }
   if(!quizRound) startNewRound();
   if(quizRound.finished) renderQuizSummary();
@@ -1215,29 +1618,26 @@ function renderQuizQuestion(){
   const q = quizRound.questions[quizRound.currentIndex];
   const card = document.createElement("div"); card.className = "quiz-card";
   if(q.answered) card.classList.add(q.userAnswerIndex === q.correctIndex ? "correct" : "wrong");
+  
+  // ===== 頂部欄 =====
   const topbar = document.createElement("div"); topbar.className = "quiz-topbar";
+  
+  // 左：進度
   const progress = document.createElement("div"); progress.className = "quiz-progress";
-  if(!q.answered) progress.textContent = (quizRound.currentIndex+1) + "/" + quizRound.questions.length;
-  else {
-    const pct = quizRound.answeredCount > 0 ? Math.round((quizRound.correctCount/quizRound.answeredCount)*100) : 0;
-    progress.textContent = quizRound.answeredCount + "  " + pct + "%";
+  if(!q.answered) {
+    progress.textContent = (quizRound.currentIndex+1) + "/" + quizRound.questions.length;
+  } else {
+    progress.textContent = quizRound.correctCount + "/" + quizRound.questions.length;
   }
-  const correctCount = document.createElement("div"); correctCount.className = "quiz-correct-count";
-  correctCount.textContent = quizRound.correctCount;
   topbar.appendChild(progress);
-  if(q.answered){
-    const actions = document.createElement("div"); actions.className = "quiz-actions";
-    const tBtn = document.createElement("button"); tBtn.className = "qa-translate";
-    tBtn.textContent = "🌐 Google翻譯";
-    tBtn.addEventListener("click", ()=> translateAndOpen(q.original));
-    const nBtn = document.createElement("button"); nBtn.className = "qa-next";
-    nBtn.textContent = "下一題";
-    nBtn.addEventListener("click", nextQuestion);
-    actions.appendChild(tBtn); actions.appendChild(nBtn);
-    topbar.appendChild(actions);
-  }
-  topbar.appendChild(correctCount); card.appendChild(topbar);
-
+  
+  // 右：按鈕 + 分數
+  const actionsTop = createQuizActions(q);
+  topbar.appendChild(actionsTop);
+  
+  card.appendChild(topbar);
+  
+  // ===== 題目 =====
   const qDiv = document.createElement("div"); qDiv.className = "quiz-question";
   let innerHtml;
   if(!q.answered){
@@ -1251,7 +1651,7 @@ function renderQuizQuestion(){
     }
   } else {
     if(q.promptType === "speaker"){
-      const displayText = q.optShowOriginal ? q.translation : q.original;
+      const displayText = q.optShowOriginal ? q.translation || q.original : q.original;
       const displayLang = q.optShowOriginal ? 'en' : q.origLang;
       const cls = displayLang === 'fr' ? 'fr-text' : (displayLang === 'en' ? 'en-text' : '');
       innerHtml = `<span class="${cls}">${escapeHtml(displayText)}</span>`;
@@ -1277,6 +1677,7 @@ function renderQuizQuestion(){
     }, 400);
   }
 
+  // ===== 選項 =====
   const optionsDiv = document.createElement("div"); optionsDiv.className = "quiz-options";
   const lineClass = (q.item.kind === "sentence" || q.item.kind === "segment") ? "opt-line-2" : "opt-line-1";
   q.options.forEach((opt, idx) => {
@@ -1301,8 +1702,57 @@ function renderQuizQuestion(){
     optionsDiv.appendChild(btn);
   });
   card.appendChild(optionsDiv);
+  
+  // ===== 底部欄 (複製頂部) =====
+  const bottombar = document.createElement("div"); bottombar.className = "quiz-bottombar";
+  
+  // 左：進度 (複製)
+  const progressBottom = document.createElement("div"); progressBottom.className = "quiz-progress";
+  if(!q.answered) {
+    progressBottom.textContent = (quizRound.currentIndex+1) + "/" + quizRound.questions.length;
+  } else {
+    progressBottom.textContent = quizRound.correctCount + "/" + quizRound.questions.length;
+  }
+  bottombar.appendChild(progressBottom);
+  
+  // 右：按鈕 + 分數 (複製)
+  const actionsBottom = createQuizActions(q);
+  bottombar.appendChild(actionsBottom);
+  
+  card.appendChild(bottombar);
+  
   wrap.appendChild(card);
   mainQuiz.appendChild(wrap);
+}
+
+// 建立 quiz actions (按鈕 + 分數) 的輔助函數
+function createQuizActions(q){
+  const actions = document.createElement("div");
+  actions.className = "quiz-actions";
+  
+  const tBtn = document.createElement("button");
+  tBtn.className = "qa-translate";
+  tBtn.textContent = "🌐 翻譯";
+  tBtn.addEventListener("click", ()=> {
+    const targetLang = q.transLang || 'en';
+    openGoogleTranslate(q.original, targetLang);
+  });
+  
+  const nBtn = document.createElement("button");
+  nBtn.className = "qa-next";
+  nBtn.textContent = "下一題";
+  nBtn.addEventListener("click", nextQuestion);
+  
+  const scoreDisplay = document.createElement("span");
+  scoreDisplay.className = "qa-score";
+  const pct = Math.round((quizRound.correctCount / quizRound.questions.length) * 100);
+  scoreDisplay.textContent = pct + "%";
+  
+  actions.appendChild(tBtn);
+  actions.appendChild(nBtn);
+  actions.appendChild(scoreDisplay);
+  
+  return actions;
 }
 
 function submitAnswer(idx){
@@ -1346,7 +1796,7 @@ function renderQuizSummary(){
         copyToClipboard(q.original);
       });
       const en = document.createElement("div"); en.className = "wen";
-      en.textContent = q.translation;
+      en.textContent = q.translation || q.original;
       const tag = document.createElement("span");
       tag.style.cssText = "display:inline-block;font-size:0.7rem;color:var(--gold-light);background:var(--charcoal-3);padding:2px 8px;border-radius:4px;margin-right:8px;";
       tag.textContent = q.item.kind === "sentence" ? "句子" : (q.item.kind === "segment" ? "片語" : "單詞");
