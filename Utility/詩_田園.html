@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>詩 · 田園詩學習系統</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;
+    --ink-2:#1a1b1e;
+    --ink-3:#232427;
+    --vermilion:#942525;
+    --vermilion-soft:#b13a3a;
+    --gold:#bd8b2a;
+    --gold-soft:#d9ac52;
+    --white:#fcfbfa;
+    --white-dim:#c9c6bf;
+    --hair:rgba(189,139,42,0.22);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top, rgba(189,139,42,0.06), transparent 55%),
+      var(--ink);
+    color:var(--white);
+    font-family:"Noto Serif TC","Inter",serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Header ===== */
+  header{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:22px clamp(20px,5vw,56px);
+    background:rgba(18,19,21,0.86);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--hair);
+  }
+  .brand{display:flex; align-items:baseline; gap:12px;}
+  .brand .mark{
+    font-family:"Cormorant Garamond",serif; font-style:italic;
+    color:var(--gold-soft); font-size:18px; letter-spacing:0.12em;
+  }
+  .brand h1{
+    font-size:clamp(26px,4vw,34px); font-weight:600; letter-spacing:0.08em; margin:0;
+  }
+  .brand h1 span{color:var(--vermilion-soft);}
+  .brand h1.brand-char{
+    font-size:clamp(38px,5vw,50px); color:var(--vermilion-soft);
+    letter-spacing:0.14em;
+  }
+
+  .mode-toggle{
+    display:flex; gap:2px; background:var(--ink-3);
+    border:1px solid var(--hair); border-radius:999px; padding:4px;
+  }
+  .mode-toggle button{
+    appearance:none; border:none; background:transparent; color:var(--white-dim);
+    font-family:"Inter",sans-serif; font-size:18px; font-weight:600;
+    letter-spacing:0.06em; padding:14px 28px; border-radius:999px; cursor:pointer;
+    transition:all .25s ease;
+  }
+  .mode-toggle button.active{
+    background:linear-gradient(135deg, var(--gold) 0%, var(--vermilion) 130%);
+    color:var(--white); box-shadow:0 4px 14px rgba(148,37,37,0.35);
+  }
+  .mode-toggle button:not(.active):hover{color:var(--white);}
+
+  main{max-width:920px; margin:0 auto; padding:40px clamp(18px,5vw,40px) 100px;}
+
+  /* ===== Filters (Reading) ===== */
+  .filters{
+    display:flex; gap:14px; flex-wrap:wrap; margin-bottom:40px;
+    position:sticky; top:70px; z-index:40;
+    background:var(--ink);
+    padding:14px 0 18px;
+  }
+  .quiz-filters{
+    display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+    margin-bottom:28px;
+  }
+  .quiz-filters .select-wrap{flex:0 1 220px; min-width:160px;}
+  .select-wrap{position:relative; flex:1; min-width:180px;}
+  .select-wrap::after{
+    content:"詩人"; position:absolute; top:-9px; left:14px;
+    font-family:"Inter",sans-serif; font-size:14px; letter-spacing:0.12em;
+    color:var(--gold-soft); background:var(--ink); padding:0 8px;
+  }
+  .select-wrap.title-select::after{content:"詩歌";}
+  select{
+    width:100%; appearance:none; background:var(--ink-2);
+    border:1px solid var(--hair); color:var(--white);
+    font-family:"Noto Serif TC",serif; font-size:20px;
+    padding:18px 48px 18px 20px; border-radius:12px; cursor:pointer;
+    transition:border-color .2s ease;
+    background-image: linear-gradient(45deg, transparent 50%, var(--gold-soft) 50%), linear-gradient(135deg, var(--gold-soft) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+  }
+  select:hover, select:focus{border-color:var(--gold);}
+  select:focus{outline:none;}
+
+  /* ===== Poem card ===== */
+  .poem-card{
+    border:1px solid var(--hair);
+    border-radius:16px;
+    padding:34px clamp(20px,5vw,52px) 40px;
+    margin-bottom:28px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);
+    position:relative;
+    overflow:hidden;
+    animation:rise .5s ease both;
+  }
+  .poem-card::before{
+    content:""; position:absolute; left:0; top:0; bottom:0; width:2px;
+    background:linear-gradient(180deg, var(--gold), var(--vermilion));
+    opacity:0.6;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);}}
+
+  .poem-head{margin-bottom:26px; padding-bottom:16px; border-bottom:1px solid var(--hair);}
+  .poem-head h2{
+    font-size:clamp(32px,4.2vw,40px); font-weight:600; margin:0 0 6px; letter-spacing:0.04em;
+  }
+  .poem-head .author{
+    font-family:"Cormorant Garamond",serif; font-style:italic; color:var(--gold-soft);
+    font-size:24px; letter-spacing:0.06em;
+  }
+
+  .poem-body{font-size:clamp(28px,3.3vw,32px); line-height:2.5; letter-spacing:0.03em;}
+  .verse-line{white-space:nowrap; color:var(--white); transition:color .25s ease;}
+  .verse-line .num{
+    color:var(--vermilion-soft); font-size:16px; vertical-align:super;
+    font-family:"Cormorant Garamond",serif; margin-left:2px; user-select:none;
+  }
+  .verse-group{
+    border:1px solid var(--hair); border-radius:12px; cursor:pointer;
+    padding:14px 20px; margin:0 0 14px; transition:background .2s ease, border-color .2s ease;
+  }
+  .verse-group:last-child{margin-bottom:0;}
+  .verse-group:hover{background:rgba(255,255,255,0.035); border-color:var(--gold);}
+  .char{cursor:pointer;}
+  .char:hover{text-decoration:underline dotted; text-underline-offset:4px; color:var(--gold-soft);}
+
+  .verse-group.concealed{border-color:var(--hair);}
+  .verse-group.concealed .verse-line{color:transparent;}
+  .verse-group.concealed .verse-line .num{color:transparent;}
+  .verse-group.concealed .char.hint{color:var(--white);}
+
+  .visibility-toggle{
+    display:flex; gap:2px; background:var(--ink-3);
+    border:1px solid var(--hair); border-radius:999px; padding:4px;
+  }
+  .visibility-toggle button{
+    appearance:none; border:none; background:transparent; color:var(--white-dim);
+    font-family:"Inter",sans-serif; font-size:16px; font-weight:600;
+    letter-spacing:0.06em; padding:12px 22px; border-radius:999px; cursor:pointer;
+    transition:all .25s ease;
+  }
+  .visibility-toggle button.active{
+    background:linear-gradient(135deg, var(--gold) 0%, var(--vermilion) 130%);
+    color:var(--white); box-shadow:0 4px 14px rgba(148,37,37,0.35);
+  }
+  .visibility-toggle button:not(.active):hover{color:var(--white);}
+
+  /* ===== Testing mode ===== */
+  :root{
+    --emerald:#3ddc84;
+    --bright-red:#e6483f;
+  }
+  .quiz-shell{max-width:640px; margin:0 auto;}
+  .progress-bar{height:5px; background:var(--ink-3); border-radius:4px; margin-bottom:18px; overflow:hidden;}
+  .progress-bar i{
+    display:block; height:100%; background:linear-gradient(90deg, var(--gold), var(--vermilion));
+    transition:width .4s ease;
+  }
+
+  .question-card{
+    position:relative;
+    text-align:center; padding:60px 24px 32px; border:1px solid var(--hair);
+    border-radius:16px; margin-bottom:20px; background:rgba(255,255,255,0.015);
+    animation:rise .4s ease both;
+  }
+  .q-corner{
+    position:absolute; top:16px; font-family:"Noto Serif TC",serif; font-weight:700;
+    font-size:clamp(20px,3.2vw,27px); letter-spacing:0.02em;
+  }
+  .q-corner.left{left:22px; color:var(--white);}
+  .q-corner.right{right:22px; color:var(--emerald);}
+  .question-card .prompt-label{font-size:18px; color:var(--white-dim); margin-bottom:16px; letter-spacing:0.06em;}
+  .question-card .prompt-text{
+    font-size:clamp(30px,5vw,40px); font-weight:600; letter-spacing:0.06em; line-height:1.5;
+  }
+  .question-card .poem-tag{
+    display:block; margin-top:16px; font-family:"Cormorant Garamond",serif; font-style:italic;
+    font-size:clamp(20px,3.2vw,27px); color:var(--gold-soft); letter-spacing:0.02em;
+  }
+  .badge-row{
+    position:relative; text-align:center;
+    margin-top:20px; min-height:52px; line-height:52px;
+  }
+  .type-badge{
+    display:inline-block; font-family:"Inter",sans-serif; font-weight:700;
+    font-size:clamp(25px,4vw,34px); letter-spacing:0.08em;
+    color:var(--white);
+    text-decoration:underline; text-underline-offset:4px;
+  }
+
+  .options{display:grid; gap:10px; margin-bottom:16px;}
+  .option{
+    text-align:left; padding:18px 24px; border:1px solid var(--hair); border-radius:14px;
+    background:var(--ink-2); color:var(--white); font-family:"Noto Serif TC",serif;
+    font-size:24px; letter-spacing:0.03em; cursor:pointer; transition:all .2s ease;
+    display:flex; align-items:center; gap:14px;
+  }
+  .option .letter{
+    font-family:"Cormorant Garamond",serif; font-style:italic; color:var(--gold-soft);
+    font-size:22px; min-width:26px;
+  }
+  .option:hover:not(.disabled){border-color:var(--gold); background:var(--ink-3); transform:translateX(3px);}
+  .option.correct{border-color:var(--emerald); background:rgba(61,220,132,0.14); box-shadow:0 0 0 1.5px var(--emerald) inset;}
+  .option.wrong{border-color:var(--bright-red); background:rgba(230,72,63,0.14); box-shadow:0 0 0 1.5px var(--bright-red) inset;}
+  .option.disabled{cursor:default;}
+  .option.dim{opacity:0.45;}
+
+  .next-btn{
+    display:block; margin:6px auto 0; padding:16px 44px; border-radius:999px; border:none;
+    background:linear-gradient(135deg, var(--gold), var(--vermilion)); color:var(--white);
+    font-family:"Inter",sans-serif; font-weight:600; font-size:19px; letter-spacing:0.08em;
+    cursor:pointer; opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .next-btn.next-btn--corner{
+    position:absolute; top:16px; left:50%; transform:translateX(-50%); margin:0;
+    padding:6px 22px; font-size:clamp(25px,4vw,34px);
+  }
+  .next-btn.show{opacity:1; pointer-events:auto;}
+  .next-btn:hover{box-shadow:0 6px 20px rgba(148,37,37,0.35);}
+
+  /* ===== Summary ===== */
+  .summary-card{text-align:center; padding:20px 10px 40px;}
+  .summary-card .big-score{
+    font-family:"Cormorant Garamond",serif; font-size:76px; color:var(--gold-soft); font-weight:600;
+    line-height:1;
+  }
+  .summary-card .big-score span{font-size:30px; color:var(--white-dim);}
+  .summary-card .verdict{margin:12px 0 34px; letter-spacing:0.06em; font-family:"Inter",sans-serif; font-size:18px; color:var(--white-dim);}
+
+  .review-list{display:grid; gap:16px; text-align:left; margin-bottom:32px;}
+  .review-item{
+    border:1px solid var(--hair); border-radius:14px; padding:22px 26px;
+    background:rgba(148,37,37,0.06);
+  }
+  .review-item .r-prompt{font-size:18px; color:var(--white-dim); margin-bottom:10px;}
+  .review-item .r-row{font-size:22px; margin-bottom:6px; letter-spacing:0.02em;}
+  .review-item .r-row.your{color:var(--vermilion-soft);}
+  .review-item .r-row.correct{color:var(--gold-soft);}
+  .review-item .r-source{font-family:"Cormorant Garamond",serif; font-style:italic; font-size:18px; color:var(--white-dim); margin-top:8px;}
+
+  .summary-actions{display:flex; gap:14px; justify-content:center; flex-wrap:wrap;}
+  .btn-outline, .btn-solid{
+    font-family:"Inter",sans-serif; font-weight:600; font-size:18px; letter-spacing:0.06em;
+    padding:18px 34px; border-radius:999px; cursor:pointer; transition:all .2s ease;
+  }
+  .btn-solid{border:none; background:linear-gradient(135deg, var(--gold), var(--vermilion)); color:var(--white);}
+  .btn-solid:hover{box-shadow:0 6px 20px rgba(148,37,37,0.35);}
+  .btn-outline{background:transparent; border:1px solid var(--hair); color:var(--white-dim);}
+  .btn-outline:hover{border-color:var(--gold); color:var(--white);}
+  .btn-outline:disabled{opacity:0.35; cursor:not-allowed;}
+  .btn-outline:disabled:hover{border-color:var(--hair); color:var(--white-dim);}
+
+  .hidden{display:none !important;}
+
+  @media (max-width:560px){
+    .verse-line{white-space:normal;}
+    .poem-body{line-height:2.2;}
+    header{padding:16px 18px;}
+    .mode-toggle button{padding:12px 20px; font-size:16px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1 class="brand-char">詩</h1>
+  </div>
+  <div class="mode-toggle">
+    <button id="btnReading" class="active">閱讀模式</button>
+    <button id="btnTesting">測驗模式</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============ READING MODE ============ -->
+  <section id="readingView">
+    <div class="filters">
+      <div class="select-wrap">
+        <select id="authorSelect"></select>
+      </div>
+      <div class="select-wrap title-select">
+        <select id="titleSelect"></select>
+      </div>
+      <div class="visibility-toggle">
+        <button id="showModeBtn" class="active">顯示</button>
+        <button id="hideModeBtn">隱藏</button>
+      </div>
+      <div class="visibility-toggle">
+        <button id="speakModeBtn">朗讀</button>
+      </div>
+    </div>
+    <div id="poemList"></div>
+  </section>
+
+  <!-- ============ TESTING MODE ============ -->
+  <section id="testingView" class="hidden">
+
+    <div id="quizIntro" class="quiz-shell">
+      <div class="quiz-filters">
+        <div class="select-wrap">
+          <select id="quizAuthorSelect"></select>
+        </div>
+        <div class="select-wrap title-select">
+          <select id="quizTitleSelect"></select>
+        </div>
+      </div>
+      <div class="question-card">
+        <div class="prompt-label">測驗說明</div>
+        <div class="prompt-text" style="font-size:26px; line-height:2;">
+          每回合 10 題，隨機抽取「答前句」或「答後句」，<br>四選一作答，測驗結束後可檢視錯題並重測。
+        </div>
+      </div>
+      <button class="next-btn show" id="startQuizBtn" style="opacity:1;pointer-events:auto;">開始測驗</button>
+    </div>
+
+    <div id="quizPlay" class="quiz-shell hidden">
+      <div class="progress-bar"><i id="progressBar" style="width:10%"></i></div>
+      <div class="question-card">
+        <div class="q-corner left" id="qIndexCorner">1/10</div>
+        <div class="q-corner right" id="qScoreCorner">0</div>
+        <button class="next-btn next-btn--corner" id="nextBtn">下一題</button>
+        <div class="prompt-text" id="qPromptText">——</div>
+        <div class="poem-tag" id="qPoemTag">《詩名》・詩人</div>
+        <div class="badge-row">
+          <span class="type-badge" id="qTypeBadge">下一句</span>
+        </div>
+      </div>
+      <div class="options" id="optionsList"></div>
+    </div>
+
+    <div id="quizSummary" class="quiz-shell summary-card hidden">
+      <div class="big-score"><span id="finalScore">0</span><span> / 10</span></div>
+      <div class="verdict" id="verdictText">測驗完成</div>
+      <div class="review-list" id="reviewList"></div>
+      <div class="summary-actions">
+        <button class="btn-outline" id="retestWrongBtn">僅重測錯誤題目</button>
+        <button class="btn-solid" id="restartQuizBtn">重新開始測驗</button>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script>
+/* ============ 資料來源：十大田園詩.txt ============ */
+const RAW_POEMS = [
+  ["歸園田居·其一","陶淵明","少無適俗韻，性本愛丘山。誤落塵網中，一去三十年。羈鳥戀舊林，池魚思故淵。開荒南野際，守拙歸園田。方宅十餘畝，草屋八九間。榆柳蔭後檐，桃李羅堂前。曖曖遠人村，依依墟里煙。狗吠深巷中，雞鳴桑樹顛。戶庭無塵雜，虛室有餘閒。久在樊籠裡，復得返自然。"],
+  ["飲酒·其五","陶淵明","結廬在人境，而無車馬喧。問君何能爾，心遠地自偏。採菊東籬下，悠然見南山。山氣日夕佳，飛鳥相與還。此中有真意，欲辨已忘言。"],
+  ["桃花源詩","陶淵明","嬴氏亂天紀，賢者避其世。黃綺之商山，伊人亦云逝。往跡浸復湮，來徑遂蕪廢。相命肆農耕，日入從所憩。桑竹垂餘蔭，菽稷隨時藝。春蠶收長絲，秋熟靡王稅。荒路曖交通，雞犬互鳴吠。俎豆猶古法，衣裳無新製。童孺縱行歌，斑白歡遊詣。草榮識節和，木衰知風厲。雖無紀曆志，四時自成歲。怡然有餘樂，于何勞智慧。"],
+  ["渭川田家","王維","斜陽照墟落，窮巷牛羊歸。野老念牧童，倚杖候荊扉。雉雊麥苗秀，蠶眠桑葉稀。田夫荷鋤至，相見語依依。即此羨閒逸，悵然吟式微。"],
+  ["終南別業","王維","中歲頗好道，晚家南山陲。興來每獨往，勝事空自知。行到水窮處，坐看雲起時。偶然值林叟，談笑無還期。"],
+  ["過故人莊","孟浩然","故人具雞黍，邀我至田家。綠樹村邊合，青山郭外斜。開軒面場圃，把酒話桑麻。待到重陽日，還來就菊花。"],
+  ["宿業師山房待丁大不至","孟浩然","夕陽度西嶺，群壑倏已暝。松月生夜涼，風泉滿清聽。樵人歸欲盡，煙鳥棲初定。之子期宿來，孤琴候蘿徑。"],
+  ["四時田園雜興（其二十五）","范成大","梅子金黃杏子肥，麥花雪白菜花稀。日長籬落無人過，惟有蜻蜓蛺蝶飛。"],
+  ["清平樂·村居","辛棄疾","茅檐低小，溪上青青草。醉里吳音相媚好，白髮誰家翁媼。大兒鋤豆溪東，中兒正織雞籠。最喜小兒亡賴，溪頭臥剝蓮蓬。"],
+  ["江村","杜甫","清江一曲抱村流，長夏江村事事幽。自去自來堂上燕，相親相近水中鷗。老妻畫紙為棋局，稚子敲針作釣鉤。多病所須唯藥物，微軀此外更何求。"]
+];
+
+function parseLines(content){
+  return content.match(/[^，。！？；]+[，。！？；]?/g) || [content];
+}
+
+const POEMS = RAW_POEMS.map(([title, author, content]) => ({
+  title, author, lines: parseLines(content)
+}));
+
+/* ============ 模式切換 ============ */
+const btnReading = document.getElementById('btnReading');
+const btnTesting = document.getElementById('btnTesting');
+const readingView = document.getElementById('readingView');
+const testingView = document.getElementById('testingView');
+
+btnReading.addEventListener('click', () => switchMode('reading'));
+btnTesting.addEventListener('click', () => switchMode('testing'));
+
+function switchMode(mode){
+  const isReading = mode === 'reading';
+  btnReading.classList.toggle('active', isReading);
+  btnTesting.classList.toggle('active', !isReading);
+  readingView.classList.toggle('hidden', !isReading);
+  testingView.classList.toggle('hidden', isReading);
+}
+
+/* ============ 閱讀模式 ============ */
+const authorSelect = document.getElementById('authorSelect');
+const titleSelect = document.getElementById('titleSelect');
+const poemList = document.getElementById('poemList');
+
+const AUTHORS = ['全部詩人', ...new Set(POEMS.map(p => p.author))];
+
+function populateAuthors(){
+  authorSelect.innerHTML = AUTHORS.map(a => `<option value="${a}">${a}</option>`).join('');
+}
+
+function populateTitles(){
+  const selectedAuthor = authorSelect.value;
+  const pool = selectedAuthor === '全部詩人' ? POEMS : POEMS.filter(p => p.author === selectedAuthor);
+  const titles = ['全部詩歌', ...pool.map(p => p.title)];
+  titleSelect.innerHTML = titles.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function setInitialSelection(){
+  // 預設只顯示第一位詩人的第一首詩
+  const firstAuthor = POEMS[0].author;
+  const firstTitle = POEMS[0].title;
+  authorSelect.value = firstAuthor;
+  populateTitles();
+  titleSelect.value = firstTitle;
+}
+
+function renderCharSpans(line, hintCount){
+  let hintUsed = 0;
+  return [...line].map(ch => {
+    if (/[\u3400-\u9fff]/.test(ch)) {
+      const isHint = hintUsed < hintCount;
+      if (isHint) hintUsed++;
+      return `<span class="char${isHint ? ' hint' : ''}" data-char="${ch}">${ch}</span>`;
+    }
+    return ch;
+  }).join('');
+}
+
+function renderPoems(){
+  const selectedAuthor = authorSelect.value;
+  const selectedTitle = titleSelect.value;
+
+  let pool = selectedAuthor === '全部詩人' ? POEMS : POEMS.filter(p => p.author === selectedAuthor);
+  if (selectedTitle !== '全部詩歌') {
+    pool = pool.filter(p => p.title === selectedTitle);
+  }
+
+  poemList.innerHTML = pool.map(poem => {
+    // 每四句（行）為一單位分組
+    const groups = [];
+    for (let i = 0; i < poem.lines.length; i += 4) {
+      groups.push(poem.lines.slice(i, i + 4).map((line, j) => ({ line, i: i + j, isFirstOfGroup: j === 0 })));
+    }
+
+    const groupsHtml = groups.map(group => {
+      const linesHtml = group.map(({ line, i, isFirstOfGroup }) => {
+        const isOdd = (i % 2 === 0); // 第 i+1 行為奇數行
+        const num = Math.floor(i / 2) + 1;
+        const numTag = isOdd ? `<sup class="num">${num}</sup>` : '';
+        const hintCount = isFirstOfGroup ? 2 : 0; // 隱藏時保留每組首句前兩字
+        return `<div class="verse-line">${renderCharSpans(line, hintCount)}${numTag}</div>`;
+      }).join('');
+      return `<div class="verse-group">${linesHtml}</div>`;
+    }).join('');
+
+    return `
+      <article class="poem-card">
+        <div class="poem-head">
+          <h2>${poem.title}</h2>
+          <div class="author">${poem.author}</div>
+        </div>
+        <div class="poem-body">${groupsHtml}</div>
+      </article>`;
+  }).join('');
+}
+
+function openMeaningLookup(ch){
+  const url = `https://www.google.com/search?q=${encodeURIComponent(ch + '的意思')}`;
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function speakChar(ch){
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(ch);
+  utter.lang = 'zh-TW';
+  utter.rate = 0.8;
+  window.speechSynthesis.speak(utter);
+}
+
+let readAloudMode = false;
+
+poemList.addEventListener('click', (e) => {
+  const group = e.target.closest('.verse-group');
+  if (!group) return;
+  const charEl = e.target.closest('.char');
+  const isConcealed = group.classList.contains('concealed');
+
+  if (isConcealed) {
+    // 該四句目前隱藏：點擊任何地方（含文字）只會顯示該四句，不查字義、不朗讀
+    group.classList.remove('concealed');
+    return;
+  }
+
+  // 該四句目前顯示中：
+  if (charEl) {
+    if (readAloudMode) {
+      // 朗讀模式 -> 朗讀該字
+      speakChar(charEl.dataset.char);
+    } else {
+      // 一般模式 -> 點擊文字查詢字義
+      openMeaningLookup(charEl.dataset.char);
+    }
+  } else {
+    // 點擊框內非文字部分 -> 將該四句切換為隱藏
+    group.classList.add('concealed');
+  }
+});
+
+const showModeBtn = document.getElementById('showModeBtn');
+const hideModeBtn = document.getElementById('hideModeBtn');
+const speakModeBtn = document.getElementById('speakModeBtn');
+
+// 朗讀為獨立開關：開啟後點字會朗讀該字，而非跳到查字分頁
+speakModeBtn.addEventListener('click', () => {
+  readAloudMode = !readAloudMode;
+  speakModeBtn.classList.toggle('active', readAloudMode);
+});
+
+// 頁首「顯示」「隱藏」為批次動作：一次將全部四句設為顯示或隱藏
+showModeBtn.addEventListener('click', () => {
+  showModeBtn.classList.add('active');
+  hideModeBtn.classList.remove('active');
+  poemList.querySelectorAll('.verse-group').forEach(g => g.classList.remove('concealed'));
+});
+
+hideModeBtn.addEventListener('click', () => {
+  hideModeBtn.classList.add('active');
+  showModeBtn.classList.remove('active');
+  poemList.querySelectorAll('.verse-group').forEach(g => g.classList.add('concealed'));
+});
+
+authorSelect.addEventListener('change', () => { populateTitles(); renderPoems(); });
+titleSelect.addEventListener('change', renderPoems);
+
+populateAuthors();
+setInitialSelection();
+renderPoems();
+
+/* ============ 測驗模式 ============ */
+const quizIntro = document.getElementById('quizIntro');
+const quizPlay = document.getElementById('quizPlay');
+const quizSummary = document.getElementById('quizSummary');
+
+const qIndexCorner = document.getElementById('qIndexCorner');
+const qScoreCorner = document.getElementById('qScoreCorner');
+const progressBar = document.getElementById('progressBar');
+const qTypeBadge = document.getElementById('qTypeBadge');
+const qPromptText = document.getElementById('qPromptText');
+const qPoemTag = document.getElementById('qPoemTag');
+const optionsList = document.getElementById('optionsList');
+const nextBtn = document.getElementById('nextBtn');
+
+const finalScoreEl = document.getElementById('finalScore');
+const verdictText = document.getElementById('verdictText');
+const reviewList = document.getElementById('reviewList');
+
+// 建立全域行池，供出題與干擾項使用
+const ALL_LINES = [];
+POEMS.forEach((poem, pIdx) => {
+  poem.lines.forEach((line, lIdx) => {
+    ALL_LINES.push({ poemIdx: pIdx, lineIdx: lIdx, text: line });
+  });
+});
+
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function buildQuestion(forcedPair, poolIndices) {
+  let poemIdx, lineIdx, type;
+
+  if (forcedPair) {
+    ({ poemIdx, lineIdx, type } = forcedPair);
+  } else {
+    // 依指定範圍（或全部）挑選一首至少 2 句的詩
+    const basePool = (poolIndices && poolIndices.length) ? poolIndices : POEMS.map((p, i) => i);
+    const candidates = basePool.filter(i => POEMS[i].lines.length >= 2);
+    poemIdx = candidates[Math.floor(Math.random() * candidates.length)];
+    const poem = POEMS[poemIdx];
+    type = Math.random() < 0.5 ? 'next' : 'prev';
+    if (type === 'next') {
+      lineIdx = Math.floor(Math.random() * (poem.lines.length - 1)); // 0..len-2
+    } else {
+      lineIdx = 1 + Math.floor(Math.random() * (poem.lines.length - 1)); // 1..len-1
+    }
+  }
+
+  const poem = POEMS[poemIdx];
+  const promptText = poem.lines[lineIdx];
+  const answerIdx = type === 'next' ? lineIdx + 1 : lineIdx - 1;
+  const correctText = poem.lines[answerIdx];
+
+  // 干擾項：從其他詩句中隨機挑 3 句，避免重複
+  const usedTexts = new Set([correctText, promptText]);
+  const distractorPool = shuffle(ALL_LINES.filter(l => !usedTexts.has(l.text)));
+  const distractors = [];
+  for (const l of distractorPool) {
+    if (distractors.length >= 3) break;
+    if (!distractors.some(d => d.text === l.text)) distractors.push(l);
+  }
+
+  const options = shuffle([correctText, ...distractors.map(d => d.text)]);
+
+  return {
+    poemIdx, lineIdx, type,
+    promptText, correctText, options,
+    poemTitle: poem.title, poemAuthor: poem.author
+  };
+}
+
+let quizQuestions = [];
+let quizPointer = 0;
+let quizScore = 0;
+let quizWrong = [];
+let answered = false;
+let currentQuizPool = null; // null = 全部詩人/詩歌
+
+function startQuiz(pairPool){
+  quizQuestions = pairPool
+    ? pairPool.map(p => buildQuestion(p))
+    : Array.from({ length: 10 }, () => buildQuestion(null, currentQuizPool));
+  quizPointer = 0;
+  quizScore = 0;
+  quizWrong = [];
+
+  quizIntro.classList.add('hidden');
+  quizSummary.classList.add('hidden');
+  quizPlay.classList.remove('hidden');
+
+  renderQuestion();
+}
+
+function renderQuestion(){
+  answered = false;
+  const q = quizQuestions[quizPointer];
+  qIndexCorner.textContent = `${quizPointer + 1}/${quizQuestions.length}`;
+  qScoreCorner.textContent = quizScore;
+  progressBar.style.width = `${((quizPointer) / quizQuestions.length) * 100 + (100/quizQuestions.length)}%`;
+
+  qTypeBadge.textContent = q.type === 'next' ? '下一句' : '上一句';
+  qPromptText.textContent = q.promptText;
+  qPoemTag.textContent = `《${q.poemTitle}》・${q.poemAuthor}`;
+
+  const letters = ['A','B','C','D'];
+  optionsList.innerHTML = q.options.map((opt, i) => `
+    <button class="option" data-text="${encodeURIComponent(opt)}">
+      <span class="letter">${letters[i]}</span><span>${opt}</span>
+    </button>`).join('');
+
+  nextBtn.classList.remove('show');
+
+  optionsList.querySelectorAll('.option').forEach(btn => {
+    btn.addEventListener('click', onSelectOption);
+  });
+}
+
+function onSelectOption(e){
+  if (answered) return;
+  answered = true;
+  const btn = e.currentTarget;
+  const chosen = decodeURIComponent(btn.dataset.text);
+  const q = quizQuestions[quizPointer];
+  const correct = chosen === q.correctText;
+
+  if (correct) quizScore++;
+  else quizWrong.push({ ...q, chosen });
+
+  optionsList.querySelectorAll('.option').forEach(o => {
+    o.classList.add('disabled');
+    const t = decodeURIComponent(o.dataset.text);
+    if (t === q.correctText) o.classList.add('correct');
+    else if (o === btn) o.classList.add('wrong');
+    else o.classList.add('dim');
+  });
+
+  qScoreCorner.textContent = quizScore;
+  nextBtn.classList.add('show');
+}
+
+nextBtn.addEventListener('click', () => {
+  quizPointer++;
+  if (quizPointer < quizQuestions.length) {
+    renderQuestion();
+  } else {
+    showSummary();
+  }
+});
+
+function showSummary(){
+  quizPlay.classList.add('hidden');
+  quizSummary.classList.remove('hidden');
+
+  finalScoreEl.textContent = quizScore;
+  const total = quizQuestions.length;
+  let verdict = '';
+  if (quizScore === total) verdict = '全數答對，田園詩已了然於心';
+  else if (quizScore >= total * 0.8) verdict = '表現優異，稍加複習即可精熟';
+  else if (quizScore >= total * 0.5) verdict = '掌握了大半，錯題值得再讀一次';
+  else verdict = '尚需多加熟讀，錯題已列於下方';
+  verdictText.textContent = verdict;
+
+  const retestBtn = document.getElementById('retestWrongBtn');
+  if (quizWrong.length === 0) {
+    reviewList.innerHTML = `<div style="text-align:center; color:var(--white-dim); font-size:18px;">本回合沒有錯題，太厲害了。</div>`;
+    retestBtn.disabled = true;
+  } else {
+    retestBtn.disabled = false;
+    reviewList.innerHTML = quizWrong.map(q => `
+      <div class="review-item">
+        <div class="r-prompt">${q.type === 'next' ? '下一句應為' : '上一句應為'}：${q.promptText}</div>
+        <div class="r-row your">你的答案：${q.chosen}</div>
+        <div class="r-row correct">正確答案：${q.correctText}</div>
+        <div class="r-source">《${q.poemTitle}》・${q.poemAuthor}</div>
+      </div>`).join('');
+  }
+}
+
+/* ============ 測驗範圍篩選 ============ */
+const quizAuthorSelect = document.getElementById('quizAuthorSelect');
+const quizTitleSelect = document.getElementById('quizTitleSelect');
+
+function populateQuizAuthors(){
+  quizAuthorSelect.innerHTML = AUTHORS.map(a => `<option value="${a}">${a}</option>`).join('');
+}
+
+function populateQuizTitles(){
+  const selectedAuthor = quizAuthorSelect.value;
+  const pool = selectedAuthor === '全部詩人' ? POEMS : POEMS.filter(p => p.author === selectedAuthor);
+  const titles = ['全部詩歌', ...pool.map(p => p.title)];
+  quizTitleSelect.innerHTML = titles.map(t => `<option value="${t}">${t}</option>`).join('');
+}
+
+function getQuizPoolIndices(){
+  const selectedAuthor = quizAuthorSelect.value;
+  const selectedTitle = quizTitleSelect.value;
+
+  let indices = POEMS.map((p, i) => i);
+  if (selectedAuthor !== '全部詩人') {
+    indices = indices.filter(i => POEMS[i].author === selectedAuthor);
+  }
+  if (selectedTitle !== '全部詩歌') {
+    indices = indices.filter(i => POEMS[i].title === selectedTitle);
+  }
+  return indices;
+}
+
+quizAuthorSelect.addEventListener('change', populateQuizTitles);
+
+populateQuizAuthors();
+populateQuizTitles();
+
+document.getElementById('startQuizBtn').addEventListener('click', () => {
+  currentQuizPool = getQuizPoolIndices();
+  startQuiz();
+});
+document.getElementById('restartQuizBtn').addEventListener('click', () => startQuiz());
+document.getElementById('retestWrongBtn').addEventListener('click', () => {
+  if (quizWrong.length === 0) return;
+  const pool = quizWrong.map(q => ({ poemIdx: q.poemIdx, lineIdx: q.lineIdx, type: q.type }));
+  startQuiz(pool);
+});
+</script>
+
+</body>
+</html>
