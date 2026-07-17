@@ -1,194 +1,192 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學習資源</title>
-    
-    <!-- PWA 設定 -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="theme-color" content="#121315">
-    <link rel="manifest" href="/manifest.json">
-    <link rel="apple-touch-icon" href="/attachments/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="/attachments/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/attachments/icon-512.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>學習與工具</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;600&display=swap');
 
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@400;500;600&display=swap');
+  :root{
+    --ink: #121315;
+    --white-jade: #fcfbfa;
+    --vermilion: #942525;
+    --gold: #bd8b2a;
+  }
 
-        :root {
-            --bg: #121315;
-            --text: #fcfbfa;
-            --accent-red: #942525;
-            --accent-gold: #bd8b2a;
-        }
+  * { box-sizing: border-box; }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--white-jade);
+    font-family: 'Noto Serif TC', serif;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', system-ui, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+  body {
+    min-height: 100vh;
+    padding: 2.2rem 1.4rem 4rem;
+  }
 
-        header {
-            background: rgba(18, 19, 21, 0.98);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(189, 139, 42, 0.25);
-            padding: 1.6rem 0 1.4rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+  header {
+    text-align: center;
+    margin-bottom: 2.8rem;
+  }
 
-        .header-content {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 0 2rem;
-            text-align: center;
-        }
+  header .eyebrow {
+    display: block;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.05rem;
+    letter-spacing: 0.35em;
+    color: var(--gold);
+    margin-bottom: 0.6rem;
+  }
 
-        .logo {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 1.85rem;
-            font-weight: 600;
-            color: var(--accent-gold);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 1.1rem;
-        }
+  header h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin: 0;
+    letter-spacing: 0.08em;
+  }
 
-        .logo::before { content: "⟡"; color: var(--accent-red); font-size: 1.4rem; }
+  /* 印章式分隔線 */
+  .seal-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9rem;
+    margin: 2.6rem 0;
+  }
+  .seal-divider .line {
+    flex: 1;
+    max-width: 5.5rem;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold));
+  }
+  .seal-divider .line.right { background: linear-gradient(90deg, var(--gold), transparent); }
+  .seal-divider .dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--vermilion);
+    transform: rotate(45deg);
+  }
 
-        .nav-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            max-width: 520px;
-            margin: 0 auto;
-        }
+  section.category {
+    margin-bottom: 1rem;
+  }
 
-        .nav-button {
-            flex: 1; max-width: 240px;
-            padding: 12px 32px;
-            border-radius: 50px;
-            font-weight: 500;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 1.08rem;
-            min-height: 52px;
-            border: 1px solid transparent;
-            transition: all 0.3s ease;
-        }
+  .category h2 {
+    font-size: 1.85rem;
+    font-weight: 700;
+    margin: 0 0 1.1rem 0.2rem;
+    color: var(--white-jade);
+    border-bottom: 3px solid var(--vermilion);
+    display: inline-block;
+    padding-bottom: 0.35rem;
+  }
 
-        .nav-button.language { background: rgba(148,37,37,0.14); color: var(--accent-gold); border-color: rgba(189,139,42,0.5); }
-        .nav-button.utility  { background: rgba(189,139,42,0.14); color: var(--accent-gold); border-color: rgba(189,139,42,0.4); }
+  .category.utility h2 {
+    border-bottom-color: var(--gold);
+  }
 
-        .nav-button:hover { transform: translateY(-3px); }
+  .app-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
 
-        main { flex: 1; max-width: 1200px; margin: 0 auto; padding: 3rem 2rem; width: 100%; }
+  .app-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-decoration: none;
+    color: var(--white-jade);
+    background: rgba(252, 251, 250, 0.04);
+    border: 1.5px solid rgba(189, 139, 42, 0.35);
+    border-radius: 4px;
+    padding: 1.35rem 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    min-height: 3.2rem;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
 
-        .sections {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
-            gap: 3rem;
-            margin-top: 2rem;
-        }
+  .category.language .app-list a:active {
+    background: rgba(148, 37, 37, 0.28);
+    border-color: var(--vermilion);
+  }
 
-        .section {
-            background: rgba(18,19,21,0.6);
-            border: 1px solid rgba(189,139,42,0.15);
-            border-radius: 12px;
-            padding: 2.5rem;
-        }
+  .category.utility .app-list a:active {
+    background: rgba(189, 139, 42, 0.22);
+    border-color: var(--gold);
+  }
 
-        .resource-card {
-            background: rgba(252,251,250,0.05);
-            border: 1px solid rgba(189,139,42,0.1);
-            border-radius: 8px;
-            padding: 1.3rem;
-            text-decoration: none;
-            color: var(--text);
-            display: block;
-        }
+  .app-list a .arrow {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.6rem;
+    color: var(--gold);
+    margin-left: 0.8rem;
+  }
 
-        .resource-card:hover {
-            background: rgba(189,139,42,0.08);
-            border-color: var(--accent-gold);
-            transform: translateY(-4px);
-        }
-    </style>
+  .category.language .app-list a .arrow { color: var(--vermilion); }
+
+  footer {
+    text-align: center;
+    margin-top: 3.2rem;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(252, 251, 250, 0.45);
+    letter-spacing: 0.12em;
+  }
+</style>
 </head>
 <body>
-    <header>
-        <div class="header-content">
-            <a href="/" class="logo">學習資源</a>
-            <div class="nav-buttons">
-                <a href="#language" class="nav-button language">🌐 語言</a>
-                <a href="#utility" class="nav-button utility">🛠️ 工具</a>
-            </div>
-        </div>
-    </header>
 
-    <main>
-        <div class="sections">
-            <div class="section" id="language">
-                <h2 style="color:var(--accent-gold); margin-bottom:1.5rem;">語言學習</h2>
-                <div id="language-grid"></div>
-            </div>
+  <header>
+    <span class="eyebrow">STUDY &amp; TOOLS</span>
+    <h1>學習與工具</h1>
+  </header>
 
-            <div class="section" id="utility">
-                <h2 style="color:var(--accent-gold); margin-bottom:1.5rem;">工具資源</h2>
-                <div id="utility-grid"></div>
-            </div>
-        </div>
-    </main>
+  <section class="category language">
+    <h2>語言</h2>
+    <div class="app-list">
+      <a href="Language/閱讀.html">
+        <span>閱讀</span>
+        <span class="arrow">›</span>
+      </a>
+      <a href="Language/toeic.html">
+        <span>TOEIC</span>
+        <span class="arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-    <footer style="padding:2rem; text-align:center; color:rgba(252,251,250,0.5); font-size:0.9rem;">
-        © 2026 學習資源 • 墨玄 ⋅ 硃砂紅 ⋅ 耀日金
-    </footer>
+  <div class="seal-divider">
+    <span class="line"></span>
+    <span class="dot"></span>
+    <span class="line right"></span>
+  </div>
 
-    <script>
-        // === 資源定義 ===
-        const languageResources = [
-            { name: "閱讀Brown Bear", path: "Language/閱讀.html", desc: "閱讀工具內含Brown bear" },
-            { name: "TOEIC 學習", path: "Language/toeic.html", desc: "學習TOEIC字彙" }
-        ];
+  <section class="category utility">
+    <h2>工具</h2>
+    <div class="app-list">
+      <a href="Utility/速讀.html">
+        <span>速讀</span>
+        <span class="arrow">›</span>
+      </a>
+      <a href="Utility/詩_田園.html">
+        <span>詩．田園</span>
+        <span class="arrow">›</span>
+      </a>
+    </div>
+  </section>
 
-        const utilityResources = [
-            { name: "速讀", path: "Utility/速讀.html", desc: "速讀工具內含愛麗絲夢遊仙境中英文第一章" }
-        ];
+  <footer>翰墨 · 微光</footer>
 
-        // 渲染卡片
-        function createCard(res) {
-            const card = document.createElement('a');
-            card.href = res.path;
-            card.className = 'resource-card';
-            card.innerHTML = `
-                <div style="font-weight:600; margin-bottom:0.5rem;">${res.name}</div>
-                <div style="font-size:0.9rem; color:rgba(252,251,250,0.65);">${res.desc}</div>
-            `;
-            return card;
-        }
-
-        document.getElementById('language-grid').append(...languageResources.map(createCard));
-        document.getElementById('utility-grid').append(...utilityResources.map(createCard));
-
-        // === PWA Service Worker 註冊 ===
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
-                .then(() => console.log('Service Worker 註冊成功'))
-                .catch(err => console.log('Service Worker 註冊失敗', err));
-        }
-    </script>
 </body>
 </html>
