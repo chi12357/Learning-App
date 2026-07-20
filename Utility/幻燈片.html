@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>相簿播放器</title>
+<meta name="theme-color" content="#121315">
+<link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjogIuebuOewv+aSreaUvuWZqCIsICJzaG9ydF9uYW1lIjogIuebuOewv+aSreaUvuWZqCIsICJkZXNjcmlwdGlvbiI6ICLlhajonqLluZXnm7jniYfoiIfpn7PmqILmipXlvbHmkq3mlL7lmagiLCAic3RhcnRfdXJsIjogIi4iLCAic2NvcGUiOiAiLiIsICJkaXNwbGF5IjogImZ1bGxzY3JlZW4iLCAib3JpZW50YXRpb24iOiAiYW55IiwgImJhY2tncm91bmRfY29sb3IiOiAiIzEyMTMxNSIsICJ0aGVtZV9jb2xvciI6ICIjMTIxMzE1IiwgImljb25zIjogW3sic3JjIjogImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBTUFBQUFEQUNBWUFBQUJTM0d3SEFBQUd1VWxFUVZSNG5PM2QyM0VjTnhTRTRTT1hJNUNLb1NrWGhzQmNHQnFEa0Y4OHBkVnFMcGhaWU5EbjlQODl5MVc0ZEFPUUtlNSsrLzdqN1ZjQXB2NlpQUUJnSmdvQWF4UUExaWdBckZFQVdLTUFzRVlCWUkwQ3dCb0ZnRFVLQUdzVUFOWW9BS3hSQUZpakFMQkdBV0NOQXNBYUJZQTFDZ0JyRkFEV0tBQ3NVUUJZb3dDd1JnRmdqUUxBR2dXQU5Rb0FheFFBMWlnQXJGRUFXUHQzOWdDcSszeC9lK20vLy9ueDFXa2tXUE9OajBmdjQ5V2duMFV4K3FBQUY5MGQrQ01VNGhvS2NJSmE2TGRRaG5ZVTRFQ1cwRytoRFBzb3dJYnN3WDlHRWRaUmdDZTlnLzlxOE5UR1V3MEYrRitQb04wVnJreGpWV2RmZ0ZmQ3BCS2lDbk9ZeGJZQVYwT2pIcGlxOHhyRnJnQlhBcEkxSEU1enZjcXFBR2NEVVNVTXJ2TnVZVk9BTXlHb0dnRFc0Ry9sQzhDbS80MDErYTEwQVZvM3V2b21iMkY5Q2hlZ1pYTXJiK3daem10VjhoZGluRGYwaXBhMXFQWlBReGFsYmdDdTlOYzRybCtaQW5EcTkrTzBsaVdlUUU0YmRnZW5KMUg2QWhEK01WeEtrTG9BaEg4c2h4S1UvVlFJZ3QvSHNvN1pnNzRsN1Eyd3R5R0V2Nys5TmMxY2pwUUZJUHh6VkN4QnVnSmtYV2dIR2ZjbVZRR09GcGpUZjd5ak5jNVdnbFFGMkpNMS9Oa0NFNUYzcmRlaytVbHd0WGYvMm55eXphUENucVFvUUlXRlhsUjd4bVhmRy9rblVNWW53cGFXdVh5K3Y1V1pjNFo1eUJkZ1Q0WVRKdUphcUxNVUljc2ViSkYrQW1XL1huc0dXSDIrV2ZjcTVRMmd2S0FSWTA1djlkdEFmVSsyeUJaQWZjUFhqSDYyWkhrV1BWTWVzMndCdHFpZU5IZHVzbW9SVlBkbWoyUUJGRGQzeTh3d3FoWmhqZW80SlF1d1JlbUVVUXFmeWpnaXRQYW9oVndCbERaempWTHdINm1PNjVIaStPUUtzRVhoWkZIY3dHY0tSVkRZcTFaU0JaaTljVnNVUW5XVzZwalZ4aVJWZ0MyelRoVFZFSjB4YS94WmJnR1pBaWdGclVMd0g2bk5SMmtzTWdYWWN1ZEpvaGFVM3U2ZVg0WmJRTDRBZDZrYy9HZlZpMzZHUkFGbWJvWnpHR2F2dXdLSkFtd1plWVU2Qi8vUjZIVlFmd1pKRndBWWJYb0JPSVY5S2V6OTlBSnNVYjg2MFU1NUwyVUxBTnlCQXNEYTFFK0hWbmdEM3EzYUo2dTk2dlA5YmVvVFNmSUdVSDR6WHZYejQ2dHBYcTEvTGh2Vk9aWDlmZ0FWVnplKyt1ZnlxNUM4QWFyb2NlcXBucHhWVUlCQmVnYVhFb3hEQVFZWUVWaEtNTWEwQW15OWJiTnY5TWp4VjEyYm1YL1A0UWFBTlFyUTBSMG5kUFpiUUEwRmdEVUswTW1kSnpPM1FEOFVBTllvQUt4UkFGaWpBTEJHQVdDTkFzQWFCWUExQ3RESjNWK1JoRDRvQUt4UmdJN3VPSms1L2Z1aUFMQTJyUUNLL3phOGg5SGZFNXlaNHUrQWNBTU1NQ0tvMmNPdmlnSU0wak93aEg4Y0NqQlFqK0FTL3JINFhLREJsZ0NmZmVjUy9IdEkzZ0FWTjcvMWl5aXFmbkdINnB5bTNnQS9QNzVrRjJZVXQva2VtZjNiYlpJM0FIQVhDZ0Jyc2dYZ3FWQ0g4bDVPTDhEc055RG1VZGo3NlFVQVpwSXV3T2p2cjFVNGdXWWJ2UTdLejU4SWtRTE1ES0p6RVdhdnV3S0pBaWhRMlpBN09KZittWHdCN3J4Q3F3Zmo3dm1wUDM4aWhBcWdGTHhxUlZDYmo5SllaQXF3WjlaSm9oYWNLMmFOUDhQcEh5RldBTld3WlN5QzZwalZ4aVJWZ0QwS0o0cmE1cTFSQ0w3Q1hyV1NLOERzelR1aUVMQTFxdU42cERnK3VRTHNVVHBabEFLbk1vNElyVDFxSVZrQXBRMDlNck1JU2lVOG9qcE95UUxzVVQxaDd2NktKTVZBcWU3Tkh0a0NLRzd3a2RIQlZBMytFZVV4eXhaZ2ovcEpNeUtveWlHSzBOK1RMZCsrLzNqN05Yc1FlL1lXVmowVWkxZkNrV0dPbWZjbzVRMnd5SExxWExrUnNqeDNzdXpCRnZrQ1pBaEJxNWE1WkFsK2l3enprSDhDTFRKZnMydlc1cE50SGhYMkpFMEJJbW9zK0xQUDk3ZVVZNit5Ri9KUG9GWlozNktad3JMSXV0WnJVaFhnS0N5Vk5rYlYwUnBuSzNTcUFrVGtXMkFuR2ZjbVhRRWk5aGVhVzJDY0t1LytSeWtMRUVFSjdsWXgvQkdGdngvZzZ1Znk0MC9WRDVPME4wQkVXN2lyYitCSUxXdVgvWUJKWFlBSVNqQ0tRL2dqQ2hRZ2doTDA1aEwraUdRL0NUN1NHdklxbTllYjQvcVZLc0RDNlFUcnhYWE5TanlCbnZFa09zYzEvQkZGYjRDRjQ1VitCdXRUdkFBUjUwNzZ5aHY5aURYNXJYd0JGbXc2YTdER3BnQVI1OS85VlVMZ091OFdWZ1dJdVBhWDM2eUJjSnJyVlhZRldGejl2MERxQWFrNnIxRnNDN0NvOEpFbEZlWXdpMzBCRmoxK0xuQlhtREtOVlIwRmVOTDdCMlN2QmsxdFBOVlFnQTNWZmxKTThOZFJnQVBaaTBEdzkxR0FFN0tVZ2RDM293QVhxWldCMEY5REFUcTV1eEFFdmc4S01OaXJ4U0RvWTFFQVdDdjVDekZBS3dvQWF4UUExaWdBckZFQVdLTUFzRVlCWUkwQ3dCb0ZnRFVLQUdzVUFOWW9BS3hSQUZpakFMQkdBV0NOQXNBYUJZQTFDZ0JyRkFEV0tBQ3NVUUJZb3dDd1JnRmdqUUxBR2dXQU5Rb0FheFFBMWlnQXJGRUFXUHNQdkNMckZUZGJGejBBQUFBQVNVVk9SSzVDWUlJPSIsICJzaXplcyI6ICIxOTJ4MTkyIiwgInR5cGUiOiAiaW1hZ2UvcG5nIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn0sIHsic3JjIjogImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBZ0FBQUFJQUNBWUFBQUQwZU5UNkFBQVRRa2xFUVZSNG5PM2MwWFVidWJLR1Vmb3NSMkF2aCtaY0hJSnpjV2dPd3VkaGxtWmtTWlRZSkJvbzFMLzMwMzI1WjBnMnV2QVJUZXZUbDYvZi9sd0FnQ2ovVy8wQ0FJRDVCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUNnejZ0ZkFEREdyeC9mcHZ4M3Z2LzhQZVcvQTV6cjA1ZXYzLzZzZmhIQWRiTTI5dEdFQXRRbUFLQ0lYVGY2bzRRQjFDQUFZTEtVamY0b1lRQnpDUUE0bVEzL1BvSUF6aVVBWURBYi9qa0VBWXdsQU9CQk52dzFCQUU4UmdEQVFUYjhtZ1FCSENNQTRBWTIvYjJJQWZpWUFJQXJiUG85aUFGNG13Q0FaMno2dllrQitJOEFnSXVOUDQwUUFBRkFNSnMrbDRzWUlKY0FJSTZObjdjSUFkSUlBQ0xZOURsQ0RKQkFBTkNhalo5SENBRTZFd0MwWk9ObkpDRkFSd0tBVnBJMy9sbWJsTThZZWhBQXROQjlVOXB0NDNFOW9ENEJ3TmE2YlRUZE54YlhDK29RQUd5cHcwWmk4L2lIYXdsckNBQzJzdk5tWVpPNGpXc01jd2dBdHJEanBtQXpHTU8xaDNNSUFNcmJaUU13OU9ld0htQU1BVUJaT3d4NlEzNHRhd1R1SndBb3AvcFFOOUJyc203Z0dBRkFLVldIdU9HOUYrc0lQaVlBS0tIaXdEYXNlN0MyNEcwQ2dLVU1aMmF4MXVCdkFvQmxLZzFrZ3ppTHRRY0NnQVVNWDZxd0Zra21BSmlxeXNBMWJIbk91aVNSQUdDYUNrUFdnT1U5MWloSkJBQ25NMVRaalRWTEFnSEFxVllQVWtPVVIxaS9kQ1lBT00zSzRXbHdNcEsxVEVjQ2dPRU1TN3F5dHVsRUFERFVxZ0ZwT0RLVGRVNEhBb0JoVmd4RkE1R1ZySGwySmdCNG1HOURKTFArMlpVQTRDRytBY0UvM0F2c1JnQnd0OWtEejdCakIrNExkdkcvMVMrQVBSbHk4TGJaYTNYMTN5cGdYMDRBT0d6bXdMSHhzelAzQ3BVNUFlQVFBdzF1TjNNTk93bmdLQ2NBM01UR0Q0OXhEMUdORXdBK1pIREI0NXdHVUkwQTRGMDJmeGhIQkZDSlJ3QmNOV3VBMlBoSjVQNWlOU2NBdk1sd2duUE5XdnRPQXJoR0FQQ0t6Ui9tRUFHczVCRUFmNWt4S0d6ODhKcDdqOW1jQVBBdkF3aldtWEZ2T0FuZ09RSEE1WEt4K1VNRklvQ1pCQUEyZnloRUJEQ0wzd0NFTzNzUTJQamhmdTVQenVRRUlKamhBcldkZlE4NUNjZ21BRUxaL0dFUElvQ3pDQUNHcy9uRFdPNHB6aUFBQXAxWi9BWVZuT1BNZThzcFFDWUJFTWJtRC9zU0FZd2tBSUxZL0dGL0lvQlJCRUFJbXovMElRSVlRUUFFc1BsRFB5S0FSd21BNW16KzBKY0k0QkVDZ0x2WS9LRUc5eUwzRWdDTm5WWHdCZzdVY3RZOTZSU2dOd0hRbE0wZnNvZ0FqaElBRGRuOElaTUk0QWdCd0Uxcy9yQUg5eXEzRWdETm5GSHFCZ3JzNVl4NzFpbEFQd0tnRVpzLzhFUUU4QkVCMElRYms2T3NHZTVoM2ZRaEFMakt0LytlZnYzNDl1OFFmLzUvMDQ5N21QY0lnQVljL1hPcmEydEZCUFRsVVFEWGZQcnk5ZHVmMVMrQys5bjh1Y1dSZGVMNjkyUlc4SklBMkpnYm1vODhza2FzaFg3TURKNzd2UG9GQU9PTkdQUlAveHNHUFBUa053Q2JVdkpjTTNwdGVON2JoOThEOEp4SEFCdXkrZk9XR1lQWU91bkJET0Z5Y1FMQXhZMjd1NW4vbE04L0crekJQYy9sSWdDMlkvanlaT1ZtTEFSNHlYcllqd0FJNTV2QW5xb00yeXF2ZytQYysvZ053RVpHRDFzRFlEK1ZOMXpyYVUvbVNpNEJzQWszYWJiS0cvOUwxdForekpkTUhnRkFjVHR0L3BlTDN3ZkFMcHdBYkVDZForcXdpVnByK3pCbjhqZ0JDT09tcksvVE4raE83NlU3c3lHUEFDak84TXpSZWJQcy9ONTRtK3RkbjBjQWhUbVN5NUUyTEszRnVzeWRIRTRBUXJnSmEwcjlacHo0bm5kaFZ1UVFBRVVaa0wybGJ2elArUXd5dU1aMUNZQUFpcjRPbTk1clBwTjZ6SXdNQXFBZ3c3QW4xL1Y5UXFBdjE3VW1BZENja2wvUHhuYU16Nm9HczZNLy93cWdtSkhEencyOGxvM3NjZGJ3ZW1aU1gwNEE0QVEyL3pHY25zQjVuQUFVb3JUM1o3TTZsM1c5aHRuVWt4TUFHTUEzMVRsOHhqQ09FNEFpRlBhZWJFanJXT2R6bVZIOU9BR0FPOW44MTNMcUFvOXhBbENBc3Q2TFRhY21hLzk4WmxVdlRnRGdScjV4MXViYXdERk9BQlpUMUh1d3VlekZ2WEFlTTZ1UHo2dGZBRlJtNDkvVDAzV3p3Y0IxVGdBV1V0SjEyZmg3Y1grTVpYYjE0RGNBOEl6bi9EMjVwdkNhQUdoQVFZOWhrK2hOM0kxajV2UWdBQll4aU9xd01XUnh2V3R4TGRZUkFKdFQ0dmV6RVdSei9SOWo5dXhQQUN4ZzZLeGw4UE9jdGJDZWE3Q0dBTmlZQWovT29PRXRvdkErWnREZS9CMEFJaGp1M01MZkR5Q0p2d013MmFpTnlJQzZqWTJmUjdqUGJtT3U3Y2tqQU5xeStmTW9hNGpPQk1CRWhza2NudWN5a3ZVMGo4OTVMZ0d3SWNka2J6T29PWlAxZFoyWnRDYy9BbVI3aGpJeithRWdYVGdCbU1TUFpNNWg4MmNWYSs5dm8yYVR6M1VlSndCc3laQ2dBcWNCN0V3QXNCVWJQeFVKQVhiazd3Qk00UGovY1RaK2R1SmVmVnp5WnppTDN3QlFuczJmM1ZpejdNQWpBTW95Uk5tWnh3SlU1d1RnWkk3RGdDVCtOY0ErQkFBQUJCSUFBQkJJQUd6QThUK3dFek5yRHdMZ1JKNWhBZHpQREQyWEFBQ0FRQUtnT0VkcHdJN01ydm9FQUFBRUVnQW44ZXdLNEhGbTZYa0VBQUFFRWdDRmVZWUc3TXdNcTAwQUFFQWdBWEFDejZ3QXhqRlR6eUVBQUNDUUFDaktzek9nQTdPc3JzK3JYd0J3dnFORDJKRXI5Q2NBQmpNNHFlRFJiMTB2Ly8rdGExYjc5ZU9iMDRUQkJBQTBjZVp3ZlA2L0xRYWdCNzhCS0VqbGNzVDNuNytucnBuWi96MzJaNzNVNUFRQU5yVjZxRDc5OTUwSXdKNEVBR3htOWNiL2toQ0FQWGtFQUJ1cHR2ay9WL20xQWE4SmdJRjhBK0lzdXp4MzMrVjFzaWN6ZGl3QlVJemh5VXM3cm9rZFh6UG5zaWJxRVFCUTJNNURjK2ZYRGdrRUFCVFZZUVB0OEI2Z0t3RUFCWFhhT0R1OUYraEVBRUF4SFRmTWp1OEpkaWNBQnZIclZFYm92RkYyZm0vTVk5YU9Jd0FLTVNDekpWei9oUGZJZGE1L0xRSUFBQUlKQUNnZzZadFIwbnVGeWdRQUxKYTRJU2ErWjZoR0FBQkFJQUVBQ3lWL0UwNSs3MUNCQUFDQVFBSUFGdkVOMkdjQUt3a0FBQWdrQUFZWThaZXBmQlBLNG5yL3gyZVJaY1QxOXRjQXh4QUFBQkJJQUFCQUlBRUFrem55ZnMxbkF2TUpBQUFJSkFBQUlKQUFBSUJBQWdBbThxejdPcDhOekNVQUFDQ1FBQUNBUUFJQUFBSUpBQUFJSkFBQUlKQUFBSUJBQWdBQUFna0FBQWdrQUFBZ2tBQUFnRUFDQUFBQ0NRQ1k2TmVQYjZ0ZlFsaytHNWhMQUFCQUlBRUFBSUVFQUFBRUVnQXdtV2Zkci9sTVlENEJBQUNCQkFBQUJCSUFBM3ovK2Z2aC93MUhvRmxjNy8vNExMS011TjRqWmk0Q0FBQWlDUUJZeERkZm53R3NKQUFBSUpBQWdJV1N2d0VudjNlb1FBQUFRQ0FCQUlzbGZoTk9mTTlRalFDQUFwSTJ4S1QzQ3BVSkFBQUlKQUFLOGMwb1c4TDFUM2lQWE9mNjF5SUFCdkdYcVJpaDg0RHMvTjZZeDZ3ZFJ3QkFNUjAzeW83dkNYWW5BS0NnVGh0bXAvY0NuUWdBS0tyRHh0bmhQVUJYQWdBSzIza0QzZm0xUXdJQlVJeWh5VXM3cm9rZFh6UG5zaWJxRVFBRCtYVXFaL24xNDlzV0EzU1gxOG1lek5peEJBQnNwUExtV3ZtMUFhOTlYdjBDZ0dPZU50b3EzNFpzL0xBbkFRQ2JXaDBDTm43WW0wY0FCUm1zSERIN3Vidm4vQnhsdmRUa0JBQ2FlRDVrUjU4S0dPRFFqd0FZN1B2UDM0WWx5NzFjZzBlRHdCcW1taXEvZWVsRUFFQUFHenJ3a3Q4QUZHVmdBeDJZWlhVSkFBQUlKQUJPNEZrVndEaG02amtFQUFBRUVnQ0ZlWFlHN013TXEwMEFBRUFnQVhBU3o2d0FIbWVXbmtjQUFFQWdBVkNjWjJqQWpzeXUrZ1FBQUFRU0FDZnk3QXJnZm1ib3VRVEFCaHlsQVRzeHMvWWdBQUFna0FBQWdFQUM0R1Nqbm1FNVVnTjJNR3BXZWY1L3ZzK3JYd0JjOHpRQXhBODdzb0ZSblJNQXlqTkkyWTAxeXc0K2ZmbjY3Yy9xRjVIQXNkZ1lUZ09velAxcHp1M0VJd0MyNHJFQUZkbXcySkVBWUV0Q2dBcHMvT3pNYndBbThhOEJ6bUVBczRxMTl6ZkgvL3R4QXNEMm5BWXdrdzJLTHB3QWJNaEc5N2J2UDM4YnpwekcrcnJPVE5xVEFKakk4SmpEb0dZazYya2VuL05jQW9DMkRCTWVaUTNSbWI4RHNJQWZ5OHpuaUpJajNGdTNNOC8yNVVlQVJQQkRRVzVoRXlLSlJ3QWJzNWtkNTNrdTExZ1h4NWxCZXhNQUN4ZzA2N2tHUEJHRjYvbjgxeEFBbTFQZzl6UDRzN24ranpGNzlpY0FGakY0NnJBUlpIRzlhM0V0MWhFQURTanhNV3dNL2JtK1k1ZzVQUWdBZU1FbTBZKzRnOWY4SFlERlJwYTBBVGVlYnpwN2MwK01aMmIxNGU4QXdEdjgvWUE5MlZqZ1kwNEFDbERVK3hBQzlia0h6bU5XOWVJM0FIQ0FvVldYNS94d2pCT0FJcFQxZnB3RzFHQzl6MkZHOWVNRUFPN2tHK2Q2UG4rNG54T0FRaFQyM3B3SXpHTjl6MlUyOWVRRUFBWXgyTTduMUFYR2NRSlFqTkx1d1duQVdOYnlPbVpTWDA0QTRBUytxWTdqYzRSek9BRW9TSEgzNDBUZ09HdDNQYk9vTnljQXpkbDRhakQ4YnVmMHBBYXpvejhCVUpEaDE1T043V00rbjU1YzE1b0VRQUFsWDRzUWVNMW5Vb3Vaa1VFQUZHVVk5bWZUOHhra2NIM3JFZ0FoRkgxZGlRUFN4bCtYV1pIRHZ3SW9idlROYU9qV2xqQjhyY0c2ekpzc1RnQ0tjd05sNmZ6TnVQTjc0elhYdWo0QkVDYmhHMllIblRiTFR1K2xNN01oajBjQW0zQTBsMnZYd1d5TjdjTjh5ZVFFQUlyYjhSdjBicThYRWprQjJJaEs1M0twZlNKZ1RlM0hYTWtsQURialp1VkpwUkN3anZaa25tVHpDQ0JjcFUyRVk2b00yeXF2ZzJQYyt3aUF6UmkyUExmeTl3RTcvamFCODFnTCt4RUErQ2JRd016TjJNYS9QL2M4bDR2ZkFHenJqQnZZVU8vRCt1QWFhNE1uVGdBMmRjWU41MXRCSDZQWGh3SGZnODJmNXo2dmZnSEFPWjRHOHlORDMzQ0h2andDMkp5aTUxWkgxb28xMEk5WndVc0NvQUUzTmtlOHQxNWM5NTdNQ043aU53QU4rRDBBUjF4Ykx3WjZUelovcmhFQVhDVUMrbnIrVC9uOHM3NiszTU84UndBMFlZQnpEK3VHbzZ5WlBnUkFJeDRGQUU4Yy9mTVJBZENNQ0FCcy90eENBSEFURVFCN2NLOXlLd0hRMEZtbGJyQkFiV2Zkbzc3OTl5UUFtaElCa01YbXoxRUNvREVSQUJscy90eERBSEFYRVFBMXVCZTVsd0JvN3N5Q04zaGdyVFB2UWQvKyt4TUFBVVFBOUdQejUxRUNJSVFJZ0Q1cy9vd2dBSUtJQU5pZnpaOVJCRUFZRVFEN3N2a3prZ0FJSkFKZ1B6Wi9SaE1BRENjQ1lDejNGR2NRQUtIT0xuNERDOFk0KzE3eTdUK1hBQWdtQXFBMm16OW4rdlRsNjdjL3ExOEVhODNZcUEwYXVKMTdraG1jQURCbEVEZ05nTnZZL0psRkFIQzVYRVFBVkdEelp5WUJ3TDlFQUt4ajgyYzJ2d0hnbFZtYnRHRUU3amZXY1FMQUs3TUdoZE1BMHRuOFdVa0E4Q1lSQU9leStiT2FSd0M4YStZR2JWQ1J3RDFGRlU0QWVOZk1BZUkwZ081cy9sUWlBUGlRQ0lESDJmeXB4aU1BRGpIRTRCajNERlU1QWVBUXB3RndPNXMvbFRrQjRDNnpOMmZEaloyNFA5aUJFd0R1TW52Z09BMWdGelovZHVFRWdJZXMySmdOUENweUw3QWJBY0REVm4wN04veW93UHBuVndLQVlYd0RJbzAxejg0RUFFUDVOa1FDNjV3T0JBRERyZnpCbmdISm1heHRPaEVBbk1hd3BBdHJtWTRFQUtkYS9jLzNERThlWWYzU21RRGdkS3VINk9WaWtIS01OVXNDQWNBMGhpclZXYU1rRVFCTVZXSEFYaTZHTEgrekxra2tBSml1eXJDOVhBemNkTllpeVFRQXl4aStyR0x0Z1FCZ3NVcUQrSW1CM0pPMUJuOFRBSlJnT0hNV2F3dmVKZ0FvcGVLd3Zsd003TjFZUi9BeEFVQTVWWWYzRTBPOEp1c0dqaEVBbEZWOW9GOHVodnBxMWdqY1R3QlEzZzVEL25JeDZHZXhIbUFNQWNBV2RobjZ6OWtBeG5EdDRSd0NnSzNzdUJrOHNTbmN4aldHT1FRQVc5cDVrM2hpcy9pSGF3bHJDQUMyMW1IemVLNzdSdUo2UVIwQ2dCYTZiU3d2N2JiUnVCNVFud0NnbGU0YnozdG1iVW8rWStoQkFOQlM4aWJGZURaK09oSUF0Q1lFZUlTTm44NEVBQkdFQUVmWStFa2dBSWdqQm5pTFRaODBBb0JZUW9ETHhjWlBMZ0VBRnpHUXhxWVBBZ0QrSWdSNnMvSERmd1FBWENFR2VyRHB3OXNFQU54QURPekZwZzhmRXdCd2tCaW95YVlQeHdnQWVKQWdXTU9HRDQ4UkFEQ1lJRGlIRFIvR0VnQndNa0Z3SHhzK25Fc0F3R1NDNEcwMmZKaExBRUFSS1dGZ280Y2FCQUFVdDJzWTJPaWhOZ0VBVGN3S0JSczc5Q0FBQUNEUS8xYS9BQUJnUGdFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUVNBQUFRQ0FCQUFDQkJBQUFCQklBQUJCSUFBQkFJQUVBQUlFRUFBQUVFZ0FBRUVnQUFFQWdBUUFBZ1FRQUFBUVNBQUFRU0FBQVFDQUJBQUNCQkFBQUJCSUFBQkJJQUFCQUlBRUFBSUVFQUFBRUVnQUFFRWdBQUVBZ0FRQUFnUVFBQUFRU0FBQVFTQUFBUUNBQkFBQ0JCQUFBQkJJQUFCQklBQUJBSUFFQUFJRUVBQUFFRWdBQUVFZ0FBRUFnQVFBQWdRUUFBQVFTQUFBUTZQL2MyWHIweWtOSWd3QUFBQUJKUlU1RXJrSmdnZz09IiwgInNpemVzIjogIjUxMng1MTIiLCAidHlwZSI6ICJpbWFnZS9wbmciLCAicHVycG9zZSI6ICJhbnkgbWFza2FibGUifV19">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,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">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="相簿播放器">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121315;          /* 墨玄 */
+    --surface:#1b1c1f;
+    --surface-2:#26272b;
+    --text:#fcfbfa;        /* 玉盤白 */
+    --text-dim:#b3b0a8;
+    --accent:#bd8b2a;      /* 耀日金 */
+    --accent-soft:rgba(189,139,42,.18);
+    --accent2:#942525;     /* 硃砂紅 */
+    --accent2-soft:rgba(148,37,37,.22);
+    --ctrl-size:72px;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg); color:var(--text);
+    font-family:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+    overscroll-behavior:none;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .ctrl-btn .lb, .info, #support-note, .status, input[type=range]{
+    font-family:"Inter","Noto Sans TC",sans-serif;
+  }
+  #app{ position:fixed; inset:0; overflow:hidden; }
+
+  /* ---------- Start screen ---------- */
+  #start-screen{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:28px;
+    padding:32px; text-align:center; background:var(--bg);
+    overflow-y:auto;
+  }
+  #start-screen h1{
+    font-size:clamp(28px,5vw,44px); font-weight:900; margin:0 0 4px;
+    letter-spacing:.06em; color:var(--accent);
+    font-family:"Cormorant Garamond","Noto Serif TC",serif;
+  }
+  #start-screen p.sub{ color:var(--text-dim); margin:0 0 12px; font-size:clamp(16px,2.4vw,20px); }
+  .picker-row{ display:flex; flex-wrap:wrap; gap:18px; justify-content:center; }
+  .big-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:8px; min-width:180px; min-height:120px; padding:18px 22px;
+    background:var(--surface); border:2px solid var(--surface-2);
+    border-radius:var(--radius); color:var(--text); cursor:pointer;
+    font-family:inherit; font-size:18px; font-weight:700;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .big-btn:hover{ border-color:var(--accent); }
+  .big-btn:active{ transform:scale(.97); background:var(--surface-2); }
+  .big-btn .icon{ font-size:40px; line-height:1; }
+  .big-btn .status{ font-size:14px; font-weight:400; color:var(--text-dim); max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .big-btn.ready{ border-color:var(--accent); background:var(--accent-soft); }
+
+  .option-row{ display:flex; flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; margin-top:4px; }
+  .option-group{
+    display:flex; align-items:center; gap:10px; background:var(--surface);
+    padding:12px 18px; border-radius:999px; font-size:17px;
+  }
+  .option-group label{ color:var(--text-dim); }
+  .toggle-pair{ display:flex; border-radius:999px; overflow:hidden; border:2px solid var(--surface-2); }
+  .toggle-pair button{
+    border:none; background:transparent; color:var(--text-dim); padding:8px 18px;
+    font-family:inherit; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  .toggle-pair button.active{ background:var(--accent); color:var(--bg); }
+  input[type=range]{ width:140px; accent-color:var(--accent); }
+
+  #start-action{
+    margin-top:10px; padding:20px 56px; font-size:24px; font-weight:900;
+    background:var(--accent); color:var(--bg); border:none; border-radius:999px;
+    cursor:pointer; box-shadow:0 6px 24px rgba(201,162,39,.35);
+  }
+  #start-action:disabled{ background:var(--surface-2); color:var(--text-dim); box-shadow:none; cursor:not-allowed; }
+  #start-action:active:not(:disabled){ transform:scale(.98); }
+
+  #resume-banner{
+    display:none; background:var(--surface); border:2px solid var(--accent);
+    border-radius:var(--radius); padding:16px 22px; font-size:17px; max-width:520px;
+    align-items:center; gap:16px; flex-wrap:wrap; justify-content:center;
+  }
+  #resume-banner button{
+    padding:12px 22px; border-radius:999px; border:none; font-family:inherit;
+    font-size:16px; font-weight:700; cursor:pointer;
+  }
+  #resume-continue{ background:var(--accent); color:var(--bg); }
+  #resume-restart{ background:var(--surface-2); color:var(--text); }
+
+  #support-note{ font-size:13px; color:var(--text-dim); max-width:520px; }
+
+  /* ---------- Stage ---------- */
+  #stage{ position:absolute; inset:0; display:none; background:#000; }
+  #photo-container{ position:absolute; inset:0; overflow:hidden; }
+  .layer{
+    position:absolute; top:0; left:0; will-change:transform, opacity;
+    opacity:0; transition:opacity 1s ease;
+    max-width:none; max-height:none;
+  }
+  .layer.visible{ opacity:1; }
+  #empty-note{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--text-dim); font-size:20px; text-align:center; padding:24px;
+  }
+
+  /* ---------- Overlay controls ---------- */
+  #controls-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    opacity:1; transition:opacity .4s ease;
+  }
+  #controls-overlay.hidden{ opacity:0; }
+  #top-bar{
+    position:absolute; top:0; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:18px 20px; pointer-events:none;
+    background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+  }
+  #top-bar .info{ font-size:15px; color:var(--text-dim); pointer-events:none; }
+  #top-bar .info b{ color:var(--text); }
+  #gear-btn{ pointer-events:auto; }
+
+  #bottom-bar{
+    position:absolute; left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+    background:linear-gradient(to top, rgba(0,0,0,.7), transparent);
+    pointer-events:auto; flex-wrap:wrap;
+  }
+  .ctrl-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:var(--ctrl-size); height:var(--ctrl-size); border-radius:50%;
+    background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.18);
+    color:var(--text); cursor:pointer; gap:2px;
+  }
+  .ctrl-btn:active{ background:rgba(255,255,255,.16); transform:scale(.95); }
+  .ctrl-btn .ic{ font-size:26px; line-height:1; }
+  .ctrl-btn .lb{ font-size:11px; color:var(--text-dim); }
+  .ctrl-btn.primary{ width:calc(var(--ctrl-size) + 18px); height:calc(var(--ctrl-size) + 18px); background:var(--accent); border:none; }
+  .ctrl-btn.primary .ic{ font-size:32px; color:var(--bg); }
+  .ctrl-btn.primary .lb{ color:rgba(18,19,21,.75); }
+  .ctrl-btn.on{ background:var(--accent-soft); border-color:var(--accent); }
+
+  #progress-track{
+    position:absolute; bottom:0; left:0; right:0; height:4px;
+    background:rgba(255,255,255,.12); pointer-events:none;
+  }
+  #progress-fill{ height:100%; width:0%; background:var(--accent); }
+
+  /* ---------- Settings panel ---------- */
+  #settings-panel{
+    position:absolute; inset:0; background:rgba(0,0,0,.72);
+    display:none; align-items:center; justify-content:center; z-index:20;
+    padding:20px;
+  }
+  #settings-card{
+    background:var(--surface); border-radius:20px; padding:28px 26px;
+    width:min(460px, 100%); max-height:86vh; overflow-y:auto;
+    display:flex; flex-direction:column; gap:20px;
+  }
+  #settings-card h2{ margin:0; font-size:22px; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; font-size:17px; }
+  .settings-row .val{ color:var(--accent); font-weight:700; min-width:48px; text-align:right; }
+  .settings-btn-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .settings-btn-row .big-btn{ min-width:0; flex:1; min-height:88px; padding:12px; }
+  #close-settings{
+    align-self:center; margin-top:6px; padding:12px 30px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--bg); font-weight:900;
+    font-size:17px; cursor:pointer; font-family:inherit;
+  }
+
+  @media (max-width:520px){
+    :root{ --ctrl-size:60px; }
+    .ctrl-btn .lb{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== START SCREEN ===================== -->
+  <div id="start-screen">
+    <h1>相簿播放器</h1>
+    <p class="sub">選好相片和音樂資料夾，就可以開始播放</p>
+
+    <div id="resume-banner">
+      <span id="resume-text">找到上次播放的進度</span>
+      <button id="resume-continue">從上次繼續</button>
+      <button id="resume-restart">從頭開始</button>
+    </div>
+
+    <div class="picker-row">
+      <button class="big-btn" id="pick-photos">
+        <span class="icon">🖼️</span>
+        <span>選擇相片資料夾</span>
+        <span class="status" id="photo-status">尚未選擇</span>
+      </button>
+      <button class="big-btn" id="pick-music">
+        <span class="icon">🎵</span>
+        <span>選擇音樂資料夾（可略過）</span>
+        <span class="status" id="music-status">尚未選擇</span>
+      </button>
+    </div>
+
+    <div class="option-row">
+      <div class="option-group">
+        <label>播放順序</label>
+        <div class="toggle-pair" id="order-toggle">
+          <button data-mode="sequential" class="active">循序</button>
+          <button data-mode="random">隨機</button>
+        </div>
+      </div>
+      <div class="option-group">
+        <label>每張秒數</label>
+        <input type="range" id="duration-range" min="3" max="100" value="8">
+        <span id="duration-label">8 秒</span>
+      </div>
+      <div class="option-group">
+        <label>放大比例</label>
+        <input type="range" id="zoom-range" min="100" max="300" step="10" value="100">
+        <span id="zoom-label">100%</span>
+      </div>
+      <div class="option-group">
+        <label>放大前先看原圖</label>
+        <div class="toggle-pair" id="original-toggle">
+          <button data-val="off" class="active">關閉</button>
+          <button data-val="on">開啟</button>
+        </div>
+      </div>
+      <div class="option-group">
+        <label>高畫質放大</label>
+        <div class="toggle-pair" id="hq-toggle">
+          <button data-val="off" class="active">關閉</button>
+          <button data-val="on">開啟</button>
+        </div>
+      </div>
+    </div>
+
+    <button id="start-action" disabled>開始播放</button>
+    <p id="support-note"></p>
+
+    <!-- hidden fallback inputs for browsers without File System Access API -->
+    <input type="file" id="photo-input-fallback" webkitdirectory multiple style="display:none">
+    <input type="file" id="music-input-fallback" webkitdirectory multiple style="display:none">
+  </div>
+
+  <!-- ===================== STAGE ===================== -->
+  <div id="stage">
+    <div id="photo-container">
+      <img class="layer" id="layer-a">
+      <img class="layer" id="layer-b">
+      <div id="empty-note" style="display:none;">這個資料夾裡沒有找到相片</div>
+    </div>
+    <audio id="audio-player"></audio>
+
+    <div id="controls-overlay">
+      <div id="top-bar">
+        <div class="info"><b id="counter-text">0 / 0</b></div>
+        <button class="ctrl-btn" id="gear-btn"><span class="ic">⚙️</span><span class="lb">設定</span></button>
+      </div>
+      <div id="bottom-bar">
+        <button class="ctrl-btn" id="prev-btn"><span class="ic">⏮</span><span class="lb">上一張</span></button>
+        <button class="ctrl-btn primary" id="play-btn"><span class="ic" id="play-icon">⏸</span><span class="lb">暫停</span></button>
+        <button class="ctrl-btn" id="next-btn"><span class="ic">⏭</span><span class="lb">下一張</span></button>
+        <button class="ctrl-btn" id="order-btn"><span class="ic">🔀</span><span class="lb" id="order-lb">隨機</span></button>
+        <button class="ctrl-btn" id="mute-btn"><span class="ic" id="mute-icon">🔊</span><span class="lb">音樂</span></button>
+        <button class="ctrl-btn" id="fullscreen-btn"><span class="ic">⛶</span><span class="lb">全螢幕</span></button>
+      </div>
+      <div id="progress-track"><div id="progress-fill"></div></div>
+    </div>
+
+    <!-- Settings panel reachable during playback -->
+    <div id="settings-panel">
+      <div id="settings-card">
+        <h2>設定</h2>
+        <div class="settings-row">
+          <label>每張相片秒數</label>
+          <input type="range" id="duration-range-2" min="3" max="100" value="8">
+          <span class="val" id="duration-label-2">8 秒</span>
+        </div>
+        <div class="settings-row">
+          <label>播放順序</label>
+          <div class="toggle-pair" id="order-toggle-2">
+            <button data-mode="sequential">循序</button>
+            <button data-mode="random">隨機</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>放大比例</label>
+          <input type="range" id="zoom-range-2" min="100" max="300" step="10" value="100">
+          <span class="val" id="zoom-label-2">100%</span>
+        </div>
+        <div class="settings-row">
+          <label>放大前先看原圖</label>
+          <div class="toggle-pair" id="original-toggle-2">
+            <button data-val="off" class="active">關閉</button>
+            <button data-val="on">開啟</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>高畫質放大</label>
+          <div class="toggle-pair" id="hq-toggle-2">
+            <button data-val="off" class="active">關閉</button>
+            <button data-val="on">開啟</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>音樂音量</label>
+          <input type="range" id="volume-range" min="0" max="100" value="70">
+          <span class="val" id="volume-label">70%</span>
+        </div>
+        <div class="settings-btn-row">
+          <button class="big-btn" id="reselect-photos"><span class="icon">🖼️</span><span>重新選相片資料夾</span></button>
+          <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>重新選音樂資料夾</span></button>
+        </div>
+        <button id="close-settings">關閉設定</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     Feature detection
+  --------------------------------------------------------------- */
+  const HAS_FS_ACCESS = 'showDirectoryPicker' in window;
+  const PHOTO_EXT = ['jpg','jpeg','png','gif','webp','bmp','heic','heif'];
+  const MUSIC_EXT = ['mp3','wav','m4a','aac','ogg','flac'];
+
+  const supportNote = document.getElementById('support-note');
+  supportNote.textContent = HAS_FS_ACCESS
+    ? '此瀏覽器支援自動記住資料夾，下次開啟可直接繼續播放。'
+    : '此瀏覽器每次開啟需要重新選擇資料夾，但會自動接續上次播放的位置。';
+
+  /* ---------------------------------------------------------------
+     Tiny IndexedDB helper (stores directory handles only)
+  --------------------------------------------------------------- */
+  const DB_NAME = 'slideshow-app-db';
+  const STORE = 'handles';
+  function idbOpen(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => { req.result.createObjectStore(STORE); };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbSet(key, value){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     localStorage progress (plain JSON, works for both browser paths)
+  --------------------------------------------------------------- */
+  const PROGRESS_KEY = 'slideshow_progress_v1';
+  function saveProgress(partial){
+    const cur = loadProgress() || {};
+    const next = Object.assign(cur, partial);
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
+  }
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  /* Settings (duration / order / volume / zoom) persist independently of
+     which photo folder is loaded, so they carry over every time the app
+     is reopened, per the user's request for the zoom level to stick. */
+  const SETTINGS_KEY = 'slideshow_settings_v1';
+  function saveSettings(){
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      duration: state.duration, orderMode: state.orderMode,
+      volume: state.volume, zoom: state.zoom,
+      showOriginalFirst: state.showOriginalFirst,
+      highQualityZoom: state.highQualityZoom,
+    }));
+  }
+  function loadSettings(){
+    try{
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  /* ---------------------------------------------------------------
+     App state
+  --------------------------------------------------------------- */
+  const state = {
+    photoFiles: [],      // [{name, getFile(): Promise<File>}]
+    musicFiles: [],
+    photoOrder: [],       // array of indices
+    musicOrder: [],
+    photoPos: 0,
+    musicPos: 0,
+    orderMode: 'sequential', // 'sequential' | 'random'
+    duration: 8,           // seconds per photo
+    volume: 0.7,
+    zoom: 1.0,             // extra zoom on top of screen-cover fit (1.0 - 3.0)
+    showOriginalFirst: false, // show the whole photo before zooming in
+    highQualityZoom: false,   // re-render zoomed photos through canvas for sharper upscaling
+    muted: false,
+    playing: false,
+    photoDirLabel: '',
+    musicDirLabel: '',
+    photoDirKey: '',       // fallback-matching key (name+count)
+    musicDirKey: '',
+    currentObjectUrl: null,
+    activeLayer: 'a',
+    timerHandle: null,
+    timerStartedAt: 0,
+    timerRemainingMs: 0,
+    pendingAction: null,   // fn to re-run when resuming from pause
+    panAnim: null,
+  };
+
+  const ORIGINAL_VIEW_MS = 2500; // how long to show the un-zoomed photo first
+
+  /* ---------------------------------------------------------------
+     File wrapping helpers
+  --------------------------------------------------------------- */
+  function wrapHandleFile(name, handle){
+    return { name, getFile: () => handle.getFile() };
+  }
+  function wrapRawFile(name, file){
+    return { name, getFile: () => Promise.resolve(file) };
+  }
+
+  async function scanDirHandle(dirHandle, exts){
+    const out = [];
+    async function walk(handle, prefix){
+      for await (const [name, entry] of handle.entries()){
+        if (entry.kind === 'file'){
+          const ext = name.split('.').pop().toLowerCase();
+          if (exts.includes(ext)) out.push(wrapHandleFile(prefix + name, entry));
+        } else if (entry.kind === 'directory'){
+          await walk(entry, prefix + name + '/');
+        }
+      }
+    }
+    await walk(dirHandle, '');
+    out.sort((a,b) => a.name.localeCompare(b.name, 'zh-Hant'));
+    return out;
+  }
+
+  function scanFileList(fileList, exts){
+    const out = [];
+    for (const file of fileList){
+      const relPath = file.webkitRelativePath || file.name;
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (exts.includes(ext)) out.push(wrapRawFile(relPath, file));
+    }
+    out.sort((a,b) => a.name.localeCompare(b.name, 'zh-Hant'));
+    return out;
+  }
+
+  function folderKeyFromFiles(files){
+    return files.length + ':' + (files[0] ? files[0].name : '') + ':' + (files[files.length-1] ? files[files.length-1].name : '');
+  }
+
+  /* ---------------------------------------------------------------
+     Order building
+  --------------------------------------------------------------- */
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function buildOrder(n, mode){
+    const idx = Array.from({length:n}, (_,i)=>i);
+    return mode === 'random' ? shuffle(idx) : idx;
+  }
+
+  /* ---------------------------------------------------------------
+     UI: Start screen wiring
+  --------------------------------------------------------------- */
+  const photoStatusEl = document.getElementById('photo-status');
+  const musicStatusEl = document.getElementById('music-status');
+  const pickPhotosBtn = document.getElementById('pick-photos');
+  const pickMusicBtn = document.getElementById('pick-music');
+  const startActionBtn = document.getElementById('start-action');
+  const photoFallbackInput = document.getElementById('photo-input-fallback');
+  const musicFallbackInput = document.getElementById('music-input-fallback');
+  const orderToggle = document.getElementById('order-toggle');
+  const durationRange = document.getElementById('duration-range');
+  const durationLabel = document.getElementById('duration-label');
+  const zoomRange = document.getElementById('zoom-range');
+  const zoomLabel = document.getElementById('zoom-label');
+  const resumeBanner = document.getElementById('resume-banner');
+  const resumeText = document.getElementById('resume-text');
+  const resumeContinueBtn = document.getElementById('resume-continue');
+  const resumeRestartBtn = document.getElementById('resume-restart');
+
+  let pendingResume = null; // saved progress object, if usable
+
+  function updateStartButton(){
+    startActionBtn.disabled = state.photoFiles.length === 0;
+  }
+
+  function setOrderModeUI(mode){
+    state.orderMode = mode;
+    [orderToggle, document.getElementById('order-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    });
+    document.getElementById('order-lb').textContent = mode === 'random' ? '隨機' : '循序';
+  }
+
+  orderToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setOrderModeUI(btn.dataset.mode);
+    saveSettings();
+  });
+
+  durationRange.addEventListener('input', () => {
+    state.duration = parseInt(durationRange.value, 10);
+    durationLabel.textContent = state.duration + ' 秒';
+    document.getElementById('duration-range-2').value = state.duration;
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    saveSettings();
+  });
+
+  function setZoomUI(zoom){
+    state.zoom = zoom;
+    const pct = Math.round(zoom * 100);
+    zoomRange.value = pct;
+    zoomLabel.textContent = pct + '%';
+    document.getElementById('zoom-range-2').value = pct;
+    document.getElementById('zoom-label-2').textContent = pct + '%';
+  }
+  zoomRange.addEventListener('input', () => {
+    setZoomUI(parseInt(zoomRange.value, 10) / 100);
+    saveSettings();
+    if (stageEl.style.display === 'block') layoutAndPan(currentVisibleLayer());
+  });
+
+  function setOriginalFirstUI(on){
+    state.showOriginalFirst = !!on;
+    [document.getElementById('original-toggle'), document.getElementById('original-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', (b.dataset.val === 'on') === state.showOriginalFirst));
+    });
+  }
+  [document.getElementById('original-toggle'), document.getElementById('original-toggle-2')].forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      setOriginalFirstUI(btn.dataset.val === 'on');
+      saveSettings();
+    });
+  });
+
+  function setHqZoomUI(on){
+    state.highQualityZoom = !!on;
+    [document.getElementById('hq-toggle'), document.getElementById('hq-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', (b.dataset.val === 'on') === state.highQualityZoom));
+    });
+  }
+  [document.getElementById('hq-toggle'), document.getElementById('hq-toggle-2')].forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      setHqZoomUI(btn.dataset.val === 'on');
+      saveSettings();
+      if (stageEl.style.display === 'block') layoutAndPan(currentVisibleLayer());
+    });
+  });
+
+  /* Restore last-used settings (duration/order/volume/zoom) so they
+     carry over across sessions regardless of which folder is loaded. */
+  (function applySavedSettings(){
+    const s = loadSettings();
+    if (!s) return;
+    if (s.duration) { state.duration = s.duration; durationRange.value = s.duration; durationLabel.textContent = s.duration + ' 秒'; }
+    if (s.orderMode) setOrderModeUI(s.orderMode);
+    if (typeof s.volume === 'number') state.volume = s.volume;
+    if (typeof s.zoom === 'number') setZoomUI(s.zoom);
+    if (typeof s.showOriginalFirst === 'boolean') setOriginalFirstUI(s.showOriginalFirst);
+    if (typeof s.highQualityZoom === 'boolean') setHqZoomUI(s.highQualityZoom);
+  })();
+
+  async function choosePhotoFolder(){
+    if (HAS_FS_ACCESS){
+      try{
+        const dirHandle = await window.showDirectoryPicker({ id: 'photos', mode: 'read' });
+        await idbSet('photoDir', dirHandle);
+        await loadPhotosFromHandle(dirHandle);
+      }catch(err){ /* user cancelled */ }
+    } else {
+      photoFallbackInput.click();
+    }
+  }
+  async function chooseMusicFolder(){
+    if (HAS_FS_ACCESS){
+      try{
+        const dirHandle = await window.showDirectoryPicker({ id: 'music', mode: 'read' });
+        await idbSet('musicDir', dirHandle);
+        await loadMusicFromHandle(dirHandle);
+      }catch(err){ /* user cancelled */ }
+    } else {
+      musicFallbackInput.click();
+    }
+  }
+
+  async function loadPhotosFromHandle(dirHandle){
+    const files = await scanDirHandle(dirHandle, PHOTO_EXT);
+    state.photoFiles = files;
+    state.photoDirLabel = dirHandle.name;
+    state.photoDirKey = folderKeyFromFiles(files);
+    photoStatusEl.textContent = files.length ? (dirHandle.name + '（' + files.length + ' 張）') : '找不到相片';
+    pickPhotosBtn.classList.toggle('ready', files.length > 0);
+    updateStartButton();
+  }
+  async function loadMusicFromHandle(dirHandle){
+    const files = await scanDirHandle(dirHandle, MUSIC_EXT);
+    state.musicFiles = files;
+    state.musicDirLabel = dirHandle.name;
+    state.musicDirKey = folderKeyFromFiles(files);
+    musicStatusEl.textContent = files.length ? (dirHandle.name + '（' + files.length + ' 首）') : '找不到音樂';
+    pickMusicBtn.classList.toggle('ready', files.length > 0);
+  }
+
+  pickPhotosBtn.addEventListener('click', choosePhotoFolder);
+  pickMusicBtn.addEventListener('click', chooseMusicFolder);
+
+  photoFallbackInput.addEventListener('change', () => {
+    const files = scanFileList(photoFallbackInput.files, PHOTO_EXT);
+    state.photoFiles = files;
+    const folderName = photoFallbackInput.files[0] ? photoFallbackInput.files[0].webkitRelativePath.split('/')[0] : '相片資料夾';
+    state.photoDirLabel = folderName;
+    state.photoDirKey = folderName + '|' + folderKeyFromFiles(files);
+    photoStatusEl.textContent = files.length ? (folderName + '（' + files.length + ' 張）') : '找不到相片';
+    pickPhotosBtn.classList.toggle('ready', files.length > 0);
+    updateStartButton();
+  });
+  musicFallbackInput.addEventListener('change', () => {
+    const files = scanFileList(musicFallbackInput.files, MUSIC_EXT);
+    state.musicFiles = files;
+    const folderName = musicFallbackInput.files[0] ? musicFallbackInput.files[0].webkitRelativePath.split('/')[0] : '音樂資料夾';
+    state.musicDirLabel = folderName;
+    state.musicDirKey = folderName + '|' + folderKeyFromFiles(files);
+    musicStatusEl.textContent = files.length ? (folderName + '（' + files.length + ' 首）') : '找不到音樂';
+    pickMusicBtn.classList.toggle('ready', files.length > 0);
+  });
+
+  /* ---------------------------------------------------------------
+     Attempt auto-resume on load (File System Access browsers only,
+     since handles persist there). Fallback browsers show the note
+     but still auto-match progress once the user reselects folders.
+  --------------------------------------------------------------- */
+  async function tryAutoDetectSavedHandles(){
+    if (!HAS_FS_ACCESS) return;
+    const photoHandle = await idbGet('photoDir');
+    const musicHandle = await idbGet('musicDir');
+    if (!photoHandle) return;
+
+    let granted = true;
+    try{
+      const perm = await photoHandle.queryPermission({ mode:'read' });
+      granted = perm === 'granted';
+    }catch(e){ granted = false; }
+
+    const progress = loadProgress();
+    resumeText.textContent = '上次播放：「' + photoHandle.name + '」';
+    resumeBanner.style.display = 'flex';
+
+    resumeContinueBtn.addEventListener('click', async () => {
+      try{
+        const perm = await photoHandle.requestPermission({ mode:'read' });
+        if (perm !== 'granted'){ alert('需要授權才能讀取資料夾'); return; }
+        await loadPhotosFromHandle(photoHandle);
+        if (musicHandle){
+          await musicHandle.requestPermission({ mode:'read' });
+          await loadMusicFromHandle(musicHandle);
+        }
+        pendingResume = progress;
+        beginPlayback(true);
+      }catch(err){ console.error(err); }
+    }, { once:true });
+
+    resumeRestartBtn.addEventListener('click', async () => {
+      try{
+        const perm = await photoHandle.requestPermission({ mode:'read' });
+        if (perm === 'granted'){
+          await loadPhotosFromHandle(photoHandle);
+          if (musicHandle){
+            await musicHandle.requestPermission({ mode:'read' });
+            await loadMusicFromHandle(musicHandle);
+          }
+        }
+      }catch(err){ console.error(err); }
+      resumeBanner.style.display = 'none';
+    }, { once:true });
+  }
+  tryAutoDetectSavedHandles();
+
+  /* For fallback (no FS Access), check if a previous progress record
+     exists so we can offer resume once folders are (re)selected. */
+  function maybeApplySavedProgressForFallback(){
+    if (HAS_FS_ACCESS) return;
+    const progress = loadProgress();
+    if (!progress) return;
+    if (progress.photoDirKey && progress.photoDirKey === state.photoDirKey){
+      pendingResume = progress;
+    }
+  }
+
+  startActionBtn.addEventListener('click', () => {
+    maybeApplySavedProgressForFallback();
+    beginPlayback(!!pendingResume && pendingResume.photoDirKey === state.photoDirKey);
+  });
+
+  /* ---------------------------------------------------------------
+     Playback engine
+  --------------------------------------------------------------- */
+  const stageEl = document.getElementById('stage');
+  const startScreenEl = document.getElementById('start-screen');
+  const layerA = document.getElementById('layer-a');
+  const layerB = document.getElementById('layer-b');
+  const emptyNote = document.getElementById('empty-note');
+  const audioEl = document.getElementById('audio-player');
+  const counterText = document.getElementById('counter-text');
+  const progressFill = document.getElementById('progress-fill');
+  const playBtn = document.getElementById('play-btn');
+  const playIcon = document.getElementById('play-icon');
+  const muteBtn = document.getElementById('mute-btn');
+  const muteIcon = document.getElementById('mute-icon');
+
+  function currentVisibleLayer(){
+    return state.activeLayer === 'a' ? layerA : layerB;
+  }
+
+  function beginPlayback(useResume){
+    if (state.photoFiles.length === 0) return;
+
+    if (useResume && pendingResume){
+      state.orderMode = pendingResume.orderMode || state.orderMode;
+      state.duration = pendingResume.duration || state.duration;
+      state.volume = (typeof pendingResume.volume === 'number') ? pendingResume.volume : state.volume;
+      state.photoOrder = (pendingResume.photoOrder && pendingResume.photoOrder.length === state.photoFiles.length)
+        ? pendingResume.photoOrder : buildOrder(state.photoFiles.length, state.orderMode);
+      state.photoPos = Math.min(pendingResume.photoPos || 0, state.photoOrder.length - 1);
+      if (state.musicFiles.length){
+        state.musicOrder = (pendingResume.musicOrder && pendingResume.musicOrder.length === state.musicFiles.length)
+          ? pendingResume.musicOrder : buildOrder(state.musicFiles.length, state.orderMode);
+        state.musicPos = Math.min(pendingResume.musicPos || 0, state.musicOrder.length - 1);
+      }
+    } else {
+      state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+      state.photoPos = 0;
+      if (state.musicFiles.length){
+        state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+        state.musicPos = 0;
+      }
+    }
+
+    setOrderModeUI(state.orderMode);
+    document.getElementById('duration-range-2').value = state.duration;
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    document.getElementById('volume-range').value = Math.round(state.volume * 100);
+    document.getElementById('volume-label').textContent = Math.round(state.volume * 100) + '%';
+    setZoomUI(state.zoom);
+    audioEl.volume = state.volume;
+
+    startScreenEl.style.display = 'none';
+    stageEl.style.display = 'block';
+
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen){
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    state.playing = true;
+    showPhoto(state.photoOrder[state.photoPos]);
+    if (state.musicFiles.length){
+      playMusicTrack(state.musicOrder[state.musicPos], useResume ? (pendingResume.musicTime || 0) : 0);
+    }
+    persistNow();
+    resetControlsHideTimer();
+  }
+
+  function persistNow(extra){
+    saveProgress(Object.assign({
+      photoDirKey: state.photoDirKey,
+      musicDirKey: state.musicDirKey,
+      photoOrder: state.photoOrder,
+      musicOrder: state.musicOrder,
+      photoPos: state.photoPos,
+      musicPos: state.musicPos,
+      musicTime: audioEl.currentTime || 0,
+      orderMode: state.orderMode,
+      duration: state.duration,
+      volume: state.volume,
+    }, extra || {}));
+  }
+  setInterval(() => { if (state.playing) persistNow(); }, 5000);
+
+  /* ---- Photo display + directional pan ---- */
+  /* Fit the whole photo within the screen (letterboxed if needed),
+     centered, with no cropping and no pan — used for the optional
+     "show original first" preview. */
+  function fitContain(img){
+    if (state.panAnim){ state.panAnim.cancel(); state.panAnim = null; }
+    const cw = window.innerWidth, ch = window.innerHeight;
+    const nw = img.naturalWidth, nh = img.naturalHeight;
+    if (!nw || !nh) return;
+    const scale = Math.min(cw / nw, ch / nh);
+    const drawW = nw * scale, drawH = nh * scale;
+    img.style.width = drawW + 'px';
+    img.style.height = drawH + 'px';
+    img.style.left = ((cw - drawW) / 2) + 'px';
+    img.style.top = ((ch - drawH) / 2) + 'px';
+    img.style.transform = 'translate(0px,0px)';
+  }
+
+  /* Crossfade the given image url onto whichever layer is currently
+     hidden, laying it out either as the full "original" (mode:
+     'contain') or the cover+zoom pan ('zoom'). Returns how long this
+     frame should stay on screen. */
+  async function renderFrame(url, mode){
+    const incoming = state.activeLayer === 'a' ? layerB : layerA;
+    const outgoing = state.activeLayer === 'a' ? layerA : layerB;
+
+    await new Promise((resolve) => {
+      incoming.onload = resolve;
+      incoming.src = url;
+    });
+    incoming._masterNW = incoming.naturalWidth;
+    incoming._masterNH = incoming.naturalHeight;
+    incoming._masterCanvas = null; // cleared so HQ redraw rebuilds from this fresh pristine bitmap
+
+    let slotMs;
+    if (mode === 'contain'){
+      fitContain(incoming);
+      slotMs = ORIGINAL_VIEW_MS;
+    } else {
+      slotMs = layoutAndPan(incoming);
+    }
+
+    incoming.classList.add('visible');
+    outgoing.classList.remove('visible');
+    state.activeLayer = state.activeLayer === 'a' ? 'b' : 'a';
+
+    return slotMs;
+  }
+
+  async function showPhoto(fileIndex){
+    const fileObj = state.photoFiles[fileIndex];
+    if (!fileObj) return;
+    let file;
+    try{ file = await fileObj.getFile(); }
+    catch(err){ console.error(err); return; }
+
+    const url = URL.createObjectURL(file);
+    if (state.currentObjectUrl) URL.revokeObjectURL(state.currentObjectUrl);
+    state.currentObjectUrl = url;
+
+    counterText.textContent = (state.photoPos + 1) + ' / ' + state.photoOrder.length;
+
+    const wantsOriginalFirst = state.showOriginalFirst && (state.zoom || 1) > 1.02;
+
+    if (wantsOriginalFirst){
+      await renderFrame(url, 'contain');
+      if (state.playing) scheduleTimer(ORIGINAL_VIEW_MS, () => switchToZoomed(url));
+    } else {
+      const slotMs = await renderFrame(url, 'zoom');
+      if (state.playing) scheduleNextPhoto(slotMs);
+    }
+  }
+
+  async function switchToZoomed(url){
+    const slotMs = await renderFrame(url, 'zoom');
+    if (state.playing) scheduleNextPhoto(slotMs);
+  }
+
+  /* Fit the photo so it covers the whole screen (whichever dimension is
+     the tighter constraint is matched exactly, the other overflows),
+     then apply the user's extra zoom on top, always keeping aspect
+     ratio. If the result overflows only one axis, pan smoothly across
+     that axis (left->right for width, bottom->top for height). If it
+     overflows both axes (typically once zoom is increased), sweep in
+     a "Z" / boustrophedon pattern: left->right, step up, right->left,
+     step up, and so on, until the whole photo has been shown. */
+  /* Keep a detached, never-mutated copy of the photo's pristine pixels
+     so repeated high-quality redraws (zoom slider drags, window
+     resizes) always resample from the original file, not from an
+     already-processed canvas output (which would compound blur). */
+  function getMasterCanvas(img){
+    if (img._masterCanvas) return img._masterCanvas;
+    const c = document.createElement('canvas');
+    c.width = img._masterNW || img.naturalWidth;
+    c.height = img._masterNH || img.naturalHeight;
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    img._masterCanvas = c;
+    return c;
+  }
+
+  /* Re-render the photo through a canvas with high-quality smoothing at
+     the exact on-screen pixel size (accounting for device pixel ratio),
+     instead of letting the browser stretch the original bitmap via CSS.
+     This can look noticeably sharper once zoomed in, though it can only
+     resample existing detail — it can't invent resolution the source
+     photo doesn't have. */
+  function applyHighQualityRender(img, targetW, targetH){
+    try{
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const outW = Math.min(Math.round(targetW * dpr), 2400);
+      const outH = Math.min(Math.round(targetH * dpr), 2400);
+      if (outW < 4 || outH < 4) return;
+      const master = getMasterCanvas(img);
+      const canvas = document.createElement('canvas');
+      canvas.width = outW; canvas.height = outH;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(master, 0, 0, outW, outH);
+      img.src = canvas.toDataURL('image/png');
+    } catch(e){ /* canvas unavailable or failed; keep the normal rendering */ }
+  }
+
+  function layoutAndPan(img){
+    if (state.panAnim){ state.panAnim.cancel(); state.panAnim = null; }
+    const cw = window.innerWidth, ch = window.innerHeight;
+    const nw = img._masterNW || img.naturalWidth, nh = img._masterNH || img.naturalHeight;
+    const configuredMs = state.duration * 1000;
+    if (!nw || !nh) return configuredMs;
+
+    const coverScale = Math.max(cw / nw, ch / nh);
+    const scale = coverScale * (state.zoom || 1);
+    const drawW = nw * scale, drawH = nh * scale;
+    img.style.width = drawW + 'px';
+    img.style.height = drawH + 'px';
+    img.style.left = '0px';
+    img.style.top = '0px';
+
+    if (state.highQualityZoom) applyHighQualityRender(img, drawW, drawH);
+
+    const overflowX = Math.max(0, drawW - cw);
+    const overflowY = Math.max(0, drawH - ch);
+
+    if (overflowX <= 4 && overflowY <= 4){
+      img.style.transform = 'translate(0px,0px)';
+      return configuredMs;
+    }
+
+    const rows = overflowY > 4 ? Math.max(2, Math.ceil(drawH / ch)) : 1;
+
+    // Build the raster path: viewX (0..overflowX) sweeps left/right per
+    // row, viewY (overflowY..0) steps from bottom row to top row.
+    const waypoints = [];
+    for (let i = 0; i < rows; i++){
+      const y = rows > 1 ? overflowY * (1 - i / (rows - 1)) : 0;
+      const xStart = i % 2 === 0 ? 0 : overflowX;
+      const xEnd   = i % 2 === 0 ? overflowX : 0;
+      if (i === 0) waypoints.push({ x:xStart, y });
+      waypoints.push({ x:xEnd, y });
+      if (i < rows - 1){
+        const yNext = overflowY * (1 - (i+1) / (rows - 1));
+        waypoints.push({ x:xEnd, y:yNext });
+      }
+    }
+    // drop zero-length duplicate points (e.g. a row with no horizontal overflow)
+    const pts = [waypoints[0]];
+    for (let i = 1; i < waypoints.length; i++){
+      const prev = pts[pts.length - 1];
+      if (Math.abs(waypoints[i].x - prev.x) > 0.5 || Math.abs(waypoints[i].y - prev.y) > 0.5) pts.push(waypoints[i]);
+    }
+
+    if (pts.length < 2){
+      img.style.transform = 'translate(' + (-pts[0].x) + 'px,' + (-pts[0].y) + 'px)';
+      return configuredMs;
+    }
+
+    const dist = [0];
+    for (let i = 1; i < pts.length; i++){
+      dist.push(dist[i-1] + Math.abs(pts[i].x - pts[i-1].x) + Math.abs(pts[i].y - pts[i-1].y));
+    }
+    const total = dist[dist.length - 1] || 1;
+    const keyframes = pts.map((p, i) => ({
+      transform: 'translate(' + (-p.x) + 'px,' + (-p.y) + 'px)',
+      offset: dist[i] / total,
+    }));
+    keyframes[0].offset = 0;
+    keyframes[keyframes.length - 1].offset = 1;
+
+    // Keep the pan speed roughly constant no matter how much the zoom
+    // level increases the distance to travel: the "每張秒數" setting
+    // defines the pace (screen-widths per second), not a hard deadline.
+    // A photo that needs more distance to fully reveal gets more time
+    // instead of panning faster.
+    const baseAnimMs = Math.max(configuredMs - 900, 400);
+    const pacePxPerSec = (8 * Math.min(cw, ch)) / (state.duration || 8);
+    const neededMs = (total / pacePxPerSec) * 1000;
+    const animMs = Math.max(baseAnimMs, neededMs);
+
+    state.panAnim = img.animate(keyframes, { duration: animMs, easing: 'linear', fill: 'forwards' });
+    return animMs + 900;
+  }
+
+  window.addEventListener('resize', () => {
+    const activeImg = currentVisibleLayer();
+    if (activeImg.src) layoutAndPan(activeImg);
+  });
+
+  /* Generic pending-action timer: whatever should happen next (switch
+     to the zoomed view, or advance to the next photo) is stored as
+     state.pendingAction so pause/resume can re-run the same step
+     rather than always assuming "advance to next photo". */
+  function scheduleTimer(ms, action){
+    clearTimeout(state.timerHandle);
+    state.timerStartedAt = Date.now();
+    state.timerRemainingMs = ms;
+    state.pendingAction = action;
+    animateProgressBar(ms);
+    state.timerHandle = setTimeout(action, ms);
+  }
+  function scheduleNextPhoto(ms){
+    scheduleTimer(ms, () => advancePhoto(1));
+  }
+
+  let progressRAF = null;
+  function animateProgressBar(totalMs){
+    cancelAnimationFrame(progressRAF);
+    const start = performance.now();
+    function step(now){
+      if (!state.playing) return;
+      const elapsed = now - start;
+      const pct = Math.min(100, (elapsed/totalMs)*100);
+      progressFill.style.width = pct + '%';
+      if (pct < 100) progressRAF = requestAnimationFrame(step);
+    }
+    progressRAF = requestAnimationFrame(step);
+  }
+
+  function advancePhoto(dir){
+    if (state.photoOrder.length === 0) return;
+    clearTimeout(state.timerHandle);
+    state.photoPos = (state.photoPos + dir + state.photoOrder.length) % state.photoOrder.length;
+    showPhoto(state.photoOrder[state.photoPos]);
+    persistNow();
+  }
+
+  /* ---- Music ---- */
+  async function playMusicTrack(fileIndex, startAt){
+    const fileObj = state.musicFiles[fileIndex];
+    if (!fileObj) return;
+    const file = await fileObj.getFile();
+    const url = URL.createObjectURL(file);
+    audioEl.src = url;
+    audioEl.volume = state.muted ? 0 : state.volume;
+    audioEl.currentTime = startAt || 0;
+    if (state.playing){
+      audioEl.play().catch(()=>{ /* needs a user gesture on some browsers */ });
+    }
+  }
+  audioEl.addEventListener('ended', () => {
+    if (state.musicOrder.length === 0) return;
+    state.musicPos = (state.musicPos + 1) % state.musicOrder.length;
+    playMusicTrack(state.musicOrder[state.musicPos], 0);
+    persistNow();
+  });
+
+  /* ---- Transport controls ---- */
+  function setPlaying(playing){
+    state.playing = playing;
+    playIcon.textContent = playing ? '⏸' : '▶';
+    playBtn.querySelector('.lb').textContent = playing ? '暫停' : '播放';
+    if (playing){
+      const remaining = Math.max(state.timerRemainingMs - (Date.now() - state.timerStartedAt), 200);
+      if (state.pendingAction) scheduleTimer(remaining, state.pendingAction);
+      if (state.panAnim) state.panAnim.play();
+      if (audioEl.src) audioEl.play().catch(()=>{});
+    } else {
+      clearTimeout(state.timerHandle);
+      state.timerRemainingMs = Math.max(state.timerRemainingMs - (Date.now() - state.timerStartedAt), 0);
+      cancelAnimationFrame(progressRAF);
+      if (state.panAnim) state.panAnim.pause();
+      audioEl.pause();
+    }
+    persistNow();
+  }
+
+  playBtn.addEventListener('click', () => setPlaying(!state.playing));
+  document.getElementById('prev-btn').addEventListener('click', () => advancePhoto(-1));
+  document.getElementById('next-btn').addEventListener('click', () => advancePhoto(1));
+
+  document.getElementById('order-btn').addEventListener('click', () => {
+    const newMode = state.orderMode === 'random' ? 'sequential' : 'random';
+    applyOrderMode(newMode);
+  });
+  function applyOrderMode(mode){
+    state.orderMode = mode;
+    setOrderModeUI(mode);
+    // rebuild order arrays but keep the currently shown item first
+    const curPhoto = state.photoOrder[state.photoPos];
+    state.photoOrder = buildOrder(state.photoFiles.length, mode);
+    state.photoPos = Math.max(0, state.photoOrder.indexOf(curPhoto));
+    if (state.musicFiles.length){
+      const curMusic = state.musicOrder[state.musicPos];
+      state.musicOrder = buildOrder(state.musicFiles.length, mode);
+      state.musicPos = Math.max(0, state.musicOrder.indexOf(curMusic));
+    }
+    persistNow();
+  }
+
+  muteBtn.addEventListener('click', () => {
+    state.muted = !state.muted;
+    audioEl.volume = state.muted ? 0 : state.volume;
+    muteIcon.textContent = state.muted ? '🔇' : '🔊';
+    muteBtn.classList.toggle('on', state.muted);
+  });
+
+  document.getElementById('fullscreen-btn').addEventListener('click', () => {
+    if (!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen().catch(()=>{});
+    }
+  });
+
+  /* ---- Settings panel ---- */
+  const settingsPanel = document.getElementById('settings-panel');
+  document.getElementById('gear-btn').addEventListener('click', () => {
+    settingsPanel.style.display = 'flex';
+    setPlaying(false);
+  });
+  document.getElementById('close-settings').addEventListener('click', () => {
+    settingsPanel.style.display = 'none';
+    setPlaying(true);
+  });
+  document.getElementById('duration-range-2').addEventListener('input', (e) => {
+    state.duration = parseInt(e.target.value, 10);
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    durationRange.value = state.duration;
+    durationLabel.textContent = state.duration + ' 秒';
+    saveSettings();
+  });
+  document.getElementById('order-toggle-2').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    applyOrderMode(btn.dataset.mode);
+    saveSettings();
+  });
+  document.getElementById('volume-range').addEventListener('input', (e) => {
+    state.volume = parseInt(e.target.value, 10) / 100;
+    document.getElementById('volume-label').textContent = Math.round(state.volume*100) + '%';
+    if (!state.muted) audioEl.volume = state.volume;
+    saveSettings();
+  });
+  document.getElementById('zoom-range-2').addEventListener('input', (e) => {
+    setZoomUI(parseInt(e.target.value, 10) / 100);
+    saveSettings();
+    layoutAndPan(currentVisibleLayer());
+  });
+  document.getElementById('reselect-photos').addEventListener('click', async () => {
+    await choosePhotoFolder();
+    state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+    state.photoPos = 0;
+    showPhoto(state.photoOrder[0]);
+    persistNow();
+  });
+  document.getElementById('reselect-music').addEventListener('click', async () => {
+    await chooseMusicFolder();
+    state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+    state.musicPos = 0;
+    playMusicTrack(state.musicOrder[0], 0);
+    persistNow();
+  });
+
+  /* ---- Auto-hide controls ---- */
+  const controlsOverlay = document.getElementById('controls-overlay');
+  let hideTimer = null;
+  function resetControlsHideTimer(){
+    controlsOverlay.classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (settingsPanel.style.display !== 'flex') controlsOverlay.classList.add('hidden');
+    }, 4000);
+  }
+  ['mousemove','touchstart','click'].forEach(evt => {
+    stageEl.addEventListener(evt, resetControlsHideTimer);
+  });
+
+  /* ---- Keyboard shortcuts (desktop) ---- */
+  document.addEventListener('keydown', (e) => {
+    if (stageEl.style.display !== 'block') return;
+    if (e.code === 'Space'){ e.preventDefault(); setPlaying(!state.playing); }
+    else if (e.code === 'ArrowRight'){ advancePhoto(1); }
+    else if (e.code === 'ArrowLeft'){ advancePhoto(-1); }
+    else if (e.key === 'f' || e.key === 'F'){ document.getElementById('fullscreen-btn').click(); }
+    else if (e.key === 'm' || e.key === 'M'){ muteBtn.click(); }
+  });
+
+  /* ---- Save progress before leaving ---- */
+  window.addEventListener('beforeunload', () => persistNow());
+
+})();
+</script>
+</body>
+</html>
