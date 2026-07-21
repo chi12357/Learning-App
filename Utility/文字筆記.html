@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>文字筆記本</title>
-    <!-- 不使用外部字體，避免載入延遲 -->
     <style>
         /* ===== 全域 ===== */
         * {
@@ -52,7 +51,7 @@
             -webkit-user-select: none;
             position: relative;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.2s ease;
         }
         body.loaded {
             opacity: 1;
@@ -495,7 +494,7 @@
             outline: 2px solid var(--gold);
             outline-offset: 2px;
         }
-        /* 初始載入動畫 */
+        /* 啟動時快速顯示 */
         .splash {
             display: none;
         }
@@ -649,14 +648,16 @@
             });
 
             // ========== 核心功能 ==========
-            // 延遲加載數據，讓界面先渲染
-            setTimeout(() => {
-                initApp();
-            }, 50);
+            // 使用 requestAnimationFrame 確保 UI 先渲染
+            requestAnimationFrame(() => {
+                setTimeout(() => {
+                    initApp();
+                }, 50); // 稍微延長延遲，給渲染更多時間
+            });
 
             // ---------- 狀態 ----------
-            const STATE_KEY = 'notebook_data_v10';
-            const SETTINGS_KEY = 'notebook_settings_v10';
+            const STATE_KEY = 'notebook_data_v12';
+            const SETTINGS_KEY = 'notebook_settings_v12';
 
             let state = {
                 pages: [],
@@ -812,7 +813,7 @@
                 historyMap[id] = { stack: [''], index: 0, max: 80 };
             }
 
-            // ---------- 檔案儲存 ----------
+            // ---------- 檔案儲存 (優化：不自動加擴展名) ----------
             async function savePage(page) {
                 if (!page) return;
                 const content = page.content || editor.value;
@@ -840,10 +841,11 @@
 
                 if (usingFileAPI) {
                     try {
+                        // 不指定 types，避免瀏覽器自動添加擴展名
                         const suggested = page.fileName || page.title;
                         const opts = {
-                            suggestedName: suggested,
-                            types: [{ description: '文字檔案', accept: { 'text/plain': ['.txt', '.md', '.html'] } }]
+                            suggestedName: suggested
+                            // 不傳 types，用戶可自由命名
                         };
                         const handle = await window.showSaveFilePicker(opts);
                         page.fileHandle = handle;
@@ -867,7 +869,7 @@
                     }
                 }
 
-                // 降級下載
+                // 降級下載（不自動加擴展名）
                 const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -999,6 +1001,10 @@
                         e.stopPropagation();
                         const newName = prompt('重新命名分頁：', page.title);
                         if (newName !== null && newName.trim()) {
+                            // 若無關聯檔案，更新 fileName 為新標題（不帶擴展名）
+                            if (!page.fileHandle) {
+                                page.fileName = newName.trim();
+                            }
                             page.title = newName.trim();
                             saveState();
                             renderTabs();
@@ -1015,6 +1021,9 @@
                         e.preventDefault();
                         const newName = prompt('重新命名分頁：', page.title);
                         if (newName !== null && newName.trim()) {
+                            if (!page.fileHandle) {
+                                page.fileName = newName.trim();
+                            }
                             page.title = newName.trim();
                             saveState();
                             renderTabs();
@@ -1178,18 +1187,18 @@
 
                 // 檢查當前行是否有編號
                 const match = currentLine.match(/^(\s*)(\d+)\.\s*/);
-                if (!match) return; // 無編號則不處理
+                if (!match) return;
 
                 const indent = match[1];
                 const indentLen = indent.length;
 
                 // 向上查找同縮進級別的所有編號，取最大值
                 let maxNum = 0;
-                let searchPos = lineStart; // 從當前行開始（包括自己）
+                let searchPos = cursorPos;
                 while (searchPos >= 0) {
                     const prevLineStart = text.lastIndexOf('\n', searchPos - 1);
                     const start = prevLineStart === -1 ? 0 : prevLineStart + 1;
-                    const line = text.substring(start, searchPos); // 不含換行
+                    const line = text.substring(start, searchPos);
                     const m = line.match(/^(\s*)(\d+)\.\s*/);
                     if (m && m[1].length === indentLen) {
                         const num = parseInt(m[2], 10);
@@ -1199,10 +1208,7 @@
                     if (searchPos < 0) break;
                 }
 
-                // 新編號 = maxNum + 1
                 const newNum = maxNum + 1;
-
-                // 插入新行，縮進與當前行相同
                 const newLine = '\n' + indent + newNum + '. ';
                 const before = text.substring(0, cursorPos);
                 const after = text.substring(cursorPos);
@@ -1465,6 +1471,10 @@
                 if (!page) return;
                 const newName = tabTitleInput.value.trim();
                 if (!newName) { showToast('請輸入標題'); return; }
+                // 若無關聯檔案，更新 fileName 為新標題（不帶擴展名）
+                if (!page.fileHandle) {
+                    page.fileName = newName;
+                }
                 page.title = newName;
                 saveState();
                 renderTabs();
@@ -1602,10 +1612,13 @@
                     }
                 }, 30000);
 
-                // 延遲顯示提示，確保一切就緒
+                // 延遲顯示提示
                 setTimeout(() => { showToast('📝 筆記本已就緒', 1200); }, 500);
                 console.log('📝 文字筆記本已啟動 | 分頁數:', state.pages.length);
             }
+
+            // 啟動完成後，如有卡頓，可嘗試清除 localStorage 或重新安裝
+            // 我們在回答中建議用戶清除快取或使用最新 Chrome
 
         })();
     </script>
