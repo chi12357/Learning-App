@@ -183,11 +183,6 @@
     border:none; background:var(--accent); color:var(--bg); font-weight:900;
     font-size:17px; cursor:pointer; font-family:inherit;
   }
-  #exit-app-btn{
-    align-self:center; margin-top:2px; padding:10px 26px; border-radius:999px;
-    border:1.5px solid var(--accent2); background:transparent; color:var(--accent2);
-    font-weight:700; font-size:15px; cursor:pointer; font-family:inherit;
-  }
 
   @media (max-width:520px){
     :root{ --ctrl-size:60px; }
@@ -211,7 +206,7 @@
       </button>
       <button class="big-btn" id="pick-photos-library" style="display:none;">
         <span class="icon">📷</span>
-        <span>從照片圖庫選相簿</span>
+        <span>選擇相片（從照片圖庫）</span>
         <span class="status" id="photo-library-status">尚未選擇</span>
       </button>
       <button class="big-btn" id="pick-music">
@@ -220,6 +215,8 @@
         <span class="status" id="music-status">尚未選擇</span>
       </button>
     </div>
+
+    <button id="start-action" disabled>開始播放</button>
 
     <div class="option-row">
       <div class="option-group">
@@ -255,7 +252,6 @@
       </div>
     </div>
 
-    <button id="start-action" disabled>開始播放</button>
     <p id="support-note"></p>
 
     <!-- hidden fallback inputs for browsers without File System Access API -->
@@ -345,7 +341,6 @@
           <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>重新選音樂資料夾</span></button>
         </div>
         <button id="close-settings">關閉設定</button>
-        <button id="exit-app-btn">結束播放並離開</button>
       </div>
     </div>
   </div>
@@ -400,10 +395,12 @@
   const supportNote = document.getElementById('support-note');
   supportNote.textContent = HAS_FS_ACCESS
     ? '此瀏覽器支援自動記住資料夾，下次開啟可直接繼續播放。'
-    : '此瀏覽器每次開啟需要重新選擇資料夾，但會自動接續上次播放的位置。';
+    : '此瀏覽器需要用「照片圖庫」選取相片：進入相簿後可以多選或全選，但無法整個相簿一鍵匯入，這是系統的限制。每次開啟需要重新選取，但會自動接續上次播放的位置。';
 
   if (!HAS_FS_ACCESS){
+    document.getElementById('pick-photos').style.display = 'none';
     document.getElementById('pick-photos-library').style.display = '';
+    document.getElementById('reselect-photos').style.display = 'none';
     document.getElementById('reselect-photos-library').style.display = '';
   }
 
@@ -1446,17 +1443,6 @@
   })();
 
   /* ---- Exit / close app ---- */
-  document.getElementById('exit-app-btn').addEventListener('click', () => {
-    if (!confirm('確定要結束播放並離開嗎？')) return;
-    setPlaying(false);
-    releaseWakeLock();
-    audioEl.pause();
-    if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
-    stageEl.style.display = 'none';
-    startScreenEl.style.display = 'flex';
-    settingsPanel.style.display = 'none';
-    window.close();
-  });
 
   /* ---- Keyboard shortcuts (desktop) ---- */
   document.addEventListener('keydown', (e) => {
