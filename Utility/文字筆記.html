@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>文字筆記本</title>
+    <!-- 不使用外部字體，避免載入延遲 -->
+    <style>
+        /* ===== 全域 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        :root {
+            --bg: #121315;
+            --primary: #942525;
+            --gold: #bd8b2a;
+            --text: #fcfbfa;
+            --text-dim: rgba(252, 251, 250, 0.6);
+            --surface: rgba(252, 251, 250, 0.06);
+            --surface-hover: rgba(252, 251, 250, 0.12);
+            --border: rgba(252, 251, 250, 0.12);
+            --radius: 14px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-en: var(--font-base);
+            --font-size-base: 20px;
+            --line-length: 100%;
+            --tab-height: 46px;
+            --toolbar-height: 52px;
+            --safe-bottom: env(safe-area-inset-bottom, 8px);
+        }
+        html {
+            font-size: var(--font-size-base);
+            font-family: var(--font-base);
+            background: var(--bg);
+            color: var(--text);
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            height: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-base);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
+            position: relative;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px 6px 12px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            min-height: 52px;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .app-title {
+            font-family: var(--font-en);
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: var(--text);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .app-title .accent { color: var(--gold); }
+        .app-title .sub { font-size: 0.5rem; color: var(--text-dim); font-weight: 400; }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .header-actions button {
+            background: var(--surface);
+            border: none;
+            color: var(--text);
+            font-size: 1.1rem;
+            padding: 6px 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-height: 40px;
+            min-width: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+        }
+        .header-actions button:active {
+            background: var(--surface-hover);
+            transform: scale(0.94);
+        }
+        .header-actions .btn-gold { background: var(--gold); color: #121315; }
+        .header-actions .btn-gold:active { background: #a67a24; }
+        .header-actions .btn-install {
+            background: #2b7a4b;
+            color: #fff;
+            font-size: 0.9rem;
+            padding: 4px 12px;
+            display: none;
+        }
+        .header-actions .btn-install:active { background: #1e5f3a; }
+
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: var(--toolbar-height);
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+            flex-wrap: nowrap;
+        }
+        .toolbar::-webkit-scrollbar { display: none; }
+        .toolbar button {
+            flex-shrink: 0;
+            background: var(--surface);
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            padding: 4px 10px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.2s;
+            min-height: 40px;
+            min-width: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            touch-action: manipulation;
+            position: relative;
+        }
+        .toolbar button:active {
+            background: var(--surface-hover);
+            transform: scale(0.94);
+        }
+        .toolbar button.btn-active {
+            background: var(--gold);
+            color: #121315;
+        }
+        .toolbar .separator {
+            width: 1px;
+            height: 28px;
+            background: var(--border);
+            flex-shrink: 0;
+            margin: 0 2px;
+        }
+        .toolbar button[title]::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            font-size: 0.6rem;
+            padding: 2px 8px;
+            border-radius: 8px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            font-family: var(--font-base);
+        }
+        .toolbar button:hover::after { opacity: 1; }
+        @media (max-width: 480px) {
+            .toolbar button { font-size: 1.1rem; min-height: 36px; min-width: 38px; padding: 2px 6px; }
+            .toolbar button[title]::after { display: none; }
+        }
+
+        .tabs-bar {
+            display: flex;
+            align-items: center;
+            padding: 2px 8px 0 8px;
+            background: var(--bg);
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            gap: 3px;
+            min-height: var(--tab-height);
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tabs-bar::-webkit-scrollbar { display: none; }
+        .tab-item {
+            flex-shrink: 0;
+            padding: 6px 8px 6px 12px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+            font-family: var(--font-base);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 150px;
+            min-height: 38px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            touch-action: manipulation;
+            position: relative;
+        }
+        .tab-item.active {
+            background: var(--surface);
+            color: var(--text);
+            font-weight: 600;
+        }
+        .tab-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--gold);
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-item .tab-label {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .tab-item .tab-close {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: background 0.2s;
+            touch-action: manipulation;
+            margin-left: 2px;
+        }
+        .tab-item .tab-close:active { background: var(--primary); color: #fff; }
+        .tab-add {
+            flex-shrink: 0;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 1px dashed var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            font-size: 22px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            margin-left: 2px;
+        }
+        .tab-add:active { background: var(--surface); transform: scale(0.92); }
+
+        .editor-wrapper {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            background: var(--bg);
+            padding: 0 10px 0 10px;
+        }
+        .editor-area {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: var(--text);
+            border: none;
+            outline: none;
+            resize: none;
+            font-family: var(--font-base);
+            font-size: 1rem;
+            line-height: 1.9;
+            padding: 12px 4px 20px 4px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-word;
+            tab-size: 4;
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+        }
+        .editor-area::placeholder { color: var(--text-dim); opacity: 0.5; }
+        .editor-line-wrap {
+            max-width: var(--line-length);
+            margin: 0 auto;
+            height: 100%;
+        }
+
+        .settings-panel {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(18, 19, 21, 0.94);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            padding: 24px 18px 20px;
+            overflow-y: auto;
+            animation: fadeIn 0.25s ease;
+        }
+        .settings-panel.open { display: flex; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .settings-panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .settings-panel .panel-header h2 { font-size: 1.2rem; font-weight: 600; color: var(--gold); }
+        .settings-panel .panel-header button {
+            background: var(--surface);
+            border: none;
+            color: var(--text);
+            font-size: 1.2rem;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            min-height: 44px;
+            min-width: 44px;
+        }
+        .settings-panel .panel-header button:active { background: var(--surface-hover); }
+        .settings-group { margin-bottom: 18px; }
+        .settings-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+        .settings-group .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .settings-group select,
+        .settings-group input[type="number"] {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-family: var(--font-base);
+            min-height: 42px;
+            flex: 1;
+            min-width: 100px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .settings-group select option { background: #1a1b1e; color: var(--text); }
+        .settings-group input[type="range"] {
+            flex: 1;
+            min-width: 80px;
+            accent-color: var(--gold);
+            height: 6px;
+            background: var(--surface);
+            border-radius: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .settings-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--gold);
+            cursor: pointer;
+        }
+        .settings-group .value-display {
+            min-width: 36px;
+            text-align: center;
+            font-weight: 600;
+            color: var(--gold);
+            font-size: 0.9rem;
+        }
+        #tabTitleInput {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-family: var(--font-base);
+            min-height: 42px;
+            flex: 1;
+            min-width: 100px;
+            outline: none;
+        }
+        #btnRenameTab {
+            background: var(--gold);
+            color: #121315;
+            border: none;
+            min-height: 42px;
+            padding: 0 18px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        #btnRenameTab:active { background: #a67a24; }
+
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--surface);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--text);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: none;
+            white-space: nowrap;
+            max-width: 90%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .toast.hide { opacity: 0; transform: translateX(-50%) translateY(20px); }
+
+        #fileInput { display: none; }
+
+        @media (max-width: 480px) {
+            .app-title { font-size: 1rem; }
+            .app-title .sub { font-size: 0.45rem; }
+            .header-actions button { font-size: 0.9rem; min-height: 34px; min-width: 38px; padding: 4px 8px; }
+            .toolbar { gap: 2px; padding: 2px 4px; min-height: 44px; }
+            .toolbar button { font-size: 1rem; min-height: 34px; min-width: 34px; padding: 2px 6px; }
+            .tab-item { font-size: 0.7rem; padding: 4px 6px 4px 8px; max-width: 110px; min-height: 34px; }
+            .tab-add { width: 34px; height: 34px; font-size: 18px; }
+            .editor-area { font-size: 0.9rem; padding: 8px 2px 16px 2px; line-height: 1.7; }
+            .settings-panel { padding: 16px 12px; }
+            .settings-group select, .settings-group input[type="number"], #tabTitleInput { min-height: 36px; font-size: 0.8rem; }
+            .toast { bottom: 70px; font-size: 0.75rem; padding: 6px 16px; }
+        }
+        @media (max-width: 380px) {
+            .app-title { font-size: 0.85rem; }
+            .header-actions button { font-size: 0.8rem; min-height: 30px; min-width: 32px; padding: 2px 6px; }
+            .toolbar button { font-size: 0.85rem; min-height: 30px; min-width: 30px; padding: 2px 4px; }
+            .tab-item { font-size: 0.6rem; padding: 2px 4px 2px 6px; max-width: 80px; min-height: 30px; }
+            .tab-add { width: 30px; height: 30px; font-size: 16px; }
+            .editor-area { font-size: 0.8rem; padding: 6px 2px 12px 2px; line-height: 1.6; }
+        }
+        button:focus-visible, select:focus-visible, input:focus-visible, .editor-area:focus-visible {
+            outline: 2px solid var(--gold);
+            outline-offset: 2px;
+        }
+        /* 初始載入動畫 */
+        .splash {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="app-title">📝 筆記本 <span class="sub">· 簡易</span></div>
+        <div class="header-actions">
+            <button id="btnInstall" class="btn-install">📲 安裝</button>
+            <button id="btnSave" title="儲存 (Ctrl+S)" class="btn-gold">💾</button>
+            <button id="btnSettings" title="設定">⚙️</button>
+        </div>
+    </header>
+
+    <div class="toolbar" id="toolbar">
+        <button id="btnUndo" title="還原 (Ctrl+Z)">↩️</button>
+        <button id="btnRedo" title="重做 (Ctrl+Shift+Z)">↪️</button>
+        <span class="separator"></span>
+        <button id="btnIndent" title="增加縮排 (Tab)">↦</button>
+        <button id="btnOutdent" title="減少縮排 (Shift+Tab)">↤</button>
+        <span class="separator"></span>
+        <button id="btnPaste" title="貼上 (不限長度)">📋</button>
+        <span class="separator"></span>
+        <button id="btnAutoNumber" title="自動編號 (切換)">🔢</button>
+        <span class="separator"></span>
+        <button id="btnHtmlPreview" title="HTML 預覽">🌐</button>
+        <button id="btnExport" title="匯出為檔案">📤</button>
+        <button id="btnOpen" title="開啟檔案">📂</button>
+        <span class="separator"></span>
+        <button id="btnCloseTab" title="關閉目前分頁">✕</button>
+    </div>
+
+    <div class="tabs-bar" id="tabsBar">
+        <button class="tab-add" id="btnAddTab" title="新增分頁">＋</button>
+    </div>
+
+    <div class="editor-wrapper">
+        <div class="editor-line-wrap" id="editorLineWrap">
+            <textarea class="editor-area" id="editor" placeholder="開始書寫…" spellcheck="true"></textarea>
+        </div>
+    </div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <div class="panel-header">
+            <h2>⚙️ 設定</h2>
+            <button id="btnCloseSettings">✕ 關閉</button>
+        </div>
+        <div class="settings-group">
+            <label>🔤 字型</label>
+            <div class="row">
+                <select id="fontSelect">
+                    <option value="'Noto Serif TC', 'Noto Serif', serif">思源宋體 (預設)</option>
+                    <option value="'Inter', 'Cormorant Garamond', sans-serif">Inter / Cormorant</option>
+                    <option value="'Times New Roman', serif">Times New Roman</option>
+                    <option value="'Arial', sans-serif">Arial</option>
+                    <option value="'Georgia', serif">Georgia</option>
+                    <option value="'Courier New', monospace">Courier New</option>
+                </select>
+            </div>
+        </div>
+        <div class="settings-group">
+            <label>📏 字型大小</label>
+            <div class="row">
+                <input type="range" id="fontSizeRange" min="14" max="36" step="1" value="20">
+                <span class="value-display" id="fontSizeDisplay">20</span>
+            </div>
+        </div>
+        <div class="settings-group">
+            <label>📐 行長度 (自動換行寬度)</label>
+            <div class="row">
+                <input type="range" id="lineLengthRange" min="40" max="100" step="1" value="100">
+                <span class="value-display" id="lineLengthDisplay">100%</span>
+            </div>
+        </div>
+        <div class="settings-group">
+            <label>📄 目前分頁標題</label>
+            <div class="row">
+                <input type="text" id="tabTitleInput" placeholder="輸入標題…">
+                <button id="btnRenameTab">重新命名</button>
+            </div>
+        </div>
+        <div style="margin-top:12px;font-size:0.7rem;color:var(--text-dim);text-align:center;border-top:1px solid var(--border);padding-top:14px;">
+            支援檔案系統存取 (Chrome/Edge) · 否則下載儲存
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <input type="file" id="fileInput" accept=".txt,.md,.html,.htm">
+
+    <script>
+        (function() {
+            'use strict';
+
+            // 立即顯示主體，避免白屏
+            document.body.classList.add('loaded');
+
+            // ========== PWA 動態 manifest (避免404) ==========
+            (function registerManifest() {
+                const manifest = {
+                    name: '文字筆記本',
+                    short_name: '筆記本',
+                    description: '簡易多分頁文字筆記本',
+                    start_url: window.location.href.split('?')[0],
+                    display: 'standalone',
+                    background_color: '#121315',
+                    theme_color: '#bd8b2a',
+                    icons: [{
+                        src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" fill="%23121315"/%3E%3Ctext x="256" y="340" font-size="280" text-anchor="middle" fill="%23bd8b2a" font-family="serif"%3E📝%3C/text%3E%3C/svg%3E',
+                        sizes: '512x512',
+                        type: 'image/svg+xml',
+                        purpose: 'any maskable'
+                    }]
+                };
+                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('link');
+                link.rel = 'manifest';
+                link.href = url;
+                document.head.appendChild(link);
+            })();
+
+            // ========== 安裝提示 ==========
+            let deferredPrompt = null;
+            const btnInstall = document.getElementById('btnInstall');
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                btnInstall.style.display = 'inline-flex';
+                btnInstall.textContent = '📲 安裝應用';
+            });
+
+            btnInstall.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const result = await deferredPrompt.userChoice;
+                    if (result.outcome === 'accepted') {
+                        showToast('✅ 已安裝成功！', 3000);
+                    } else {
+                        showToast('安裝已取消', 2000);
+                    }
+                    deferredPrompt = null;
+                    btnInstall.style.display = 'none';
+                }
+            });
+
+            window.addEventListener('appinstalled', () => {
+                showToast('✅ 已安裝成功！', 3000);
+                btnInstall.style.display = 'none';
+            });
+
+            // ========== 核心功能 ==========
+            // 延遲加載數據，讓界面先渲染
+            setTimeout(() => {
+                initApp();
+            }, 50);
+
+            // ---------- 狀態 ----------
+            const STATE_KEY = 'notebook_data_v10';
+            const SETTINGS_KEY = 'notebook_settings_v10';
+
+            let state = {
+                pages: [],
+                activeIndex: 0,
+                nextId: 1
+            };
+
+            let settings = {
+                fontFamily: "'Noto Serif TC', 'Noto Serif', serif",
+                fontSize: 20,
+                lineLength: 100
+            };
+
+            let historyMap = {};
+            let isAutoNumber = false;
+            let toastTimer = null;
+            let isComposing = false;
+            let usingFileAPI = typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
+
+            // DOM 參考
+            const editor = document.getElementById('editor');
+            const tabsBar = document.getElementById('tabsBar');
+            const btnAddTab = document.getElementById('btnAddTab');
+            const btnSave = document.getElementById('btnSave');
+            const btnSettings = document.getElementById('btnSettings');
+            const btnCloseSettings = document.getElementById('btnCloseSettings');
+            const settingsPanel = document.getElementById('settingsPanel');
+            const fontSelect = document.getElementById('fontSelect');
+            const fontSizeRange = document.getElementById('fontSizeRange');
+            const fontSizeDisplay = document.getElementById('fontSizeDisplay');
+            const lineLengthRange = document.getElementById('lineLengthRange');
+            const lineLengthDisplay = document.getElementById('lineLengthDisplay');
+            const tabTitleInput = document.getElementById('tabTitleInput');
+            const btnRenameTab = document.getElementById('btnRenameTab');
+            const btnIndent = document.getElementById('btnIndent');
+            const btnOutdent = document.getElementById('btnOutdent');
+            const btnUndo = document.getElementById('btnUndo');
+            const btnRedo = document.getElementById('btnRedo');
+            const btnPaste = document.getElementById('btnPaste');
+            const btnAutoNumber = document.getElementById('btnAutoNumber');
+            const btnHtmlPreview = document.getElementById('btnHtmlPreview');
+            const btnExport = document.getElementById('btnExport');
+            const btnOpen = document.getElementById('btnOpen');
+            const btnCloseTab = document.getElementById('btnCloseTab');
+            const fileInput = document.getElementById('fileInput');
+            const toast = document.getElementById('toast');
+            const editorLineWrap = document.getElementById('editorLineWrap');
+
+            // ---------- 工具 ----------
+            function generateId() { return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6); }
+
+            function getActivePage() {
+                if (state.pages.length === 0) return null;
+                return state.pages[state.activeIndex] || null;
+            }
+
+            function getHistory(pageId) {
+                if (!historyMap[pageId]) {
+                    historyMap[pageId] = { stack: [], index: -1, max: 80 };
+                }
+                return historyMap[pageId];
+            }
+
+            function showToast(msg, duration) {
+                duration = duration || 2200;
+                toast.textContent = msg;
+                toast.classList.remove('hide', 'show');
+                void toast.offsetWidth;
+                toast.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                    toast.classList.add('hide');
+                }, duration);
+            }
+
+            function saveState() {
+                try {
+                    const active = getActivePage();
+                    if (active) {
+                        active.content = editor.value;
+                        active.modified = Date.now();
+                        active.cursor = {
+                            selectionStart: editor.selectionStart,
+                            selectionEnd: editor.selectionEnd,
+                            scrollTop: editor.scrollTop
+                        };
+                    }
+                    const pagesToStore = state.pages.map(p => {
+                        const { fileHandle, ...rest } = p;
+                        return rest;
+                    });
+                    const stateCopy = { ...state, pages: pagesToStore };
+                    localStorage.setItem(STATE_KEY, JSON.stringify(stateCopy));
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                } catch (e) { console.warn('儲存狀態失敗:', e); }
+            }
+
+            function loadState() {
+                try {
+                    const raw = localStorage.getItem(STATE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed && parsed.pages && Array.isArray(parsed.pages)) {
+                            state = parsed;
+                            if (state.activeIndex >= state.pages.length) {
+                                state.activeIndex = Math.max(0, state.pages.length - 1);
+                            }
+                            if (state.pages.length === 0) {
+                                createDefaultPage();
+                            }
+                            state.pages.forEach(p => {
+                                if (!p.id) p.id = generateId();
+                                p.fileHandle = null;
+                                if (!p.cursor) p.cursor = { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
+                            });
+                            if (!state.nextId) state.nextId = state.pages.length + 1;
+                            return true;
+                        }
+                    }
+                } catch (e) { console.warn('載入狀態失敗:', e); }
+                return false;
+            }
+
+            function loadSettings() {
+                try {
+                    const raw = localStorage.getItem(SETTINGS_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        if (parsed) {
+                            settings = { ...settings, ...parsed };
+                            return true;
+                        }
+                    }
+                } catch (e) { console.warn('載入設定失敗:', e); }
+                return false;
+            }
+
+            function createDefaultPage() {
+                const id = generateId();
+                state.pages = [{
+                    id: id,
+                    title: '未命名',
+                    content: '',
+                    created: Date.now(),
+                    modified: Date.now(),
+                    fileName: null,
+                    fileHandle: null,
+                    cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
+                }];
+                state.activeIndex = 0;
+                state.nextId = 2;
+                historyMap[id] = { stack: [''], index: 0, max: 80 };
+            }
+
+            // ---------- 檔案儲存 ----------
+            async function savePage(page) {
+                if (!page) return;
+                const content = page.content || editor.value;
+                if (page.fileHandle && typeof page.fileHandle.createWritable === 'function') {
+                    try {
+                        const writable = await page.fileHandle.createWritable({ keepExistingData: false });
+                        await writable.write(content);
+                        await writable.close();
+                        page.modified = Date.now();
+                        const newTitle = page.fileHandle.name;
+                        if (page.title !== newTitle) {
+                            page.title = newTitle;
+                            page.fileName = newTitle;
+                            renderTabs();
+                            updateTitleInput();
+                        }
+                        showToast('已儲存至 ' + page.fileHandle.name);
+                        saveState();
+                        return;
+                    } catch (e) {
+                        console.warn('寫入失敗，嘗試重新選擇', e);
+                        page.fileHandle = null;
+                    }
+                }
+
+                if (usingFileAPI) {
+                    try {
+                        const suggested = page.fileName || page.title;
+                        const opts = {
+                            suggestedName: suggested,
+                            types: [{ description: '文字檔案', accept: { 'text/plain': ['.txt', '.md', '.html'] } }]
+                        };
+                        const handle = await window.showSaveFilePicker(opts);
+                        page.fileHandle = handle;
+                        page.fileName = handle.name;
+                        const newTitle = handle.name;
+                        if (page.title !== newTitle) {
+                            page.title = newTitle;
+                            renderTabs();
+                            updateTitleInput();
+                        }
+                        const writable = await handle.createWritable({ keepExistingData: false });
+                        await writable.write(content);
+                        await writable.close();
+                        page.modified = Date.now();
+                        showToast('已儲存至 ' + handle.name);
+                        saveState();
+                        return;
+                    } catch (e) {
+                        if (e.name === 'AbortError') return;
+                        console.warn('儲存取消或失敗', e);
+                    }
+                }
+
+                // 降級下載
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = page.fileName || page.title;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+                showToast('已下載 ' + (page.fileName || page.title));
+            }
+
+            // ---------- 開啟檔案 ----------
+            async function openFileWithAPI() {
+                if (!usingFileAPI) {
+                    fileInput.click();
+                    return;
+                }
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{ description: '文字檔案', accept: { 'text/plain': ['.txt', '.md', '.html'] } }],
+                        multiple: false
+                    });
+                    const file = await handle.getFile();
+                    const content = await file.text();
+                    const name = file.name;
+                    const id = generateId();
+                    const newPage = {
+                        id: id,
+                        title: name,
+                        content: content,
+                        created: Date.now(),
+                        modified: Date.now(),
+                        fileName: name,
+                        fileHandle: handle,
+                        cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
+                    };
+                    state.pages.push(newPage);
+                    state.nextId++;
+                    historyMap[id] = { stack: [content], index: 0, max: 80 };
+                    const active = getActivePage();
+                    if (active) {
+                        active.content = editor.value;
+                        active.modified = Date.now();
+                        active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
+                                .scrollTop };
+                    }
+                    state.activeIndex = state.pages.length - 1;
+                    editor.value = content;
+                    editor.selectionStart = 0;
+                    editor.selectionEnd = 0;
+                    editor.scrollTop = 0;
+                    renderTabs();
+                    saveState();
+                    updateTitleInput();
+                    editor.focus();
+                    showToast('已開啟: ' + file.name);
+                } catch (e) {
+                    if (e.name === 'AbortError') return;
+                    showToast('開啟失敗');
+                    console.warn(e);
+                }
+            }
+
+            function handleFileInput(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const content = ev.target.result;
+                    if (content) {
+                        const name = file.name;
+                        const id = generateId();
+                        const newPage = {
+                            id: id,
+                            title: name,
+                            content: content,
+                            created: Date.now(),
+                            modified: Date.now(),
+                            fileName: name,
+                            fileHandle: null,
+                            cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
+                        };
+                        state.pages.push(newPage);
+                        state.nextId++;
+                        historyMap[id] = { stack: [content], index: 0, max: 80 };
+                        const active = getActivePage();
+                        if (active) {
+                            active.content = editor.value;
+                            active.modified = Date.now();
+                            active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
+                                scrollTop: editor.scrollTop };
+                        }
+                        state.activeIndex = state.pages.length - 1;
+                        editor.value = content;
+                        editor.selectionStart = 0;
+                        editor.selectionEnd = 0;
+                        editor.scrollTop = 0;
+                        renderTabs();
+                        saveState();
+                        updateTitleInput();
+                        editor.focus();
+                        showToast('已開啟: ' + file.name);
+                    }
+                };
+                reader.onerror = function() { showToast('讀取失敗'); };
+                reader.readAsText(file, 'UTF-8');
+                fileInput.value = '';
+            }
+
+            // ---------- 渲染分頁 ----------
+            function renderTabs() {
+                tabsBar.innerHTML = '';
+                state.pages.forEach((page, idx) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'tab-item' + (idx === state.activeIndex ? ' active' : '');
+                    btn.dataset.index = idx;
+                    const label = page.fileName || page.title || '未命名';
+                    btn.innerHTML = `
+                        <span class="tab-label">${escapeHtml(label)}</span>
+                        <span class="tab-close" data-index="${idx}" title="關閉分頁">✕</span>
+                    `;
+                    btn.addEventListener('click', (e) => {
+                        if (e.target.classList.contains('tab-close')) return;
+                        switchTab(idx);
+                    });
+                    const labelSpan = btn.querySelector('.tab-label');
+                    labelSpan.addEventListener('dblclick', (e) => {
+                        e.stopPropagation();
+                        const newName = prompt('重新命名分頁：', page.title);
+                        if (newName !== null && newName.trim()) {
+                            page.title = newName.trim();
+                            saveState();
+                            renderTabs();
+                            updateTitleInput();
+                            showToast('已重新命名');
+                        }
+                    });
+                    const closeBtn = btn.querySelector('.tab-close');
+                    closeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        closeTab(idx);
+                    });
+                    btn.addEventListener('contextmenu', (e) => {
+                        e.preventDefault();
+                        const newName = prompt('重新命名分頁：', page.title);
+                        if (newName !== null && newName.trim()) {
+                            page.title = newName.trim();
+                            saveState();
+                            renderTabs();
+                            updateTitleInput();
+                            showToast('已重新命名');
+                        }
+                    });
+                    tabsBar.appendChild(btn);
+                });
+                const addBtnNew = document.createElement('button');
+                addBtnNew.className = 'tab-add';
+                addBtnNew.textContent = '＋';
+                addBtnNew.addEventListener('click', addNewTab);
+                tabsBar.appendChild(addBtnNew);
+
+                const activeEl = tabsBar.querySelector('.tab-item.active');
+                if (activeEl) {
+                    activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+                updateTitleInput();
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            // ---------- 切換分頁 ----------
+            function switchTab(index) {
+                const active = getActivePage();
+                if (active) {
+                    active.content = editor.value;
+                    active.modified = Date.now();
+                    active.cursor = {
+                        selectionStart: editor.selectionStart,
+                        selectionEnd: editor.selectionEnd,
+                        scrollTop: editor.scrollTop
+                    };
+                }
+                state.activeIndex = index;
+                const page = getActivePage();
+                if (page) {
+                    editor.value = page.content || '';
+                    const cursor = page.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
+                    editor.selectionStart = cursor.selectionStart || 0;
+                    editor.selectionEnd = cursor.selectionEnd || 0;
+                    editor.scrollTop = cursor.scrollTop || 0;
+                    const hist = getHistory(page.id);
+                    if (hist.stack.length === 0) {
+                        hist.stack = [page.content || ''];
+                        hist.index = 0;
+                    }
+                }
+                renderTabs();
+                saveState();
+                updateTitleInput();
+                editor.focus();
+            }
+
+            // ---------- 新增/關閉分頁 ----------
+            function addNewTab() {
+                const id = generateId();
+                const newPage = {
+                    id: id,
+                    title: '未命名 ' + state.nextId,
+                    content: '',
+                    created: Date.now(),
+                    modified: Date.now(),
+                    fileName: null,
+                    fileHandle: null,
+                    cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
+                };
+                state.nextId++;
+                state.pages.push(newPage);
+                historyMap[id] = { stack: [''], index: 0, max: 80 };
+                const active = getActivePage();
+                if (active) {
+                    active.content = editor.value;
+                    active.modified = Date.now();
+                    active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
+                            .scrollTop };
+                }
+                state.activeIndex = state.pages.length - 1;
+                editor.value = '';
+                editor.selectionStart = 0;
+                editor.selectionEnd = 0;
+                editor.scrollTop = 0;
+                renderTabs();
+                saveState();
+                updateTitleInput();
+                editor.focus();
+                showToast('已新增分頁');
+            }
+
+            function closeTab(index) {
+                if (state.pages.length <= 1) { showToast('至少保留一個分頁'); return; }
+                const page = state.pages[index];
+                if (!page) return;
+                if (!confirm(`確定要關閉「${page.title}」嗎？`)) return;
+                delete historyMap[page.id];
+                state.pages.splice(index, 1);
+                if (state.activeIndex >= state.pages.length) {
+                    state.activeIndex = state.pages.length - 1;
+                } else if (state.activeIndex === index) {
+                    state.activeIndex = Math.min(index, state.pages.length - 1);
+                } else if (state.activeIndex > index) {
+                    state.activeIndex--;
+                }
+                const newPage = getActivePage();
+                if (newPage) {
+                    editor.value = newPage.content || '';
+                    const cursor = newPage.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
+                    editor.selectionStart = cursor.selectionStart || 0;
+                    editor.selectionEnd = cursor.selectionEnd || 0;
+                    editor.scrollTop = cursor.scrollTop || 0;
+                    const hist = getHistory(newPage.id);
+                    if (hist.stack.length === 0) {
+                        hist.stack = [newPage.content || ''];
+                        hist.index = 0;
+                    }
+                } else { editor.value = ''; }
+                renderTabs();
+                saveState();
+                updateTitleInput();
+                editor.focus();
+                showToast('已關閉分頁');
+            }
+
+            function updateTitleInput() {
+                const page = getActivePage();
+                if (page) { tabTitleInput.value = page.title || ''; }
+                else { tabTitleInput.value = ''; }
+            }
+
+            function updateEditorState() {
+                editor.style.fontFamily = settings.fontFamily;
+                editor.style.fontSize = settings.fontSize + 'px';
+                editorLineWrap.style.maxWidth = settings.lineLength + '%';
+                if (isAutoNumber) {
+                    editor.style.paddingLeft = '20px';
+                } else {
+                    editor.style.paddingLeft = '4px';
+                }
+            }
+
+            // ---------- 核心：自動編號 (修正版) ----------
+            function handleAutoNumber(e) {
+                if (!isAutoNumber) return;
+                if (e.key !== 'Enter') return;
+                if (isComposing) return;
+
+                const text = editor.value;
+                const cursorPos = editor.selectionStart;
+
+                // 找出當前行
+                let lineStart = text.lastIndexOf('\n', cursorPos - 1);
+                if (lineStart === -1) lineStart = 0;
+                else lineStart = lineStart + 1;
+                const currentLine = text.substring(lineStart, cursorPos);
+
+                // 檢查當前行是否有編號
+                const match = currentLine.match(/^(\s*)(\d+)\.\s*/);
+                if (!match) return; // 無編號則不處理
+
+                const indent = match[1];
+                const indentLen = indent.length;
+
+                // 向上查找同縮進級別的所有編號，取最大值
+                let maxNum = 0;
+                let searchPos = lineStart; // 從當前行開始（包括自己）
+                while (searchPos >= 0) {
+                    const prevLineStart = text.lastIndexOf('\n', searchPos - 1);
+                    const start = prevLineStart === -1 ? 0 : prevLineStart + 1;
+                    const line = text.substring(start, searchPos); // 不含換行
+                    const m = line.match(/^(\s*)(\d+)\.\s*/);
+                    if (m && m[1].length === indentLen) {
+                        const num = parseInt(m[2], 10);
+                        if (num > maxNum) maxNum = num;
+                    }
+                    searchPos = start - 1;
+                    if (searchPos < 0) break;
+                }
+
+                // 新編號 = maxNum + 1
+                const newNum = maxNum + 1;
+
+                // 插入新行，縮進與當前行相同
+                const newLine = '\n' + indent + newNum + '. ';
+                const before = text.substring(0, cursorPos);
+                const after = text.substring(cursorPos);
+                const newText = before + newLine + after;
+                editor.value = newText;
+                const newPos = cursorPos + newLine.length;
+                editor.selectionStart = editor.selectionEnd = newPos;
+
+                const page = getActivePage();
+                if (page) {
+                    const hist = getHistory(page.id);
+                    pushHistory(page.id, newText);
+                }
+                e.preventDefault();
+            }
+
+            // ---------- 縮排 / 減縮 ----------
+            function indentLines(direction) {
+                const text = editor.value;
+                const start = editor.selectionStart;
+                const end = editor.selectionEnd;
+                let lineStart = text.lastIndexOf('\n', start - 1) + 1;
+                let lineEnd = text.indexOf('\n', end);
+                if (lineEnd === -1) lineEnd = text.length;
+                const selectedText = text.substring(lineStart, lineEnd);
+                const lines = selectedText.split('\n');
+                const indentStr = '    ';
+                let newLines;
+                if (direction === 'in') {
+                    newLines = lines.map(line => indentStr + line);
+                } else {
+                    newLines = lines.map(line => {
+                        if (line.startsWith(indentStr)) return line.substring(indentStr.length);
+                        if (line.startsWith('\t')) return line.substring(1);
+                        const leading = line.match(/^ {1,4}/);
+                        if (leading) return line.substring(leading[0].length);
+                        return line;
+                    });
+                }
+                const newText = text.substring(0, lineStart) + newLines.join('\n') + text.substring(lineEnd);
+                editor.value = newText;
+                const newEnd = lineStart + newLines.join('\n').length;
+                if (start !== end) {
+                    const oldLen = selectedText.length;
+                    const newLen = newLines.join('\n').length;
+                    const offset = newLen - oldLen;
+                    editor.selectionStart = start;
+                    editor.selectionEnd = end + offset;
+                } else {
+                    const pos = start + (newLines.join('\n').length - selectedText.length);
+                    editor.selectionStart = editor.selectionEnd = pos;
+                }
+                const page = getActivePage();
+                if (page) {
+                    const hist = getHistory(page.id);
+                    pushHistory(page.id, newText);
+                }
+                saveState();
+            }
+
+            // ---------- 歷史 ----------
+            function pushHistory(pageId, content) {
+                const hist = getHistory(pageId);
+                if (hist.index < hist.stack.length - 1) {
+                    hist.stack = hist.stack.slice(0, hist.index + 1);
+                }
+                if (hist.stack.length > 0 && hist.stack[hist.stack.length - 1] === content) return;
+                hist.stack.push(content);
+                if (hist.stack.length > hist.max) hist.stack.shift();
+                hist.index = hist.stack.length - 1;
+            }
+
+            function undo() {
+                const page = getActivePage();
+                if (!page) return;
+                const hist = getHistory(page.id);
+                if (hist.index <= 0) { showToast('沒有更早的記錄'); return; }
+                hist.index--;
+                const content = hist.stack[hist.index];
+                if (content !== undefined) {
+                    editor.value = content;
+                    page.content = content;
+                    editor.selectionStart = editor.selectionEnd = content.length;
+                    editor.scrollTop = 0;
+                    saveState();
+                    showToast('已還原');
+                }
+            }
+
+            function redo() {
+                const page = getActivePage();
+                if (!page) return;
+                const hist = getHistory(page.id);
+                if (hist.index >= hist.stack.length - 1) { showToast('沒有更後的記錄'); return; }
+                hist.index++;
+                const content = hist.stack[hist.index];
+                if (content !== undefined) {
+                    editor.value = content;
+                    page.content = content;
+                    editor.selectionStart = editor.selectionEnd = content.length;
+                    editor.scrollTop = 0;
+                    saveState();
+                    showToast('已重做');
+                }
+            }
+
+            let historyTimer = null;
+
+            function autoSaveHistory() {
+                const page = getActivePage();
+                if (!page) return;
+                const content = editor.value;
+                clearTimeout(historyTimer);
+                historyTimer = setTimeout(() => {
+                    const hist = getHistory(page.id);
+                    if (hist.stack.length > 0 && hist.stack[hist.index] === content) return;
+                    pushHistory(page.id, content);
+                    page.content = content;
+                    page.modified = Date.now();
+                    saveState();
+                }, 400);
+            }
+
+            // ---------- 貼上 ----------
+            async function pasteClipboard() {
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        const start = editor.selectionStart;
+                        const end = editor.selectionEnd;
+                        const before = editor.value.substring(0, start);
+                        const after = editor.value.substring(end);
+                        const newText = before + text + after;
+                        editor.value = newText;
+                        const newPos = start + text.length;
+                        editor.selectionStart = editor.selectionEnd = newPos;
+                        const page = getActivePage();
+                        if (page) {
+                            pushHistory(page.id, newText);
+                            page.content = newText;
+                            saveState();
+                        }
+                        showToast('已貼上 (' + text.length + ' 字元)');
+                    } else { showToast('剪貼簿無文字'); }
+                } catch (e) {
+                    const text = prompt('請貼上文字 (Ctrl+V 後按確定):');
+                    if (text !== null) {
+                        const start = editor.selectionStart;
+                        const end = editor.selectionEnd;
+                        const before = editor.value.substring(0, start);
+                        const after = editor.value.substring(end);
+                        const newText = before + text + after;
+                        editor.value = newText;
+                        const newPos = start + text.length;
+                        editor.selectionStart = editor.selectionEnd = newPos;
+                        const page = getActivePage();
+                        if (page) {
+                            pushHistory(page.id, newText);
+                            page.content = newText;
+                            saveState();
+                        }
+                        showToast('已貼上 (' + text.length + ' 字元)');
+                    }
+                }
+            }
+
+            // ---------- HTML 預覽 ----------
+            function htmlPreview() {
+                const content = editor.value;
+                if (!content.trim()) { showToast('內容為空'); return; }
+                const isHtml = content.trim().toLowerCase().includes('<html') ||
+                    content.trim().toLowerCase().includes('<!doctype') ||
+                    content.trim().toLowerCase().includes('<body') ||
+                    content.trim().toLowerCase().includes('<div') ||
+                    content.trim().toLowerCase().includes('<p');
+                let htmlContent = content;
+                if (!isHtml) {
+                    htmlContent = `<!DOCTYPE html>
+                <html lang="zh-TW"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>預覽</title>
+                <style>body{font-family:sans-serif;max-width:720px;margin:40px auto;padding:20px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;}</style>
+                </head><body>${escapeHtml(content)}</body></html>`;
+                }
+                const win = window.open('', '_blank', 'width=800,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
+                if (win) { win.document.write(htmlContent); win.document.close(); } else {
+                    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                }
+                showToast('已開啟預覽');
+            }
+
+            // ---------- 匯出 ----------
+            function exportFile() {
+                const page = getActivePage();
+                if (!page) return;
+                const content = editor.value;
+                if (!content.trim()) { showToast('內容為空'); return; }
+                const format = prompt('請選擇匯出格式 (txt / md / html):', 'txt');
+                if (!format) return;
+                const ext = format.toLowerCase();
+                if (!['txt', 'md', 'html'].includes(ext)) { showToast('不支援的格式'); return; }
+                const filename = (page.title || '未命名') + '.' + ext;
+                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => URL.revokeObjectURL(url), 30000);
+                showToast('已匯出: ' + filename);
+            }
+
+            // ---------- 快速儲存 ----------
+            async function quickSave() {
+                const page = getActivePage();
+                if (!page) { showToast('沒有分頁'); return; }
+                page.content = editor.value;
+                page.modified = Date.now();
+                page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
+                        .scrollTop };
+                pushHistory(page.id, editor.value);
+                await savePage(page);
+            }
+
+            // ---------- 設定面板 ----------
+            function openSettings() {
+                fontSelect.value = settings.fontFamily;
+                fontSizeRange.value = settings.fontSize;
+                fontSizeDisplay.textContent = settings.fontSize;
+                lineLengthRange.value = settings.lineLength;
+                lineLengthDisplay.textContent = settings.lineLength + '%';
+                updateTitleInput();
+                settingsPanel.classList.add('open');
+            }
+
+            function closeSettings() {
+                settingsPanel.classList.remove('open');
+                applySettings();
+                saveState();
+            }
+
+            function applySettings() {
+                settings.fontFamily = fontSelect.value;
+                settings.fontSize = parseInt(fontSizeRange.value, 10) || 20;
+                settings.lineLength = parseInt(lineLengthRange.value, 10) || 100;
+                fontSizeDisplay.textContent = settings.fontSize;
+                lineLengthDisplay.textContent = settings.lineLength + '%';
+                updateEditorState();
+                try {
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+                } catch (e) {}
+                document.documentElement.style.fontSize = settings.fontSize + 'px';
+            }
+
+            function renameTab() {
+                const page = getActivePage();
+                if (!page) return;
+                const newName = tabTitleInput.value.trim();
+                if (!newName) { showToast('請輸入標題'); return; }
+                page.title = newName;
+                saveState();
+                renderTabs();
+                updateTitleInput();
+                showToast('已重新命名');
+            }
+
+            function toggleAutoNumber() {
+                isAutoNumber = !isAutoNumber;
+                btnAutoNumber.classList.toggle('btn-active', isAutoNumber);
+                showToast(isAutoNumber ? '自動編號 開啟' : '自動編號 關閉');
+                updateEditorState();
+                editor.focus();
+            }
+
+            // ---------- 鍵盤事件 ----------
+            function handleKeyboard(e) {
+                if (e.ctrlKey && e.key === 's') { e.preventDefault(); quickSave(); return; }
+                if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); return; }
+                if (e.ctrlKey && e.shiftKey && e.key === 'Z') { e.preventDefault(); redo(); return; }
+                if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); indentLines('in'); return; }
+                if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); indentLines('out'); return; }
+                if (e.key === 'Enter' && isAutoNumber) { handleAutoNumber(e); return; }
+            }
+
+            // ---------- 主要初始化 ----------
+            function initApp() {
+                loadSettings();
+                const hasState = loadState();
+                if (!hasState || state.pages.length === 0) {
+                    createDefaultPage();
+                    const page = getActivePage();
+                    if (page) { historyMap[page.id] = { stack: [''], index: 0, max: 80 }; }
+                }
+                const active = getActivePage();
+                if (active) {
+                    if (!historyMap[active.id]) {
+                        historyMap[active.id] = { stack: [active.content || ''], index: 0, max: 80 };
+                    }
+                    editor.value = active.content || '';
+                    const cursor = active.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
+                    editor.selectionStart = cursor.selectionStart || 0;
+                    editor.selectionEnd = cursor.selectionEnd || 0;
+                    editor.scrollTop = cursor.scrollTop || 0;
+                }
+                applySettings();
+                renderTabs();
+                updateTitleInput();
+
+                btnAutoNumber.classList.remove('btn-active');
+
+                // 事件綁定
+                editor.addEventListener('input', function() {
+                    autoSaveHistory();
+                    const page = getActivePage();
+                    if (page) { page.content = editor.value; }
+                });
+                editor.addEventListener('keydown', handleKeyboard);
+                editor.addEventListener('compositionstart', function() { isComposing = true; });
+                editor.addEventListener('compositionend', function() { isComposing = false; autoSaveHistory(); });
+
+                editor.addEventListener('scroll', function() {
+                    const page = getActivePage();
+                    if (page) {
+                        page.cursor = page.cursor || {};
+                        page.cursor.scrollTop = editor.scrollTop;
+                    }
+                });
+                editor.addEventListener('selectionchange', function() {
+                    const page = getActivePage();
+                    if (page) {
+                        page.cursor = page.cursor || {};
+                        page.cursor.selectionStart = editor.selectionStart;
+                        page.cursor.selectionEnd = editor.selectionEnd;
+                    }
+                });
+
+                btnAddTab.addEventListener('click', addNewTab);
+                btnSave.addEventListener('click', quickSave);
+                btnSettings.addEventListener('click', openSettings);
+                btnCloseSettings.addEventListener('click', closeSettings);
+                settingsPanel.addEventListener('click', function(e) {
+                    if (e.target === settingsPanel) closeSettings();
+                });
+                fontSelect.addEventListener('change', applySettings);
+                fontSizeRange.addEventListener('input', function() {
+                    fontSizeDisplay.textContent = this.value;
+                    applySettings();
+                });
+                lineLengthRange.addEventListener('input', function() {
+                    lineLengthDisplay.textContent = this.value + '%';
+                    applySettings();
+                });
+                btnRenameTab.addEventListener('click', renameTab);
+                tabTitleInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') { e.preventDefault(); renameTab(); }
+                });
+
+                btnIndent.addEventListener('click', function() { indentLines('in'); });
+                btnOutdent.addEventListener('click', function() { indentLines('out'); });
+                btnUndo.addEventListener('click', undo);
+                btnRedo.addEventListener('click', redo);
+                btnPaste.addEventListener('click', pasteClipboard);
+                btnAutoNumber.addEventListener('click', toggleAutoNumber);
+                btnHtmlPreview.addEventListener('click', htmlPreview);
+                btnExport.addEventListener('click', exportFile);
+                btnOpen.addEventListener('click', openFileWithAPI);
+                btnCloseTab.addEventListener('click', function() { closeTab(state.activeIndex); });
+
+                fileInput.addEventListener('change', handleFileInput);
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.ctrlKey && e.shiftKey && e.key === 'S') { e.preventDefault(); quickSave(); }
+                });
+
+                window.addEventListener('beforeunload', function() {
+                    const page = getActivePage();
+                    if (page) {
+                        page.content = editor.value;
+                        page.modified = Date.now();
+                        page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
+                            scrollTop: editor.scrollTop };
+                    }
+                    saveState();
+                });
+
+                setInterval(function() {
+                    const page = getActivePage();
+                    if (page) {
+                        page.content = editor.value;
+                        page.modified = Date.now();
+                        page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
+                            scrollTop: editor.scrollTop };
+                        saveState();
+                    }
+                }, 30000);
+
+                // 延遲顯示提示，確保一切就緒
+                setTimeout(() => { showToast('📝 筆記本已就緒', 1200); }, 500);
+                console.log('📝 文字筆記本已啟動 | 分頁數:', state.pages.length);
+            }
+
+        })();
+    </script>
+</body>
+</html>
