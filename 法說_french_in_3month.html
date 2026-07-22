@@ -1,0 +1,1961 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>法文學習</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Inter:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;
+    --ink-2:#1b1c1f;
+    --ink-3:#232427;
+    --vermilion:#942525;
+    --gold:#bd8b2a;
+    --jade:#fcfbfa;
+    --green:#4cd787;
+    --gold-dim: rgba(189,139,42,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--ink);
+    color:var(--jade);
+    font-family:'Noto Serif TC', serif;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .fr-text{ font-family:'Cormorant Garamond','Noto Serif TC',serif; }
+  .num-text{ font-family:'Inter',sans-serif; }
+  button, select{ font-family:'Noto Serif TC',serif; }
+
+  /* ---------- Header ---------- */
+  header#appHeader{
+    position:fixed; top:0; left:0; right:0; height:64px;
+    background:var(--ink);
+    border-bottom:1px solid var(--gold);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 18px;
+    z-index:100;
+  }
+  .brand{
+    font-size:1.75rem;
+    font-weight:900;
+    letter-spacing:0.06em;
+    color:var(--jade);
+    white-space:nowrap;
+  }
+  .mode-toggle{ display:flex; gap:8px; }
+  .mode-btn{
+    background:transparent;
+    border:1px solid var(--gold);
+    color:var(--jade);
+    padding:10px 16px;
+    font-size:1rem;
+    border-radius:6px;
+    cursor:pointer;
+    transition:background .15s, color .15s;
+  }
+  .mode-btn.active{
+    background:var(--vermilion);
+    border-color:var(--vermilion);
+    color:var(--jade);
+    font-weight:700;
+  }
+
+  /* ---------- Filter bar ---------- */
+  #filterBar{
+    position:fixed; top:64px; left:0; right:0; height:66px;
+    background:var(--ink-2);
+    border-bottom:1px solid var(--gold-dim);
+    display:flex; align-items:center;
+    padding:0 18px;
+    z-index:99;
+  }
+  .filters{ display:flex; gap:12px; align-items:center; width:100%; flex:1; }
+  .filters[hidden]{ display:none; }
+  select{
+    background:var(--ink);
+    color:var(--jade);
+    border:1px solid var(--gold);
+    border-radius:6px;
+    padding:11px 10px;
+    font-size:1.05rem;
+  }
+  /* 字卡文字下拉：剛好容納2字 */
+  #learnCardText{ width:calc(2em + 30px); flex:none; }
+  /* 題型下拉：剛好容納5字 */
+  #testType{ width:calc(5em + 30px); flex:none; }
+  /* 章節下拉：填滿剩餘寬度，使篩選列右緣與頁首右緣對齊 */
+  #learnChapter, #testChapter{ flex:1; min-width:0; }
+
+  /* ---------- Translation panel (learn mode only) ---------- */
+  #translationPanel{
+    position:fixed; top:130px; left:0; right:0; height:150px;
+    background:var(--ink-2);
+    border-bottom:2px solid var(--gold);
+    display:flex; align-items:center; gap:16px;
+    padding:12px 18px;
+    z-index:98;
+  }
+  #translationContent{
+    flex:1;
+    max-height:120px;
+    overflow-y:auto;
+    display:flex; align-items:center; justify-content:flex-end;
+    text-align:right;
+    font-size:1.35rem;
+    line-height:1.5;
+    color:var(--jade);
+  }
+  #translateBtn{
+    flex-shrink:0;
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:6px;
+    padding:14px 18px;
+    font-size:1rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  #translateBtn:active{ opacity:0.8; }
+
+  /* ---------- Main content ---------- */
+  body.mode-learn #mainContent{ padding-top:296px; }
+  body.mode-test #mainContent{ padding-top:150px; }
+  #mainContent{ min-height:100vh; padding-bottom:60px; }
+  .view[hidden]{ display:none; }
+
+  /* ---------- Learn mode card grid ---------- */
+  #cardGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
+    gap:14px;
+    padding:18px;
+  }
+  .card{
+    background:var(--ink-2);
+    border:1px solid var(--gold-dim);
+    border-radius:10px;
+    padding:22px 16px;
+    text-align:center;
+    font-size:1.51875rem;
+    cursor:pointer;
+    transition:transform .12s, border-color .12s;
+  }
+  .card:hover{ border-color:var(--gold); transform:translateY(-2px); }
+  .card.speaking{ border-color:var(--vermilion); box-shadow:0 0 0 2px var(--vermilion); }
+  .speaker-tag{
+    font-size:0.42em;
+    color:var(--gold);
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    vertical-align:super;
+    margin-left:6px;
+    letter-spacing:0.02em;
+  }
+  .section-header{
+    grid-column:1 / -1;
+    font-size:1.3rem;
+    font-weight:700;
+    color:var(--gold);
+    border-bottom:2px solid var(--gold);
+    padding:14px 4px 8px;
+    margin-top:8px;
+  }
+  .section-header:first-child{ margin-top:0; }
+  .section-subheader{
+    grid-column:1 / -1;
+    font-size:1rem;
+    font-weight:600;
+    color:var(--jade);
+    background:var(--vermilion);
+    display:inline-block;
+    padding:4px 14px;
+    border-radius:20px;
+    margin:4px 0 -2px;
+    width:fit-content;
+  }
+
+  /* ---------- Quiz ---------- */
+  #quizArea{ max-width:640px; margin:0 auto; padding:20px; }
+  .quiz-card{
+    background:var(--ink-2);
+    border:1px solid var(--gold);
+    border-radius:14px;
+    padding:22px;
+  }
+  .quiz-header{
+    display:grid;
+    grid-template-columns:1fr auto 1fr;
+    align-items:center;
+    gap:8px;
+    min-height:42px;
+  }
+  .quiz-progress{ text-align:left; font-weight:700; color:var(--jade); font-size:1.2rem; }
+  .quiz-score{ text-align:right; font-weight:700; color:var(--green); font-size:1.2rem; }
+  .quiz-center-actions{
+    display:none;
+    gap:8px;
+    justify-self:center;
+  }
+  .quiz-action-btn{
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:8px;
+    padding:10px 14px;
+    font-size:0.9rem;
+    font-weight:700;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .quiz-next-btn{
+    background:var(--vermilion);
+    color:var(--jade);
+  }
+  .quiz-question{
+    font-size:1.6875rem;
+    text-align:center;
+    margin:26px 0;
+    cursor:pointer;
+    min-height:1.4em;
+  }
+  .quiz-options{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .quiz-option{
+    background:var(--ink);
+    border:2px solid var(--gold-dim);
+    border-radius:10px;
+    padding:16px 10px;
+    text-align:center;
+    font-size:1.5525rem;
+    cursor:pointer;
+  }
+  .quiz-option.correct{ border-color:var(--green); box-shadow:0 0 0 2px var(--green); }
+  .quiz-option.wrong{ border-color:var(--vermilion); box-shadow:0 0 0 2px var(--vermilion); }
+
+  .result-card{
+    background:var(--ink-2);
+    border:1px solid var(--gold);
+    border-radius:14px;
+    padding:26px;
+    text-align:center;
+  }
+  .result-score{
+    font-size:3rem;
+    font-weight:900;
+    color:var(--gold);
+    margin:10px 0 20px;
+  }
+  .result-wrong-list{ text-align:left; margin:16px 0; }
+  .result-wrong-item{
+    padding:12px;
+    border-bottom:1px solid var(--gold-dim);
+    cursor:pointer;
+  }
+  .result-actions{ display:flex; gap:14px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+  .result-btn{
+    background:var(--gold);
+    color:var(--ink);
+    border:none;
+    border-radius:8px;
+    padding:14px 22px;
+    font-size:1.05rem;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .result-btn.secondary{
+    background:transparent;
+    color:var(--jade);
+    border:1px solid var(--gold);
+  }
+  .celebrate{ font-size:1.3rem; color:var(--green); font-weight:700; margin:16px 0; }
+</style>
+</head>
+<body class="mode-learn">
+
+<header id="appHeader">
+  <div class="brand">法文學習</div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" data-mode="learn">學習</button>
+    <button class="mode-btn" data-mode="test">測驗</button>
+  </div>
+</header>
+
+<div id="filterBar">
+  <div class="filters" id="learnFilters">
+    <select id="learnCardText">
+      <option value="fr">法文</option>
+      <option value="zh">英文</option>
+    </select>
+    <select id="learnChapter"></select>
+  </div>
+  <div class="filters" id="testFilters" hidden>
+    <select id="testType">
+      <option value="all">全部</option>
+      <option value="fr2zh">法翻英</option>
+      <option value="zh2fr">英翻法</option>
+      <option value="listen">法文音聽</option>
+    </select>
+    <select id="testChapter"></select>
+  </div>
+</div>
+
+<div id="translationPanel">
+  <div id="translationContent" class="fr-text"></div>
+  <button id="translateBtn">🌐 翻譯</button>
+</div>
+
+<input type="file" id="importRecordInput" accept=".txt" style="display:none">
+
+<main id="mainContent">
+  <div class="view" id="learnView">
+    <div id="cardGrid"></div>
+  </div>
+  <div class="view" id="testView" hidden>
+    <div id="quizArea"></div>
+  </div>
+</main>
+
+<script>
+/* =====================  資料  ===================== */
+const DATA = {
+  "project": "French A1 - Complete Course (12 Weeks)",
+  "level": "A1",
+  "scenarios": [
+    {
+      "scenario_id": "001",
+      "topic": "At Passport Control",
+      "participants": [
+        { "role": "police officer", "name": "Policier" },
+        { "role": "tourist", "name": "Touriste" }
+      ],
+      "vocabulary": [
+        { "term": "Le passeport", "translation": "The passport" },
+        { "term": "L'instant", "translation": "The moment" },
+        { "term": "La valise", "translation": "The suitcase" },
+        { "term": "Le livre", "translation": "The book" },
+        { "term": "La carte", "translation": "The map / card" },
+        { "term": "La clé", "translation": "The key" },
+        { "term": "Le portable", "translation": "The mobile phone" },
+        { "term": "L'appareil-photo", "translation": "The camera" },
+        { "term": "La clé USB", "translation": "The USB flash drive" },
+        { "term": "La tablette", "translation": "The tablet" },
+        { "term": "Le vin", "translation": "The wine" },
+        { "term": "Le parfum", "translation": "The perfume" },
+        { "term": "Le journal", "translation": "The newspaper" },
+        { "term": "Le miracle", "translation": "The miracle" },
+        { "term": "Le contrôle", "translation": "The check / control" },
+        { "term": "Le policier", "translation": "The police officer" },
+        { "term": "Le touriste", "translation": "The tourist" },
+        { "term": "S'il vous plaît", "translation": "Please (formal)" },
+        { "term": "Un instant", "translation": "One moment" },
+        { "term": "Où est", "translation": "Where is" },
+        { "term": "Et mince alors!", "translation": "Oh no!" },
+        { "term": "C'est très grave", "translation": "That's very serious" },
+        { "term": "Peut-être", "translation": "Perhaps" },
+        { "term": "Dans la valise", "translation": "In the suitcase" },
+        { "term": "Attendez", "translation": "Wait" },
+        { "term": "Vous permettez?", "translation": "May I?" },
+        { "term": "Voici", "translation": "Here is / Here are" },
+        { "term": "J'ai", "translation": "I have" },
+        { "term": "Je n'ai pas", "translation": "I don't have" },
+        { "term": "Avez-vous", "translation": "Do you have" },
+        { "term": "Oui", "translation": "Yes" },
+        { "term": "Non", "translation": "No" },
+        { "term": "Et", "translation": "And" },
+        { "term": "Mais", "translation": "But" },
+        { "term": "Aussi", "translation": "Also" },
+        { "term": "J'ai une voiture.", "translation": "I have a car." },
+        { "term": "Je n'ai pas de clés.", "translation": "I don't have any keys." },
+        { "term": "Nous avons une valise.", "translation": "We have a suitcase." },
+        { "term": "Elle a de l'alcool.", "translation": "She has some alcohol." },
+        { "term": "Il n'a pas de journal.", "translation": "He doesn't have a newspaper." },
+        { "term": "Ils ont des livres.", "translation": "They (masculine) have some books." },
+        { "term": "Elles n'ont pas de cartes.", "translation": "They (feminine) don't have any maps." },
+        { "term": "Vous n'avez pas d'imprimante.", "translation": "You don't have a printer." },
+        { "term": "Avez-vous un appareil-photo?", "translation": "Do you have a camera?" },
+        { "term": "Avez-vous des tablettes?", "translation": "Do you have any tablets?" },
+        { "term": "Avez-vous des livres?", "translation": "Do you have any books?" },
+        { "term": "Avez-vous une radio?", "translation": "Do you have a radio?" },
+        { "term": "Bonjour, monsieur.", "translation": "Good morning/afternoon, sir." },
+        { "term": "Bonsoir, madame.", "translation": "Good evening, madam." },
+        { "term": "Au revoir, mademoiselle.", "translation": "Goodbye, miss." },
+        { "term": "Monsieur Dupont", "translation": "Mr. Dupont" },
+        { "term": "Madame Duval", "translation": "Mrs. Duval" },
+        { "term": "Mademoiselle Martin", "translation": "Miss Martin" },
+        { "term": "avoir faim", "translation": "to be hungry" },
+        { "term": "avoir soif", "translation": "to be thirsty" },
+        { "term": "avoir chaud", "translation": "to be warm" },
+        { "term": "avoir froid", "translation": "to be cold" },
+        { "term": "avoir raison", "translation": "to be right" },
+        { "term": "avoir tort", "translation": "to be wrong" },
+        { "term": "Il a douze ans.", "translation": "He is twelve." },
+        { "term": "j'ai", "translation": "I have" },
+        { "term": "tu as", "translation": "you have (familiar singular)" },
+        { "term": "il a", "translation": "he / it has" },
+        { "term": "elle a", "translation": "she / it has" },
+        { "term": "nous avons", "translation": "we have" },
+        { "term": "vous avez", "translation": "you have (formal singular / plural)" },
+        { "term": "ils ont", "translation": "they (masculine) have" },
+        { "term": "elles ont", "translation": "they (feminine) have" },
+        { "term": "je n'ai pas", "translation": "I have not" },
+        { "term": "tu n'as pas", "translation": "you have not (familiar)" },
+        { "term": "il n'a pas", "translation": "he has not" },
+        { "term": "elle n'a pas", "translation": "she has not" },
+        { "term": "nous n'avons pas", "translation": "we have not" },
+        { "term": "vous n'avez pas", "translation": "you have not" },
+        { "term": "ils n'ont pas", "translation": "they (masculine) have not" },
+        { "term": "elles n'ont pas", "translation": "they (feminine) have not" },
+        { "term": "J'ai de la bière.", "translation": "I have some beer." },
+        { "term": "Je n'ai pas de bière.", "translation": "I have no beer." },
+        { "term": "je", "translation": "I" },
+        { "term": "tu", "translation": "you (familiar singular)" },
+        { "term": "il", "translation": "he / it (masculine)" },
+        { "term": "elle", "translation": "she / it (feminine)" },
+        { "term": "nous", "translation": "we" },
+        { "term": "vous", "translation": "you (formal singular / plural)" },
+        { "term": "ils", "translation": "they (masculine)" },
+        { "term": "elles", "translation": "they (feminine)" }
+      ],
+      "dialogue": [
+        { "speaker": "Policier", "text": "Votre passeport, s'il vous plaît, madame.", "translation": "Your passport please, madam." },
+        { "speaker": "Touriste", "text": "Un instant, s'il vous plaît.", "translation": "One moment, please." },
+        { "speaker": "Touriste", "text": "Mon passeport? Où est mon passeport?", "translation": "My passport? Where's my passport?" },
+        { "speaker": "Touriste", "text": "Et mince alors!", "translation": "Oh no!" },
+        { "speaker": "Touriste", "text": "J'ai un livre, une carte de France, des clés, un portable, mais... je n'ai pas de passeport!", "translation": "I've got a book, a map of France, some keys, a mobile phone, but... I don't have a passport!" },
+        { "speaker": "Policier", "text": "Vous n'avez pas de passeport, madame? C'est très grave.", "translation": "You don't have your passport, madam? That's very serious." },
+        { "speaker": "Policier", "text": "Mais votre passeport est peut-être dans la valise?", "translation": "But perhaps your passport is in the suitcase?" },
+        { "speaker": "Touriste", "text": "Attendez, monsieur.", "translation": "Wait, sir." },
+        { "speaker": "Touriste", "text": "J'ai un appareil-photo, une clé USB, et une tablette.", "translation": "I have a camera, a USB flash drive, and a tablet." },
+        { "speaker": "Touriste", "text": "J'ai aussi du vin, du parfum, un journal....", "translation": "I also have some wine, some perfume, a newspaper...." },
+        { "speaker": "Policier", "text": "Vous permettez, madame?", "translation": "May I, madam?" },
+        { "speaker": "Policier", "text": "Voici l'appareil-photo, le journal, le vin, le parfum, et la tablette.", "translation": "Here's the camera, the newspaper, the wine, the perfume, and the tablet." },
+        { "speaker": "Policier", "text": "Et... miracle - voici le passeport!", "translation": "And... surprise - here's the passport!" }
+      ]
+    },
+    {
+      "scenario_id": "002",
+      "topic": "Street Survey - French Habits",
+      "participants": [
+        { "role": "journalist", "name": "Journaliste" },
+        { "role": "passer-by", "name": "Passante" }
+      ],
+      "vocabulary": [
+        { "term": "Pardon", "translation": "Excuse me" },
+        { "term": "française", "translation": "French (feminine)" },
+        { "term": "Je prépare", "translation": "I'm preparing" },
+        { "term": "une enquête", "translation": "a survey" },
+        { "term": "sur", "translation": "on / about" },
+        { "term": "les Français", "translation": "the French" },
+        { "term": "sept", "translation": "seven" },
+        { "term": "des questions", "translation": "questions" },
+        { "term": "à Paris", "translation": "in Paris" },
+        { "term": "à Versailles", "translation": "in Versailles" },
+        { "term": "pour", "translation": "for" },
+        { "term": "une agence", "translation": "an agency" },
+        { "term": "de publicité", "translation": "of advertising" },
+        { "term": "beaucoup", "translation": "a lot / much" },
+        { "term": "pour affaires", "translation": "on business" },
+        { "term": "plusieurs", "translation": "several" },
+        { "term": "des langues", "translation": "languages" },
+        { "term": "seulement", "translation": "only" },
+        { "term": "le français", "translation": "French (language)" },
+        { "term": "l'anglais", "translation": "English (language)" },
+        { "term": "un sport", "translation": "a sport" },
+        { "term": "je fais", "translation": "I do / I go" },
+        { "term": "du jogging", "translation": "jogging" },
+        { "term": "la télévision", "translation": "television" },
+        { "term": "souvent", "translation": "often" },
+        { "term": "la radio", "translation": "the radio" },
+        { "term": "Jamais!", "translation": "Never!" },
+        { "term": "préparer", "translation": "to prepare" },
+        { "term": "habiter", "translation": "to live" },
+        { "term": "travailler", "translation": "to work" },
+        { "term": "voyager", "translation": "to travel" },
+        { "term": "parler", "translation": "to speak" },
+        { "term": "pratiquer", "translation": "to practise" },
+        { "term": "regarder", "translation": "to watch" },
+        { "term": "écouter", "translation": "to listen (to)" },
+        { "term": "le sport", "translation": "sport" },
+        { "term": "la langue", "translation": "language" },
+        { "term": "deux", "translation": "two" },
+        { "term": "je suis", "translation": "I am" },
+        { "term": "tu es", "translation": "you are (familiar)" },
+        { "term": "il est", "translation": "he is" },
+        { "term": "elle est", "translation": "she is" },
+        { "term": "nous sommes", "translation": "we are" },
+        { "term": "vous êtes", "translation": "you are" },
+        { "term": "ils sont", "translation": "they (m.) are" },
+        { "term": "elles sont", "translation": "they (f.) are" },
+        { "term": "riche", "translation": "rich" },
+        { "term": "pauvre", "translation": "poor" },
+        { "term": "poli", "translation": "polite" },
+        { "term": "impoli", "translation": "impolite" },
+        { "term": "intelligent", "translation": "intelligent" },
+        { "term": "heureux", "translation": "happy" },
+        { "term": "malheureux", "translation": "unhappy" },
+        { "term": "intéressant", "translation": "interesting" },
+        { "term": "ennuyeux", "translation": "boring" },
+        { "term": "bon / bonne", "translation": "good" },
+        { "term": "mauvais", "translation": "bad" },
+        { "term": "facile", "translation": "easy" },
+        { "term": "difficile", "translation": "difficult" },
+        { "term": "stupide", "translation": "stupid" },
+        { "term": "est-ce que", "translation": "do / does / is / are (question)" },
+        { "term": "pourquoi", "translation": "why" },
+        { "term": "parce que", "translation": "because" },
+        { "term": "quand", "translation": "when" },
+        { "term": "comment", "translation": "how" },
+        { "term": "qui", "translation": "who" },
+        { "term": "que", "translation": "what" },
+        { "term": "qu'est-ce que", "translation": "what" },
+        { "term": "combien", "translation": "how much / how many" },
+        { "term": "où", "translation": "where" }
+      ],
+      "dialogue": [
+        { "speaker": "Journaliste", "text": "Pardon madame, vous êtes française?", "translation": "Excuse me, madam, are you French?" },
+        { "speaker": "Passante", "text": "Oui, je suis française.", "translation": "Yes, I'm French." },
+        { "speaker": "Journaliste", "text": "Je prépare une enquête sur les Français. J'ai sept questions.", "translation": "I'm preparing a survey on the French. I have seven questions." },
+        { "speaker": "Passante", "text": "Oui.", "translation": "Yes." },
+        { "speaker": "Journaliste", "text": "Vous habitez à Paris?", "translation": "Do you live in Paris?" },
+        { "speaker": "Passante", "text": "Non, j'habite à Versailles.", "translation": "No, I live in Versailles." },
+        { "speaker": "Journaliste", "text": "Vous travaillez à Paris?", "translation": "Do you work in Paris?" },
+        { "speaker": "Passante", "text": "Oui, je travaille pour une agence de publicité.", "translation": "Yes, I work for an advertising agency." },
+        { "speaker": "Journaliste", "text": "Est-ce que vous voyagez beaucoup?", "translation": "Do you travel a great deal?" },
+        { "speaker": "Passante", "text": "Oui, je voyage pour affaires.", "translation": "Yes, I travel on business." },
+        { "speaker": "Journaliste", "text": "Est-ce que vous parlez plusieurs langues?", "translation": "Do you speak several languages?" },
+        { "speaker": "Passante", "text": "Deux seulement, français et anglais.", "translation": "Only two, French and English." },
+        { "speaker": "Journaliste", "text": "Pratiquez-vous un sport?", "translation": "Do you practise a sport?" },
+        { "speaker": "Passante", "text": "Oui, je fais du jogging.", "translation": "Yes, I go jogging." },
+        { "speaker": "Journaliste", "text": "Regardez-vous la télévision?", "translation": "Do you watch television?" },
+        { "speaker": "Passante", "text": "Oui, souvent.", "translation": "Yes, often." },
+        { "speaker": "Journaliste", "text": "Vous écoutez la radio?", "translation": "Do you listen to the radio?" },
+        { "speaker": "Passante", "text": "Jamais!", "translation": "Never!" }
+      ]
+    },
+    {
+      "scenario_id": "003",
+      "topic": "Dietitian Consultation",
+      "participants": [
+        { "role": "businessman", "name": "Homme d'affaires" },
+        { "role": "dietitian", "name": "Diététicienne" }
+      ],
+      "vocabulary": [
+        { "term": "Un petit instant", "translation": "One small moment" },
+        { "term": "Je finis", "translation": "I'm finishing" },
+        { "term": "ce rapport", "translation": "this report" },
+        { "term": "Comment allez-vous?", "translation": "How are you?" },
+        { "term": "Je pense que", "translation": "I think that" },
+        { "term": "je grossis", "translation": "I'm putting on weight" },
+        { "term": "Vous ne réussissez pas à maigrir?", "translation": "You don't succeed in losing weight?" },
+        { "term": "Pourquoi pas?", "translation": "Why not?" },
+        { "term": "J'ai toujours faim.", "translation": "I'm always hungry." },
+        { "term": "J'ai toujours soif.", "translation": "I'm always thirsty." },
+        { "term": "Qu'est-ce que je dois faire?", "translation": "What must I do?" },
+        { "term": "Faites du sport", "translation": "Do some sport" },
+        { "term": "régulièrement", "translation": "regularly" },
+        { "term": "Saisissez chaque occasion", "translation": "Seize every opportunity" },
+        { "term": "pour manger", "translation": "to eat" },
+        { "term": "de la salade", "translation": "some salad" },
+        { "term": "Et qu'est-ce que je ne dois pas faire?", "translation": "And what must I not do?" },
+        { "term": "Ne choisissez jamais", "translation": "Never choose" },
+        { "term": "de gâteaux", "translation": "cakes" },
+        { "term": "de glaces", "translation": "ice creams" },
+        { "term": "de fromage", "translation": "cheese" },
+        { "term": "Très bien.", "translation": "Very good." },
+        { "term": "Ne remplissez jamais", "translation": "Never fill" },
+        { "term": "votre verre", "translation": "your glass" },
+        { "term": "complètement", "translation": "completely" },
+        { "term": "Vous me garantissez ce régime?", "translation": "Do you guarantee this diet?" },
+        { "term": "Une chose est certaine", "translation": "One thing is certain" },
+        { "term": "si vous grossissez", "translation": "if you put on weight" },
+        { "term": "vous raccourcissez votre vie", "translation": "you shorten your life" },
+        { "term": "Vous avez raison.", "translation": "You are right." },
+        { "term": "finir", "translation": "to finish" },
+        { "term": "choisir", "translation": "to choose" },
+        { "term": "grossir", "translation": "to put on weight" },
+        { "term": "maigrir", "translation": "to lose weight" },
+        { "term": "remplir", "translation": "to fill" },
+        { "term": "réussir", "translation": "to succeed" },
+        { "term": "garantir", "translation": "to guarantee" },
+        { "term": "raccourcir", "translation": "to shorten" },
+        { "term": "le rapport", "translation": "the report" },
+        { "term": "le régime", "translation": "the diet" },
+        { "term": "la chose", "translation": "the thing" },
+        { "term": "la vie", "translation": "life" },
+        { "term": "le gâteau", "translation": "the cake" },
+        { "term": "le verre", "translation": "the glass" },
+        { "term": "le fromage", "translation": "the cheese" },
+        { "term": "la glace", "translation": "the ice cream" },
+        { "term": "l'occasion", "translation": "the opportunity" },
+        { "term": "penser", "translation": "to think" },
+        { "term": "faire", "translation": "to do / make" },
+        { "term": "je dois", "translation": "I must" },
+        { "term": "toujours", "translation": "always" },
+        { "term": "entre", "translation": "between" }
+      ],
+      "dialogue": [
+        { "speaker": "Homme d'affaires", "text": "Bonjour, madame.", "translation": "Good morning, madam." },
+        { "speaker": "Diététicienne", "text": "Bonjour, monsieur. Un petit instant, s'il vous plaît, je finis ce rapport. Bon. Comment allez-vous?", "translation": "Good morning, sir. One small moment, please, I'm finishing this report. Good. How are you?" },
+        { "speaker": "Homme d'affaires", "text": "Je pense que je grossis.", "translation": "I think I'm putting on weight." },
+        { "speaker": "Diététicienne", "text": "Ah? Vous ne réussissez pas à maigrir? Pourquoi pas?", "translation": "Ah? You don't succeed in losing weight? Why not?" },
+        { "speaker": "Homme d'affaires", "text": "J'ai toujours faim. J'ai toujours soif. Qu'est-ce que je dois faire?", "translation": "I'm always hungry. I'm always thirsty. What must I do?" },
+        { "speaker": "Diététicienne", "text": "Faites du sport régulièrement. Saisissez chaque occasion pour manger de la salade.", "translation": "Do some sport regularly. Seize every opportunity to eat salad." },
+        { "speaker": "Homme d'affaires", "text": "Et qu'est-ce que je ne dois pas faire?", "translation": "And what must I not do?" },
+        { "speaker": "Diététicienne", "text": "Ne choisissez jamais de gâteaux. Ne choisissez jamais de glaces. Ne choisissez jamais de fromage.", "translation": "Never choose cakes. Never choose ice creams. Never choose cheese." },
+        { "speaker": "Homme d'affaires", "text": "Très bien. Et pour le vin?", "translation": "Very good. And for wine?" },
+        { "speaker": "Diététicienne", "text": "Ne remplissez jamais votre verre complètement.", "translation": "Never fill your glass completely." },
+        { "speaker": "Homme d'affaires", "text": "Vous me garantissez ce régime?", "translation": "Do you guarantee this diet?" },
+        { "speaker": "Diététicienne", "text": "Oui. Une chose est certaine: si vous grossissez, vous raccourcissez votre vie.", "translation": "Yes. One thing is certain: if you put on weight, you shorten your life." },
+        { "speaker": "Homme d'affaires", "text": "Oui, madame, vous avez raison.", "translation": "Yes, madam, you are right." }
+      ]
+    },
+    {
+      "scenario_id": "004",
+      "topic": "Travel Agency - Booking a Holiday",
+      "participants": [
+        { "role": "customer", "name": "Cliente" },
+        { "role": "agent", "name": "Employé" }
+      ],
+      "vocabulary": [
+        { "term": "Mon mari et moi", "translation": "My husband and I" },
+        { "term": "nous désirons", "translation": "we want" },
+        { "term": "passer deux semaines", "translation": "to spend two weeks" },
+        { "term": "en France", "translation": "in France" },
+        { "term": "au printemps", "translation": "in spring" },
+        { "term": "Nous avons visité", "translation": "We visited" },
+        { "term": "l'Italie", "translation": "Italy" },
+        { "term": "en août", "translation": "in August" },
+        { "term": "mais", "translation": "but" },
+        { "term": "nous n'avons pas passé", "translation": "we didn't spend / have" },
+        { "term": "de bonnes vacances", "translation": "a good holiday" },
+        { "term": "Ah? Pourquoi?", "translation": "Oh? Why?" },
+        { "term": "Nous avons trouvé", "translation": "We found" },
+        { "term": "la nourriture", "translation": "the food" },
+        { "term": "un peu", "translation": "a little" },
+        { "term": "indigeste", "translation": "indigestible / heavy" },
+        { "term": "la chaleur", "translation": "the heat" },
+        { "term": "insupportable", "translation": "unbearable" },
+        { "term": "nous avons dépensé", "translation": "we spent" },
+        { "term": "beaucoup d'argent", "translation": "a lot of money" },
+        { "term": "Avez-vous l'intention de", "translation": "Do you intend to" },
+        { "term": "voyager en avion?", "translation": "travel by plane?" },
+        { "term": "Non, par le train", "translation": "No, by train" },
+        { "term": "c'est plus agréable", "translation": "it's more pleasant" },
+        { "term": "je consulte", "translation": "I consult" },
+        { "term": "l'horaire", "translation": "the timetable" },
+        { "term": "de l'Eurostar", "translation": "of the Eurostar" },
+        { "term": "Il y a", "translation": "There is / are" },
+        { "term": "des départs", "translation": "departures" },
+        { "term": "à huit heures", "translation": "at eight o'clock" },
+        { "term": "à neuf heures", "translation": "at nine o'clock" },
+        { "term": "etc.", "translation": "etc." },
+        { "term": "Il faut", "translation": "It is necessary / You must" },
+        { "term": "réserver", "translation": "to reserve" },
+        { "term": "les places", "translation": "the seats" },
+        { "term": "à l'avance", "translation": "in advance" },
+        { "term": "Oui, d'accord.", "translation": "Yes, OK." },
+        { "term": "Départ", "translation": "Departure" },
+        { "term": "le 9 avril", "translation": "the 9th of April" },
+        { "term": "retour", "translation": "return" },
+        { "term": "le 23 avril", "translation": "the 23rd of April" },
+        { "term": "le départ", "translation": "the departure" },
+        { "term": "le retour", "translation": "the return" },
+        { "term": "la nourriture", "translation": "the food" },
+        { "term": "la chaleur", "translation": "the heat" },
+        { "term": "l'argent", "translation": "the money" },
+        { "term": "les vacances", "translation": "the holidays" },
+        { "term": "visiter", "translation": "to visit" },
+        { "term": "trouver", "translation": "to find" },
+        { "term": "consulter", "translation": "to consult" },
+        { "term": "désirer", "translation": "to want / desire" },
+        { "term": "dépenser", "translation": "to spend (money)" },
+        { "term": "le printemps", "translation": "spring" },
+        { "term": "l'été", "translation": "summer" },
+        { "term": "l'automne", "translation": "autumn" },
+        { "term": "l'hiver", "translation": "winter" },
+        { "term": "janvier", "translation": "January" },
+        { "term": "février", "translation": "February" },
+        { "term": "mars", "translation": "March" },
+        { "term": "avril", "translation": "April" },
+        { "term": "mai", "translation": "May" },
+        { "term": "juin", "translation": "June" },
+        { "term": "juillet", "translation": "July" },
+        { "term": "août", "translation": "August" },
+        { "term": "septembre", "translation": "September" },
+        { "term": "octobre", "translation": "October" },
+        { "term": "novembre", "translation": "November" },
+        { "term": "décembre", "translation": "December" },
+        { "term": "lundi", "translation": "Monday" },
+        { "term": "mardi", "translation": "Tuesday" },
+        { "term": "mercredi", "translation": "Wednesday" },
+        { "term": "jeudi", "translation": "Thursday" },
+        { "term": "vendredi", "translation": "Friday" },
+        { "term": "samedi", "translation": "Saturday" },
+        { "term": "dimanche", "translation": "Sunday" }
+      ],
+      "dialogue": [
+        { "speaker": "Cliente", "text": "Mon mari et moi, nous désirons passer deux semaines en France au printemps. Nous avons visité l'Italie en août, mais nous n'avons pas passé de bonnes vacances.", "translation": "My husband and I want to spend two weeks in France in the spring. We visited Italy in August, but we didn't have a good holiday." },
+        { "speaker": "Employé", "text": "Ah? Pourquoi?", "translation": "Oh? Why not?" },
+        { "speaker": "Cliente", "text": "Nous avons trouvé la nourriture un peu indigeste, nous avons trouvé la chaleur insupportable, et nous avons dépensé beaucoup d'argent.", "translation": "We found the food a little heavy, we found the heat unbearable, and we spent a lot of money." },
+        { "speaker": "Employé", "text": "Avez-vous l'intention de voyager en avion?", "translation": "Do you intend to travel by plane?" },
+        { "speaker": "Cliente", "text": "Non, par le train, c'est plus agréable.", "translation": "No, by train, it's more pleasant." },
+        { "speaker": "Employé", "text": "Un petit instant, madame, je consulte l'horaire de l'Eurostar. Il y a des départs à huit heures, à neuf heures, à dix heures, à onze heures, etc. Il faut réserver les places à l'avance.", "translation": "Just one moment, madam, I'll consult the Eurostar timetable. There are departures at eight o'clock, at nine o'clock, at ten o'clock, at eleven o'clock, etc. You need to reserve seats in advance." },
+        { "speaker": "Cliente", "text": "Oui, d'accord. Départ le 9 avril, retour le 23 avril.", "translation": "Yes, OK. Departure on 9 April, return on 23 April." },
+        { "speaker": "Employé", "text": "Un instant, s'il vous plaît.", "translation": "One moment, please." }
+      ]
+    },
+    {
+      "scenario_id": "005",
+      "topic": "Mobile Phone Complaint",
+      "participants": [
+        { "role": "customer", "name": "Client" },
+        { "role": "saleswoman", "name": "Vendeuse" }
+      ],
+      "vocabulary": [
+        { "term": "Il y a deux semaines", "translation": "Two weeks ago" },
+        { "term": "vous m'avez vendu", "translation": "you sold me" },
+        { "term": "un téléphone", "translation": "a telephone / phone" },
+        { "term": "mais il ne marche pas", "translation": "but it doesn't work" },
+        { "term": "Malheureusement", "translation": "Unfortunately" },
+        { "term": "je ne reçois pas", "translation": "I don't receive" },
+        { "term": "les appels téléphoniques", "translation": "the telephone calls" },
+        { "term": "de mes amis", "translation": "from my friends" },
+        { "term": "Je suis surprise", "translation": "I'm surprised" },
+        { "term": "d'apprendre cela", "translation": "to learn that" },
+        { "term": "Nos téléphones", "translation": "Our telephones" },
+        { "term": "sont d'excellente qualité", "translation": "are of excellent quality" },
+        { "term": "Avez-vous lu", "translation": "Have you read" },
+        { "term": "le mode d'emploi?", "translation": "the operating instructions?" },
+        { "term": "Oui, je l'ai lu", "translation": "Yes, I read it" },
+        { "term": "très attentivement", "translation": "very carefully" },
+        { "term": "Attendez", "translation": "Wait" },
+        { "term": "je l'ai ici", "translation": "I have it here" },
+        { "term": "dans ma poche", "translation": "in my pocket" },
+        { "term": "Mais, où est-il?", "translation": "But, where is it?" },
+        { "term": "Je l'ai peut-être perdu.", "translation": "I may have lost it." },
+        { "term": "Ce n'est pas grave", "translation": "It doesn't matter" },
+        { "term": "Avez-vous branché", "translation": "Have you plugged in" },
+        { "term": "l'appareil", "translation": "the device" },
+        { "term": "correctement?", "translation": "correctly?" },
+        { "term": "Avez-vous mis l'appareil en marche?", "translation": "Have you started the device?" },
+        { "term": "Avez-vous compris", "translation": "Have you understood" },
+        { "term": "les explications?", "translation": "the explanations?" },
+        { "term": "Oui, j'ai tout compris", "translation": "Yes, I understood everything" },
+        { "term": "et j'ai tout fait", "translation": "and I did everything" },
+        { "term": "correctement.", "translation": "correctly." },
+        { "term": "J'ai même interdit", "translation": "I even forbade" },
+        { "term": "à mes enfants", "translation": "my children" },
+        { "term": "de l'utiliser.", "translation": "to use it." },
+        { "term": "Permettez-moi", "translation": "Allow me" },
+        { "term": "de vous répéter", "translation": "to repeat to you" },
+        { "term": "que", "translation": "that" },
+        { "term": "nos produits", "translation": "our products" },
+        { "term": "Si vous n'avez pas reçu", "translation": "If you haven't received" },
+        { "term": "un seul appel", "translation": "a single call" },
+        { "term": "depuis deux semaines", "translation": "for two weeks" },
+        { "term": "la seule explication possible", "translation": "the only possible explanation" },
+        { "term": "c'est que personne ne vous téléphone!", "translation": "is that nobody phones you!" },
+        { "term": "vendre", "translation": "to sell" },
+        { "term": "attendre", "translation": "to wait (for)" },
+        { "term": "rendre", "translation": "to give back" },
+        { "term": "entendre", "translation": "to hear" },
+        { "term": "descendre", "translation": "to go down / take down" },
+        { "term": "répondre", "translation": "to reply" },
+        { "term": "perdre", "translation": "to lose" },
+        { "term": "le client / la cliente", "translation": "the customer" },
+        { "term": "le mode d'emploi", "translation": "the operating instructions" },
+        { "term": "l'ami / l'amie", "translation": "the friend" },
+        { "term": "la leçon", "translation": "the lesson" },
+        { "term": "le commerçant / la commerçante", "translation": "the shopkeeper" },
+        { "term": "brancher", "translation": "to plug in" },
+        { "term": "mettre en marche", "translation": "to start / set going" }
+      ],
+      "dialogue": [
+        { "speaker": "Client", "text": "Bonjour, madame. Il y a deux semaines vous m'avez vendu un téléphone, mais il ne marche pas. Malheureusement, je ne reçois pas les appels téléphoniques de mes amis.", "translation": "Good morning, madam. Two weeks ago you sold me a phone, but it doesn't work. Unfortunately, I don't receive telephone calls from my friends." },
+        { "speaker": "Vendeuse", "text": "Je suis surprise d'apprendre cela, monsieur. Nos téléphones sont d'excellente qualité. Avez-vous lu le mode d'emploi?", "translation": "I'm surprised to learn that, sir. Our telephones are of excellent quality. Have you read the operating instructions?" },
+        { "speaker": "Client", "text": "Oui, je l'ai lu très attentivement. Attendez, je l'ai ici dans ma poche. Mais, où est-il? Je l'ai peut-être perdu.", "translation": "Yes, I read it very carefully. Wait, I have it here in my pocket. But, where is it? I may have lost it." },
+        { "speaker": "Vendeuse", "text": "Ce n'est pas grave, monsieur. Avez-vous branché l'appareil correctement? Avez-vous mis l'appareil en marche? Avez-vous compris les explications?", "translation": "It doesn't matter, sir. Have you plugged in the device correctly? Have you started the device? Have you understood the explanations?" },
+        { "speaker": "Client", "text": "Oui, j'ai tout compris et j'ai tout fait correctement. J'ai même interdit à mes enfants de l'utiliser.", "translation": "Yes, I understood everything and I did everything correctly. I even forbade my children to use it." },
+        { "speaker": "Vendeuse", "text": "Permettez-moi de vous répéter, monsieur, que nos produits sont d'excellente qualité. Si vous n'avez pas reçu un seul appel depuis deux semaines, la seule explication possible, c'est que personne ne vous téléphone!", "translation": "Allow me to repeat to you, sir, that our products are of excellent quality. If you haven't received a single call for two weeks, the only possible explanation is that nobody phones you!" }
+      ]
+    },
+    {
+      "scenario_id": "006",
+      "topic": "Boulogne-sur-Mer - Grocery Shopping",
+      "participants": [
+        { "role": "tourist", "name": "Touriste" },
+        { "role": "passer-by", "name": "Passante" },
+        { "role": "shopkeeper", "name": "Épicère" }
+      ],
+      "vocabulary": [
+        { "term": "Pardon, madame.", "translation": "Excuse me, madam." },
+        { "term": "Je cherche", "translation": "I'm looking for" },
+        { "term": "une bonne épicerie", "translation": "a good food shop" },
+        { "term": "ici près du port", "translation": "here near the port" },
+        { "term": "La meilleure épicerie", "translation": "The best food shop" },
+        { "term": "de Boulogne", "translation": "in Boulogne" },
+        { "term": "est sur la place", "translation": "is on the square" },
+        { "term": "en face de la banque", "translation": "opposite the bank" },
+        { "term": "Vous allez tout droit", "translation": "You go straight ahead" },
+        { "term": "et vous prenez", "translation": "and you take" },
+        { "term": "la première rue à gauche", "translation": "the first street on the left" },
+        { "term": "Merci, madame.", "translation": "Thank you, madam." },
+        { "term": "je tourne à droite", "translation": "I turn right" },
+        { "term": "je tourne à gauche", "translation": "I turn left" },
+        { "term": "Ah, voilà l'épicerie", "translation": "Ah, there's the food shop" },
+        { "term": "Bonjour, monsieur. Vous désirez?", "translation": "Good morning, sir. What would you like?" },
+        { "term": "Bonjour, madame.", "translation": "Good morning, madam." },
+        { "term": "Je voudrais", "translation": "I would like" },
+        { "term": "du fromage", "translation": "some cheese" },
+        { "term": "du vin", "translation": "some wine" },
+        { "term": "de la bière", "translation": "some beer" },
+        { "term": "Voici le fromage.", "translation": "Here is the cheese." },
+        { "term": "C'est la meilleure marque.", "translation": "It's the best brand." },
+        { "term": "Il est plus cher", "translation": "It's more expensive" },
+        { "term": "que les autres fromages", "translation": "than the other cheeses" },
+        { "term": "mais il est excellent.", "translation": "but it's excellent." },
+        { "term": "Je vous recommande", "translation": "I recommend" },
+        { "term": "aussi ce vin rouge.", "translation": "also this red wine." },
+        { "term": "Il est moins cher", "translation": "It's less expensive" },
+        { "term": "que d'habitude", "translation": "than usual" },
+        { "term": "il est en promotion.", "translation": "it's on special offer." },
+        { "term": "Bien. Je prends ces trois articles.", "translation": "Good. I'll take these three items." },
+        { "term": "Est-ce que vous vendez aussi du pain?", "translation": "Do you also sell bread?" },
+        { "term": "Non, monsieur.", "translation": "No, sir." },
+        { "term": "Pour cela", "translation": "For that" },
+        { "term": "il faut aller", "translation": "you must go" },
+        { "term": "à la boulangerie.", "translation": "to the bakery." },
+        { "term": "La boulangerie", "translation": "The bakery" },
+        { "term": "est à côté du bureau de poste.", "translation": "is next to the post office." },
+        { "term": "Au revoir, madame.", "translation": "Goodbye, madam." },
+        { "term": "Oh, il pleut!", "translation": "Oh, it's raining!" },
+        { "term": "Et il y a du vent.", "translation": "And it's windy." },
+        { "term": "Attendez quelques instants.", "translation": "Wait a few moments." },
+        { "term": "Ici à Boulogne", "translation": "Here in Boulogne" },
+        { "term": "il fait rarement beau.", "translation": "the weather is rarely fine." },
+        { "term": "Il pleut souvent", "translation": "It often rains" },
+        { "term": "et il y a toujours du vent.", "translation": "and it's always windy." },
+        { "term": "Oui. L'année dernière", "translation": "Yes. Last year" },
+        { "term": "ma femme et moi", "translation": "my wife and I" },
+        { "term": "nous sommes venus", "translation": "we came" },
+        { "term": "passer la journée ici", "translation": "to spend the day here" },
+        { "term": "mais il a fait si mauvais.", "translation": "but the weather was so bad." },
+        { "term": "Nous avons attendu", "translation": "We waited" },
+        { "term": "un jour, deux jours.", "translation": "one day, two days." },
+        { "term": "Finalement", "translation": "Finally" },
+        { "term": "nous sommes restés", "translation": "we stayed" },
+        { "term": "une semaine", "translation": "a week" },
+        { "term": "à Boulogne!", "translation": "in Boulogne!" },
+        { "term": "dans", "translation": "in" },
+        { "term": "sur", "translation": "on" },
+        { "term": "sous", "translation": "under" },
+        { "term": "devant", "translation": "in front of" },
+        { "term": "derrière", "translation": "behind" },
+        { "term": "près de", "translation": "near" },
+        { "term": "à côté de", "translation": "next to" },
+        { "term": "en face de", "translation": "opposite" },
+        { "term": "à", "translation": "at / to" },
+        { "term": "de", "translation": "of / from" },
+        { "term": "pour", "translation": "for" },
+        { "term": "avec", "translation": "with" },
+        { "term": "sans", "translation": "without" },
+        { "term": "après", "translation": "after" },
+        { "term": "avant", "translation": "before" }
+      ],
+      "dialogue": [
+        { "speaker": "Touriste", "text": "Pardon, madame. Je cherche une bonne épicerie, ici près du port.", "translation": "Excuse me, madam. I'm looking for a good food shop, here near the port." },
+        { "speaker": "Passante", "text": "La meilleure épicerie de Boulogne est sur la place, en face de la banque. Vous allez tout droit et vous prenez la première rue à gauche.", "translation": "The best food shop in Boulogne is on the square, opposite the bank. You go straight ahead and take the first street on the left." },
+        { "speaker": "Touriste", "text": "Merci, madame.", "translation": "Thank you, madam." },
+        { "speaker": "Touriste", "text": "je vais tout droit, je tourne à droite... non, non... je tourne à gauche. Ah, voilà l'épicerie.", "translation": "I go straight ahead, I turn right... no, no... I turn left. Ah, there's the food shop." },
+        { "speaker": "Épicère", "text": "Bonjour, monsieur. Vous désirez?", "translation": "Good morning, sir. What would you like?" },
+        { "speaker": "Touriste", "text": "Bonjour, madame. Je voudrais du fromage, du vin et de la bière, s'il vous plaît.", "translation": "Good morning, madam. I would like some cheese, some wine and some beer, please." },
+        { "speaker": "Épicère", "text": "Voici le fromage. C'est la meilleure marque. Il est plus cher que les autres fromages, mais il est excellent. Je vous recommande aussi ce vin rouge. Il est moins cher que d'habitude; il est en promotion.", "translation": "Here is the cheese. It's the best brand. It's more expensive than the other cheeses, but it's excellent. I also recommend this red wine. It's less expensive than usual; it's on special offer." },
+        { "speaker": "Touriste", "text": "Bien. Je prends ces trois articles. Merci. Est-ce que vous vendez aussi du pain?", "translation": "Good. I'll take these three items. Thank you. Do you also sell bread?" },
+        { "speaker": "Épicère", "text": "Non, monsieur. Pour cela, il faut aller à la boulangerie. La boulangerie est à côté du bureau de poste.", "translation": "No, sir. For that, you must go to the bakery. The bakery is next to the post office." },
+        { "speaker": "Touriste", "text": "Merci. Au revoir, madame.", "translation": "Thank you. Goodbye, madam." },
+        { "speaker": "Touriste", "text": "Oh, il pleut! Et il y a du vent.", "translation": "Oh, it's raining! And it's windy." },
+        { "speaker": "Épicère", "text": "Attendez quelques instants. Ici à Boulogne il fait rarement beau. Il pleut souvent et il y a toujours du vent.", "translation": "Wait a few moments. Here in Boulogne the weather is rarely fine. It often rains and it's always windy." },
+        { "speaker": "Touriste", "text": "Oui. L'année dernière, ma femme et moi, nous sommes venus passer la journée ici, mais il a fait si mauvais. Nous avons attendu un jour, deux jours. Finalement, nous sommes restés une semaine à Boulogne!", "translation": "Yes. Last year, my wife and I came to spend the day here, but the weather was so bad. We waited one day, two days. Finally, we stayed a week in Boulogne!" }
+      ]
+    },
+    {
+      "scenario_id": "007",
+      "topic": "New Year's Resolutions",
+      "participants": [
+        { "role": "friend", "name": "Karim" },
+        { "role": "friend", "name": "Hélène" }
+      ],
+      "vocabulary": [
+        { "term": "Je suis venu", "translation": "I came" },
+        { "term": "vous souhaiter", "translation": "to wish you" },
+        { "term": "une bonne année", "translation": "a happy new year" },
+        { "term": "Bonne année à vous aussi.", "translation": "Happy new year to you too." },
+        { "term": "Quoi de neuf?", "translation": "What's new? / What's up?" },
+        { "term": "Eh bien", "translation": "Well" },
+        { "term": "j'ai décidé", "translation": "I decided" },
+        { "term": "de changer de vie.", "translation": "to change my life." },
+        { "term": "J'ai pris", "translation": "I took" },
+        { "term": "beaucoup de résolutions", "translation": "many resolutions" },
+        { "term": "pour la nouvelle année.", "translation": "for the new year." },
+        { "term": "Vraiment?", "translation": "Really?" },
+        { "term": "Et quelles sont ces résolutions?", "translation": "And what are these resolutions?" },
+        { "term": "Voici ma liste:", "translation": "Here's my list:" },
+        { "term": "Je vais maigrir.", "translation": "I'm going to lose weight." },
+        { "term": "Je vais regarder", "translation": "I'm going to watch" },
+        { "term": "la télévision moins souvent.", "translation": "television less often." },
+        { "term": "Je mangerai", "translation": "I will eat" },
+        { "term": "plus de légumes.", "translation": "more vegetables." },
+        { "term": "plus de fruits.", "translation": "more fruit." },
+        { "term": "Je dépenserai", "translation": "I will spend" },
+        { "term": "moins d'argent", "translation": "less money" },
+        { "term": "en vêtements.", "translation": "on clothes." },
+        { "term": "Mon mari", "translation": "My husband" },
+        { "term": "m'a fait aussi", "translation": "also made me" },
+        { "term": "quelques promesses.", "translation": "some promises." },
+        { "term": "Voici sa liste:", "translation": "Here's his list:" },
+        { "term": "Il va boire", "translation": "He's going to drink" },
+        { "term": "moins de bière.", "translation": "less beer." },
+        { "term": "plus d'eau.", "translation": "more water." },
+        { "term": "Il arrêtera de fumer.", "translation": "He will stop smoking." },
+        { "term": "Il fera du sport", "translation": "He will do sport" },
+        { "term": "chaque matin.", "translation": "every morning." },
+        { "term": "Il rentrera", "translation": "He will return" },
+        { "term": "plus tôt à la maison", "translation": "earlier home" },
+        { "term": "le soir.", "translation": "in the evening." },
+        { "term": "Et vous pensez", "translation": "And do you think" },
+        { "term": "que vous serez plus heureux?", "translation": "you'll be happier?" },
+        { "term": "Oui. Nous aurons", "translation": "Yes. We'll have" },
+        { "term": "plus de temps", "translation": "more time" },
+        { "term": "et plus d'argent.", "translation": "and more money." },
+        { "term": "Nous serons", "translation": "We'll be" },
+        { "term": "tous les deux", "translation": "both" },
+        { "term": "en meilleure santé.", "translation": "in better health." },
+        { "term": "Et comment est-ce que", "translation": "And how" },
+        { "term": "vous dépenserez", "translation": "will you spend" },
+        { "term": "tout cet argent?", "translation": "all this money?" },
+        { "term": "Nous achèterons", "translation": "We'll buy" },
+        { "term": "une voiture électrique.", "translation": "an electric car." },
+        { "term": "Nous voyagerons", "translation": "We'll travel" },
+        { "term": "à l'étranger.", "translation": "abroad." },
+        { "term": "Nous irons au Japon.", "translation": "We'll go to Japan." },
+        { "term": "Nous irons en Chine", "translation": "We'll go to China" },
+        { "term": "et aux États-Unis.", "translation": "and to the United States." },
+        { "term": "Nous ferons le tour du monde.", "translation": "We'll travel around the world." },
+        { "term": "Excusez-moi", "translation": "Excuse me" },
+        { "term": "mais je dois dire", "translation": "but I must say" },
+        { "term": "que j'ai déjà entendu ça.", "translation": "that I've already heard that." },
+        { "term": "Je l'ai entendu", "translation": "I heard it" },
+        { "term": "l'année dernière.", "translation": "last year." },
+        { "term": "Je ne veux pas", "translation": "I don't want to" },
+        { "term": "vous décourager", "translation": "discourage you" },
+        { "term": "mais je suis certain", "translation": "but I'm certain" },
+        { "term": "que vous ne ferez jamais rien!", "translation": "that you'll never do anything!" },
+        { "term": "la résolution", "translation": "the resolution" },
+        { "term": "la liste", "translation": "the list" },
+        { "term": "la promesse", "translation": "the promise" },
+        { "term": "la santé", "translation": "health" },
+        { "term": "avoir l'intention (de)", "translation": "to intend / plan (to)" },
+        { "term": "souhaiter", "translation": "to wish / want" },
+        { "term": "décider (de)", "translation": "to decide (to)" },
+        { "term": "excuser", "translation": "to excuse" },
+        { "term": "boire", "translation": "to drink" },
+        { "term": "dire", "translation": "to say / tell" },
+        { "term": "beaucoup", "translation": "much / many / a lot of" },
+        { "term": "trop", "translation": "too much / too many" },
+        { "term": "peu", "translation": "little / few" },
+        { "term": "assez", "translation": "enough" },
+        { "term": "plus", "translation": "more" },
+        { "term": "moins", "translation": "less / fewer" },
+        { "term": "autant", "translation": "as much / as many" }
+      ],
+      "dialogue": [
+        { "speaker": "Karim", "text": "Bonjour, Hélène. Je suis venu vous souhaiter une bonne année.", "translation": "Good morning, Hélène. I came to wish you a happy new year." },
+        { "speaker": "Hélène", "text": "Bonjour, Karim. Bonne année à vous aussi.", "translation": "Good morning, Karim. Happy new year to you too." },
+        { "speaker": "Karim", "text": "Quoi de neuf?", "translation": "What's new?" },
+        { "speaker": "Hélène", "text": "Eh bien, j'ai décidé de changer de vie. J'ai pris beaucoup de résolutions pour la nouvelle année.", "translation": "Well, I decided to change my life. I made many resolutions for the new year." },
+        { "speaker": "Karim", "text": "Vraiment? Et quelles sont ces résolutions?", "translation": "Really? And what are these resolutions?" },
+        { "speaker": "Hélène", "text": "Voici ma liste: 1 Je vais maigrir. 2 Je vais regarder la télévision moins souvent. 3 Je mangerai plus de légumes. 4 Je mangerai plus de fruits. 5 Je dépenserai moins d'argent en vêtements.", "translation": "Here's my list: 1 I'm going to lose weight. 2 I'm going to watch television less often. 3 I will eat more vegetables. 4 I will eat more fruit. 5 I will spend less money on clothes." },
+        { "speaker": "Hélène", "text": "Mon mari m'a fait aussi quelques promesses. Voici sa liste: 1 Il va boire moins de bière. 2 Il va boire plus d'eau. 3 Il arrêtera de fumer. 4 Il fera du sport chaque matin. 5 Il rentrera plus tôt à la maison le soir.", "translation": "My husband also made me some promises. Here's his list: 1 He's going to drink less beer. 2 He's going to drink more water. 3 He will stop smoking. 4 He will do sport every morning. 5 He will return home earlier in the evening." },
+        { "speaker": "Karim", "text": "Et vous pensez que vous serez plus heureux?", "translation": "And do you think you'll be happier?" },
+        { "speaker": "Hélène", "text": "Oui. Nous aurons plus de temps et plus d'argent. Nous serons tous les deux en meilleure santé.", "translation": "Yes. We'll have more time and more money. We'll both be in better health." },
+        { "speaker": "Karim", "text": "Et comment est-ce que vous dépenserez tout cet argent?", "translation": "And how will you spend all this money?" },
+        { "speaker": "Hélène", "text": "Nous achèterons une voiture électrique. Nous voyagerons à l'étranger. Nous irons au Japon. Nous irons en Chine et aux États-Unis. Nous ferons le tour du monde.", "translation": "We'll buy an electric car. We'll travel abroad. We'll go to Japan. We'll go to China and to the United States. We'll travel around the world." },
+        { "speaker": "Karim", "text": "Excusez-moi, mais je dois dire que j'ai déjà entendu ça. Je l'ai entendu l'année dernière. Je ne veux pas vous décourager, mais je suis certain que vous ne ferez jamais rien!", "translation": "Excuse me, but I must say I've already heard that. I heard it last year. I don't want to discourage you, but I'm certain you'll never do anything!" }
+      ]
+    },
+    {
+      "scenario_id": "008",
+      "topic": "Unexpected Visit",
+      "participants": [
+        { "role": "friend", "name": "Pierre" },
+        { "role": "friend", "name": "Nicole" }
+      ],
+      "vocabulary": [
+        { "term": "Bonsoir Nicole", "translation": "Good evening Nicole" },
+        { "term": "j'espère que", "translation": "I hope that" },
+        { "term": "je ne te dérange pas.", "translation": "I'm not disturbing you." },
+        { "term": "Pierre! Bonsoir.", "translation": "Pierre! Good evening." },
+        { "term": "Je pensais justement à toi.", "translation": "I was just thinking about you." },
+        { "term": "Tu n'es pas trop occupée?", "translation": "You're not too busy?" },
+        { "term": "Non, non.", "translation": "No, no." },
+        { "term": "J'écrivais une lettre", "translation": "I was writing a letter" },
+        { "term": "quand tu as frappé à la porte.", "translation": "when you knocked at the door." },
+        { "term": "Ah bon?", "translation": "Oh really?" },
+        { "term": "A qui est-ce que tu écrivais?", "translation": "Who were you writing to?" },
+        { "term": "Aux Dupont.", "translation": "To the Duponts." },
+        { "term": "Les Dupont? Je ne les connais pas.", "translation": "The Duponts? I don't know them." },
+        { "term": "Mais si!", "translation": "But yes (you do)!" },
+        { "term": "Les Dupont sont les gens", "translation": "The Duponts are the people" },
+        { "term": "qui habitaient au-dessus de chez nous à Paris", "translation": "who lived above us in Paris" },
+        { "term": "qui voyageaient beaucoup", "translation": "who travelled a lot" },
+        { "term": "et dont les enfants étaient si bruyants.", "translation": "and whose children were so noisy." },
+        { "term": "Ah oui.", "translation": "Ah yes." },
+        { "term": "Je ne les connaissais pas très bien.", "translation": "I didn't know them very well." },
+        { "term": "À propos", "translation": "By the way" },
+        { "term": "comment va ton travail?", "translation": "how's your work going?" },
+        { "term": "Pas trop bien.", "translation": "Not too well." },
+        { "term": "Si seulement", "translation": "If only" },
+        { "term": "je pouvais travailler à mi-temps", "translation": "I could work part-time" },
+        { "term": "ça m'arrangerait bien.", "translation": "that would suit me well." },
+        { "term": "Qu'est-ce que tu ferais", "translation": "What would you do" },
+        { "term": "de tout ce temps libre?", "translation": "with all this free time?" },
+        { "term": "Je peindrais, je dessinerais.", "translation": "I would paint, I would draw." },
+        { "term": "Michel et moi", "translation": "Michel and I" },
+        { "term": "nous sortirions plus souvent", "translation": "we would go out more often" },
+        { "term": "nous irions au cinéma", "translation": "we would go to the cinema" },
+        { "term": "au restaurant.", "translation": "to the restaurant." },
+        { "term": "Je ferais du sport", "translation": "I would do sport" },
+        { "term": "j'apprendrais l'anglais", "translation": "I would learn English" },
+        { "term": "je lirais", "translation": "I would read" },
+        { "term": "tous les livres que j'ai achetés", "translation": "all the books I bought" },
+        { "term": "l'année dernière", "translation": "last year" },
+        { "term": "Tu ferais mieux", "translation": "You'd better" },
+        { "term": "de prendre ta retraite", "translation": "to retire" },
+        { "term": "tout de suite!", "translation": "right away!" },
+        { "term": "le cas", "translation": "the case / situation" },
+        { "term": "les gens", "translation": "people" },
+        { "term": "la visite", "translation": "the visit" },
+        { "term": "la porte", "translation": "the door" },
+        { "term": "la retraite", "translation": "retirement" },
+        { "term": "au-dessus de", "translation": "above" },
+        { "term": "chez", "translation": "at someone's home" },
+        { "term": "bonsoir", "translation": "good evening" },
+        { "term": "justement", "translation": "just / exactly" },
+        { "term": "si", "translation": "yes (emphatic after negative)" },
+        { "term": "à propos", "translation": "by the way" },
+        { "term": "à mi-temps", "translation": "part-time" },
+        { "term": "tout de suite", "translation": "right away" },
+        { "term": "inattendu", "translation": "unexpected" },
+        { "term": "bruyant", "translation": "noisy" },
+        { "term": "déranger", "translation": "to disturb" },
+        { "term": "arranger", "translation": "to suit / arrange" },
+        { "term": "frapper", "translation": "to knock" },
+        { "term": "penser à", "translation": "to think of (something)" },
+        { "term": "penser de", "translation": "to think of (opinion)" },
+        { "term": "espérer", "translation": "to hope" }
+      ],
+      "dialogue": [
+        { "speaker": "Pierre", "text": "Bonsoir Nicole, j'espère que je ne te dérange pas.", "translation": "Good evening Nicole, I hope I'm not disturbing you." },
+        { "speaker": "Nicole", "text": "Pierre! Bonsoir. Je pensais justement à toi.", "translation": "Pierre! Good evening. I was just thinking about you." },
+        { "speaker": "Pierre", "text": "Tu n'es pas trop occupée?", "translation": "You're not too busy?" },
+        { "speaker": "Nicole", "text": "Non, non. J'écrivais une lettre, quand tu as frappé à la porte.", "translation": "No, no. I was writing a letter, when you knocked at the door." },
+        { "speaker": "Pierre", "text": "Ah bon? A qui est-ce que tu écrivais?", "translation": "Oh really? Who were you writing to?" },
+        { "speaker": "Nicole", "text": "Aux Dupont.", "translation": "To the Duponts." },
+        { "speaker": "Pierre", "text": "Les Dupont? Je ne les connais pas.", "translation": "The Duponts? I don't know them." },
+        { "speaker": "Nicole", "text": "Mais si! Les Dupont sont les gens qui habitaient au-dessus de chez nous à Paris, qui voyageaient beaucoup et dont les enfants étaient si bruyants.", "translation": "But yes (you do)! The Duponts are the people who lived above us in Paris, who travelled a lot and whose children were so noisy." },
+        { "speaker": "Pierre", "text": "Ah oui. Je ne les connaissais pas très bien. À propos, comment va ton travail?", "translation": "Ah yes. I didn't know them very well. By the way, how's your work going?" },
+        { "speaker": "Nicole", "text": "Pas trop bien. Si seulement je pouvais travailler à mi-temps, ça m'arrangerait bien.", "translation": "Not too well. If only I could work part-time, that would suit me well." },
+        { "speaker": "Pierre", "text": "Qu'est-ce que tu ferais de tout ce temps libre?", "translation": "What would you do with all this free time?" },
+        { "speaker": "Nicole", "text": "Je peindrais, je dessinerais. Michel et moi, nous sortirions plus souvent, nous irions au cinéma, au restaurant. Je ferais du sport, j'apprendrais l'anglais, je lirais tous les livres que j'ai achetés l'année dernière, je…", "translation": "I would paint, I would draw. Michel and I would go out more often, we would go to the cinema, to the restaurant. I would do sport, I would learn English, I would read all the books I bought last year, I…" },
+        { "speaker": "Pierre", "text": "Tu ferais mieux de prendre ta retraite tout de suite!", "translation": "You'd better retire right away!" }
+      ]
+    },
+    {
+      "scenario_id": "009",
+      "topic": "Shopping for Clothes",
+      "participants": [
+        { "role": "sales assistant", "name": "Vendeur" },
+        { "role": "customer", "name": "Cliente" }
+      ],
+      "vocabulary": [
+        { "term": "la veste", "translation": "the jacket" },
+        { "term": "la taille", "translation": "the size" },
+        { "term": "la couleur", "translation": "the colour" },
+        { "term": "la mode", "translation": "fashion" },
+        { "term": "la laine", "translation": "wool" },
+        { "term": "la vitrine", "translation": "the shop window" },
+        { "term": "la vente", "translation": "the sale" },
+        { "term": "le mariage", "translation": "the wedding / marriage" },
+        { "term": "le mannequin", "translation": "the model / dummy" },
+        { "term": "bleu marine", "translation": "navy blue" },
+        { "term": "gris clair", "translation": "light grey" },
+        { "term": "pur", "translation": "pure" },
+        { "term": "court", "translation": "short" },
+        { "term": "long / longue", "translation": "long" },
+        { "term": "malheureusement", "translation": "unfortunately" },
+        { "term": "heureusement", "translation": "fortunately" },
+        { "term": "exactement", "translation": "exactly" },
+        { "term": "être en train de", "translation": "to be in the middle of (doing)" },
+        { "term": "essayer", "translation": "to try / try on" },
+        { "term": "ne...que", "translation": "only" },
+        { "term": "plaire", "translation": "to please / be pleasing" }
+      ],
+      "dialogue": [
+        { "speaker": "Vendeur", "text": "Bonjour, madame. Je peux vous aider?", "translation": "Good morning, madam. Can I help you?" },
+        { "speaker": "Cliente", "text": "Bonjour, monsieur. Je cherche une veste pour mon mariage.", "translation": "Good morning, sir. I'm looking for a jacket for my wedding." },
+        { "speaker": "Vendeur", "text": "Quelle taille et quelle couleur préférez-vous?", "translation": "What size and colour do you prefer?" },
+        { "speaker": "Cliente", "text": "Du 40, en bleu marine ou gris clair.", "translation": "Size 40, in navy blue or light grey." },
+        { "speaker": "Vendeur", "text": "J'ai exactement ce qu'il vous faut. Voici un modèle très chic, en laine pure.", "translation": "I have exactly what you need. Here's a very stylish model, in pure wool." },
+        { "speaker": "Cliente", "text": "Puis-je l'essayer?", "translation": "Can I try it on?" },
+        { "speaker": "Vendeur", "text": "Bien sûr, madame. La cabine est libre.", "translation": "Of course, madam. The fitting room is free." },
+        { "speaker": "Cliente", "text": "Elle me plaît beaucoup. Elle est parfaite! Je la prends.", "translation": "I like it very much. It's perfect! I'll take it." },
+        { "speaker": "Vendeur", "text": "Très bon choix, madame. C'est en promotion cette semaine.", "translation": "Very good choice, madam. It's on sale this week." }
+      ]
+    },
+    {
+      "scenario_id": "010",
+      "topic": "Learning English in 3 Months",
+      "participants": [
+        { "role": "friend", "name": "David" },
+        { "role": "friend", "name": "Isabelle" }
+      ],
+      "vocabulary": [
+        { "term": "la chaîne hi-fi", "translation": "the hi-fi system" },
+        { "term": "il y a quelques années", "translation": "a few years ago" },
+        { "term": "je ne me sers plus", "translation": "I no longer use" },
+        { "term": "de celle-là", "translation": "that one" },
+        { "term": "Je m'en suis débarrassée", "translation": "I got rid of it" },
+        { "term": "je me suis acheté", "translation": "I bought myself" },
+        { "term": "une enceinte connectée", "translation": "a smart speaker" },
+        { "term": "beaucoup plus perfectionnée", "translation": "much more sophisticated" },
+        { "term": "N'est-il pas difficile", "translation": "Isn't it difficult" },
+        { "term": "d'apprécier la musique", "translation": "to appreciate music" },
+        { "term": "avec un si petit appareil?", "translation": "with such a small device?" },
+        { "term": "Vous vous trompez", "translation": "You're mistaken" },
+        { "term": "ce n'est pas de la musique", "translation": "it's not music" },
+        { "term": "que j'écoute", "translation": "that I listen to" },
+        { "term": "ce sont des cours d'anglais.", "translation": "it's English lessons." },
+        { "term": "Je les ai achetés", "translation": "I bought them" },
+        { "term": "parce que je dois apprendre l'anglais", "translation": "because I have to learn English" },
+        { "term": "en trois mois.", "translation": "in three months." },
+        { "term": "Est-ce que vous avez le temps", "translation": "Do you have time" },
+        { "term": "d'écouter ces enregistrements?", "translation": "to listen to these recordings?" },
+        { "term": "Oui, bien sûr.", "translation": "Yes, of course." },
+        { "term": "Je les écoute le matin", "translation": "I listen to them in the morning" },
+        { "term": "lorsque je me lave", "translation": "when I wash" },
+        { "term": "lorsque je m'habille", "translation": "when I get dressed" },
+        { "term": "lorsque je me coiffe", "translation": "when I do my hair" },
+        { "term": "et lorsque je me maquille.", "translation": "and when I put on make-up." },
+        { "term": "Mon mari les écoute aussi", "translation": "My husband listens to them too" },
+        { "term": "quand il se rase", "translation": "when he shaves" },
+        { "term": "quand il se lave", "translation": "when he washes" },
+        { "term": "et se brosse les dents.", "translation": "and brushes his teeth." },
+        { "term": "Le dimanche", "translation": "On Sundays" },
+        { "term": "nous aimons sortir", "translation": "we like to go out" },
+        { "term": "et je les écoute encore", "translation": "and I listen to them again" },
+        { "term": "lorsque nous nous promenons au parc", "translation": "when we walk in the park" },
+        { "term": "et lorsque nous nous asseyons", "translation": "and when we sit down" },
+        { "term": "sur un banc pour nous reposer.", "translation": "on a bench to rest." },
+        { "term": "Ce n'est pas une attitude très sociable.", "translation": "That's not a very sociable attitude." },
+        { "term": "C'est vrai", "translation": "It's true" },
+        { "term": "mais si je réussis", "translation": "but if I succeed" },
+        { "term": "à apprendre l'anglais en trois mois", "translation": "in learning English in three months" },
+        { "term": "il me sera possible", "translation": "it will be possible for me" },
+        { "term": "d'obtenir une promotion", "translation": "to get a promotion" },
+        { "term": "et de partir en Angleterre", "translation": "and to leave for England" },
+        { "term": "et aux États-Unis.", "translation": "and to the United States." },
+        { "term": "Bon, alors, bonne chance", "translation": "Well then, good luck" },
+        { "term": "ou, comme on dit en anglais", "translation": "or, as they say in English" },
+        { "term": "'good luck'!", "translation": "'good luck'!" },
+        { "term": "se laver", "translation": "to wash oneself" },
+        { "term": "se raser", "translation": "to shave oneself" },
+        { "term": "se brûler", "translation": "to burn oneself" },
+        { "term": "se perdre", "translation": "to lose oneself" },
+        { "term": "se couper", "translation": "to cut oneself" },
+        { "term": "se préparer", "translation": "to prepare oneself" },
+        { "term": "s'amuser", "translation": "to enjoy oneself" },
+        { "term": "s'habiller", "translation": "to dress oneself" },
+        { "term": "se déshabiller", "translation": "to undress" },
+        { "term": "s'endormir", "translation": "to fall asleep" },
+        { "term": "se réveiller", "translation": "to wake up" },
+        { "term": "se lever", "translation": "to get up" },
+        { "term": "se dépêcher", "translation": "to hurry" },
+        { "term": "se promener", "translation": "to go for a walk" },
+        { "term": "se reposer", "translation": "to rest" },
+        { "term": "se coucher", "translation": "to go to bed" },
+        { "term": "se tromper", "translation": "to make a mistake" },
+        { "term": "s'appeler", "translation": "to be called" },
+        { "term": "se marier", "translation": "to get married" },
+        { "term": "se débarrasser de", "translation": "to get rid of" },
+        { "term": "se servir de", "translation": "to make use of" },
+        { "term": "se souvenir de", "translation": "to remember" },
+        { "term": "se coiffer", "translation": "to fix one's hair" },
+        { "term": "se maquiller", "translation": "to put on make-up" },
+        { "term": "se laver les mains", "translation": "to wash one's hands" },
+        { "term": "se brosser les dents", "translation": "to brush one's teeth" }
+      ],
+      "dialogue": [
+        { "speaker": "David", "text": "Est-ce que vous vous servez toujours de la chaîne hi-fi que vous avez achetée il y a quelques années?", "translation": "Do you still use the hi-fi system you bought a few years ago?" },
+        { "speaker": "Isabelle", "text": "Non, je ne me sers plus de celle-là. Je m'en suis débarrassée et je me suis acheté une enceinte connectée beaucoup plus perfectionnée.", "translation": "No, I no longer use that one. I got rid of it and I bought myself a much more sophisticated smart speaker." },
+        { "speaker": "David", "text": "N'est-il pas difficile d'apprécier la musique avec un si petit appareil?", "translation": "Isn't it difficult to appreciate music with such a small device?" },
+        { "speaker": "Isabelle", "text": "Vous vous trompez, ce n'est pas de la musique que j'écoute, ce sont des cours d'anglais. Je les ai achetés parce que je dois apprendre l'anglais en trois mois.", "translation": "You're mistaken, it's not music I listen to, it's English lessons. I bought them because I have to learn English in three months." },
+        { "speaker": "David", "text": "Est-ce que vous avez le temps d'écouter ces enregistrements?", "translation": "Do you have time to listen to these recordings?" },
+        { "speaker": "Isabelle", "text": "Oui, bien sûr. Je les écoute le matin lorsque je me lave, lorsque je m'habille, lorsque je me coiffe et lorsque je me maquille. Mon mari les écoute aussi quand il se rase, quand il se lave et se brosse les dents. Le dimanche nous aimons sortir et je les écoute encore lorsque nous nous promenons au parc et lorsque nous nous asseyons sur un banc pour nous reposer.", "translation": "Yes, of course. I listen to them in the morning when I wash, when I get dressed, when I do my hair and when I put on make-up. My husband listens to them too when he shaves, when he washes and brushes his teeth. On Sundays we like to go out and I listen to them again when we walk in the park and when we sit on a bench to rest." },
+        { "speaker": "David", "text": "Ce n'est pas une attitude très sociable.", "translation": "That's not a very sociable attitude." },
+        { "speaker": "Isabelle", "text": "C'est vrai, mais si je réussis à apprendre l'anglais en trois mois, il me sera possible d'obtenir une promotion et de partir en Angleterre et aux États-Unis.", "translation": "It's true, but if I succeed in learning English in three months, it will be possible for me to get a promotion and to leave for England and to the United States." },
+        { "speaker": "David", "text": "Bon, alors, bonne chance ou, comme on dit en anglais, 'good luck'!", "translation": "Well then, good luck or, as they say in English, 'good luck'!" }
+      ]
+    },
+    {
+      "scenario_id": "011",
+      "topic": "Camping Plans",
+      "participants": [
+        { "role": "friend 1", "name": "Ami" },
+        { "role": "friend 2", "name": "Amie" }
+      ],
+      "vocabulary": [
+        { "term": "le sac de couchage", "translation": "the sleeping bag" },
+        { "term": "le champ", "translation": "the field" },
+        { "term": "la piscine", "translation": "the swimming pool" },
+        { "term": "supplémentaire", "translation": "extra" },
+        { "term": "tomber en panne", "translation": "to break down" },
+        { "term": "parce que", "translation": "because" },
+        { "term": "car", "translation": "for / because" },
+        { "term": "puisque", "translation": "since / because" },
+        { "term": "comme", "translation": "as / since" },
+        { "term": "donc", "translation": "so / therefore" },
+        { "term": "quand", "translation": "when" },
+        { "term": "lorsque", "translation": "when" },
+        { "term": "dès que", "translation": "as soon as" },
+        { "term": "aussitôt que", "translation": "as soon as" },
+        { "term": "pendant que", "translation": "while" },
+        { "term": "maintenant que", "translation": "now that" },
+        { "term": "mais", "translation": "but" },
+        { "term": "tandis que", "translation": "whereas" }
+      ],
+      "dialogue": [
+        { "speaker": "Ami", "text": "Nous avons acheté une tente, car nous voulons faire du camping.", "translation": "We bought a tent because we want to go camping." },
+        { "speaker": "Amie", "text": "Mon père n'aime pas l'Italie, donc nous sommes allés en Allemagne.", "translation": "My father doesn't like Italy, so we went to Germany." },
+        { "speaker": "Ami", "text": "Puisque tu es fatigué, nous pourrions camper ici.", "translation": "Since you're tired, we could camp here." },
+        { "speaker": "Amie", "text": "Pendant que tu vas chercher de la bière, je vais regarder la télévision.", "translation": "While you go and get some beer, I'll watch television." },
+        { "speaker": "Ami", "text": "C'est un bon camping, mais où sont les toilettes?", "translation": "It's a good campsite, but where are the toilets?" },
+        { "speaker": "Amie", "text": "Quand nous ferons du camping l'année prochaine, toute la famille s'amusera bien.", "translation": "When we go camping next year, the whole family will have a good time." },
+        { "speaker": "Ami", "text": "Aussitôt que tu seras prêt, je préparerai à manger.", "translation": "As soon as you're ready, I'll prepare something to eat." },
+        { "speaker": "Amie", "text": "Quand je suis en vacances, je dépense toujours beaucoup d'argent.", "translation": "When I'm on holiday, I always spend a lot of money." }
+      ]
+    },
+    {
+      "scenario_id": "012",
+      "topic": "Telephone Call - Graphologist",
+      "participants": [
+        { "role": "client", "name": "Cliente" },
+        { "role": "graphologist", "name": "Graphologue" }
+      ],
+      "vocabulary": [
+        { "term": "Allô. Bonjour, monsieur.", "translation": "Hello. Good morning, sir." },
+        { "term": "C'est vous le graphologue?", "translation": "Are you the graphologist?" },
+        { "term": "Oui, c'est moi.", "translation": "Yes, it's me." },
+        { "term": "Eh bien, mon fiancé", "translation": "Well, my fiancé" },
+        { "term": "vient de fixer la date", "translation": "has just fixed the date" },
+        { "term": "de notre mariage", "translation": "of our wedding" },
+        { "term": "Félicitations, mademoiselle!", "translation": "Congratulations, miss!" },
+        { "term": "Merci.", "translation": "Thank you." },
+        { "term": "Je ne crois pas", "translation": "I don't think" },
+        { "term": "que je sois tout à fait prête", "translation": "I'm quite ready" },
+        { "term": "pour le mariage", "translation": "for marriage" },
+        { "term": "alors je voudrais", "translation": "so I would like" },
+        { "term": "que vous analysiez mon écriture", "translation": "you to analyse my handwriting" },
+        { "term": "et aussi celle de mon fiancé", "translation": "and also my fiancé's" },
+        { "term": "pour voir", "translation": "to see" },
+        { "term": "si nos personnalités", "translation": "if our personalities" },
+        { "term": "sont compatibles.", "translation": "are compatible." },
+        { "term": "Oui, c'est très facile.", "translation": "Yes, that's very easy." },
+        { "term": "Il faut que vous m'envoyiez", "translation": "You must send me" },
+        { "term": "un échantillon", "translation": "a sample" },
+        { "term": "de votre écriture", "translation": "of your handwriting" },
+        { "term": "et de celle de votre fiancé.", "translation": "and of your fiancé's." },
+        { "term": "Quelle sorte d'échantillon", "translation": "What sort of sample" },
+        { "term": "faut-il que je vous envoie?", "translation": "must I send you?" },
+        { "term": "Je préfère", "translation": "I prefer" },
+        { "term": "que vous écriviez", "translation": "you to write" },
+        { "term": "une lettre tout à fait ordinaire", "translation": "a perfectly ordinary letter" },
+        { "term": "mais il faut qu'elle soit signée.", "translation": "but it must be signed." },
+        { "term": "Je doute", "translation": "I doubt" },
+        { "term": "que mon fiancé soit prêt", "translation": "my fiancé is willing" },
+        { "term": "à rédiger une lettre", "translation": "to write a letter" },
+        { "term": "et à la signer", "translation": "and to sign it" },
+        { "term": "sans savoir pourquoi.", "translation": "without knowing why." },
+        { "term": "Mais il est très important", "translation": "But it's very important" },
+        { "term": "qu'il n'en connaisse pas la raison.", "translation": "that he doesn't know the reason." },
+        { "term": "Bon, très bien.", "translation": "OK, fine." },
+        { "term": "Pour que vous puissiez", "translation": "So that you can" },
+        { "term": "arriver à une conclusion", "translation": "come to a conclusion" },
+        { "term": "plus rapidement", "translation": "more rapidly" },
+        { "term": "est-ce qu'il faut que nous vous donnions", "translation": "do we have to give you" },
+        { "term": "des renseignements supplémentaires?", "translation": "additional information?" },
+        { "term": "Non, pas du tout.", "translation": "No, not at all." },
+        { "term": "Vous savez", "translation": "You know" },
+        { "term": "cette analyse est très importante pour moi.", "translation": "this analysis is very important for me." },
+        { "term": "A moins que votre rapport ne soit favorable", "translation": "Unless your report is favourable" },
+        { "term": "il est possible", "translation": "it's possible" },
+        { "term": "que je retarde le mariage.", "translation": "I may delay the wedding." },
+        { "term": "le graphologue", "translation": "the graphologist" },
+        { "term": "le mariage", "translation": "the wedding / marriage" },
+        { "term": "le renseignement", "translation": "information" },
+        { "term": "l'échantillon", "translation": "the sample" },
+        { "term": "la conversation téléphonique", "translation": "the telephone conversation" },
+        { "term": "la personnalité", "translation": "the personality" },
+        { "term": "la conclusion", "translation": "the conclusion" },
+        { "term": "l'écriture", "translation": "the handwriting" },
+        { "term": "l'analyse", "translation": "the analysis" },
+        { "term": "les félicitations", "translation": "congratulations" },
+        { "term": "analyser", "translation": "to analyse" },
+        { "term": "rédiger", "translation": "to write / draft" },
+        { "term": "retarder", "translation": "to delay" },
+        { "term": "tout à fait", "translation": "quite / completely" },
+        { "term": "compatible", "translation": "compatible" },
+        { "term": "ordinaire", "translation": "ordinary" },
+        { "term": "favorable", "translation": "favourable" },
+        { "term": "alors", "translation": "so" },
+        { "term": "allô", "translation": "hello (on telephone)" }
+      ],
+      "dialogue": [
+        { "speaker": "Cliente", "text": "Allô. Bonjour, monsieur. C'est vous le graphologue?", "translation": "Hello. Good morning, sir. Are you the graphologist?" },
+        { "speaker": "Graphologue", "text": "Oui, c'est moi.", "translation": "Yes, it's me." },
+        { "speaker": "Cliente", "text": "Eh bien, mon fiancé vient de fixer la date de notre mariage et…", "translation": "Well, my fiancé has just fixed the date of our wedding and…" },
+        { "speaker": "Graphologue", "text": "Félicitations, mademoiselle!", "translation": "Congratulations, miss!" },
+        { "speaker": "Cliente", "text": "Merci. Je ne crois pas que je sois tout à fait prête pour le mariage, alors je voudrais que vous analysiez mon écriture et aussi celle de mon fiancé pour voir si nos personnalités sont compatibles.", "translation": "Thank you. I don't think I'm quite ready for marriage, so I'd like you to analyse my handwriting and also my fiancé's to see if our personalities are compatible." },
+        { "speaker": "Graphologue", "text": "Oui, c'est très facile. Il faut que vous m'envoyiez un échantillon de votre écriture et de celle de votre fiancé.", "translation": "Yes, that's very easy. You must send me a sample of your handwriting and of your fiancé's." },
+        { "speaker": "Cliente", "text": "Quelle sorte d'échantillon faut-il que je vous envoie?", "translation": "What sort of sample do I have to send?" },
+        { "speaker": "Graphologue", "text": "Je préfère que vous écriviez une lettre tout à fait ordinaire, mais il faut qu'elle soit signée.", "translation": "I prefer you to write a perfectly ordinary letter, but it must be signed." },
+        { "speaker": "Cliente", "text": "Je doute que mon fiancé soit prêt à rédiger une lettre et à la signer sans savoir pourquoi.", "translation": "I doubt whether my fiancé will be willing to write a letter and to sign it without knowing why." },
+        { "speaker": "Graphologue", "text": "Mais il est très important qu'il n'en connaisse pas la raison.", "translation": "But it's very important that he doesn't know the reason for it." },
+        { "speaker": "Cliente", "text": "Bon, très bien. Pour que vous puissiez arriver à une conclusion plus rapidement, est-ce qu'il faut que nous vous donnions des renseignements supplémentaires?", "translation": "OK, fine. So that you can come to a conclusion more rapidly, do we have to give you any additional information?" },
+        { "speaker": "Graphologue", "text": "Non, pas du tout.", "translation": "No, not at all." },
+        { "speaker": "Cliente", "text": "Vous savez, cette analyse est très importante pour moi. A moins que votre rapport ne soit favorable, il est possible que je retarde le mariage.", "translation": "You know, this analysis is very important for me. Unless your report is favourable, it's possible I may delay the wedding." }
+      ]
+    }
+  ]
+};
+
+/* 英文翻譯：由於資料來源為英文對照，這裡不另外提供中文欄位，
+   顯示「英文」時使用英文譯文（保留原始資料語意）。*/
+
+/* =====================  建立字卡資料  ===================== */
+let ALL_CARDS = [];
+DATA.scenarios.forEach(sc=>{
+  sc.vocabulary.forEach(v=>{
+    ALL_CARDS.push({type:'word', chapter:sc.scenario_id, fr:v.term, zh:v.translation});
+  });
+  sc.dialogue.forEach(d=>{
+    ALL_CARDS.push({type:'sentence', chapter:sc.scenario_id, fr:d.text, zh:d.translation, speaker:d.speaker});
+  });
+});
+
+function chapterLabel(sc){ return sc.scenario_id + ' · ' + sc.topic; }
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* =====================  章節學習記錄（持久化）  =====================
+   說明：瀏覽器基於安全考量，網頁無法在使用者不主動選擇檔案的情況下，
+   靜默讀寫磁碟上任意路徑的檔案（例如「學習記錄.txt」）。
+   因此本機自動接續記錄採用瀏覽器 localStorage 儲存（同一裝置、同一瀏覽器
+   重新開啟本頁面時會自動繼續累加）；同時提供「匯出／匯入 學習記錄.txt」
+   按鈕，讓使用者可取得實際文字檔備份，或匯入先前匯出的記錄檔繼續使用。
+*/
+const CHAPTER_COMPLETE_THRESHOLD = 50;
+const LEARNING_RECORD_KEY = 'frAppLearningRecord';
+let chapterProgress = {};
+let completedChapters = new Set();
+
+function loadChapterProgress(){
+  try{
+    const raw = window.localStorage.getItem(LEARNING_RECORD_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(parsed && typeof parsed === 'object') chapterProgress = parsed;
+    }
+  }catch(e){ chapterProgress = {}; }
+}
+function saveChapterProgress(){
+  try{ window.localStorage.setItem(LEARNING_RECORD_KEY, JSON.stringify(chapterProgress)); }catch(e){}
+}
+function updateCompletionStatus(){
+  completedChapters = new Set(
+    DATA.scenarios
+      .map(function(sc){ return sc.scenario_id; })
+      .filter(function(id){ return (chapterProgress[id] || 0) > CHAPTER_COMPLETE_THRESHOLD; })
+  );
+}
+function recordTextContent(){
+  return DATA.scenarios.map(function(sc){
+    return sc.scenario_id + ',' + (chapterProgress[sc.scenario_id] || 0);
+  }).join('\n') + '\n';
+}
+function exportLearningRecord(){
+  const blob = new Blob([recordTextContent()], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '學習記錄.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+function importLearningRecordText(text){
+  const next = {};
+  text.split(/\r?\n/).forEach(function(line){
+    const parts = line.split(',');
+    if(parts.length>=2){
+      const id = parts[0].trim();
+      const count = parseInt(parts[1], 10);
+      if(id && !isNaN(count)) next[id] = count;
+    }
+  });
+  chapterProgress = next;
+  saveChapterProgress();
+  updateCompletionStatus();
+  refreshLearnChapterOptions();
+}
+
+/* File System Access API：支援的瀏覽器（如桌面版 Chrome/Edge）可一次授權，
+   之後每完成 10 題會自動將完整記錄寫入使用者選定的「學習記錄.txt」，
+   不需再手動匯出。不支援的瀏覽器（多數手機瀏覽器）則維持 localStorage
+   自動接續＋手動匯出/匯入。 */
+const FS_ACCESS_SUPPORTED = 'showSaveFilePicker' in window;
+let recordFileHandle = null;
+async function connectRecordFile(){
+  if(!FS_ACCESS_SUPPORTED) return;
+  try{
+    recordFileHandle = await window.showSaveFilePicker({
+      suggestedName: '學習記錄.txt',
+      types: [{ description:'Text file', accept:{'text/plain':['.txt']} }]
+    });
+    await writeRecordFile();
+    const btn = document.getElementById('connectRecordBtn');
+    if(btn){ btn.textContent = '✅ 已連結，自動寫入中'; btn.disabled = true; }
+  }catch(e){ /* 使用者取消選檔，忽略 */ }
+}
+async function writeRecordFile(){
+  if(!recordFileHandle) return;
+  try{
+    const writable = await recordFileHandle.createWritable();
+    await writable.write(recordTextContent());
+    await writable.close();
+  }catch(e){ /* 權限被收回或寫入失敗，忽略，仍保留 localStorage 記錄 */ }
+}
+
+loadChapterProgress();
+updateCompletionStatus();
+
+/* =====================  狀態  ===================== */
+const state = {
+  mode:'learn',
+  learn:{ chapter:'all', cardText:'fr', currentCard:null },
+  test:{ chapter:'all', type:'all', queue:[], currentSet:[], currentIndex:0, correctCount:0, wrongList:[], answered:false, isRetest:false, cumulativeAnswered:0, cumulativeCorrect:0 },
+  speechToken:0
+};
+
+/* =====================  語音  ===================== */
+let frVoice = null;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  const voices = window.speechSynthesis.getVoices();
+  frVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf('fr') === 0; }) || null;
+}
+if('speechSynthesis' in window){
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+  /* Chrome/Android 上 speechSynthesis 長時間播放會自動暫停，定時喚醒 */
+  setInterval(function(){
+    if(window.speechSynthesis.speaking && !window.speechSynthesis.paused){
+      window.speechSynthesis.pause();
+      window.speechSynthesis.resume();
+    }
+  }, 4000);
+}
+
+function cancelSpeech(){
+  state.speechToken++;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+function speakFrench(text, times, interval){
+  if(!('speechSynthesis' in window)) return;
+  state.speechToken++;
+  const token = state.speechToken;
+  window.speechSynthesis.cancel();
+  let count = 0;
+  function speakOnce(){
+    if(token !== state.speechToken) return;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'fr-FR';
+    if(frVoice) utter.voice = frVoice;
+    utter.rate = 0.92;
+    count++;
+    if(count < times){
+      utter.onend = function(){
+        if(token !== state.speechToken) return;
+        setTimeout(function(){ if(token === state.speechToken) speakOnce(); }, interval);
+      };
+    }
+    window.speechSynthesis.speak(utter);
+  }
+  /* 部分瀏覽器在 cancel() 後立即 speak() 會被忽略，故延遲一個 tick */
+  setTimeout(speakOnce, 30);
+}
+
+/* =====================  DOM refs  ===================== */
+const modeBtns = document.querySelectorAll('.mode-btn');
+const learnFilters = document.getElementById('learnFilters');
+const testFilters = document.getElementById('testFilters');
+const translationPanel = document.getElementById('translationPanel');
+const translationContent = document.getElementById('translationContent');
+const translateBtn = document.getElementById('translateBtn');
+const learnView = document.getElementById('learnView');
+const testView = document.getElementById('testView');
+const cardGrid = document.getElementById('cardGrid');
+const quizArea = document.getElementById('quizArea');
+const learnChapterSel = document.getElementById('learnChapter');
+const learnCardTextSel = document.getElementById('learnCardText');
+const testChapterSel = document.getElementById('testChapter');
+const testTypeSel = document.getElementById('testType');
+
+/* =====================  下拉選單初始化  ===================== */
+function fillChapterSelect(sel, allLabel, markCompleted){
+  sel.innerHTML = '<option value="completed">已完成章節</option>' +
+    '<option value="all">'+allLabel+'</option>' +
+    DATA.scenarios.map(function(sc){
+      const isDone = markCompleted && completedChapters.has(sc.scenario_id);
+      const style = isDone ? ' style="text-decoration:line-through;"' : '';
+      return '<option value="'+sc.scenario_id+'"'+style+'>'+chapterLabel(sc)+'</option>';
+    }).join('');
+}
+function refreshLearnChapterOptions(){
+  const current = learnChapterSel.value;
+  fillChapterSelect(learnChapterSel, '全部學習章節', true);
+  learnChapterSel.value = current;
+}
+fillChapterSelect(learnChapterSel, '全部學習章節', true);
+fillChapterSelect(testChapterSel, '全部測驗章節', false);
+testTypeSel.value = state.test.type;
+learnCardTextSel.value = state.learn.cardText;
+learnChapterSel.value = state.learn.chapter;
+testChapterSel.value = state.test.chapter;
+
+/* =====================  模式切換  ===================== */
+modeBtns.forEach(btn=>{
+  btn.addEventListener('click', function(){
+    state.mode = btn.dataset.mode;
+    modeBtns.forEach(b=>b.classList.toggle('active', b===btn));
+    document.body.classList.toggle('mode-learn', state.mode==='learn');
+    document.body.classList.toggle('mode-test', state.mode==='test');
+    learnFilters.hidden = state.mode !== 'learn';
+    testFilters.hidden = state.mode !== 'test';
+    translationPanel.style.display = state.mode==='learn' ? 'flex' : 'none';
+    learnView.hidden = state.mode !== 'learn';
+    testView.hidden = state.mode !== 'test';
+    cancelSpeech();
+    if(state.mode==='test'){
+      if(state.test.chapter !== state.learn.chapter){
+        state.test.chapter = state.learn.chapter;
+        testChapterSel.value = state.test.chapter;
+        resetTestSession();
+      } else if(state.test.currentSet.length===0){
+        resetTestSession();
+      }
+    }
+  });
+});
+
+/* =====================  學習模式  ===================== */
+function getRelevantChapters(){
+  if(state.learn.chapter==='completed') return DATA.scenarios.filter(function(sc){ return completedChapters.has(sc.scenario_id); });
+  if(state.learn.chapter==='all') return DATA.scenarios;
+  return DATA.scenarios.filter(function(sc){ return sc.scenario_id===state.learn.chapter; });
+}
+
+function escapeHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function appendLearnCard(card){
+  const div = document.createElement('div');
+  div.className = 'card ' + (state.learn.cardText==='fr' ? 'fr-text' : '');
+  const mainText = state.learn.cardText==='fr' ? card.fr : card.zh;
+  if(card.type==='sentence' && card.speaker){
+    div.innerHTML = escapeHtml(mainText) + '<sup class="speaker-tag">' + escapeHtml(card.speaker) + '</sup>';
+  } else {
+    div.textContent = mainText;
+  }
+  div.addEventListener('click', function(){ onCardClick(card, div); });
+  cardGrid.appendChild(div);
+}
+
+function renderCardGrid(){
+  const chapters = getRelevantChapters();
+  cardGrid.innerHTML = '';
+  if(chapters.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'section-header';
+    empty.textContent = '尚無已完成章節';
+    cardGrid.appendChild(empty);
+    return;
+  }
+  chapters.forEach(function(sc){
+    const chapterHeader = document.createElement('div');
+    chapterHeader.className = 'section-header';
+    chapterHeader.textContent = chapterLabel(sc);
+    cardGrid.appendChild(chapterHeader);
+
+    const wordCards = ALL_CARDS.filter(function(c){ return c.chapter===sc.scenario_id && c.type==='word'; });
+    wordCards.forEach(appendLearnCard);
+
+    const sentenceCards = ALL_CARDS.filter(function(c){ return c.chapter===sc.scenario_id && c.type==='sentence'; });
+    if(sentenceCards.length>0){
+      const dialogueHeader = document.createElement('div');
+      dialogueHeader.className = 'section-subheader';
+      dialogueHeader.textContent = '對話';
+      cardGrid.appendChild(dialogueHeader);
+      sentenceCards.forEach(appendLearnCard);
+    }
+  });
+}
+
+function onCardClick(card, el){
+  document.querySelectorAll('.card.speaking').forEach(function(c){ c.classList.remove('speaking'); });
+  el.classList.add('speaking');
+  state.learn.currentCard = card;
+  if(state.learn.cardText==='fr'){
+    translationContent.textContent = card.zh;
+    translationContent.classList.remove('fr-text');
+    speakFrench(card.fr, 3, 1000);
+  } else {
+    translationContent.textContent = card.fr;
+    translationContent.classList.add('fr-text');
+    speakFrench(card.fr, 1, 1000);
+  }
+}
+
+learnChapterSel.addEventListener('change', function(){
+  state.learn.chapter = learnChapterSel.value;
+  cancelSpeech();
+  translationContent.textContent = '';
+  renderCardGrid();
+});
+learnCardTextSel.addEventListener('change', function(){
+  state.learn.cardText = learnCardTextSel.value;
+  cancelSpeech();
+  translationContent.textContent = '';
+  renderCardGrid();
+});
+
+function copyToClipboard(text){
+  /* 優先使用 Clipboard API（需 https 安全環境） */
+  if(window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).catch(function(){});
+  }
+  /* 同時使用相容性較高的 execCommand 備援，確保在 file:// 或非安全環境下也能複製 */
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }catch(e){}
+}
+
+translateBtn.addEventListener('click', function(){
+  const card = state.learn.currentCard;
+  if(!card) return;
+  const text = state.learn.cardText==='fr' ? card.fr : card.zh;
+  copyToClipboard(text);
+  const targetLang = state.learn.cardText==='fr' ? 'zh-TW' : 'fr';
+  const url = 'https://translate.google.com/?sl=auto&tl=' + targetLang + '&text=' + encodeURIComponent(text) + '&op=translate';
+  /* window.open 必須在點擊事件的同一個呼叫堆疊中同步執行，避免被彈出視窗攔截 */
+  window.open(url, '_blank');
+});
+
+/* =====================  測驗模式  ===================== */
+function buildTestPool(){
+  const chapter = state.test.chapter;
+  let pool;
+  if(chapter === 'completed'){
+    pool = ALL_CARDS.filter(function(c){ return completedChapters.has(c.chapter); });
+  } else if(chapter === 'all'){
+    pool = ALL_CARDS;
+  } else {
+    pool = ALL_CARDS.filter(function(c){ return c.chapter===chapter; });
+  }
+  return pool;
+}
+
+function ensureQueue(){
+  if(state.test.queue.length < 10){
+    state.test.queue = state.test.queue.concat(shuffle(buildTestPool()));
+  }
+}
+
+function resetTestSession(){
+  state.test.queue = [];
+  state.test.cumulativeAnswered = 0;
+  state.test.cumulativeCorrect = 0;
+  ensureQueue();
+  startNewRound();
+}
+
+function startNewRound(){
+  ensureQueue();
+  state.test.currentSet = state.test.queue.splice(0, Math.min(10, state.test.queue.length));
+  state.test.currentIndex = 0;
+  state.test.correctCount = 0;
+  state.test.wrongList = [];
+  state.test.isRetest = false;
+  renderQuestion();
+}
+
+function startRetest(){
+  state.test.isRetest = true;
+  state.test.currentSet = shuffle(state.test.wrongList);
+  state.test.wrongList = [];
+  state.test.currentIndex = 0;
+  state.test.correctCount = 0;
+  renderQuestion();
+}
+
+function getOptions(question, mode){
+  const samePool = ALL_CARDS.filter(function(c){ return c.type===question.type && c!==question; });
+  const shuffled = shuffle(samePool);
+  const makeOpt = function(card){ return { text: mode==='zh2fr' ? card.fr : card.zh, fr: card.fr }; };
+  const correctOpt = makeOpt(question);
+  const used = new Set([correctOpt.text]);
+  const distractors = [];
+  for(let i=0;i<shuffled.length && distractors.length<3;i++){
+    const opt = makeOpt(shuffled[i]);
+    if(!used.has(opt.text)){ used.add(opt.text); distractors.push(opt); }
+  }
+  return { options: shuffle([correctOpt].concat(distractors)), correctVal: correctOpt.text };
+}
+
+function renderQuestion(){
+  const idx = state.test.currentIndex;
+  const total = state.test.currentSet.length;
+  if(total===0){
+    quizArea.innerHTML = '<div class="quiz-card"><p style="text-align:center;">此章節暫無題目。</p></div>';
+    return;
+  }
+  const q = state.test.currentSet[idx];
+  const rawType = state.test.type;
+  const type = rawType==='all' ? ['fr2zh','zh2fr','listen'][Math.floor(Math.random()*3)] : rawType;
+  state.test.answered = false;
+
+  let questionDisplay, questionIsFr, useMode;
+  if(type==='fr2zh'){
+    questionDisplay = q.fr; questionIsFr = true; useMode = 'fr2zh';
+  } else if(type==='zh2fr'){
+    questionDisplay = q.zh; questionIsFr = false; useMode = 'zh2fr';
+  } else {
+    questionDisplay = '🔊'; questionIsFr = false;
+    useMode = Math.random() < 0.5 ? 'fr2zh' : 'zh2fr';
+  }
+  const result = getOptions(q, useMode);
+
+  quizArea.innerHTML =
+    '<div class="quiz-card">' +
+      '<div class="quiz-header">' +
+        '<div class="quiz-progress num-text" id="quizProgress">' + (idx+1) + '/' + total + '</div>' +
+        '<div class="quiz-center-actions" id="quizCenterActions">' +
+          '<button class="quiz-action-btn" id="quizTranslateBtn">🌐 Google翻譯</button>' +
+          '<button class="quiz-action-btn quiz-next-btn" id="quizNextBtn">下一題</button>' +
+        '</div>' +
+        '<div class="quiz-score num-text" id="quizScore">' + state.test.correctCount + '</div>' +
+      '</div>' +
+      '<div class="quiz-question ' + (questionIsFr ? 'fr-text' : '') + '" id="quizQuestion">' + questionDisplay + '</div>' +
+      '<div class="quiz-options" id="quizOptions"></div>' +
+    '</div>';
+
+  const optionsContainer = document.getElementById('quizOptions');
+  result.options.forEach(function(opt){
+    const div = document.createElement('div');
+    const optIsFr = useMode==='zh2fr';
+    div.className = 'quiz-option ' + (optIsFr ? 'fr-text' : '');
+    div.textContent = opt.text;
+    div.addEventListener('click', function(){
+      if(state.test.answered){
+        speakFrench(q.fr, 1, 1000);
+        return;
+      }
+      if(type==='fr2zh'){ speakFrench(opt.fr, 1, 1000); }
+      onAnswer(opt.text, result.correctVal, q, div, optIsFr, type, useMode);
+    });
+    optionsContainer.appendChild(div);
+  });
+
+  const questionEl = document.getElementById('quizQuestion');
+  const speakable = (type==='fr2zh' || type==='listen');
+  if(speakable){
+    questionEl.addEventListener('click', function(){ speakFrench(q.fr, 1, 1000); });
+    speakFrench(q.fr, 1, 1000);
+  }
+
+  document.getElementById('quizTranslateBtn').addEventListener('click', function(){
+    copyToClipboard(q.fr);
+    const url = 'https://translate.google.com/?sl=fr&tl=en&text=' + encodeURIComponent(q.fr) + '&op=translate';
+    window.open(url, '_blank');
+  });
+
+  document.getElementById('quizNextBtn').addEventListener('click', function(){
+    state.test.currentIndex++;
+    if(state.test.currentIndex < state.test.currentSet.length){
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  });
+}
+
+function onAnswer(selected, correct, q, btnEl, optIsFr, type, useMode){
+  if(state.test.answered) return;
+  state.test.answered = true;
+  const isCorrect = selected === correct;
+  if(isCorrect){
+    state.test.correctCount++;
+  } else {
+    state.test.wrongList.push(q);
+  }
+  state.test.cumulativeAnswered++;
+  if(isCorrect) state.test.cumulativeCorrect++;
+  document.querySelectorAll('.quiz-option').forEach(function(o){
+    if(o.textContent === correct) o.classList.add('correct');
+    else if(o === btnEl) o.classList.add('wrong');
+  });
+  document.getElementById('quizScore').textContent = state.test.correctCount;
+  document.getElementById('quizCenterActions').style.display = 'flex';
+  const pct = Math.round((state.test.cumulativeCorrect / state.test.cumulativeAnswered) * 100);
+  document.getElementById('quizProgress').textContent = state.test.cumulativeAnswered + '  ' + pct + '%';
+  const questionEl = document.getElementById('quizQuestion');
+  if(type==='listen'){
+    /* 選項是法文(zh2fr) -> 題目區顯示英文；選項是英文(fr2zh) -> 題目區顯示法文 */
+    if(useMode==='zh2fr'){
+      questionEl.textContent = q.zh;
+      questionEl.classList.remove('fr-text');
+    } else {
+      questionEl.textContent = q.fr;
+      questionEl.classList.add('fr-text');
+    }
+  }
+  /* 看結果時，點擊題目區一律朗讀法文 */
+  questionEl.addEventListener('click', function(){ speakFrench(q.fr, 1, 1000); });
+  speakFrench(q.fr, 1, 1000);
+}
+
+function showResults(){
+  const total = state.test.currentSet.length;
+  const score = total>0 ? Math.round((state.test.correctCount/total)*100) : 0;
+  const wrongList = state.test.wrongList;
+
+  if(!state.test.isRetest && total>0){
+    const increments = {};
+    state.test.currentSet.forEach(function(card){
+      increments[card.chapter] = (increments[card.chapter] || 0) + 1;
+    });
+    Object.keys(increments).forEach(function(id){
+      chapterProgress[id] = (chapterProgress[id] || 0) + increments[id];
+    });
+    saveChapterProgress();
+    updateCompletionStatus();
+    refreshLearnChapterOptions();
+    if(recordFileHandle){ writeRecordFile(); }
+  }
+
+  let html = '<div class="result-card">';
+  html += '<div>測驗完成</div>';
+  html += '<div class="result-score num-text">' + score + '</div>';
+
+  if(state.test.isRetest && wrongList.length===0){
+    html += '<div class="celebrate">錯題全數消滅 🎉</div>';
+  } else if(wrongList.length>0){
+    html += '<div class="result-wrong-list">';
+    wrongList.forEach(function(w){
+      html += '<div class="result-wrong-item fr-text" data-fr="'+encodeURIComponent(w.fr)+'">' + w.fr + '　<span style="opacity:.7;">' + w.zh + '</span></div>';
+    });
+    html += '</div>';
+  }
+
+  html += '<div class="result-actions">';
+  if(wrongList.length>0){
+    html += '<button class="result-btn" id="retestBtn">重測（僅錯題）</button>';
+  }
+  html += '<button class="result-btn secondary" id="nextSetBtn">下10題</button>';
+  html += '</div>';
+  html += '<div class="result-actions">';
+  if(FS_ACCESS_SUPPORTED && !recordFileHandle){
+    html += '<button class="result-btn secondary" id="connectRecordBtn">🔗 連結學習記錄.txt（自動寫入）</button>';
+  }
+  html += '<button class="result-btn secondary" id="exportRecordBtn">📤 匯出學習記錄.txt</button>';
+  html += '<button class="result-btn secondary" id="importRecordBtn">📥 匯入學習記錄.txt</button>';
+  html += '</div></div>';
+
+  quizArea.innerHTML = html;
+
+  document.querySelectorAll('.result-wrong-item').forEach(function(el){
+    el.addEventListener('click', function(){
+      speakFrench(decodeURIComponent(el.dataset.fr), 1, 1000);
+    });
+  });
+  const retestBtn = document.getElementById('retestBtn');
+  if(retestBtn) retestBtn.addEventListener('click', startRetest);
+  document.getElementById('nextSetBtn').addEventListener('click', startNewRound);
+  const connectBtn = document.getElementById('connectRecordBtn');
+  if(connectBtn) connectBtn.addEventListener('click', connectRecordFile);
+  document.getElementById('exportRecordBtn').addEventListener('click', exportLearningRecord);
+  document.getElementById('importRecordBtn').addEventListener('click', function(){
+    document.getElementById('importRecordInput').click();
+  });
+}
+
+document.getElementById('importRecordInput').addEventListener('change', function(e){
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){ importLearningRecordText(String(reader.result)); };
+  reader.readAsText(file);
+  e.target.value = '';
+});
+
+testChapterSel.addEventListener('change', function(){
+  state.test.chapter = testChapterSel.value;
+  cancelSpeech();
+  resetTestSession();
+});
+testTypeSel.addEventListener('change', function(){
+  state.test.type = testTypeSel.value;
+  cancelSpeech();
+  resetTestSession();
+});
+
+/* =====================  初始化  ===================== */
+renderCardGrid();
+</script>
+</body>
+</html>
