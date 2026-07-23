@@ -1,1626 +1,1267 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>文字筆記本</title>
-    <style>
-        /* ===== 全域 ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-        :root {
-            --bg: #121315;
-            --primary: #942525;
-            --gold: #bd8b2a;
-            --text: #fcfbfa;
-            --text-dim: rgba(252, 251, 250, 0.6);
-            --surface: rgba(252, 251, 250, 0.06);
-            --surface-hover: rgba(252, 251, 250, 0.12);
-            --border: rgba(252, 251, 250, 0.12);
-            --radius: 14px;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-            --font-base: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            --font-en: var(--font-base);
-            --font-size-base: 20px;
-            --line-length: 100%;
-            --tab-height: 46px;
-            --toolbar-height: 52px;
-            --safe-bottom: env(safe-area-inset-bottom, 8px);
-        }
-        html {
-            font-size: var(--font-size-base);
-            font-family: var(--font-base);
-            background: var(--bg);
-            color: var(--text);
-            height: 100%;
-            overflow: hidden;
-        }
-        body {
-            height: 100%;
-            overflow: hidden;
-            background: var(--bg);
-            color: var(--text);
-            font-family: var(--font-base);
-            display: flex;
-            flex-direction: column;
-            user-select: none;
-            -webkit-user-select: none;
-            position: relative;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        body.loaded {
-            opacity: 1;
-        }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>文字筆記本</title>
+<meta name="theme-color" content="#121315">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="筆記本">
+<link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIuaWh+Wtl+ethuiomOacrCIsCiAgInNob3J0X25hbWUiOiAi562G6KiY5pysIiwKICAic3RhcnRfdXJsIjogIi4vIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTIxMzE1IiwKICAidGhlbWVfY29sb3IiOiAiIzEyMTMxNSIsCiAgImljb25zIjogWwogICAgeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNpSUhacFpYZENiM2c5SWpBZ01DQXhPVElnTVRreUlqNEtQSEpsWTNRZ2QybGtkR2c5SWpFNU1pSWdhR1ZwWjJoMFBTSXhPVElpSUhKNFBTSXlPQ0lnWm1sc2JEMGlJekV5TVRNeE5TSXZQZ284WTJseVkyeGxJR040UFNJNU5pSWdZM2s5SWprMklpQnlQU0kzTWlJZ1ptbHNiRDBpYm05dVpTSWdjM1J5YjJ0bFBTSWpZbVE0WWpKaElpQnpkSEp2YTJVdGQybGtkR2c5SWpJaUx6NEtQSEJoZEdnZ1pEMGlUVFUySURFek1pQlJPREFnTmpBZ01UTTRJRFEySWlCemRISnZhMlU5SWlOaVpEaGlNbUVpSUhOMGNtOXJaUzEzYVdSMGFEMGlOeUlnWm1sc2JEMGlibTl1WlNJZ2MzUnliMnRsTFd4cGJtVmpZWEE5SW5KdmRXNWtJaTgrQ2p4amFYSmpiR1VnWTNnOUlqRXpPQ0lnWTNrOUlqUTJJaUJ5UFNJM0lpQm1hV3hzUFNJak9UUXlOVEkxSWk4K0NqeHdZWFJvSUdROUlrMDFOaUF4TXpJZ1REY3dJREUxTUNJZ2MzUnliMnRsUFNJak9UUXlOVEkxSWlCemRISnZhMlV0ZDJsa2RHZzlJalVpSUdacGJHdzlJbTV2Ym1VaUlITjBjbTlyWlMxc2FXNWxZMkZ3UFNKeWIzVnVaQ0l2UGdvOEwzTjJaejRLIiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIn0sCiAgICB7InNyYyI6ICJkYXRhOmltYWdlL3N2Zyt4bWw7YmFzZTY0LFBITjJaeUI0Yld4dWN6MGlhSFIwY0RvdkwzZDNkeTUzTXk1dmNtY3ZNakF3TUM5emRtY2lJSFpwWlhkQ2IzZzlJakFnTUNBeE9USWdNVGt5SWo0S1BISmxZM1FnZDJsa2RHZzlJakU1TWlJZ2FHVnBaMmgwUFNJeE9USWlJSEo0UFNJeU9DSWdabWxzYkQwaUl6RXlNVE14TlNJdlBnbzhZMmx5WTJ4bElHTjRQU0k1TmlJZ1kzazlJamsySWlCeVBTSTNNaUlnWm1sc2JEMGlibTl1WlNJZ2MzUnliMnRsUFNJalltUTRZakpoSWlCemRISnZhMlV0ZDJsa2RHZzlJaklpTHo0S1BIQmhkR2dnWkQwaVRUVTJJREV6TWlCUk9EQWdOakFnTVRNNElEUTJJaUJ6ZEhKdmEyVTlJaU5pWkRoaU1tRWlJSE4wY205clpTMTNhV1IwYUQwaU55SWdabWxzYkQwaWJtOXVaU0lnYzNSeWIydGxMV3hwYm1WallYQTlJbkp2ZFc1a0lpOCtDanhqYVhKamJHVWdZM2c5SWpFek9DSWdZM2s5SWpRMklpQnlQU0kzSWlCbWFXeHNQU0lqT1RReU5USTFJaTgrQ2p4d1lYUm9JR1E5SWswMU5pQXhNeklnVERjd0lERTFNQ0lnYzNSeWIydGxQU0lqT1RReU5USTFJaUJ6ZEhKdmEyVXRkMmxrZEdnOUlqVWlJR1pwYkd3OUltNXZibVVpSUhOMGNtOXJaUzFzYVc1bFkyRndQU0p5YjNWdVpDSXZQZ284TDNOMlp6NEsiLCAic2l6ZXMiOiAiNTEyeDUxMiIsICJ0eXBlIjogImltYWdlL3N2Zyt4bWwifQogIF0KfQo=">
+<link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIyOCIgZmlsbD0iIzEyMTMxNSIvPgo8Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI3MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYmQ4YjJhIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTU2IDEzMiBRODAgNjAgMTM4IDQ2IiBzdHJva2U9IiNiZDhiMmEiIHN0cm9rZS13aWR0aD0iNyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxjaXJjbGUgY3g9IjEzOCIgY3k9IjQ2IiByPSI3IiBmaWxsPSIjOTQyNTI1Ii8+CjxwYXRoIGQ9Ik01NiAxMzIgTDcwIDE1MCIgc3Ryb2tlPSIjOTQyNTI1IiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj4KPHJlY3Qgd2lkdGg9IjE5MiIgaGVpZ2h0PSIxOTIiIHJ4PSIyOCIgZmlsbD0iIzEyMTMxNSIvPgo8Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI3MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjYmQ4YjJhIiBzdHJva2Utd2lkdGg9IjIiLz4KPHBhdGggZD0iTTU2IDEzMiBRODAgNjAgMTM4IDQ2IiBzdHJva2U9IiNiZDhiMmEiIHN0cm9rZS13aWR0aD0iNyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjxjaXJjbGUgY3g9IjEzOCIgY3k9IjQ2IiByPSI3IiBmaWxsPSIjOTQyNTI1Ii8+CjxwYXRoIGQ9Ik01NiAxMzIgTDcwIDE1MCIgc3Ryb2tlPSIjOTQyNTI1IiBzdHJva2Utd2lkdGg9IjUiIGZpbGw9Im5vbmUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8L3N2Zz4K">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121315;
+    --bg-raised:#1b1c1f;
+    --bg-tab:#201f22;
+    --line:#3a3632;
+    --red:#942525;
+    --gold:#bd8b2a;
+    --ink:#fcfbfa;
+    --ink-dim:#c9c5bd;
+    --font-ui:'Noto Serif TC', serif;
+    --content-family:'Noto Serif TC', 'Cormorant Garamond', 'Inter', serif;
+    --content-size:20px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-ui);
+    display:flex; flex-direction:column; height:100vh; overflow:hidden;
+    -webkit-user-select:auto; user-select:auto;
+  }
+  header{
+    flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+    padding:10px 14px; border-bottom:1px solid var(--line); background:var(--bg-raised);
+  }
+  header h1{font-size:19px; margin:0; font-weight:600; letter-spacing:.04em; color:var(--gold);}
+  header .icon-btn{color:var(--ink-dim);}
+  .header-actions{display:flex; align-items:center; gap:8px;}
+  .icon-btn.save-btn{
+    width:52px; height:52px; border-radius:50%;
+    background:var(--gold); color:var(--bg); border:1px solid var(--gold);
+  }
+  .icon-btn.save-btn svg{width:26px; height:26px;}
+  .icon-btn.save-btn:active{background:#a97c25;}
 
-        .app-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 12px 6px 12px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            min-height: 52px;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-        .app-title {
-            font-family: var(--font-en);
-            font-weight: 600;
-            font-size: 1.2rem;
-            color: var(--text);
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            white-space: nowrap;
-        }
-        .app-title .accent { color: var(--gold); }
-        .app-title .sub { font-size: 0.5rem; color: var(--text-dim); font-weight: 400; }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .header-actions button {
-            background: var(--surface);
-            border: none;
-            color: var(--text);
-            font-size: 1.1rem;
-            padding: 6px 10px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: background 0.2s;
-            min-height: 40px;
-            min-width: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-        }
-        .header-actions button:active {
-            background: var(--surface-hover);
-            transform: scale(0.94);
-        }
-        .header-actions .btn-gold { background: var(--gold); color: #121315; }
-        .header-actions .btn-gold:active { background: #a67a24; }
-        .header-actions .btn-install {
-            background: #2b7a4b;
-            color: #fff;
-            font-size: 0.9rem;
-            padding: 4px 12px;
-            display: none;
-        }
-        .header-actions .btn-install:active { background: #1e5f3a; }
+  .icon-btn{
+    background:none; border:1px solid transparent; color:var(--ink);
+    width:42px; height:42px; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; flex:0 0 auto;
+  }
+  .icon-btn svg{width:22px; height:22px;}
+  .icon-btn:active{background:rgba(189,139,42,.18); border-color:var(--gold);}
+  .icon-btn.on{background:rgba(189,139,42,.25); border-color:var(--gold); color:var(--gold);}
+  .icon-btn:disabled{opacity:.35; cursor:default;}
 
-        .toolbar {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 8px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            overflow-x: auto;
-            overflow-y: hidden;
-            min-height: var(--toolbar-height);
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            flex-wrap: nowrap;
-        }
-        .toolbar::-webkit-scrollbar { display: none; }
-        .toolbar button {
-            flex-shrink: 0;
-            background: var(--surface);
-            border: none;
-            color: var(--text);
-            font-size: 1.3rem;
-            padding: 4px 10px;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: background 0.2s;
-            min-height: 40px;
-            min-width: 44px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            touch-action: manipulation;
-            position: relative;
-        }
-        .toolbar button:active {
-            background: var(--surface-hover);
-            transform: scale(0.94);
-        }
-        .toolbar button.btn-active {
-            background: var(--gold);
-            color: #121315;
-        }
-        .toolbar .separator {
-            width: 1px;
-            height: 28px;
-            background: var(--border);
-            flex-shrink: 0;
-            margin: 0 2px;
-        }
-        .toolbar button[title]::after {
-            content: attr(title);
-            position: absolute;
-            bottom: -22px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 8px;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.2s;
-            font-family: var(--font-base);
-        }
-        .toolbar button:hover::after { opacity: 1; }
-        @media (max-width: 480px) {
-            .toolbar button { font-size: 1.1rem; min-height: 36px; min-width: 38px; padding: 2px 6px; }
-            .toolbar button[title]::after { display: none; }
-        }
+  .toolbar{
+    flex:0 0 auto; display:flex; gap:2px; padding:6px 8px; overflow-x:auto;
+    background:var(--bg-raised); border-bottom:1px solid var(--line);
+    scrollbar-width:none;
+  }
+  .toolbar::-webkit-scrollbar{display:none;}
+  .toolbar .sep{width:1px; background:var(--line); margin:6px 6px; flex:0 0 auto;}
 
-        .tabs-bar {
-            display: flex;
-            align-items: center;
-            padding: 2px 8px 0 8px;
-            background: var(--bg);
-            border-bottom: 1px solid var(--border);
-            flex-shrink: 0;
-            overflow-x: auto;
-            overflow-y: hidden;
-            gap: 3px;
-            min-height: var(--tab-height);
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-        }
-        .tabs-bar::-webkit-scrollbar { display: none; }
-        .tab-item {
-            flex-shrink: 0;
-            padding: 6px 8px 6px 12px;
-            border-radius: var(--radius) var(--radius) 0 0;
-            background: transparent;
-            color: var(--text-dim);
-            font-size: 0.8rem;
-            font-family: var(--font-base);
-            border: none;
-            cursor: pointer;
-            transition: all 0.2s;
-            max-width: 150px;
-            min-height: 38px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            touch-action: manipulation;
-            position: relative;
-        }
-        .tab-item.active {
-            background: var(--surface);
-            color: var(--text);
-            font-weight: 600;
-        }
-        .tab-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 20%;
-            right: 20%;
-            height: 3px;
-            background: var(--gold);
-            border-radius: 4px 4px 0 0;
-        }
-        .tab-item .tab-label {
-            flex: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            min-width: 0;
-        }
-        .tab-item .tab-close {
-            flex-shrink: 0;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            border: none;
-            background: transparent;
-            color: var(--text-dim);
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0;
-            transition: background 0.2s;
-            touch-action: manipulation;
-            margin-left: 2px;
-        }
-        .tab-item .tab-close:active { background: var(--primary); color: #fff; }
-        .tab-add {
-            flex-shrink: 0;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px dashed var(--border);
-            background: transparent;
-            color: var(--text-dim);
-            font-size: 22px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            margin-left: 2px;
-        }
-        .tab-add:active { background: var(--surface); transform: scale(0.92); }
+  .tabbar{
+    flex:0 0 auto; display:flex; align-items:stretch; gap:6px; padding:8px 8px 0 8px;
+    overflow-x:auto; background:var(--bg); scrollbar-width:none;
+  }
+  .tabbar::-webkit-scrollbar{display:none;}
+  .tab{
+    position:relative; flex:0 0 auto; max-width:38vw; min-width:84px;
+    background:var(--bg-tab); border:1px solid var(--line); border-bottom:none;
+    border-radius:10px 10px 0 0; padding:9px 30px 9px 12px;
+    display:flex; align-items:center; cursor:pointer;
+  }
+  .tab.active{background:var(--bg-raised); border-color:var(--gold);}
+  .tab .name{
+    font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    max-width:100%; color:var(--ink-dim);
+  }
+  .tab.active .name{color:var(--ink);}
+  .tab .name[contenteditable="true"]{outline:none; text-overflow:clip; background:rgba(255,255,255,.06); border-radius:4px; padding:0 2px;}
+  .tab .close{
+    position:absolute; right:2px; top:50%; transform:translateY(-50%);
+    width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    color:var(--ink-dim); font-size:13px; flex:0 0 auto;
+  }
+  .tab .close:active{background:rgba(148,37,37,.35); color:var(--ink);}
+  .tab .dirty-dot{
+    position:absolute; left:5px; top:6px; width:6px; height:6px; border-radius:50%; background:var(--red);
+    display:none;
+  }
+  .tab.dirty .dirty-dot{display:block;}
+  .newtab{
+    flex:0 0 auto; width:38px; height:38px; align-self:center; border-radius:10px;
+    background:none; border:1px dashed var(--line); color:var(--gold); font-size:20px; cursor:pointer;
+  }
 
-        .editor-wrapper {
-            flex: 1;
-            overflow: hidden;
-            position: relative;
-            background: var(--bg);
-            padding: 0 10px 0 10px;
-        }
-        .editor-area {
-            width: 100%;
-            height: 100%;
-            background: transparent;
-            color: var(--text);
-            border: none;
-            outline: none;
-            resize: none;
-            font-family: var(--font-base);
-            font-size: 1rem;
-            line-height: 1.9;
-            padding: 12px 4px 20px 4px;
-            overflow-y: auto;
-            overflow-x: hidden;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            word-break: break-word;
-            tab-size: 4;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
-        }
-        .editor-area::placeholder { color: var(--text-dim); opacity: 0.5; }
-        .editor-line-wrap {
-            max-width: var(--line-length);
-            margin: 0 auto;
-            height: 100%;
-        }
+  .editor-area{
+    flex:1 1 auto; overflow:hidden; position:relative; background:var(--bg-raised);
+  }
+  .page{
+    display:none; height:100%; overflow-y:auto; padding:18px 16px 40vh 10px;
+    font-family:var(--content-family); font-size:var(--content-size); line-height:1.75;
+  }
+  .page.active{display:block;}
+  .page.wrap-off{white-space:pre; overflow-x:auto;}
+  .page .txt{outline:none;}
+  .page textarea{
+    width:100%; height:100%; resize:none; border:none; outline:none; background:transparent;
+    color:var(--ink); font-family:var(--content-family); font-size:var(--content-size); line-height:1.75;
+    white-space:pre-wrap; word-break:break-word;
+  }
+  .page.wrap-off textarea{white-space:pre; word-break:normal;}
 
-        .settings-panel {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(18, 19, 21, 0.94);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            z-index: 999;
-            display: none;
-            flex-direction: column;
-            padding: 24px 18px 20px;
-            overflow-y: auto;
-            animation: fadeIn 0.25s ease;
-        }
-        .settings-panel.open { display: flex; }
-        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
-        .settings-panel .panel-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-        .settings-panel .panel-header h2 { font-size: 1.2rem; font-weight: 600; color: var(--gold); }
-        .settings-panel .panel-header button {
-            background: var(--surface);
-            border: none;
-            color: var(--text);
-            font-size: 1.2rem;
-            padding: 6px 14px;
-            border-radius: 30px;
-            cursor: pointer;
-            min-height: 44px;
-            min-width: 44px;
-        }
-        .settings-panel .panel-header button:active { background: var(--surface-hover); }
-        .settings-group { margin-bottom: 18px; }
-        .settings-group label {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        .settings-group .row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .settings-group select,
-        .settings-group input[type="number"] {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 12px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-family: var(--font-base);
-            min-height: 42px;
-            flex: 1;
-            min-width: 100px;
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .settings-group select option { background: #1a1b1e; color: var(--text); }
-        .settings-group input[type="range"] {
-            flex: 1;
-            min-width: 80px;
-            accent-color: var(--gold);
-            height: 6px;
-            background: var(--surface);
-            border-radius: 4px;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-        .settings-group input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: var(--gold);
-            cursor: pointer;
-        }
-        .settings-group .value-display {
-            min-width: 36px;
-            text-align: center;
-            font-weight: 600;
-            color: var(--gold);
-            font-size: 0.9rem;
-        }
-        #tabTitleInput {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 8px 14px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-family: var(--font-base);
-            min-height: 42px;
-            flex: 1;
-            min-width: 100px;
-            outline: none;
-        }
-        #btnRenameTab {
-            background: var(--gold);
-            color: #121315;
-            border: none;
-            min-height: 42px;
-            padding: 0 18px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        #btnRenameTab:active { background: #a67a24; }
+  .line{
+    display:flex; align-items:baseline; min-height:1.75em; word-break:break-word; overflow-wrap:anywhere;
+    border-radius:4px;
+  }
+  .line .badge{
+    flex:0 0 auto; color:var(--gold); font-variant-numeric:tabular-nums; margin-right:.4em;
+    font-family:'Inter',sans-serif; -webkit-user-select:none; user-select:none;
+  }
+  .line .txt{flex:1 1 auto; white-space:pre-wrap;}
+  .line.lvl-0{padding-left:0}
+  .line.lvl-1{padding-left:1.6em}
+  .line.lvl-2{padding-left:3.2em}
+  .line.lvl-3{padding-left:4.8em}
+  .line.lvl-4{padding-left:6.4em}
+  .line.lvl-5{padding-left:8.0em}
+  .line.lvl-6{padding-left:9.6em}
 
-        .toast {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--surface);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            color: var(--text);
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            border: 1px solid var(--border);
-            box-shadow: var(--shadow);
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            pointer-events: none;
-            white-space: nowrap;
-            max-width: 90%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast.hide { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  .run-fab{
+    position:absolute; right:16px; bottom:16px; background:var(--gold); color:var(--bg);
+    border:none; width:52px; height:52px; border-radius:50%; box-shadow:0 4px 14px rgba(0,0,0,.4);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
 
-        #fileInput { display: none; }
+  .panel-overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.55); display:none; align-items:flex-end; z-index:50;
+  }
+  .panel-overlay.show{display:flex;}
+  .panel{
+    background:var(--bg-raised); width:100%; max-height:82vh; overflow-y:auto;
+    border-top:1px solid var(--gold); border-radius:16px 16px 0 0; padding:18px 18px 26px;
+  }
+  .panel h2{margin:0 0 14px; font-size:17px; color:var(--gold); display:flex; justify-content:space-between; align-items:center;}
+  .panel h2 button{background:none; border:none; color:var(--ink-dim); font-size:20px;}
+  .field{margin-bottom:14px;}
+  .field label{display:block; font-size:14px; color:var(--ink-dim); margin-bottom:6px;}
+  .field input[type="text"], .field select{
+    width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--line);
+    background:var(--bg); color:var(--ink); font-size:16px; font-family:var(--font-ui);
+  }
+  .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+  .row.between{justify-content:space-between;}
+  .chk{display:flex; align-items:center; gap:8px; font-size:14px; color:var(--ink-dim);}
+  .chk input{width:20px; height:20px;}
+  .btn{
+    padding:11px 16px; border-radius:9px; border:1px solid var(--gold); background:none;
+    color:var(--gold); font-size:15px; font-family:var(--font-ui); cursor:pointer; flex:1 1 auto;
+  }
+  .btn.solid{background:var(--gold); color:var(--bg); font-weight:600;}
+  .btn.danger{border-color:var(--red); color:var(--red);}
+  .stepper{display:flex; align-items:center; gap:10px;}
+  .stepper button{
+    width:40px; height:40px; border-radius:8px; border:1px solid var(--line); background:var(--bg);
+    color:var(--ink); font-size:18px;
+  }
+  .stepper span{min-width:2ch; text-align:center; font-size:16px;}
+  .swatch-row{display:flex; gap:8px;}
+  .swatch{width:34px; height:34px; border-radius:8px; border:2px solid transparent; cursor:pointer;}
+  .swatch.sel{border-color:var(--ink);}
 
-        @media (max-width: 480px) {
-            .app-title { font-size: 1rem; }
-            .app-title .sub { font-size: 0.45rem; }
-            .header-actions button { font-size: 0.9rem; min-height: 34px; min-width: 38px; padding: 4px 8px; }
-            .toolbar { gap: 2px; padding: 2px 4px; min-height: 44px; }
-            .toolbar button { font-size: 1rem; min-height: 34px; min-width: 34px; padding: 2px 6px; }
-            .tab-item { font-size: 0.7rem; padding: 4px 6px 4px 8px; max-width: 110px; min-height: 34px; }
-            .tab-add { width: 34px; height: 34px; font-size: 18px; }
-            .editor-area { font-size: 0.9rem; padding: 8px 2px 16px 2px; line-height: 1.7; }
-            .settings-panel { padding: 16px 12px; }
-            .settings-group select, .settings-group input[type="number"], #tabTitleInput { min-height: 36px; font-size: 0.8rem; }
-            .toast { bottom: 70px; font-size: 0.75rem; padding: 6px 16px; }
-        }
-        @media (max-width: 380px) {
-            .app-title { font-size: 0.85rem; }
-            .header-actions button { font-size: 0.8rem; min-height: 30px; min-width: 32px; padding: 2px 6px; }
-            .toolbar button { font-size: 0.85rem; min-height: 30px; min-width: 30px; padding: 2px 4px; }
-            .tab-item { font-size: 0.6rem; padding: 2px 4px 2px 6px; max-width: 80px; min-height: 30px; }
-            .tab-add { width: 30px; height: 30px; font-size: 16px; }
-            .editor-area { font-size: 0.8rem; padding: 6px 2px 12px 2px; line-height: 1.6; }
-        }
-        button:focus-visible, select:focus-visible, input:focus-visible, .editor-area:focus-visible {
-            outline: 2px solid var(--gold);
-            outline-offset: 2px;
-        }
-        /* 啟動時快速顯示 */
-        .splash {
-            display: none;
-        }
-    </style>
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    background:var(--bg-tab); border:1px solid var(--gold); color:var(--ink);
+    padding:9px 18px; border-radius:20px; font-size:14px; z-index:80; opacity:0; pointer-events:none;
+    transition:opacity .25s;
+  }
+  .toast.show{opacity:1;}
+
+  ::selection{background:rgba(189,139,42,.4);}
+</style>
 </head>
 <body>
-    <header class="app-header">
-        <div class="app-title">📝 筆記本 <span class="sub">· 簡易</span></div>
-        <div class="header-actions">
-            <button id="btnInstall" class="btn-install">📲 安裝</button>
-            <button id="btnSave" title="儲存 (Ctrl+S)" class="btn-gold">💾</button>
-            <button id="btnSettings" title="設定">⚙️</button>
-        </div>
-    </header>
 
-    <div class="toolbar" id="toolbar">
-        <button id="btnUndo" title="還原 (Ctrl+Z)">↩️</button>
-        <button id="btnRedo" title="重做 (Ctrl+Shift+Z)">↪️</button>
-        <span class="separator"></span>
-        <button id="btnIndent" title="增加縮排 (Tab)">↦</button>
-        <button id="btnOutdent" title="減少縮排 (Shift+Tab)">↤</button>
-        <span class="separator"></span>
-        <button id="btnPaste" title="貼上 (不限長度)">📋</button>
-        <span class="separator"></span>
-        <button id="btnAutoNumber" title="自動編號 (切換)">🔢</button>
-        <span class="separator"></span>
-        <button id="btnHtmlPreview" title="HTML 預覽">🌐</button>
-        <button id="btnExport" title="匯出為檔案">📤</button>
-        <button id="btnOpen" title="開啟檔案">📂</button>
-        <span class="separator"></span>
-        <button id="btnCloseTab" title="關閉目前分頁">✕</button>
+<header>
+  <h1>文字筆記本</h1>
+  <div class="header-actions">
+    <button class="icon-btn" id="btnOpenHeader" title="開啟本機檔案" aria-label="開啟本機檔案">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg>
+    </button>
+    <button class="icon-btn save-btn" id="btnSaveHeader" title="快速儲存" aria-label="快速儲存">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v6h8V4M8 21v-7h8v7"/></svg>
+    </button>
+    <button class="icon-btn" id="btnSettings" title="設定" aria-label="設定">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 13.5a7.6 7.6 0 0 0 0-3l2-1.5-2-3.4-2.3.8a7.6 7.6 0 0 0-2.6-1.5L14 2h-4l-.5 2.4a7.6 7.6 0 0 0-2.6 1.5l-2.3-.8-2 3.4 2 1.5a7.6 7.6 0 0 0 0 3l-2 1.5 2 3.4 2.3-.8a7.6 7.6 0 0 0 2.6 1.5L10 22h4l.5-2.4a7.6 7.6 0 0 0 2.6-1.5l2.3.8 2-3.4-2-1.5Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<div class="toolbar" id="toolbar">
+  <button class="icon-btn" data-cmd="undo" title="復原"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h9a5 5 0 0 1 0 10h-2"/><path d="M8 5 3 10l5 5"/></svg></button>
+  <button class="icon-btn" data-cmd="redo" title="重做"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10h-9a5 5 0 0 0 0 10h2"/><path d="M16 5l5 5-5 5"/></svg></button>
+  <button class="icon-btn" data-cmd="paste" title="貼上"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 11h6M9 15h6"/></svg></button>
+  <button class="icon-btn" data-cmd="numlist" title="編號清單"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6h11M9 12h11M9 18h11"/><text x="1" y="8" font-size="6" fill="currentColor" stroke="none">1</text><text x="1" y="14" font-size="6" fill="currentColor" stroke="none">2</text><text x="1" y="20" font-size="6" fill="currentColor" stroke="none">3</text></svg></button>
+  <button class="icon-btn" data-cmd="indent" title="增加縮排"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M9 12h12M3 19h18"/><path d="M3 9l4 3-4 3"/></svg></button>
+  <button class="icon-btn" data-cmd="outdent" title="減少縮排"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18M9 12h12M3 19h18"/><path d="M7 9 3 12l4 3"/></svg></button>
+  <div class="sep"></div>
+  <button class="icon-btn" data-cmd="find" title="尋找與取代"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+  <div class="sep"></div>
+  <button class="icon-btn" data-cmd="saveas" title="另存新檔"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v6h8V4"/><path d="M12 14v5M9.5 16.5 12 19l2.5-2.5"/></svg></button>
+  <div class="sep"></div>
+  <button class="icon-btn" data-cmd="closetab" title="關閉分頁"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+</div>
+
+<div class="tabbar" id="tabbar">
+  <button class="newtab" id="btnNewTab" title="新增分頁">＋</button>
+</div>
+
+<div class="editor-area" id="editorArea">
+  <button class="run-fab" id="btnRun" style="display:none" title="在瀏覽器中執行">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+</div>
+
+<!-- 設定面板 -->
+<div class="panel-overlay" id="settingsOverlay">
+  <div class="panel">
+    <h2>設定 <button id="closeSettings">✕</button></h2>
+    <div class="field">
+      <label>字型</label>
+      <select id="fontFamily">
+        <option value="'Noto Serif TC','Cormorant Garamond','Inter',serif">思源宋體（預設）</option>
+        <option value="'Inter','Noto Serif TC',sans-serif">Inter（無襯線）</option>
+        <option value="'Cormorant Garamond','Noto Serif TC',serif">Cormorant Garamond</option>
+        <option value="ui-monospace,'Courier New',monospace">等寬字體</option>
+      </select>
     </div>
-
-    <div class="tabs-bar" id="tabsBar">
-        <button class="tab-add" id="btnAddTab" title="新增分頁">＋</button>
+    <div class="field">
+      <label>字級</label>
+      <div class="stepper">
+        <button id="fontDec">A-</button>
+        <span id="fontSizeLabel">20</span>
+        <button id="fontInc">A+</button>
+      </div>
     </div>
-
-    <div class="editor-wrapper">
-        <div class="editor-line-wrap" id="editorLineWrap">
-            <textarea class="editor-area" id="editor" placeholder="開始書寫…" spellcheck="true"></textarea>
-        </div>
+    <div class="field row between">
+      <span class="chk"><input type="checkbox" id="wrapToggle" checked><label style="margin:0">自動依寬度換行</label></span>
     </div>
-
-    <div class="settings-panel" id="settingsPanel">
-        <div class="panel-header">
-            <h2>⚙️ 設定</h2>
-            <button id="btnCloseSettings">✕ 關閉</button>
-        </div>
-        <div class="settings-group">
-            <label>🔤 字型</label>
-            <div class="row">
-                <select id="fontSelect">
-                    <option value="'Noto Serif TC', 'Noto Serif', serif">思源宋體 (預設)</option>
-                    <option value="'Inter', 'Cormorant Garamond', sans-serif">Inter / Cormorant</option>
-                    <option value="'Times New Roman', serif">Times New Roman</option>
-                    <option value="'Arial', sans-serif">Arial</option>
-                    <option value="'Georgia', serif">Georgia</option>
-                    <option value="'Courier New', monospace">Courier New</option>
-                </select>
-            </div>
-        </div>
-        <div class="settings-group">
-            <label>📏 字型大小</label>
-            <div class="row">
-                <input type="range" id="fontSizeRange" min="14" max="36" step="1" value="20">
-                <span class="value-display" id="fontSizeDisplay">20</span>
-            </div>
-        </div>
-        <div class="settings-group">
-            <label>📐 行長度 (自動換行寬度)</label>
-            <div class="row">
-                <input type="range" id="lineLengthRange" min="40" max="100" step="1" value="100">
-                <span class="value-display" id="lineLengthDisplay">100%</span>
-            </div>
-        </div>
-        <div class="settings-group">
-            <label>📄 目前分頁標題</label>
-            <div class="row">
-                <input type="text" id="tabTitleInput" placeholder="輸入標題…">
-                <button id="btnRenameTab">重新命名</button>
-            </div>
-        </div>
-        <div style="margin-top:12px;font-size:0.7rem;color:var(--text-dim);text-align:center;border-top:1px solid var(--border);padding-top:14px;">
-            支援檔案系統存取 (Chrome/Edge) · 否則下載儲存
-        </div>
+    <div class="field">
+      <label>安裝為 App</label>
+      <div style="font-size:13px;color:var(--ink-dim);line-height:1.6">
+        iPhone／Safari：可直接用分享選單的「加入主畫面」，不受下方限制。<br>
+        Android／Chrome：瀏覽器選單的「安裝應用程式」只有在網頁是透過 <b>https://</b>（或 http://localhost）開啟時才會出現；直接雙擊本機檔案（file://）開啟不會出現安裝選項，需先將本 HTML 與同資料夾的 sw.js 一起上傳到網站或本機伺服器。
+      </div>
     </div>
-
-    <div class="toast" id="toast"></div>
-    <input type="file" id="fileInput" accept=".txt,.md,.html,.htm">
-
-    <script>
-        (function() {
-            'use strict';
-
-            // 立即顯示主體，避免白屏
-            document.body.classList.add('loaded');
-
-            // ========== PWA 動態 manifest (避免404) ==========
-            (function registerManifest() {
-                const manifest = {
-                    name: '文字筆記本',
-                    short_name: '筆記本',
-                    description: '簡易多分頁文字筆記本',
-                    start_url: window.location.href.split('?')[0],
-                    display: 'standalone',
-                    background_color: '#121315',
-                    theme_color: '#bd8b2a',
-                    icons: [{
-                        src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" fill="%23121315"/%3E%3Ctext x="256" y="340" font-size="280" text-anchor="middle" fill="%23bd8b2a" font-family="serif"%3E📝%3C/text%3E%3C/svg%3E',
-                        sizes: '512x512',
-                        type: 'image/svg+xml',
-                        purpose: 'any maskable'
-                    }]
-                };
-                const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const link = document.createElement('link');
-                link.rel = 'manifest';
-                link.href = url;
-                document.head.appendChild(link);
-            })();
-
-            // ========== 安裝提示 ==========
-            let deferredPrompt = null;
-            const btnInstall = document.getElementById('btnInstall');
-
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                btnInstall.style.display = 'inline-flex';
-                btnInstall.textContent = '📲 安裝應用';
-            });
-
-            btnInstall.addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const result = await deferredPrompt.userChoice;
-                    if (result.outcome === 'accepted') {
-                        showToast('✅ 已安裝成功！', 3000);
-                    } else {
-                        showToast('安裝已取消', 2000);
-                    }
-                    deferredPrompt = null;
-                    btnInstall.style.display = 'none';
-                }
-            });
-
-            window.addEventListener('appinstalled', () => {
-                showToast('✅ 已安裝成功！', 3000);
-                btnInstall.style.display = 'none';
-            });
-
-            // ========== 核心功能 ==========
-            // 使用 requestAnimationFrame 確保 UI 先渲染
-            requestAnimationFrame(() => {
-                setTimeout(() => {
-                    initApp();
-                }, 50); // 稍微延長延遲，給渲染更多時間
-            });
-
-            // ---------- 狀態 ----------
-            const STATE_KEY = 'notebook_data_v12';
-            const SETTINGS_KEY = 'notebook_settings_v12';
-
-            let state = {
-                pages: [],
-                activeIndex: 0,
-                nextId: 1
-            };
-
-            let settings = {
-                fontFamily: "'Noto Serif TC', 'Noto Serif', serif",
-                fontSize: 20,
-                lineLength: 100
-            };
-
-            let historyMap = {};
-            let isAutoNumber = false;
-            let toastTimer = null;
-            let isComposing = false;
-            let usingFileAPI = typeof window.showSaveFilePicker === 'function' && typeof window.showOpenFilePicker === 'function';
-
-            // DOM 參考
-            const editor = document.getElementById('editor');
-            const tabsBar = document.getElementById('tabsBar');
-            const btnAddTab = document.getElementById('btnAddTab');
-            const btnSave = document.getElementById('btnSave');
-            const btnSettings = document.getElementById('btnSettings');
-            const btnCloseSettings = document.getElementById('btnCloseSettings');
-            const settingsPanel = document.getElementById('settingsPanel');
-            const fontSelect = document.getElementById('fontSelect');
-            const fontSizeRange = document.getElementById('fontSizeRange');
-            const fontSizeDisplay = document.getElementById('fontSizeDisplay');
-            const lineLengthRange = document.getElementById('lineLengthRange');
-            const lineLengthDisplay = document.getElementById('lineLengthDisplay');
-            const tabTitleInput = document.getElementById('tabTitleInput');
-            const btnRenameTab = document.getElementById('btnRenameTab');
-            const btnIndent = document.getElementById('btnIndent');
-            const btnOutdent = document.getElementById('btnOutdent');
-            const btnUndo = document.getElementById('btnUndo');
-            const btnRedo = document.getElementById('btnRedo');
-            const btnPaste = document.getElementById('btnPaste');
-            const btnAutoNumber = document.getElementById('btnAutoNumber');
-            const btnHtmlPreview = document.getElementById('btnHtmlPreview');
-            const btnExport = document.getElementById('btnExport');
-            const btnOpen = document.getElementById('btnOpen');
-            const btnCloseTab = document.getElementById('btnCloseTab');
-            const fileInput = document.getElementById('fileInput');
-            const toast = document.getElementById('toast');
-            const editorLineWrap = document.getElementById('editorLineWrap');
-
-            // ---------- 工具 ----------
-            function generateId() { return Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6); }
-
-            function getActivePage() {
-                if (state.pages.length === 0) return null;
-                return state.pages[state.activeIndex] || null;
-            }
-
-            function getHistory(pageId) {
-                if (!historyMap[pageId]) {
-                    historyMap[pageId] = { stack: [], index: -1, max: 80 };
-                }
-                return historyMap[pageId];
-            }
-
-            function showToast(msg, duration) {
-                duration = duration || 2200;
-                toast.textContent = msg;
-                toast.classList.remove('hide', 'show');
-                void toast.offsetWidth;
-                toast.classList.add('show');
-                clearTimeout(toastTimer);
-                toastTimer = setTimeout(() => {
-                    toast.classList.remove('show');
-                    toast.classList.add('hide');
-                }, duration);
-            }
-
-            function saveState() {
-                try {
-                    const active = getActivePage();
-                    if (active) {
-                        active.content = editor.value;
-                        active.modified = Date.now();
-                        active.cursor = {
-                            selectionStart: editor.selectionStart,
-                            selectionEnd: editor.selectionEnd,
-                            scrollTop: editor.scrollTop
-                        };
-                    }
-                    const pagesToStore = state.pages.map(p => {
-                        const { fileHandle, ...rest } = p;
-                        return rest;
-                    });
-                    const stateCopy = { ...state, pages: pagesToStore };
-                    localStorage.setItem(STATE_KEY, JSON.stringify(stateCopy));
-                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-                } catch (e) { console.warn('儲存狀態失敗:', e); }
-            }
-
-            function loadState() {
-                try {
-                    const raw = localStorage.getItem(STATE_KEY);
-                    if (raw) {
-                        const parsed = JSON.parse(raw);
-                        if (parsed && parsed.pages && Array.isArray(parsed.pages)) {
-                            state = parsed;
-                            if (state.activeIndex >= state.pages.length) {
-                                state.activeIndex = Math.max(0, state.pages.length - 1);
-                            }
-                            if (state.pages.length === 0) {
-                                createDefaultPage();
-                            }
-                            state.pages.forEach(p => {
-                                if (!p.id) p.id = generateId();
-                                p.fileHandle = null;
-                                if (!p.cursor) p.cursor = { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
-                            });
-                            if (!state.nextId) state.nextId = state.pages.length + 1;
-                            return true;
-                        }
-                    }
-                } catch (e) { console.warn('載入狀態失敗:', e); }
-                return false;
-            }
-
-            function loadSettings() {
-                try {
-                    const raw = localStorage.getItem(SETTINGS_KEY);
-                    if (raw) {
-                        const parsed = JSON.parse(raw);
-                        if (parsed) {
-                            settings = { ...settings, ...parsed };
-                            return true;
-                        }
-                    }
-                } catch (e) { console.warn('載入設定失敗:', e); }
-                return false;
-            }
-
-            function createDefaultPage() {
-                const id = generateId();
-                state.pages = [{
-                    id: id,
-                    title: '未命名',
-                    content: '',
-                    created: Date.now(),
-                    modified: Date.now(),
-                    fileName: null,
-                    fileHandle: null,
-                    cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
-                }];
-                state.activeIndex = 0;
-                state.nextId = 2;
-                historyMap[id] = { stack: [''], index: 0, max: 80 };
-            }
-
-            // ---------- 檔案儲存 (優化：不自動加擴展名) ----------
-            async function savePage(page) {
-                if (!page) return;
-                const content = page.content || editor.value;
-                if (page.fileHandle && typeof page.fileHandle.createWritable === 'function') {
-                    try {
-                        const writable = await page.fileHandle.createWritable({ keepExistingData: false });
-                        await writable.write(content);
-                        await writable.close();
-                        page.modified = Date.now();
-                        const newTitle = page.fileHandle.name;
-                        if (page.title !== newTitle) {
-                            page.title = newTitle;
-                            page.fileName = newTitle;
-                            renderTabs();
-                            updateTitleInput();
-                        }
-                        showToast('已儲存至 ' + page.fileHandle.name);
-                        saveState();
-                        return;
-                    } catch (e) {
-                        console.warn('寫入失敗，嘗試重新選擇', e);
-                        page.fileHandle = null;
-                    }
-                }
-
-                if (usingFileAPI) {
-                    try {
-                        // 不指定 types，避免瀏覽器自動添加擴展名
-                        const suggested = page.fileName || page.title;
-                        const opts = {
-                            suggestedName: suggested
-                            // 不傳 types，用戶可自由命名
-                        };
-                        const handle = await window.showSaveFilePicker(opts);
-                        page.fileHandle = handle;
-                        page.fileName = handle.name;
-                        const newTitle = handle.name;
-                        if (page.title !== newTitle) {
-                            page.title = newTitle;
-                            renderTabs();
-                            updateTitleInput();
-                        }
-                        const writable = await handle.createWritable({ keepExistingData: false });
-                        await writable.write(content);
-                        await writable.close();
-                        page.modified = Date.now();
-                        showToast('已儲存至 ' + handle.name);
-                        saveState();
-                        return;
-                    } catch (e) {
-                        if (e.name === 'AbortError') return;
-                        console.warn('儲存取消或失敗', e);
-                    }
-                }
-
-                // 降級下載（不自動加擴展名）
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = page.fileName || page.title;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 30000);
-                showToast('已下載 ' + (page.fileName || page.title));
-            }
-
-            // ---------- 開啟檔案 ----------
-            async function openFileWithAPI() {
-                if (!usingFileAPI) {
-                    fileInput.click();
-                    return;
-                }
-                try {
-                    const [handle] = await window.showOpenFilePicker({
-                        types: [{ description: '文字檔案', accept: { 'text/plain': ['.txt', '.md', '.html'] } }],
-                        multiple: false
-                    });
-                    const file = await handle.getFile();
-                    const content = await file.text();
-                    const name = file.name;
-                    const id = generateId();
-                    const newPage = {
-                        id: id,
-                        title: name,
-                        content: content,
-                        created: Date.now(),
-                        modified: Date.now(),
-                        fileName: name,
-                        fileHandle: handle,
-                        cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
-                    };
-                    state.pages.push(newPage);
-                    state.nextId++;
-                    historyMap[id] = { stack: [content], index: 0, max: 80 };
-                    const active = getActivePage();
-                    if (active) {
-                        active.content = editor.value;
-                        active.modified = Date.now();
-                        active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
-                                .scrollTop };
-                    }
-                    state.activeIndex = state.pages.length - 1;
-                    editor.value = content;
-                    editor.selectionStart = 0;
-                    editor.selectionEnd = 0;
-                    editor.scrollTop = 0;
-                    renderTabs();
-                    saveState();
-                    updateTitleInput();
-                    editor.focus();
-                    showToast('已開啟: ' + file.name);
-                } catch (e) {
-                    if (e.name === 'AbortError') return;
-                    showToast('開啟失敗');
-                    console.warn(e);
-                }
-            }
-
-            function handleFileInput(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    const content = ev.target.result;
-                    if (content) {
-                        const name = file.name;
-                        const id = generateId();
-                        const newPage = {
-                            id: id,
-                            title: name,
-                            content: content,
-                            created: Date.now(),
-                            modified: Date.now(),
-                            fileName: name,
-                            fileHandle: null,
-                            cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
-                        };
-                        state.pages.push(newPage);
-                        state.nextId++;
-                        historyMap[id] = { stack: [content], index: 0, max: 80 };
-                        const active = getActivePage();
-                        if (active) {
-                            active.content = editor.value;
-                            active.modified = Date.now();
-                            active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
-                                scrollTop: editor.scrollTop };
-                        }
-                        state.activeIndex = state.pages.length - 1;
-                        editor.value = content;
-                        editor.selectionStart = 0;
-                        editor.selectionEnd = 0;
-                        editor.scrollTop = 0;
-                        renderTabs();
-                        saveState();
-                        updateTitleInput();
-                        editor.focus();
-                        showToast('已開啟: ' + file.name);
-                    }
-                };
-                reader.onerror = function() { showToast('讀取失敗'); };
-                reader.readAsText(file, 'UTF-8');
-                fileInput.value = '';
-            }
-
-            // ---------- 渲染分頁 ----------
-            function renderTabs() {
-                tabsBar.innerHTML = '';
-                state.pages.forEach((page, idx) => {
-                    const btn = document.createElement('button');
-                    btn.className = 'tab-item' + (idx === state.activeIndex ? ' active' : '');
-                    btn.dataset.index = idx;
-                    const label = page.fileName || page.title || '未命名';
-                    btn.innerHTML = `
-                        <span class="tab-label">${escapeHtml(label)}</span>
-                        <span class="tab-close" data-index="${idx}" title="關閉分頁">✕</span>
-                    `;
-                    btn.addEventListener('click', (e) => {
-                        if (e.target.classList.contains('tab-close')) return;
-                        switchTab(idx);
-                    });
-                    const labelSpan = btn.querySelector('.tab-label');
-                    labelSpan.addEventListener('dblclick', (e) => {
-                        e.stopPropagation();
-                        const newName = prompt('重新命名分頁：', page.title);
-                        if (newName !== null && newName.trim()) {
-                            // 若無關聯檔案，更新 fileName 為新標題（不帶擴展名）
-                            if (!page.fileHandle) {
-                                page.fileName = newName.trim();
-                            }
-                            page.title = newName.trim();
-                            saveState();
-                            renderTabs();
-                            updateTitleInput();
-                            showToast('已重新命名');
-                        }
-                    });
-                    const closeBtn = btn.querySelector('.tab-close');
-                    closeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        closeTab(idx);
-                    });
-                    btn.addEventListener('contextmenu', (e) => {
-                        e.preventDefault();
-                        const newName = prompt('重新命名分頁：', page.title);
-                        if (newName !== null && newName.trim()) {
-                            if (!page.fileHandle) {
-                                page.fileName = newName.trim();
-                            }
-                            page.title = newName.trim();
-                            saveState();
-                            renderTabs();
-                            updateTitleInput();
-                            showToast('已重新命名');
-                        }
-                    });
-                    tabsBar.appendChild(btn);
-                });
-                const addBtnNew = document.createElement('button');
-                addBtnNew.className = 'tab-add';
-                addBtnNew.textContent = '＋';
-                addBtnNew.addEventListener('click', addNewTab);
-                tabsBar.appendChild(addBtnNew);
-
-                const activeEl = tabsBar.querySelector('.tab-item.active');
-                if (activeEl) {
-                    activeEl.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-                }
-                updateTitleInput();
-            }
-
-            function escapeHtml(text) {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
-            }
-
-            // ---------- 切換分頁 ----------
-            function switchTab(index) {
-                const active = getActivePage();
-                if (active) {
-                    active.content = editor.value;
-                    active.modified = Date.now();
-                    active.cursor = {
-                        selectionStart: editor.selectionStart,
-                        selectionEnd: editor.selectionEnd,
-                        scrollTop: editor.scrollTop
-                    };
-                }
-                state.activeIndex = index;
-                const page = getActivePage();
-                if (page) {
-                    editor.value = page.content || '';
-                    const cursor = page.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
-                    editor.selectionStart = cursor.selectionStart || 0;
-                    editor.selectionEnd = cursor.selectionEnd || 0;
-                    editor.scrollTop = cursor.scrollTop || 0;
-                    const hist = getHistory(page.id);
-                    if (hist.stack.length === 0) {
-                        hist.stack = [page.content || ''];
-                        hist.index = 0;
-                    }
-                }
-                renderTabs();
-                saveState();
-                updateTitleInput();
-                editor.focus();
-            }
-
-            // ---------- 新增/關閉分頁 ----------
-            function addNewTab() {
-                const id = generateId();
-                const newPage = {
-                    id: id,
-                    title: '未命名 ' + state.nextId,
-                    content: '',
-                    created: Date.now(),
-                    modified: Date.now(),
-                    fileName: null,
-                    fileHandle: null,
-                    cursor: { selectionStart: 0, selectionEnd: 0, scrollTop: 0 }
-                };
-                state.nextId++;
-                state.pages.push(newPage);
-                historyMap[id] = { stack: [''], index: 0, max: 80 };
-                const active = getActivePage();
-                if (active) {
-                    active.content = editor.value;
-                    active.modified = Date.now();
-                    active.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
-                            .scrollTop };
-                }
-                state.activeIndex = state.pages.length - 1;
-                editor.value = '';
-                editor.selectionStart = 0;
-                editor.selectionEnd = 0;
-                editor.scrollTop = 0;
-                renderTabs();
-                saveState();
-                updateTitleInput();
-                editor.focus();
-                showToast('已新增分頁');
-            }
-
-            function closeTab(index) {
-                if (state.pages.length <= 1) { showToast('至少保留一個分頁'); return; }
-                const page = state.pages[index];
-                if (!page) return;
-                if (!confirm(`確定要關閉「${page.title}」嗎？`)) return;
-                delete historyMap[page.id];
-                state.pages.splice(index, 1);
-                if (state.activeIndex >= state.pages.length) {
-                    state.activeIndex = state.pages.length - 1;
-                } else if (state.activeIndex === index) {
-                    state.activeIndex = Math.min(index, state.pages.length - 1);
-                } else if (state.activeIndex > index) {
-                    state.activeIndex--;
-                }
-                const newPage = getActivePage();
-                if (newPage) {
-                    editor.value = newPage.content || '';
-                    const cursor = newPage.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
-                    editor.selectionStart = cursor.selectionStart || 0;
-                    editor.selectionEnd = cursor.selectionEnd || 0;
-                    editor.scrollTop = cursor.scrollTop || 0;
-                    const hist = getHistory(newPage.id);
-                    if (hist.stack.length === 0) {
-                        hist.stack = [newPage.content || ''];
-                        hist.index = 0;
-                    }
-                } else { editor.value = ''; }
-                renderTabs();
-                saveState();
-                updateTitleInput();
-                editor.focus();
-                showToast('已關閉分頁');
-            }
-
-            function updateTitleInput() {
-                const page = getActivePage();
-                if (page) { tabTitleInput.value = page.title || ''; }
-                else { tabTitleInput.value = ''; }
-            }
-
-            function updateEditorState() {
-                editor.style.fontFamily = settings.fontFamily;
-                editor.style.fontSize = settings.fontSize + 'px';
-                editorLineWrap.style.maxWidth = settings.lineLength + '%';
-                if (isAutoNumber) {
-                    editor.style.paddingLeft = '20px';
-                } else {
-                    editor.style.paddingLeft = '4px';
-                }
-            }
-
-            // ---------- 核心：自動編號 (修正版) ----------
-            function handleAutoNumber(e) {
-                if (!isAutoNumber) return;
-                if (e.key !== 'Enter') return;
-                if (isComposing) return;
-
-                const text = editor.value;
-                const cursorPos = editor.selectionStart;
-
-                // 找出當前行
-                let lineStart = text.lastIndexOf('\n', cursorPos - 1);
-                if (lineStart === -1) lineStart = 0;
-                else lineStart = lineStart + 1;
-                const currentLine = text.substring(lineStart, cursorPos);
-
-                // 檢查當前行是否有編號
-                const match = currentLine.match(/^(\s*)(\d+)\.\s*/);
-                if (!match) return;
-
-                const indent = match[1];
-                const indentLen = indent.length;
-
-                // 向上查找同縮進級別的所有編號，取最大值
-                let maxNum = 0;
-                let searchPos = cursorPos;
-                while (searchPos >= 0) {
-                    const prevLineStart = text.lastIndexOf('\n', searchPos - 1);
-                    const start = prevLineStart === -1 ? 0 : prevLineStart + 1;
-                    const line = text.substring(start, searchPos);
-                    const m = line.match(/^(\s*)(\d+)\.\s*/);
-                    if (m && m[1].length === indentLen) {
-                        const num = parseInt(m[2], 10);
-                        if (num > maxNum) maxNum = num;
-                    }
-                    searchPos = start - 1;
-                    if (searchPos < 0) break;
-                }
-
-                const newNum = maxNum + 1;
-                const newLine = '\n' + indent + newNum + '. ';
-                const before = text.substring(0, cursorPos);
-                const after = text.substring(cursorPos);
-                const newText = before + newLine + after;
-                editor.value = newText;
-                const newPos = cursorPos + newLine.length;
-                editor.selectionStart = editor.selectionEnd = newPos;
-
-                const page = getActivePage();
-                if (page) {
-                    const hist = getHistory(page.id);
-                    pushHistory(page.id, newText);
-                }
-                e.preventDefault();
-            }
-
-            // ---------- 縮排 / 減縮 ----------
-            function indentLines(direction) {
-                const text = editor.value;
-                const start = editor.selectionStart;
-                const end = editor.selectionEnd;
-                let lineStart = text.lastIndexOf('\n', start - 1) + 1;
-                let lineEnd = text.indexOf('\n', end);
-                if (lineEnd === -1) lineEnd = text.length;
-                const selectedText = text.substring(lineStart, lineEnd);
-                const lines = selectedText.split('\n');
-                const indentStr = '    ';
-                let newLines;
-                if (direction === 'in') {
-                    newLines = lines.map(line => indentStr + line);
-                } else {
-                    newLines = lines.map(line => {
-                        if (line.startsWith(indentStr)) return line.substring(indentStr.length);
-                        if (line.startsWith('\t')) return line.substring(1);
-                        const leading = line.match(/^ {1,4}/);
-                        if (leading) return line.substring(leading[0].length);
-                        return line;
-                    });
-                }
-                const newText = text.substring(0, lineStart) + newLines.join('\n') + text.substring(lineEnd);
-                editor.value = newText;
-                const newEnd = lineStart + newLines.join('\n').length;
-                if (start !== end) {
-                    const oldLen = selectedText.length;
-                    const newLen = newLines.join('\n').length;
-                    const offset = newLen - oldLen;
-                    editor.selectionStart = start;
-                    editor.selectionEnd = end + offset;
-                } else {
-                    const pos = start + (newLines.join('\n').length - selectedText.length);
-                    editor.selectionStart = editor.selectionEnd = pos;
-                }
-                const page = getActivePage();
-                if (page) {
-                    const hist = getHistory(page.id);
-                    pushHistory(page.id, newText);
-                }
-                saveState();
-            }
-
-            // ---------- 歷史 ----------
-            function pushHistory(pageId, content) {
-                const hist = getHistory(pageId);
-                if (hist.index < hist.stack.length - 1) {
-                    hist.stack = hist.stack.slice(0, hist.index + 1);
-                }
-                if (hist.stack.length > 0 && hist.stack[hist.stack.length - 1] === content) return;
-                hist.stack.push(content);
-                if (hist.stack.length > hist.max) hist.stack.shift();
-                hist.index = hist.stack.length - 1;
-            }
-
-            function undo() {
-                const page = getActivePage();
-                if (!page) return;
-                const hist = getHistory(page.id);
-                if (hist.index <= 0) { showToast('沒有更早的記錄'); return; }
-                hist.index--;
-                const content = hist.stack[hist.index];
-                if (content !== undefined) {
-                    editor.value = content;
-                    page.content = content;
-                    editor.selectionStart = editor.selectionEnd = content.length;
-                    editor.scrollTop = 0;
-                    saveState();
-                    showToast('已還原');
-                }
-            }
-
-            function redo() {
-                const page = getActivePage();
-                if (!page) return;
-                const hist = getHistory(page.id);
-                if (hist.index >= hist.stack.length - 1) { showToast('沒有更後的記錄'); return; }
-                hist.index++;
-                const content = hist.stack[hist.index];
-                if (content !== undefined) {
-                    editor.value = content;
-                    page.content = content;
-                    editor.selectionStart = editor.selectionEnd = content.length;
-                    editor.scrollTop = 0;
-                    saveState();
-                    showToast('已重做');
-                }
-            }
-
-            let historyTimer = null;
-
-            function autoSaveHistory() {
-                const page = getActivePage();
-                if (!page) return;
-                const content = editor.value;
-                clearTimeout(historyTimer);
-                historyTimer = setTimeout(() => {
-                    const hist = getHistory(page.id);
-                    if (hist.stack.length > 0 && hist.stack[hist.index] === content) return;
-                    pushHistory(page.id, content);
-                    page.content = content;
-                    page.modified = Date.now();
-                    saveState();
-                }, 400);
-            }
-
-            // ---------- 貼上 ----------
-            async function pasteClipboard() {
-                try {
-                    const text = await navigator.clipboard.readText();
-                    if (text) {
-                        const start = editor.selectionStart;
-                        const end = editor.selectionEnd;
-                        const before = editor.value.substring(0, start);
-                        const after = editor.value.substring(end);
-                        const newText = before + text + after;
-                        editor.value = newText;
-                        const newPos = start + text.length;
-                        editor.selectionStart = editor.selectionEnd = newPos;
-                        const page = getActivePage();
-                        if (page) {
-                            pushHistory(page.id, newText);
-                            page.content = newText;
-                            saveState();
-                        }
-                        showToast('已貼上 (' + text.length + ' 字元)');
-                    } else { showToast('剪貼簿無文字'); }
-                } catch (e) {
-                    const text = prompt('請貼上文字 (Ctrl+V 後按確定):');
-                    if (text !== null) {
-                        const start = editor.selectionStart;
-                        const end = editor.selectionEnd;
-                        const before = editor.value.substring(0, start);
-                        const after = editor.value.substring(end);
-                        const newText = before + text + after;
-                        editor.value = newText;
-                        const newPos = start + text.length;
-                        editor.selectionStart = editor.selectionEnd = newPos;
-                        const page = getActivePage();
-                        if (page) {
-                            pushHistory(page.id, newText);
-                            page.content = newText;
-                            saveState();
-                        }
-                        showToast('已貼上 (' + text.length + ' 字元)');
-                    }
-                }
-            }
-
-            // ---------- HTML 預覽 ----------
-            function htmlPreview() {
-                const content = editor.value;
-                if (!content.trim()) { showToast('內容為空'); return; }
-                const isHtml = content.trim().toLowerCase().includes('<html') ||
-                    content.trim().toLowerCase().includes('<!doctype') ||
-                    content.trim().toLowerCase().includes('<body') ||
-                    content.trim().toLowerCase().includes('<div') ||
-                    content.trim().toLowerCase().includes('<p');
-                let htmlContent = content;
-                if (!isHtml) {
-                    htmlContent = `<!DOCTYPE html>
-                <html lang="zh-TW"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>預覽</title>
-                <style>body{font-family:sans-serif;max-width:720px;margin:40px auto;padding:20px;line-height:1.8;white-space:pre-wrap;word-wrap:break-word;}</style>
-                </head><body>${escapeHtml(content)}</body></html>`;
-                }
-                const win = window.open('', '_blank', 'width=800,height=600,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes');
-                if (win) { win.document.write(htmlContent); win.document.close(); } else {
-                    const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    window.open(url, '_blank');
-                    setTimeout(() => URL.revokeObjectURL(url), 60000);
-                }
-                showToast('已開啟預覽');
-            }
-
-            // ---------- 匯出 ----------
-            function exportFile() {
-                const page = getActivePage();
-                if (!page) return;
-                const content = editor.value;
-                if (!content.trim()) { showToast('內容為空'); return; }
-                const format = prompt('請選擇匯出格式 (txt / md / html):', 'txt');
-                if (!format) return;
-                const ext = format.toLowerCase();
-                if (!['txt', 'md', 'html'].includes(ext)) { showToast('不支援的格式'); return; }
-                const filename = (page.title || '未命名') + '.' + ext;
-                const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filename;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(() => URL.revokeObjectURL(url), 30000);
-                showToast('已匯出: ' + filename);
-            }
-
-            // ---------- 快速儲存 ----------
-            async function quickSave() {
-                const page = getActivePage();
-                if (!page) { showToast('沒有分頁'); return; }
-                page.content = editor.value;
-                page.modified = Date.now();
-                page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd, scrollTop: editor
-                        .scrollTop };
-                pushHistory(page.id, editor.value);
-                await savePage(page);
-            }
-
-            // ---------- 設定面板 ----------
-            function openSettings() {
-                fontSelect.value = settings.fontFamily;
-                fontSizeRange.value = settings.fontSize;
-                fontSizeDisplay.textContent = settings.fontSize;
-                lineLengthRange.value = settings.lineLength;
-                lineLengthDisplay.textContent = settings.lineLength + '%';
-                updateTitleInput();
-                settingsPanel.classList.add('open');
-            }
-
-            function closeSettings() {
-                settingsPanel.classList.remove('open');
-                applySettings();
-                saveState();
-            }
-
-            function applySettings() {
-                settings.fontFamily = fontSelect.value;
-                settings.fontSize = parseInt(fontSizeRange.value, 10) || 20;
-                settings.lineLength = parseInt(lineLengthRange.value, 10) || 100;
-                fontSizeDisplay.textContent = settings.fontSize;
-                lineLengthDisplay.textContent = settings.lineLength + '%';
-                updateEditorState();
-                try {
-                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-                } catch (e) {}
-                document.documentElement.style.fontSize = settings.fontSize + 'px';
-            }
-
-            function renameTab() {
-                const page = getActivePage();
-                if (!page) return;
-                const newName = tabTitleInput.value.trim();
-                if (!newName) { showToast('請輸入標題'); return; }
-                // 若無關聯檔案，更新 fileName 為新標題（不帶擴展名）
-                if (!page.fileHandle) {
-                    page.fileName = newName;
-                }
-                page.title = newName;
-                saveState();
-                renderTabs();
-                updateTitleInput();
-                showToast('已重新命名');
-            }
-
-            function toggleAutoNumber() {
-                isAutoNumber = !isAutoNumber;
-                btnAutoNumber.classList.toggle('btn-active', isAutoNumber);
-                showToast(isAutoNumber ? '自動編號 開啟' : '自動編號 關閉');
-                updateEditorState();
-                editor.focus();
-            }
-
-            // ---------- 鍵盤事件 ----------
-            function handleKeyboard(e) {
-                if (e.ctrlKey && e.key === 's') { e.preventDefault(); quickSave(); return; }
-                if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); return; }
-                if (e.ctrlKey && e.shiftKey && e.key === 'Z') { e.preventDefault(); redo(); return; }
-                if (e.key === 'Tab' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); indentLines('in'); return; }
-                if (e.key === 'Tab' && e.shiftKey) { e.preventDefault(); indentLines('out'); return; }
-                if (e.key === 'Enter' && isAutoNumber) { handleAutoNumber(e); return; }
-            }
-
-            // ---------- 主要初始化 ----------
-            function initApp() {
-                loadSettings();
-                const hasState = loadState();
-                if (!hasState || state.pages.length === 0) {
-                    createDefaultPage();
-                    const page = getActivePage();
-                    if (page) { historyMap[page.id] = { stack: [''], index: 0, max: 80 }; }
-                }
-                const active = getActivePage();
-                if (active) {
-                    if (!historyMap[active.id]) {
-                        historyMap[active.id] = { stack: [active.content || ''], index: 0, max: 80 };
-                    }
-                    editor.value = active.content || '';
-                    const cursor = active.cursor || { selectionStart: 0, selectionEnd: 0, scrollTop: 0 };
-                    editor.selectionStart = cursor.selectionStart || 0;
-                    editor.selectionEnd = cursor.selectionEnd || 0;
-                    editor.scrollTop = cursor.scrollTop || 0;
-                }
-                applySettings();
-                renderTabs();
-                updateTitleInput();
-
-                btnAutoNumber.classList.remove('btn-active');
-
-                // 事件綁定
-                editor.addEventListener('input', function() {
-                    autoSaveHistory();
-                    const page = getActivePage();
-                    if (page) { page.content = editor.value; }
-                });
-                editor.addEventListener('keydown', handleKeyboard);
-                editor.addEventListener('compositionstart', function() { isComposing = true; });
-                editor.addEventListener('compositionend', function() { isComposing = false; autoSaveHistory(); });
-
-                editor.addEventListener('scroll', function() {
-                    const page = getActivePage();
-                    if (page) {
-                        page.cursor = page.cursor || {};
-                        page.cursor.scrollTop = editor.scrollTop;
-                    }
-                });
-                editor.addEventListener('selectionchange', function() {
-                    const page = getActivePage();
-                    if (page) {
-                        page.cursor = page.cursor || {};
-                        page.cursor.selectionStart = editor.selectionStart;
-                        page.cursor.selectionEnd = editor.selectionEnd;
-                    }
-                });
-
-                btnAddTab.addEventListener('click', addNewTab);
-                btnSave.addEventListener('click', quickSave);
-                btnSettings.addEventListener('click', openSettings);
-                btnCloseSettings.addEventListener('click', closeSettings);
-                settingsPanel.addEventListener('click', function(e) {
-                    if (e.target === settingsPanel) closeSettings();
-                });
-                fontSelect.addEventListener('change', applySettings);
-                fontSizeRange.addEventListener('input', function() {
-                    fontSizeDisplay.textContent = this.value;
-                    applySettings();
-                });
-                lineLengthRange.addEventListener('input', function() {
-                    lineLengthDisplay.textContent = this.value + '%';
-                    applySettings();
-                });
-                btnRenameTab.addEventListener('click', renameTab);
-                tabTitleInput.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter') { e.preventDefault(); renameTab(); }
-                });
-
-                btnIndent.addEventListener('click', function() { indentLines('in'); });
-                btnOutdent.addEventListener('click', function() { indentLines('out'); });
-                btnUndo.addEventListener('click', undo);
-                btnRedo.addEventListener('click', redo);
-                btnPaste.addEventListener('click', pasteClipboard);
-                btnAutoNumber.addEventListener('click', toggleAutoNumber);
-                btnHtmlPreview.addEventListener('click', htmlPreview);
-                btnExport.addEventListener('click', exportFile);
-                btnOpen.addEventListener('click', openFileWithAPI);
-                btnCloseTab.addEventListener('click', function() { closeTab(state.activeIndex); });
-
-                fileInput.addEventListener('change', handleFileInput);
-
-                document.addEventListener('keydown', function(e) {
-                    if (e.ctrlKey && e.shiftKey && e.key === 'S') { e.preventDefault(); quickSave(); }
-                });
-
-                window.addEventListener('beforeunload', function() {
-                    const page = getActivePage();
-                    if (page) {
-                        page.content = editor.value;
-                        page.modified = Date.now();
-                        page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
-                            scrollTop: editor.scrollTop };
-                    }
-                    saveState();
-                });
-
-                setInterval(function() {
-                    const page = getActivePage();
-                    if (page) {
-                        page.content = editor.value;
-                        page.modified = Date.now();
-                        page.cursor = { selectionStart: editor.selectionStart, selectionEnd: editor.selectionEnd,
-                            scrollTop: editor.scrollTop };
-                        saveState();
-                    }
-                }, 30000);
-
-                // 延遲顯示提示
-                setTimeout(() => { showToast('📝 筆記本已就緒', 1200); }, 500);
-                console.log('📝 文字筆記本已啟動 | 分頁數:', state.pages.length);
-            }
-
-            // 啟動完成後，如有卡頓，可嘗試清除 localStorage 或重新安裝
-            // 我們在回答中建議用戶清除快取或使用最新 Chrome
-
-        })();
-    </script>
+  </div>
+</div>
+
+<!-- 尋找取代面板 -->
+<div class="panel-overlay" id="findOverlay">
+  <div class="panel">
+    <h2>尋找與取代 <button id="closeFind">✕</button></h2>
+    <div class="field">
+      <label>尋找</label>
+      <input type="text" id="findInput" placeholder="輸入文字或正則式">
+    </div>
+    <div class="field">
+      <label>取代為</label>
+      <input type="text" id="replaceInput" placeholder="取代文字">
+    </div>
+    <div class="row" style="margin-bottom:14px">
+      <span class="chk"><input type="checkbox" id="regexToggle"><label style="margin:0">正則式</label></span>
+      <span class="chk"><input type="checkbox" id="wrapSearchToggle" checked><label style="margin:0">循環整頁搜尋</label></span>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnFindNext">找下一個</button>
+      <button class="btn" id="btnReplaceOne">取代此處</button>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="btnReplaceSel">只取代選取範圍</button>
+      <button class="btn solid" id="btnReplaceAll">全部取代</button>
+    </div>
+    <div id="findStatus" style="margin-top:12px;font-size:13px;color:var(--ink-dim)"></div>
+  </div>
+</div>
+
+<!-- 另存新檔（無 File System Access API 時的後備視窗） -->
+<div class="panel-overlay" id="saveFallbackOverlay">
+  <div class="panel">
+    <h2>另存新檔 <button id="closeSaveFallback">✕</button></h2>
+    <div class="field">
+      <label>檔名（可自行輸入副檔名，如不加則不會自動補上）</label>
+      <input type="text" id="saveFallbackName">
+    </div>
+    <div class="row">
+      <button class="btn solid" id="btnSaveFallbackGo">下載檔案</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".txt,.md,.markdown,.html,.htm" style="display:none">
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- 共用工具 ---------- */
+const $ = (s,el)=> (el||document).querySelector(s);
+const $$ = (s,el)=> Array.from((el||document).querySelectorAll(s));
+let uidSeq = 1;
+function uid(){ return 't' + (uidSeq++) + '_' + Date.now().toString(36); }
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._h); toast._h = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+const STORAGE_KEY = 'wznotebook_state_v1';
+const MAX_INDENT = 6;
+
+/* ---------- 全域設定 ---------- */
+let settings = {fontFamily:"'Noto Serif TC','Cormorant Garamond','Inter',serif", fontSize:20, wrap:true};
+function loadSettings(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY+'_settings');
+    if(raw) settings = Object.assign(settings, JSON.parse(raw));
+  }catch(e){}
+}
+function saveSettings(){
+  try{ localStorage.setItem(STORAGE_KEY+'_settings', JSON.stringify(settings)); }catch(e){}
+}
+function applySettings(){
+  document.documentElement.style.setProperty('--content-family', settings.fontFamily);
+  document.documentElement.style.setProperty('--content-size', settings.fontSize+'px');
+  $('#fontFamily').value = settings.fontFamily;
+  $('#fontSizeLabel').textContent = settings.fontSize;
+  $('#wrapToggle').checked = settings.wrap;
+  $$('.page').forEach(p=> p.classList.toggle('wrap-off', !settings.wrap));
+}
+
+/* ---------- 分頁模型 ----------
+   tab: {id,name,ext,type:'rich'|'raw', dirty, fileHandle, pageEl, scrollTop, caretInfo, history:[], typing:false}
+*/
+let tabs = [];
+let activeId = null;
+
+function createLineEl(indent, numbered, text){
+  const div = document.createElement('div');
+  div.className = 'line lvl-'+indent;
+  div.dataset.indent = String(indent);
+  div.dataset.num = numbered ? '1':'0';
+  if(numbered){
+    const badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = '';
+    div.appendChild(badge);
+  }
+  const txt = document.createElement('span');
+  txt.className='txt';
+  txt.contentEditable = 'true';
+  txt.textContent = text || '';
+  div.appendChild(txt);
+  return div;
+}
+
+function linesOf(pageEl){ return Array.from(pageEl.children).filter(el=>el.classList.contains('line')); }
+
+function renumberAll(pageEl){
+  const counters = new Array(MAX_INDENT+2).fill(0);
+  linesOf(pageEl).forEach(line=>{
+    const indent = parseInt(line.dataset.indent,10)||0;
+    const numbered = line.dataset.num === '1';
+    line.className = 'line lvl-'+indent;
+    let badge = line.querySelector(':scope > .badge');
+    if(numbered){
+      counters[indent]++;
+      for(let k=indent+1;k<counters.length;k++) counters[k]=0;
+      if(!badge){
+        badge = document.createElement('span');
+        badge.className='badge';
+        line.insertBefore(badge, line.firstChild);
+      }
+      badge.textContent = counters[indent] + '.';
+    } else {
+      counters[indent] = 0;
+      for(let k=indent+1;k<counters.length;k++) counters[k]=0;
+      if(badge) badge.remove();
+    }
+  });
+}
+
+function getActiveTab(){ return tabs.find(t=>t.id===activeId); }
+
+/* ---------- 游標 / 選取工具 ---------- */
+function lineIndexOf(pageEl, lineEl){ return linesOf(pageEl).indexOf(lineEl); }
+function closestLine(node, pageEl){
+  let n = node;
+  while(n && n!==pageEl){
+    if(n.nodeType===1 && n.classList && n.classList.contains('line')) return n;
+    n = n.parentNode;
+  }
+  return null;
+}
+function getTxtSpan(lineEl){ return lineEl.querySelector(':scope > .txt'); }
+
+function placeCaretAt(txtSpan, offset){
+  txtSpan.focus();
+  const sel = window.getSelection();
+  const range = document.createRange();
+  let node = txtSpan.firstChild;
+  if(!node){ node = document.createTextNode(''); txtSpan.appendChild(node); }
+  const len = node.textContent.length;
+  const off = Math.max(0, Math.min(offset, len));
+  range.setStart(node, off);
+  range.collapse(true);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+function getCaretPos(pageEl){
+  const sel = window.getSelection();
+  if(!sel.rangeCount) return null;
+  const range = sel.getRangeAt(0);
+  const lineEl = closestLine(range.startContainer, pageEl);
+  if(!lineEl) return null;
+  return {lineIndex: lineIndexOf(pageEl,lineEl), offset: range.startOffset, lineEl};
+}
+
+/* ---------- 歷史紀錄（復原） ---------- */
+function snapshot(tab){
+  tab.history.push(tab.pageEl.innerHTML);
+  if(tab.history.length>60) tab.history.shift();
+  tab.redo.length = 0;
+}
+function undo(tab){
+  if(!tab.history.length){ toast('沒有可復原的動作'); return; }
+  tab.redo.push(tab.pageEl.innerHTML);
+  const html = tab.history.pop();
+  tab.pageEl.innerHTML = html;
+  renumberAll(tab.pageEl);
+  markDirty(tab);
+  refocusEnd(tab);
+}
+function redo(tab){
+  if(!tab.redo.length){ toast('沒有可重做的動作'); return; }
+  tab.history.push(tab.pageEl.innerHTML);
+  const html = tab.redo.pop();
+  tab.pageEl.innerHTML = html;
+  renumberAll(tab.pageEl);
+  markDirty(tab);
+  refocusEnd(tab);
+}
+function refocusEnd(tab){
+  if(tab.type!=='rich') return;
+  const lines = linesOf(tab.pageEl);
+  const last = lines[lines.length-1];
+  if(last){ placeCaretAt(getTxtSpan(last), getTxtSpan(last).textContent.length); }
+}
+
+/* ---------- 結構操作：Enter / Backspace / 縮排 ---------- */
+function splitLine(pageEl, lineEl, offset){
+  const txt = getTxtSpan(lineEl);
+  const full = txt.textContent;
+  const before = full.slice(0, offset);
+  const after = full.slice(offset);
+  txt.textContent = before;
+  const indent = parseInt(lineEl.dataset.indent,10)||0;
+  const numbered = lineEl.dataset.num==='1';
+  const newLine = createLineEl(indent, numbered, after);
+  lineEl.after(newLine);
+  renumberAll(pageEl);
+  placeCaretAt(getTxtSpan(newLine), 0);
+}
+function mergeUp(pageEl, lineEl){
+  const idx = lineIndexOf(pageEl, lineEl);
+  if(idx<=0) return;
+  const prev = linesOf(pageEl)[idx-1];
+  const prevTxt = getTxtSpan(prev);
+  const curTxt = getTxtSpan(lineEl);
+  const mergePoint = prevTxt.textContent.length;
+  prevTxt.textContent = prevTxt.textContent + curTxt.textContent;
+  lineEl.remove();
+  renumberAll(pageEl);
+  placeCaretAt(prevTxt, mergePoint);
+}
+function getEffectiveLines(tab){
+  const pageEl = tab.pageEl;
+  const sel = window.getSelection();
+  let lines = [];
+  if(sel.rangeCount){
+    const range = sel.getRangeAt(0);
+    if(pageEl.contains(range.startContainer) && pageEl.contains(range.endContainer)){
+      const l1 = closestLine(range.startContainer, pageEl);
+      const l2 = closestLine(range.endContainer, pageEl);
+      if(l1 && l2){
+        const all = linesOf(pageEl);
+        const i1 = all.indexOf(l1), i2 = all.indexOf(l2);
+        lines = all.slice(Math.min(i1,i2), Math.max(i1,i2)+1);
+      }
+    }
+  }
+  if(!lines.length && tab.savedCaret){
+    const all = linesOf(pageEl);
+    const idx = Math.min(Math.max(tab.savedCaret.lineIndex,0), all.length-1);
+    if(idx>=0) lines = [all[idx]];
+  }
+  if(!lines.length && linesOf(pageEl).length){
+    lines = [linesOf(pageEl)[linesOf(pageEl).length-1]];
+  }
+  return lines;
+}
+function restoreCaretToLine(tab, lineEl){
+  const txt = getTxtSpan(lineEl);
+  const offset = tab.savedCaret ? tab.savedCaret.offset : txt.textContent.length;
+  placeCaretAt(txt, offset);
+}
+function indentSelected(tab, delta){
+  const pageEl = tab.pageEl;
+  const lines = getEffectiveLines(tab);
+  lines.forEach(line=>{
+    let ind = parseInt(line.dataset.indent,10)||0;
+    ind = Math.max(0, Math.min(MAX_INDENT, ind+delta));
+    line.dataset.indent = String(ind);
+  });
+  renumberAll(pageEl);
+  if(lines.length) restoreCaretToLine(tab, lines[lines.length-1]);
+}
+function toggleNumbered(tab){
+  const pageEl = tab.pageEl;
+  const lines = getEffectiveLines(tab);
+  const allOn = lines.every(l=>l.dataset.num==='1');
+  lines.forEach(l=> l.dataset.num = allOn? '0':'1');
+  renumberAll(pageEl);
+  if(lines.length) restoreCaretToLine(tab, lines[lines.length-1]);
+}
+
+/* ---------- 分頁事件綁定（rich 類型） ---------- */
+function bindRichPage(tab){
+  const pageEl = tab.pageEl;
+  let typingTimer = null;
+  function beginTypingBurstIfNeeded(){
+    if(!tab._inBurst){
+      snapshot(tab);
+      tab._inBurst = true;
+    }
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(()=>{ tab._inBurst=false; }, 800);
+  }
+
+  pageEl.addEventListener('keydown', (e)=>{
+    if(e.key==='Enter'){
+      e.preventDefault();
+      snapshot(tab); tab._inBurst=false;
+      const pos = getCaretPos(pageEl);
+      if(pos) splitLine(pageEl, pos.lineEl, pos.offset);
+      markDirty(tab);
+      return;
+    }
+    if(e.key==='Tab'){
+      e.preventDefault();
+      snapshot(tab); tab._inBurst=false;
+      indentSelected(tab, e.shiftKey? -1: 1);
+      markDirty(tab);
+      return;
+    }
+    if(e.key==='Backspace'){
+      const pos = getCaretPos(pageEl);
+      if(pos && pos.offset===0){
+        const idx = lineIndexOf(pageEl,pos.lineEl);
+        if(idx>0){
+          e.preventDefault();
+          snapshot(tab); tab._inBurst=false;
+          mergeUp(pageEl, pos.lineEl);
+          markDirty(tab);
+          return;
+        } else { e.preventDefault(); return; }
+      }
+      beginTypingBurstIfNeeded();
+      return;
+    }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){
+      e.preventDefault(); undo(tab); return;
+    }
+    if(!e.ctrlKey && !e.metaKey && e.key.length===1){
+      beginTypingBurstIfNeeded();
+    }
+  });
+
+  pageEl.addEventListener('paste', (e)=>{
+    e.preventDefault();
+    snapshot(tab); tab._inBurst=false;
+    const text = (e.clipboardData||window.clipboardData).getData('text/plain');
+    insertMultilineAtCaret(pageEl, text);
+    markDirty(tab);
+  });
+
+  pageEl.addEventListener('beforeinput', (e)=>{
+    if(e.inputType && e.inputType!=='insertText' && e.inputType!=='insertCompositionText'){
+      snapshot(tab); tab._inBurst=false;
+    }
+  });
+  pageEl.addEventListener('input', ()=>{ renumberAll(pageEl); markDirty(tab); });
+
+  function trackCaret(){
+    const pos = getCaretPos(pageEl);
+    if(pos) tab.savedCaret = {lineIndex: pos.lineIndex, offset: pos.offset};
+  }
+  pageEl.addEventListener('keyup', trackCaret);
+  pageEl.addEventListener('mouseup', trackCaret);
+  pageEl.addEventListener('focusin', trackCaret);
+
+  // 點擊行與行之間的空白處(不是任何一行本身)時，聚焦最後一行的末端
+  pageEl.addEventListener('mousedown', (e)=>{
+    if(e.target===pageEl){
+      const lines = linesOf(pageEl);
+      const last = lines[lines.length-1];
+      if(last){ e.preventDefault(); placeCaretAt(getTxtSpan(last), getTxtSpan(last).textContent.length); }
+    }
+  });
+  // 點擊編號徽章本身(不可編輯)時，把游標移到該行文字最前面
+  pageEl.addEventListener('click', (e)=>{
+    const badge = e.target.closest && e.target.closest('.badge');
+    if(!badge) return;
+    const lineEl = closestLine(badge, pageEl);
+    if(lineEl) placeCaretAt(getTxtSpan(lineEl), 0);
+  });
+}
+
+function insertMultilineAtCaret(pageEl, text){
+  const pos = getCaretPos(pageEl);
+  const parts = text.replace(/\r\n/g,'\n').split('\n');
+  if(!pos){
+    const indent = 0;
+    parts.forEach(p=> pageEl.appendChild(createLineEl(indent,false,p)));
+    renumberAll(pageEl);
+    return;
+  }
+  const lineEl = pos.lineEl;
+  const indent = parseInt(lineEl.dataset.indent,10)||0;
+  const txt = getTxtSpan(lineEl);
+  const full = txt.textContent;
+  const before = full.slice(0,pos.offset);
+  const after = full.slice(pos.offset);
+  if(parts.length===1){
+    txt.textContent = before + parts[0] + after;
+    placeCaretAt(txt, (before+parts[0]).length);
+  } else {
+    txt.textContent = before + parts[0];
+    let lastEl = lineEl;
+    for(let i=1;i<parts.length;i++){
+      const isLast = i===parts.length-1;
+      const newLine = createLineEl(indent, false, isLast? (parts[i]+after) : parts[i]);
+      lastEl.after(newLine);
+      lastEl = newLine;
+      if(isLast) placeCaretAt(getTxtSpan(newLine), parts[i].length);
+    }
+  }
+  renumberAll(pageEl);
+}
+
+/* ---------- raw 類型（開啟既有 txt/md/html 原始碼編輯） ---------- */
+function bindRawPage(tab){
+  const ta = tab.textarea;
+  ta.addEventListener('input', ()=> markDirty(tab));
+  ta.addEventListener('keydown', (e)=>{
+    if(e.key==='Tab'){
+      e.preventDefault();
+      const s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0,s) + '\t' + ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s+1;
+      markDirty(tab);
+    }
+  });
+}
+
+/* ---------- 建立/切換/關閉分頁 ---------- */
+function newTab(opts){
+  opts = opts||{};
+  const tab = {
+    id: uid(),
+    name: opts.name || '未命名筆記',
+    ext: opts.ext || null,
+    type: opts.type || 'rich',
+    dirty: false,
+    fileHandle: opts.fileHandle || null,
+    history: [],
+    redo: [],
+    savedCaret: null,
+    _inBurst: false,
+    scrollTop: 0
+  };
+  const pageEl = document.createElement('div');
+  pageEl.className = 'page' + (settings.wrap? '' : ' wrap-off');
+  pageEl.id = 'page_'+tab.id;
+
+  if(tab.type==='rich'){
+    pageEl.spellcheck = false;
+    if(opts.initialLines && opts.initialLines.length){
+      opts.initialLines.forEach(l=> pageEl.appendChild(createLineEl(l.indent, l.numbered, l.text)));
+    } else {
+      pageEl.appendChild(createLineEl(0,false,''));
+    }
+    tab.pageEl = pageEl;
+    $('#editorArea').appendChild(pageEl);
+    renumberAll(pageEl);
+    bindRichPage(tab);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = opts.rawText || '';
+    ta.spellcheck = false;
+    pageEl.appendChild(ta);
+    tab.pageEl = pageEl;
+    tab.textarea = ta;
+    $('#editorArea').appendChild(pageEl);
+    bindRawPage(tab);
+  }
+
+  tabs.push(tab);
+  switchTab(tab.id);
+  renderTabBar();
+  persist();
+  return tab;
+}
+
+function switchTab(id){
+  const cur = getActiveTab();
+  if(cur){
+    cur.scrollTop = cur.pageEl.scrollTop;
+  }
+  activeId = id;
+  $$('.page').forEach(p=>p.classList.remove('active'));
+  const tab = getActiveTab();
+  if(tab){
+    tab.pageEl.classList.add('active');
+    tab.pageEl.scrollTop = tab.scrollTop || 0;
+    $('#btnRun').style.display = (tab.type==='raw' && tab.ext==='html') ? 'flex':'none';
+  }
+  renderTabBar();
+}
+
+function closeTab(id){
+  const idx = tabs.findIndex(t=>t.id===id);
+  if(idx<0) return;
+  const tab = tabs[idx];
+  if(tab.dirty && !confirm('此分頁尚未儲存，確定要關閉嗎？')) return;
+  tab.pageEl.remove();
+  tabs.splice(idx,1);
+  if(activeId===id){
+    const next = tabs[idx] || tabs[idx-1];
+    if(next) switchTab(next.id); else newTab({});
+  }
+  renderTabBar();
+  persist();
+}
+
+function markDirty(tab){
+  tab.dirty = true;
+  renderTabBar();
+  persist();
+}
+
+function renderTabBar(){
+  const bar = $('#tabbar');
+  $$('.tab').forEach(el=>el.remove());
+  tabs.forEach(tab=>{
+    const el = document.createElement('div');
+    el.className = 'tab' + (tab.id===activeId? ' active':'') + (tab.dirty? ' dirty':'');
+    el.innerHTML = '<span class="dirty-dot"></span><span class="name">'+escapeHtml(tab.name)+'</span><span class="close">✕</span>';
+    el.addEventListener('click',(e)=>{
+      if(e.target.classList.contains('close')){ closeTab(tab.id); return; }
+      if(e.target.classList.contains('name')) return; // 讓 dblclick 處理改名
+      switchTab(tab.id);
+    });
+    const nameEl = el.querySelector('.name');
+    nameEl.addEventListener('click', ()=>{
+      if(tab.id!==activeId){ switchTab(tab.id); return; }
+      startRename(tab, nameEl);
+    });
+    bar.insertBefore(el, $('#btnNewTab'));
+  });
+}
+
+function startRename(tab, nameEl){
+  nameEl.contentEditable = 'true';
+  nameEl.focus();
+  document.execCommand('selectAll', false, null);
+  function finish(){
+    nameEl.contentEditable = 'false';
+    const newName = nameEl.textContent.trim() || tab.name;
+    tab.name = newName;
+    renderTabBar();
+    persist();
+  }
+  nameEl.addEventListener('blur', finish, {once:true});
+  nameEl.addEventListener('keydown', function h(e){
+    if(e.key==='Enter'){ e.preventDefault(); nameEl.blur(); }
+    if(e.key==='Escape'){ nameEl.blur(); }
+  });
+}
+
+/* ---------- 匯出 ---------- */
+function exportLinesData(pageEl){
+  return linesOf(pageEl).map(line=>{
+    const indent = parseInt(line.dataset.indent,10)||0;
+    const numbered = line.dataset.num==='1';
+    const badge = line.querySelector(':scope > .badge');
+    const number = badge ? badge.textContent : '';
+    const text = getTxtSpan(line).textContent;
+    return {indent, numbered, number, text};
+  });
+}
+function formatAsText(lines){
+  return lines.map(l=> '  '.repeat(l.indent) + (l.numbered? l.number+' ':'') + l.text).join('\n');
+}
+function formatAsHtml(lines, title){
+  const body = lines.map(l=>{
+    const style = 'margin-left:'+(l.indent*1.6)+'em';
+    const prefix = l.numbered? '<span style="color:#bd8b2a;margin-right:.4em">'+escapeHtml(l.number)+'</span>':'';
+    return '<div style="'+style+'">'+prefix+escapeHtml(l.text)+'</div>';
+  }).join('\n');
+  return '<!DOCTYPE html>\n<html lang="zh-Hant"><head><meta charset="UTF-8">\n'+
+    '<meta name="viewport" content="width=device-width, initial-scale=1">\n'+
+    '<title>'+escapeHtml(title)+'</title>\n'+
+    '<style>body{background:#121315;color:#fcfbfa;font-family:"Noto Serif TC",serif;'+
+    'font-size:20px;line-height:1.75;padding:24px;white-space:pre-wrap;word-break:break-word}</style>\n'+
+    '</head><body>\n'+body+'\n</body></html>';
+}
+function currentContentFor(tab, targetExt){
+  if(tab.type==='raw'){
+    return tab.textarea.value;
+  }
+  const lines = exportLinesData(tab.pageEl);
+  if(targetExt==='html') return formatAsHtml(lines, tab.name);
+  return formatAsText(lines);
+}
+function extFromName(name){
+  const m = /\.([a-zA-Z0-9]+)$/.exec(name);
+  return m? m[1].toLowerCase() : null;
+}
+
+/* ---------- 開啟本機檔案 ---------- */
+async function openFile(){
+  if(window.showOpenFilePicker){
+    try{
+      const [handle] = await window.showOpenFilePicker({
+        types:[{description:'文字檔', accept:{'text/plain':['.txt','.md','.markdown','.html','.htm']}}],
+        excludeAcceptAllOption:false, multiple:false
+      });
+      const file = await handle.getFile();
+      const text = await file.text();
+      loadFileIntoTab(file.name, text, handle);
+    }catch(e){ /* 使用者取消 */ }
+  } else {
+    $('#fileInput').click();
+  }
+}
+$('#fileInput').addEventListener('change', async (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const text = await file.text();
+  loadFileIntoTab(file.name, text, null);
+  e.target.value='';
+});
+
+function loadFileIntoTab(filename, text, handle){
+  const ext = extFromName(filename) || 'txt';
+  if(ext==='html'||ext==='htm'){
+    newTab({name:filename, ext:'html', type:'raw', rawText:text, fileHandle:handle});
+  } else {
+    const rawLines = text.replace(/\r\n/g,'\n').split('\n');
+    const initialLines = rawLines.map(line=>{
+      const m = /^(\s*)((\d+)[.)]\s+)?(.*)$/.exec(line);
+      const indentSpaces = m? m[1].length : 0;
+      const indent = Math.min(MAX_INDENT, Math.round(indentSpaces/2));
+      const numbered = !!(m && m[2]);
+      const rest = m? m[4] : line;
+      return {indent, numbered, text:rest};
+    });
+    if(!initialLines.length) initialLines.push({indent:0,numbered:false,text:''});
+    newTab({name:filename, ext:ext, type:'rich', initialLines:initialLines, fileHandle:handle});
+  }
+  toast('已開啟「'+filename+'」');
+}
+
+/* ---------- 儲存 ---------- */
+async function quickSave(tab){
+  if(!tab) return;
+  if(tab.fileHandle){
+    try{
+      const targetExt = extFromName(tab.name) || tab.ext || 'txt';
+      const content = currentContentFor(tab, targetExt);
+      const writable = await tab.fileHandle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      tab.dirty = false;
+      renderTabBar(); persist();
+      toast('已儲存');
+    }catch(e){
+      toast('儲存失敗，請改用「另存新檔」');
+    }
+  } else {
+    await saveAs(tab);
+  }
+}
+
+async function saveAs(tab){
+  if(!tab) return;
+  if(window.showSaveFilePicker){
+    try{
+      const handle = await window.showSaveFilePicker({ suggestedName: tab.name });
+      const targetExt = extFromName(handle.name) || tab.ext || 'txt';
+      const content = currentContentFor(tab, targetExt);
+      const writable = await handle.createWritable();
+      await writable.write(content);
+      await writable.close();
+      tab.fileHandle = handle;
+      tab.name = handle.name;
+      tab.ext = targetExt;
+      tab.dirty = false;
+      renderTabBar(); persist();
+      toast('已儲存為「'+handle.name+'」');
+    }catch(e){ /* 使用者取消 */ }
+  } else {
+    openSaveFallback(tab);
+  }
+}
+
+function openSaveFallback(tab){
+  $('#saveFallbackName').value = tab.name;
+  $('#saveFallbackOverlay').classList.add('show');
+  $('#saveFallbackOverlay')._tab = tab;
+}
+$('#btnSaveFallbackGo').addEventListener('click', ()=>{
+  const tab = $('#saveFallbackOverlay')._tab;
+  const name = $('#saveFallbackName').value.trim() || tab.name;
+  const targetExt = extFromName(name) || tab.ext || 'txt';
+  const content = currentContentFor(tab, targetExt);
+  const mime = targetExt==='html' ? 'text/html' : 'text/plain';
+  const blob = new Blob([content], {type:mime});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 2000);
+  tab.name = name; tab.ext = targetExt; tab.dirty=false;
+  renderTabBar(); persist();
+  $('#saveFallbackOverlay').classList.remove('show');
+  toast('已下載「'+name+'」');
+});
+$('#closeSaveFallback').addEventListener('click', ()=> $('#saveFallbackOverlay').classList.remove('show'));
+
+/* ---------- 在瀏覽器執行（HTML 分頁） ---------- */
+$('#btnRun').addEventListener('click', ()=>{
+  const tab = getActiveTab();
+  if(!tab || tab.type!=='raw') return;
+  const blob = new Blob([tab.textarea.value], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  window.open(url, '_blank');
+});
+
+/* ---------- 工具列事件 ---------- */
+// 避免點擊工具列/頁首按鈕時讓 contenteditable 分頁失去焦點與選取範圍
+$('#toolbar').addEventListener('mousedown', (e)=>{ if(e.target.closest('[data-cmd]')) e.preventDefault(); });
+$('.header-actions').addEventListener('mousedown', (e)=>{ if(e.target.closest('button')) e.preventDefault(); });
+
+$('#toolbar').addEventListener('click', (e)=>{
+  const btn = e.target.closest('[data-cmd]');
+  if(!btn) return;
+  const tab = getActiveTab();
+  if(!tab) return;
+  const cmd = btn.dataset.cmd;
+  if(tab.type==='rich'){
+    if(cmd==='undo') undo(tab);
+    else if(cmd==='redo') redo(tab);
+    else if(cmd==='numlist'){ snapshot(tab); toggleNumbered(tab); markDirty(tab); }
+    else if(cmd==='indent'){ snapshot(tab); indentSelected(tab,1); markDirty(tab); }
+    else if(cmd==='outdent'){ snapshot(tab); indentSelected(tab,-1); markDirty(tab); }
+    else if(cmd==='paste') doToolbarPaste(tab);
+  } else {
+    if(cmd==='undo') document.execCommand('undo');
+    else if(cmd==='redo') document.execCommand('redo');
+    else if(cmd==='paste') doToolbarPaste(tab);
+    else if(cmd==='indent' || cmd==='outdent' || cmd==='numlist'){
+      toast('此分頁為原始檔內容，不支援編號/縮排');
+    }
+  }
+  if(cmd==='find') openFindPanel();
+  else if(cmd==='saveas') saveAs(tab);
+  else if(cmd==='closetab') closeTab(tab.id);
+});
+
+$('#btnOpenHeader').addEventListener('click', openFile);
+$('#btnSaveHeader').addEventListener('click', ()=>{
+  const tab = getActiveTab();
+  if(tab) quickSave(tab);
+});
+
+async function doToolbarPaste(tab){
+  try{
+    const text = await navigator.clipboard.readText();
+    if(tab.type==='rich'){
+      snapshot(tab);
+      const lines = linesOf(tab.pageEl);
+      if(tab.savedCaret && lines[tab.savedCaret.lineIndex]){
+        placeCaretAt(getTxtSpan(lines[tab.savedCaret.lineIndex]), tab.savedCaret.offset);
+      } else if(lines.length){
+        placeCaretAt(getTxtSpan(lines[lines.length-1]), getTxtSpan(lines[lines.length-1]).textContent.length);
+      }
+      insertMultilineAtCaret(tab.pageEl, text);
+    } else {
+      const ta = tab.textarea;
+      const s = ta.selectionStart, en = ta.selectionEnd;
+      ta.value = ta.value.slice(0,s)+text+ta.value.slice(en);
+      ta.selectionStart = ta.selectionEnd = s+text.length;
+    }
+    markDirty(tab);
+  }catch(e){
+    toast('無法讀取剪貼簿，請直接使用系統貼上');
+  }
+}
+
+$('#btnNewTab').addEventListener('click', ()=> newTab({}));
+
+/* ---------- 設定面板 ---------- */
+$('#btnSettings').addEventListener('click', ()=> $('#settingsOverlay').classList.add('show'));
+$('#closeSettings').addEventListener('click', ()=> $('#settingsOverlay').classList.remove('show'));
+$('#fontFamily').addEventListener('change', (e)=>{ settings.fontFamily=e.target.value; applySettings(); saveSettings(); });
+$('#fontInc').addEventListener('click', ()=>{ settings.fontSize=Math.min(40,settings.fontSize+1); applySettings(); saveSettings(); });
+$('#fontDec').addEventListener('click', ()=>{ settings.fontSize=Math.max(12,settings.fontSize-1); applySettings(); saveSettings(); });
+$('#wrapToggle').addEventListener('change', (e)=>{ settings.wrap=e.target.checked; applySettings(); saveSettings(); });
+
+/* ---------- 尋找與取代 ---------- */
+function openFindPanel(){
+  $('#findOverlay').classList.add('show');
+  $('#findInput').focus();
+}
+$('#closeFind').addEventListener('click', ()=> $('#findOverlay').classList.remove('show'));
+
+function buildFlatText(tab){
+  if(tab.type==='raw') return tab.textarea.value;
+  const lines = exportLinesData(tab.pageEl);
+  return lines.map(l=>l.text).join('\n');
+}
+function makeMatcher(){
+  const q = $('#findInput').value;
+  const useRegex = $('#regexToggle').checked;
+  if(!q) return null;
+  try{
+    return useRegex ? new RegExp(q,'g') : new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g');
+  }catch(e){ toast('正則式錯誤'); return null; }
+}
+let lastMatchEnd = 0;
+function findNextMatch(tab){
+  const re = makeMatcher();
+  if(!re) return null;
+  const text = buildFlatText(tab);
+  re.lastIndex = lastMatchEnd;
+  let m = re.exec(text);
+  if(!m && $('#wrapSearchToggle').checked){
+    re.lastIndex = 0;
+    m = re.exec(text);
+  }
+  if(!m){ $('#findStatus').textContent='找不到相符內容'; return null; }
+  lastMatchEnd = m.index + Math.max(m[0].length,1);
+  $('#findStatus').textContent = '找到：位置 '+m.index+'，長度 '+m[0].length;
+  highlightRange(tab, m.index, m[0].length);
+  return {index:m.index, length:m[0].length, match:m};
+}
+function mapIndexToLineOffset(tab, globalIndex){
+  if(tab.type==='raw') return null;
+  const lines = linesOf(tab.pageEl);
+  let acc = 0;
+  for(let i=0;i<lines.length;i++){
+    const len = getTxtSpan(lines[i]).textContent.length;
+    if(globalIndex <= acc+len){
+      return {lineEl:lines[i], offset: globalIndex-acc};
+    }
+    acc += len + 1; // +1 for \n
+  }
+  return {lineEl:lines[lines.length-1], offset:0};
+}
+function highlightRange(tab, index, length){
+  if(tab.type==='raw'){
+    const ta = tab.textarea;
+    ta.focus(); ta.setSelectionRange(index, index+length);
+    return;
+  }
+  const start = mapIndexToLineOffset(tab, index);
+  const end = mapIndexToLineOffset(tab, index+length);
+  if(!start||!end) return;
+  const sel = window.getSelection();
+  const range = document.createRange();
+  getTxtSpan(start.lineEl).focus();
+  const sNode = getTxtSpan(start.lineEl).firstChild || getTxtSpan(start.lineEl);
+  const eNode = getTxtSpan(end.lineEl).firstChild || getTxtSpan(end.lineEl);
+  try{
+    range.setStart(sNode, start.offset);
+    range.setEnd(eNode, end.offset);
+    sel.removeAllRanges(); sel.addRange(range);
+    end.lineEl.scrollIntoView({block:'center'});
+  }catch(e){}
+}
+function replaceAtMatch(tab, index, length, replacement){
+  if(tab.type==='raw'){
+    const ta = tab.textarea;
+    ta.value = ta.value.slice(0,index) + replacement + ta.value.slice(index+length);
+    return;
+  }
+  const start = mapIndexToLineOffset(tab, index);
+  const end = mapIndexToLineOffset(tab, index+length);
+  if(!start||!end) return;
+  if(start.lineEl===end.lineEl){
+    const txt = getTxtSpan(start.lineEl);
+    txt.textContent = txt.textContent.slice(0,start.offset)+replacement+txt.textContent.slice(end.offset);
+  } else {
+    // 跨行取代：合併為單行處理（簡化）
+    const startTxt = getTxtSpan(start.lineEl);
+    const endTxt = getTxtSpan(end.lineEl);
+    startTxt.textContent = startTxt.textContent.slice(0,start.offset)+replacement+endTxt.textContent.slice(end.offset);
+    let cur = start.lineEl.nextSibling;
+    while(cur && cur!==end.lineEl.nextSibling){
+      const toRemove = cur; cur = cur.nextSibling; toRemove.remove();
+    }
+  }
+}
+$('#btnFindNext').addEventListener('click', ()=>{
+  const tab = getActiveTab(); if(!tab) return;
+  findNextMatch(tab);
+});
+$('#btnReplaceOne').addEventListener('click', ()=>{
+  const tab = getActiveTab(); if(!tab) return;
+  const repl = $('#replaceInput').value;
+  const re = makeMatcher(); if(!re) return;
+  const text = buildFlatText(tab);
+  re.lastIndex = Math.max(0,lastMatchEnd-1);
+  const m = re.exec(text);
+  if(!m){ toast('請先按「找下一個」定位'); return; }
+  snapshot(tab); tab._inBurst=false;
+  replaceAtMatch(tab, m.index, m[0].length, repl);
+  if(tab.type==='rich') renumberAll(tab.pageEl);
+  lastMatchEnd = m.index + repl.length;
+  markDirty(tab);
+  toast('已取代');
+});
+$('#btnReplaceAll').addEventListener('click', ()=>{
+  const tab = getActiveTab(); if(!tab) return;
+  const repl = $('#replaceInput').value;
+  const re = makeMatcher(); if(!re) return;
+  snapshot(tab); tab._inBurst=false;
+  const text = buildFlatText(tab);
+  const newText = text.replace(re, repl);
+  applyFlatTextToTab(tab, newText);
+  markDirty(tab);
+  toast('已全部取代');
+});
+$('#btnReplaceSel').addEventListener('click', ()=>{
+  const tab = getActiveTab(); if(!tab) return;
+  const repl = $('#replaceInput').value;
+  const re = makeMatcher(); if(!re) return;
+  let selText='', selStart=0, selEnd=0;
+  if(tab.type==='raw'){
+    const ta = tab.textarea;
+    selStart = ta.selectionStart; selEnd = ta.selectionEnd;
+    selText = ta.value.slice(selStart, selEnd);
+  } else {
+    const sel = window.getSelection();
+    selText = sel.toString();
+    const full = buildFlatText(tab);
+    selStart = full.indexOf(selText);
+    selEnd = selStart + selText.length;
+  }
+  if(!selText){ toast('請先選取要取代的範圍'); return; }
+  snapshot(tab); tab._inBurst=false;
+  const replacedSel = selText.replace(re, repl);
+  const full = buildFlatText(tab);
+  const newText = full.slice(0,selStart) + replacedSel + full.slice(selEnd);
+  applyFlatTextToTab(tab, newText);
+  markDirty(tab);
+  toast('已取代選取範圍');
+});
+function applyFlatTextToTab(tab, newText){
+  if(tab.type==='raw'){
+    tab.textarea.value = newText;
+    return;
+  }
+  const oldLines = linesOf(tab.pageEl);
+  const meta = oldLines.map(l=>({indent:parseInt(l.dataset.indent,10)||0, numbered:l.dataset.num==='1'}));
+  const newLineTexts = newText.split('\n');
+  tab.pageEl.innerHTML='';
+  newLineTexts.forEach((t,i)=>{
+    const m = meta[i] || meta[meta.length-1] || {indent:0,numbered:false};
+    tab.pageEl.appendChild(createLineEl(m.indent, m.numbered, t));
+  });
+  renumberAll(tab.pageEl);
+}
+
+/* ---------- 持久化 ---------- */
+function persist(){
+  try{
+    const data = tabs.map(t=>({
+      id:t.id, name:t.name, ext:t.ext, type:t.type, dirty:t.dirty,
+      content: t.type==='rich'? t.pageEl.innerHTML : t.textarea.value
+    }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({activeId, tabs:data}));
+  }catch(e){}
+}
+document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState==='hidden') persist(); });
+window.addEventListener('pagehide', persist);
+function restore(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return false;
+    const data = JSON.parse(raw);
+    if(!data.tabs || !data.tabs.length) return false;
+    data.tabs.forEach(td=>{
+      if(td.type==='rich'){
+        const tab = newTab({name:td.name, ext:td.ext, type:'rich'});
+        tab.pageEl.innerHTML = td.content;
+        Array.from(tab.pageEl.querySelectorAll('.txt')).forEach(t=> t.contentEditable='true');
+        Array.from(tab.pageEl.querySelectorAll('.badge')).forEach(b=> b.removeAttribute('contenteditable'));
+        renumberAll(tab.pageEl);
+        tab.dirty = !!td.dirty;
+      } else {
+        const tab = newTab({name:td.name, ext:td.ext, type:'raw', rawText:td.content});
+        tab.dirty = !!td.dirty;
+      }
+    });
+    if(data.activeId && tabs.some(t=>t.id===data.activeId)) switchTab(data.activeId);
+    renderTabBar();
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- 離開頁面前提醒（未儲存） ---------- */
+window.addEventListener('beforeunload', (e)=>{
+  if(tabs.some(t=>t.dirty)){
+    e.preventDefault(); e.returnValue='';
+  }
+});
+
+/* ---------- Service Worker（PWA 安裝條件之一，需 https 或 localhost） ---------- */
+if('serviceWorker' in navigator && (location.protocol==='https:' || location.hostname==='localhost')){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+/* ---------- 初始化 ---------- */
+loadSettings();
+applySettings();
+if(!restore()){
+  newTab({name:'未命名筆記'});
+}
+})();
+</script>
 </body>
 </html>
