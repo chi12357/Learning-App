@@ -8,930 +8,1760 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { font-size: 28.8px; -webkit-text-size-adjust: 100%; transition: font-size 0.15s ease; scroll-padding-top: 120px; }
-        body { background-color: #121315; color: #fcfbfa; font-family: 'Noto Serif TC', 'Inter', 'Cormorant Garamond', serif; padding: 16px 12px 40px; min-height: 100vh; line-height: 1.6; }
-        .app { max-width: 820px; margin: 0 auto; }
-        .app-header { text-align: center; padding: 8px 0 16px; border-bottom: 2px solid rgba(189, 139, 42, 0.25); margin-bottom: 12px; }
-        .app-header h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: 4px; color: #fcfbfa; text-shadow: 0 0 12px rgba(189, 139, 42, 0.15); }
-        .app-header h1 small { display: block; font-size: 0.65rem; font-weight: 400; letter-spacing: 6px; color: rgba(252, 251, 250, 0.5); margin-top: 2px; font-family: 'Inter', sans-serif; }
-        .sticky-toolbar { position: sticky; top: 0; z-index: 100; background-color: rgba(18, 19, 21, 0.92); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 10px 0 6px; margin-bottom: 14px; border-bottom: 1px solid rgba(252, 251, 250, 0.06); }
-        .toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .search-wrap { flex: 1; position: relative; min-width: 150px; }
-        .search-wrap input { width: 100%; padding: 10px 14px 10px 44px; font-size: 0.95rem; font-family: 'Noto Serif TC', serif; background: rgba(252, 251, 250, 0.07); border: 1.5px solid rgba(252, 251, 250, 0.15); border-radius: 60px; color: #fcfbfa; outline: none; transition: border-color 0.3s, box-shadow 0.3s; -webkit-appearance: none; }
-        .search-wrap input::placeholder { color: rgba(252, 251, 250, 0.35); font-weight: 400; }
-        .search-wrap input:focus { border-color: #bd8b2a; box-shadow: 0 0 0 3px rgba(189, 139, 42, 0.2); }
-        .search-wrap .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: rgba(252, 251, 250, 0.3); pointer-events: none; line-height: 1; }
-        .search-wrap .clear-btn { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: rgba(252, 251, 250, 0.3); font-size: 1.1rem; cursor: pointer; padding: 4px 8px; display: none; line-height: 1; border-radius: 50%; transition: background 0.2s; }
-        .search-wrap .clear-btn:hover { background: rgba(252, 251, 250, 0.08); }
-        .search-wrap .clear-btn.visible { display: block; }
-        .controls-group { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
-        .controls-group .toggle-all-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(252, 251, 250, 0.15); background: rgba(252, 251, 250, 0.04); color: rgba(252, 251, 250, 0.4); font-size: 1.6rem; cursor: pointer; transition: background 0.2s, border-color 0.2s, transform 0.35s ease; display: flex; align-items: center; justify-content: center; line-height: 1; user-select: none; -webkit-tap-highlight-color: transparent; padding: 0; }
-        .controls-group .toggle-all-btn:hover { background: rgba(252, 251, 250, 0.08); }
-        .controls-group .toggle-all-btn:active { background: rgba(189, 139, 42, 0.15); border-color: rgba(189, 139, 42, 0.3); }
-        .controls-group .toggle-all-btn.all-open { transform: rotate(180deg); color: rgba(252, 251, 250, 0.6); }
-        .controls-group .divider { width: 1px; height: 28px; background: rgba(252, 251, 250, 0.08); flex-shrink: 0; }
-        .font-controls { display: flex; gap: 4px; flex-shrink: 0; align-items: center; }
-        .font-controls button { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(252, 251, 250, 0.15); background: rgba(252, 251, 250, 0.04); color: #fcfbfa; font-size: 1.2rem; font-weight: 300; cursor: pointer; transition: background 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; user-select: none; -webkit-tap-highlight-color: transparent; }
-        .font-controls button:hover { background: rgba(252, 251, 250, 0.08); }
-        .font-controls button:active { background: rgba(189, 139, 42, 0.15); border-color: rgba(189, 139, 42, 0.3); }
-        .font-controls .font-size-label { font-size: 0.65rem; color: rgba(252, 251, 250, 0.3); font-family: 'Inter', sans-serif; display: flex; align-items: center; padding: 0 4px; min-width: 28px; justify-content: center; }
-        .stats { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: rgba(252, 251, 250, 0.4); padding: 0 4px 10px; font-family: 'Inter', sans-serif; letter-spacing: 0.3px; border-bottom: 1px solid rgba(252, 251, 250, 0.05); margin-bottom: 14px; flex-wrap: wrap; gap: 4px; }
-        .stats .count { font-weight: 500; }
-        .stats .hint { font-size: 0.7rem; opacity: 0.5; }
-        .dynasty { margin-bottom: 12px; border-radius: 12px; background: rgba(252, 251, 250, 0.03); border: 1px solid rgba(252, 251, 250, 0.06); overflow: hidden; transition: border-color 0.3s; }
-        .dynasty.highlight { border-color: rgba(189, 139, 42, 0.35); }
-        .dynasty-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; cursor: pointer; -webkit-tap-highlight-color: transparent; user-select: none; transition: background 0.2s; gap: 12px; min-height: 64px; }
-        .dynasty-header:hover { background: rgba(252, 251, 250, 0.04); }
-        .dynasty-header:active { background: rgba(252, 251, 250, 0.07); }
-        .dynasty-name { font-size: 2.6rem; font-weight: 700; color: #fcfbfa; letter-spacing: 2px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; }
-        .dynasty-name .years { font-size: 1.6rem; font-weight: 400; color: rgba(252, 251, 250, 0.4); font-family: 'Inter', sans-serif; letter-spacing: 0.5px; }
-        .dynasty-name .badge { font-size: 1.2rem; font-weight: 400; color: rgba(252, 251, 250, 0.3); background: rgba(252, 251, 250, 0.06); padding: 0 10px; border-radius: 20px; font-family: 'Inter', sans-serif; letter-spacing: 0.5px; }
-        .dynasty-toggle { flex-shrink: 0; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: rgba(252, 251, 250, 0.35); transition: transform 0.35s ease, color 0.2s; border-radius: 50%; background: rgba(252, 251, 250, 0.04); }
-        .dynasty-toggle.open { transform: rotate(180deg); color: rgba(252, 251, 250, 0.6); }
-        .dynasty-body { overflow: hidden; transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease; max-height: 0; opacity: 0; padding: 0 4px; }
-        .dynasty-body.open { max-height: 9999px; opacity: 1; padding: 0 4px 8px; }
-        .emperor-grid { display: flex; flex-direction: column; gap: 2px; }
-        .emperor-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 6px 10px; padding: 10px 14px; border-radius: 8px; background: rgba(252, 251, 250, 0.02); transition: background 0.2s, border-color 0.2s; border-left: 2px solid transparent; align-items: start; min-height: 52px; }
-        .emperor-row:hover { background: rgba(252, 251, 250, 0.04); }
-        .emperor-row.match { background: rgba(189, 139, 42, 0.08); border-left-color: #bd8b2a; }
-        .emperor-row.cross-year { border-left-color: #942525; background: rgba(148, 37, 37, 0.06); }
-        .col-emperor { font-weight: 600; font-size: 1.425rem; color: #fcfbfa; letter-spacing: 0.5px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding-top: 4px; line-height: 1.3; }
-        .col-emperor .emp-era { font-weight: 700; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 6px; }
-        .col-emperor .emp-name { font-weight: 700; }
-        .col-emperor .era-name { font-weight: 700; }
-        .col-emperor .year-range { font-weight: 400; color: rgba(252, 251, 250, 0.45); font-family: 'Inter', sans-serif; letter-spacing: 0.3px; font-size: 0.85rem; display: block; }
-        .col-china { font-size: 0.9rem; color: #fcfbfa; line-height: 1.6; }
-        .col-china .event-item { display: block; padding: 1px 0; }
-        .col-china .bullet { display: inline-block; margin-right: 6px; color: #942525; font-weight: 700; font-size: 1.2em; }
-        .col-china .cross-tag { font-size: 0.6rem; color: #942525; background: rgba(148, 37, 37, 0.15); padding: 0 8px; border-radius: 12px; margin-right: 4px; font-weight: 600; letter-spacing: 0.5px; display: inline-block; vertical-align: middle; }
-        .col-world { font-size: 0.85rem; color: rgba(252, 251, 250, 0.7); line-height: 1.6; }
-        .col-world .event-item { display: block; padding: 1px 0; }
-        .col-world .bullet { display: inline-block; margin-right: 6px; color: #bd8b2a; font-weight: 700; font-size: 1.2em; }
-        .search-match { background: rgba(189, 139, 42, 0.25); border-radius: 2px; padding: 0 2px; color: #fcfbfa; }
-        .empty-state { text-align: center; padding: 40px 20px; color: rgba(252, 251, 250, 0.3); font-size: 1rem; letter-spacing: 1px; }
-        .empty-state .icon { font-size: 2.4rem; margin-bottom: 12px; opacity: 0.4; }
-        @media (max-width: 767px) { html { font-size: 25.6px; } body { padding: 8px 6px 24px; } .app-header h1 { font-size: 1.4rem; letter-spacing: 2px; } .app-header h1 small { font-size: 0.5rem; letter-spacing: 3px; } .sticky-toolbar { padding: 6px 0 4px; margin-bottom: 10px; } .toolbar { gap: 6px; } .search-wrap { min-width: 100px; flex: 1 1 100%; order: 1; } .search-wrap input { font-size: 0.85rem; padding: 8px 12px 8px 36px; } .search-wrap .search-icon { font-size: 0.9rem; left: 10px; } .search-wrap .clear-btn { font-size: 0.9rem; right: 8px; } .controls-group { order: 2; width: 100%; justify-content: flex-end; gap: 4px; } .controls-group .toggle-all-btn { width: 34px; height: 34px; font-size: 1.2rem; } .controls-group .divider { height: 22px; } .font-controls button { width: 34px; height: 34px; font-size: 1rem; } .font-controls .font-size-label { font-size: 0.55rem; min-width: 24px; } .stats { font-size: 0.65rem; padding: 0 2px 8px; margin-bottom: 10px; } .stats .hint { font-size: 0.6rem; } .dynasty-header { padding: 10px 12px; min-height: 48px; } .dynasty-name { font-size: 2.0rem; } .dynasty-name .years { font-size: 1.2rem; } .dynasty-name .badge { font-size: 0.9rem; } .dynasty-toggle { width: 32px; height: 32px; font-size: 1.3rem; } .emperor-row { grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 8px 10px; border-radius: 6px; min-height: 56px; grid-template-rows: auto auto auto; align-items: start; } .col-emperor { font-size: 1.2rem; grid-column: 1 / 3; grid-row: 1 / 2; padding-top: 2px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; } .col-emperor .emp-era { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; } .col-emperor .year-range { font-size: 0.75rem; display: inline; } .col-china { font-size: 0.78rem; grid-column: 1 / 3; grid-row: 2 / 3; padding-top: 4px; border-top: 1px solid rgba(252, 251, 250, 0.05); } .col-world { font-size: 0.72rem; grid-column: 1 / 3; grid-row: 3 / 4; color: rgba(252, 251, 250, 0.5); padding-top: 4px; border-top: none; display: block; } .col-china .cross-tag { font-size: 0.5rem; padding: 0 4px; } }
-        @media (max-width: 419px) { html { font-size: 22.4px; } body { padding: 4px 4px 16px; } .dynasty-name { font-size: 1.6rem; } .dynasty-name .years { font-size: 1.0rem; } .dynasty-name .badge { font-size: 0.75rem; } .emperor-row { padding: 6px 8px; gap: 2px 4px; } .col-emperor { font-size: 1.0rem; } .col-emperor .year-range { font-size: 0.6rem; } .col-china { font-size: 0.7rem; } .col-world { font-size: 0.65rem; } .dynasty-header { padding: 8px 10px; min-height: 40px; } .controls-group .toggle-all-btn { width: 30px; height: 30px; font-size: 1.0rem; } .font-controls button { width: 30px; height: 30px; font-size: 0.85rem; } .search-wrap input { font-size: 0.75rem; padding: 6px 10px 6px 30px; } .search-wrap .search-icon { font-size: 0.75rem; left: 8px; } }
-        @media (min-width: 768px) { .emperor-row { grid-template-columns: 1.2fr 1.2fr 1.2fr 1.2fr; gap: 10px 14px; padding: 10px 18px; } .col-emperor { font-size: 1.5rem; } .col-emperor .year-range { font-size: 0.9rem; } .col-china { font-size: 0.95rem; } .col-world { font-size: 0.9rem; } .dynasty-header { padding: 16px 22px; } .dynasty-body.open { padding: 0 8px 12px; } .emperor-row .col-world { display: block; } }
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: rgba(252, 251, 250, 0.04); }
-        ::-webkit-scrollbar-thumb { background: rgba(189, 139, 42, 0.3); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(189, 139, 42, 0.5); }
-        @media print { body { background: #fff; color: #121315; padding: 20px; } .app-header h1 { color: #121315; } .app-header h1 small { color: rgba(18, 19, 21, 0.5); } .sticky-toolbar, .stats .hint, .dynasty-toggle { display: none !important; } .dynasty-body { max-height: none !important; opacity: 1 !important; padding: 0 !important; } .emperor-row { background: #f5f5f5 !important; border-left-color: #942525 !important; color: #121315 !important; } .col-emperor, .col-china, .col-world { color: #121315 !important; } .col-emperor .year-range { color: #555 !important; } .dynasty { border-color: #ccc !important; background: #fff !important; } .dynasty-header { background: #eee !important; } .dynasty-name .years { color: #666 !important; } .stats { color: #666 !important; border-bottom-color: #ddd !important; } .emperor-row.match { background: #f0f0f0 !important; } .emperor-row.cross-year { background: #faf0f0 !important; } .col-world { color: #555 !important; } .search-match { background: #ffd54f !important; color: #121315 !important; } .col-china .bullet { color: #942525 !important; } .col-world .bullet { color: #bd8b2a !important; } }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            font-size: 28.8px;
+            -webkit-text-size-adjust: 100%;
+            transition: font-size 0.15s ease;
+            scroll-padding-top: 120px;
+        }
+        body {
+            background-color: #121315;
+            color: #fcfbfa;
+            font-family: 'Noto Serif TC', 'Inter', 'Cormorant Garamond', serif;
+            padding: 16px 12px 40px;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+        .app {
+            max-width: 820px;
+            margin: 0 auto;
+        }
+        .app-header {
+            text-align: center;
+            padding: 8px 0 16px;
+            border-bottom: 2px solid rgba(189, 139, 42, 0.25);
+            margin-bottom: 12px;
+        }
+        .app-header h1 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: #fcfbfa;
+            text-shadow: 0 0 12px rgba(189, 139, 42, 0.15);
+        }
+        .app-header h1 small {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            letter-spacing: 6px;
+            color: rgba(252, 251, 250, 0.5);
+            margin-top: 2px;
+            font-family: 'Inter', sans-serif;
+        }
+        .sticky-toolbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(18, 19, 21, 0.92);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 10px 0 6px;
+            margin-bottom: 14px;
+            border-bottom: 1px solid rgba(252, 251, 250, 0.06);
+        }
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .search-wrap {
+            flex: 1;
+            position: relative;
+            min-width: 150px;
+        }
+        .search-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 44px;
+            font-size: 0.95rem;
+            font-family: 'Noto Serif TC', serif;
+            background: rgba(252, 251, 250, 0.07);
+            border: 1.5px solid rgba(252, 251, 250, 0.15);
+            border-radius: 60px;
+            color: #fcfbfa;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            -webkit-appearance: none;
+        }
+        .search-wrap input::placeholder {
+            color: rgba(252, 251, 250, 0.35);
+            font-weight: 400;
+        }
+        .search-wrap input:focus {
+            border-color: #bd8b2a;
+            box-shadow: 0 0 0 3px rgba(189, 139, 42, 0.2);
+        }
+        .search-wrap .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: rgba(252, 251, 250, 0.3);
+            pointer-events: none;
+            line-height: 1;
+        }
+        .search-wrap .clear-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: rgba(252, 251, 250, 0.3);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            display: none;
+            line-height: 1;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        .search-wrap .clear-btn:hover {
+            background: rgba(252, 251, 250, 0.08);
+        }
+        .search-wrap .clear-btn.visible {
+            display: block;
+        }
+        .controls-group {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        .controls-group .toggle-all-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(252, 251, 250, 0.15);
+            background: rgba(252, 251, 250, 0.04);
+            color: rgba(252, 251, 250, 0.4);
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, transform 0.35s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            padding: 0;
+        }
+        .controls-group .toggle-all-btn:hover {
+            background: rgba(252, 251, 250, 0.08);
+        }
+        .controls-group .toggle-all-btn:active {
+            background: rgba(189, 139, 42, 0.15);
+            border-color: rgba(189, 139, 42, 0.3);
+        }
+        .controls-group .toggle-all-btn.all-open {
+            transform: rotate(180deg);
+            color: rgba(252, 251, 250, 0.6);
+        }
+        .controls-group .divider {
+            width: 1px;
+            height: 28px;
+            background: rgba(252, 251, 250, 0.08);
+            flex-shrink: 0;
+        }
+        .font-controls {
+            display: flex;
+            gap: 4px;
+            flex-shrink: 0;
+            align-items: center;
+        }
+        .font-controls button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(252, 251, 250, 0.15);
+            background: rgba(252, 251, 250, 0.04);
+            color: #fcfbfa;
+            font-size: 1.2rem;
+            font-weight: 300;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-controls button:hover {
+            background: rgba(252, 251, 250, 0.08);
+        }
+        .font-controls button:active {
+            background: rgba(189, 139, 42, 0.15);
+            border-color: rgba(189, 139, 42, 0.3);
+        }
+        .font-controls .font-size-label {
+            font-size: 0.65rem;
+            color: rgba(252, 251, 250, 0.3);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+            min-width: 28px;
+            justify-content: center;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: rgba(252, 251, 250, 0.4);
+            padding: 0 4px 10px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            border-bottom: 1px solid rgba(252, 251, 250, 0.05);
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+        .stats .count {
+            font-weight: 500;
+        }
+        .stats .hint {
+            font-size: 0.7rem;
+            opacity: 0.5;
+        }
+        .dynasty {
+            margin-bottom: 12px;
+            border-radius: 12px;
+            background: rgba(252, 251, 250, 0.03);
+            border: 1px solid rgba(252, 251, 250, 0.06);
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .dynasty.highlight {
+            border-color: rgba(189, 139, 42, 0.35);
+        }
+        .dynasty-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            transition: background 0.2s;
+            gap: 12px;
+            min-height: 64px;
+        }
+        .dynasty-header:hover {
+            background: rgba(252, 251, 250, 0.04);
+        }
+        .dynasty-header:active {
+            background: rgba(252, 251, 250, 0.07);
+        }
+        .dynasty-name {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #fcfbfa;
+            letter-spacing: 2px;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 4px 10px;
+        }
+        .dynasty-name .years {
+            font-size: 1.6rem;
+            font-weight: 400;
+            color: rgba(252, 251, 250, 0.4);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        .dynasty-name .badge {
+            font-size: 1.2rem;
+            font-weight: 400;
+            color: rgba(252, 251, 250, 0.3);
+            background: rgba(252, 251, 250, 0.06);
+            padding: 0 10px;
+            border-radius: 20px;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.5px;
+        }
+        .dynasty-toggle {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: rgba(252, 251, 250, 0.35);
+            transition: transform 0.35s ease, color 0.2s;
+            border-radius: 50%;
+            background: rgba(252, 251, 250, 0.04);
+        }
+        .dynasty-toggle.open {
+            transform: rotate(180deg);
+            color: rgba(252, 251, 250, 0.6);
+        }
+        .dynasty-body {
+            overflow: hidden;
+            transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            max-height: 0;
+            opacity: 0;
+            padding: 0 4px;
+        }
+        .dynasty-body.open {
+            max-height: 9999px;
+            opacity: 1;
+            padding: 0 4px 8px;
+        }
+        .emperor-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .emperor-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 6px 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: rgba(252, 251, 250, 0.02);
+            transition: background 0.2s, border-color 0.2s;
+            border-left: 2px solid transparent;
+            align-items: start;
+            min-height: 52px;
+        }
+        .emperor-row:hover {
+            background: rgba(252, 251, 250, 0.04);
+        }
+        .emperor-row.match {
+            background: rgba(189, 139, 42, 0.08);
+            border-left-color: #bd8b2a;
+        }
+        .emperor-row.cross-year {
+            border-left-color: #942525;
+            background: rgba(148, 37, 37, 0.06);
+        }
+
+        /* 皇帝欄位：兩行顯示 */
+        .col-emperor {
+            font-weight: 600;
+            font-size: 1.425rem;
+            color: #fcfbfa;
+            letter-spacing: 0.5px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+            padding-top: 4px;
+            line-height: 1.3;
+        }
+        .col-emperor .emp-era {
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 2px 6px;
+        }
+        .col-emperor .emp-name {
+            font-weight: 700;
+        }
+        .col-emperor .era-name {
+            font-weight: 700;
+        }
+        .col-emperor .year-range {
+            font-weight: 400;
+            color: rgba(252, 251, 250, 0.45);
+            font-family: 'Inter', sans-serif;
+            letter-spacing: 0.3px;
+            font-size: 0.85rem;
+            display: block;
+        }
+
+        /* 事件欄位 */
+        .col-china {
+            font-size: 0.9rem;
+            color: #fcfbfa;
+            line-height: 1.6;
+        }
+        .col-world {
+            font-size: 0.85rem;
+            color: rgba(252, 251, 250, 0.7);
+            line-height: 1.6;
+        }
+
+        /* 事件項目 — 可點擊 */
+        .col-china .event-item,
+        .col-world .event-item {
+            display: block;
+            padding: 2px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.15s ease, color 0.15s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+        .col-china .event-item:hover,
+        .col-world .event-item:hover {
+            background: rgba(252, 251, 250, 0.06);
+        }
+        .col-china .event-item:active,
+        .col-world .event-item:active {
+            background: rgba(189, 139, 42, 0.2);
+        }
+        /* 點擊後閃爍反饋 */
+        .col-china .event-item.flash,
+        .col-world .event-item.flash {
+            animation: flashClick 0.4s ease;
+        }
+        @keyframes flashClick {
+            0% { background: rgba(189, 139, 42, 0); }
+            30% { background: rgba(189, 139, 42, 0.4); }
+            100% { background: rgba(189, 139, 42, 0); }
+        }
+
+        .col-china .bullet {
+            display: inline-block;
+            margin-right: 6px;
+            color: #942525;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+        .col-china .cross-tag {
+            font-size: 0.6rem;
+            color: #942525;
+            background: rgba(148, 37, 37, 0.15);
+            padding: 0 8px;
+            border-radius: 12px;
+            margin-right: 4px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .col-world .bullet {
+            display: inline-block;
+            margin-right: 6px;
+            color: #bd8b2a;
+            font-weight: 700;
+            font-size: 1.2em;
+        }
+        .col-world .event-item:hover .bullet {
+            color: #d4a83a;
+        }
+
+        .search-match {
+            background: rgba(189, 139, 42, 0.25);
+            border-radius: 2px;
+            padding: 0 2px;
+            color: #fcfbfa;
+        }
+
+        /* 提示訊息（複製成功） */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: rgba(18, 19, 21, 0.92);
+            backdrop-filter: blur(8px);
+            color: #fcfbfa;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            border: 1px solid rgba(189, 139, 42, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 999;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast .icon {
+            margin-right: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(252, 251, 250, 0.3);
+            font-size: 1rem;
+            letter-spacing: 1px;
+        }
+        .empty-state .icon {
+            font-size: 2.4rem;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        /* 無事件顯示「—」不可點擊 */
+        .col-china .no-event,
+        .col-world .no-event {
+            color: rgba(252, 251, 250, 0.2);
+            cursor: default;
+        }
+
+        /* ===== 手機版 ===== */
+        @media (max-width: 767px) {
+            html {
+                font-size: 25.6px;
+            }
+            body {
+                padding: 8px 6px 24px;
+            }
+            .app-header h1 {
+                font-size: 1.4rem;
+                letter-spacing: 2px;
+            }
+            .app-header h1 small {
+                font-size: 0.5rem;
+                letter-spacing: 3px;
+            }
+            .sticky-toolbar {
+                padding: 6px 0 4px;
+                margin-bottom: 10px;
+            }
+            .toolbar {
+                gap: 6px;
+            }
+            .search-wrap {
+                min-width: 100px;
+                flex: 1 1 100%;
+                order: 1;
+            }
+            .search-wrap input {
+                font-size: 0.85rem;
+                padding: 8px 12px 8px 36px;
+            }
+            .search-wrap .search-icon {
+                font-size: 0.9rem;
+                left: 10px;
+            }
+            .search-wrap .clear-btn {
+                font-size: 0.9rem;
+                right: 8px;
+            }
+            .controls-group {
+                order: 2;
+                width: 100%;
+                justify-content: flex-end;
+                gap: 4px;
+            }
+            .controls-group .toggle-all-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.2rem;
+            }
+            .controls-group .divider {
+                height: 22px;
+            }
+            .font-controls button {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+            .font-controls .font-size-label {
+                font-size: 0.55rem;
+                min-width: 24px;
+            }
+            .stats {
+                font-size: 0.65rem;
+                padding: 0 2px 8px;
+                margin-bottom: 10px;
+            }
+            .stats .hint {
+                font-size: 0.6rem;
+            }
+            .dynasty-header {
+                padding: 10px 12px;
+                min-height: 48px;
+            }
+            .dynasty-name {
+                font-size: 2.0rem;
+            }
+            .dynasty-name .years {
+                font-size: 1.2rem;
+            }
+            .dynasty-name .badge {
+                font-size: 0.9rem;
+            }
+            .dynasty-toggle {
+                width: 32px;
+                height: 32px;
+                font-size: 1.3rem;
+            }
+            .emperor-row {
+                grid-template-columns: 1fr 1fr;
+                gap: 4px 8px;
+                padding: 8px 10px;
+                border-radius: 6px;
+                min-height: 56px;
+                grid-template-rows: auto auto auto;
+                align-items: start;
+            }
+            .col-emperor {
+                font-size: 1.2rem;
+                grid-column: 1 / 3;
+                grid-row: 1 / 2;
+                padding-top: 2px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                align-items: baseline;
+                gap: 2px 6px;
+            }
+            .col-emperor .emp-era {
+                display: inline-flex;
+                flex-wrap: wrap;
+                gap: 2px 4px;
+            }
+            .col-emperor .year-range {
+                font-size: 0.75rem;
+                display: inline;
+            }
+            .col-china {
+                font-size: 0.78rem;
+                grid-column: 1 / 3;
+                grid-row: 2 / 3;
+                padding-top: 4px;
+                border-top: 1px solid rgba(252, 251, 250, 0.05);
+            }
+            .col-world {
+                font-size: 0.72rem;
+                grid-column: 1 / 3;
+                grid-row: 3 / 4;
+                color: rgba(252, 251, 250, 0.5);
+                padding-top: 4px;
+                border-top: none;
+                display: block;
+            }
+            .col-china .cross-tag {
+                font-size: 0.5rem;
+                padding: 0 4px;
+            }
+            .toast {
+                font-size: 0.7rem;
+                padding: 8px 16px;
+                bottom: 20px;
+            }
+        }
+
+        @media (max-width: 419px) {
+            html {
+                font-size: 22.4px;
+            }
+            body {
+                padding: 4px 4px 16px;
+            }
+            .dynasty-name {
+                font-size: 1.6rem;
+            }
+            .dynasty-name .years {
+                font-size: 1.0rem;
+            }
+            .dynasty-name .badge {
+                font-size: 0.75rem;
+            }
+            .emperor-row {
+                padding: 6px 8px;
+                gap: 2px 4px;
+            }
+            .col-emperor {
+                font-size: 1.0rem;
+            }
+            .col-emperor .year-range {
+                font-size: 0.6rem;
+            }
+            .col-china {
+                font-size: 0.7rem;
+            }
+            .col-world {
+                font-size: 0.65rem;
+            }
+            .dynasty-header {
+                padding: 8px 10px;
+                min-height: 40px;
+            }
+            .controls-group .toggle-all-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 1.0rem;
+            }
+            .font-controls button {
+                width: 30px;
+                height: 30px;
+                font-size: 0.85rem;
+            }
+            .search-wrap input {
+                font-size: 0.75rem;
+                padding: 6px 10px 6px 30px;
+            }
+            .search-wrap .search-icon {
+                font-size: 0.75rem;
+                left: 8px;
+            }
+            .toast {
+                font-size: 0.6rem;
+                padding: 6px 12px;
+                bottom: 16px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .emperor-row {
+                grid-template-columns: 1.2fr 1.2fr 1.2fr 1.2fr;
+                gap: 10px 14px;
+                padding: 10px 18px;
+            }
+            .col-emperor {
+                font-size: 1.5rem;
+            }
+            .col-emperor .year-range {
+                font-size: 0.9rem;
+            }
+            .col-china {
+                font-size: 0.95rem;
+            }
+            .col-world {
+                font-size: 0.9rem;
+            }
+            .dynasty-header {
+                padding: 16px 22px;
+            }
+            .dynasty-body.open {
+                padding: 0 8px 12px;
+            }
+            .emperor-row .col-world {
+                display: block;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(252, 251, 250, 0.04);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(189, 139, 42, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(189, 139, 42, 0.5);
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #121315;
+                padding: 20px;
+            }
+            .app-header h1 {
+                color: #121315;
+            }
+            .app-header h1 small {
+                color: rgba(18, 19, 21, 0.5);
+            }
+            .sticky-toolbar,
+            .stats .hint,
+            .dynasty-toggle,
+            .toast {
+                display: none !important;
+            }
+            .dynasty-body {
+                max-height: none !important;
+                opacity: 1 !important;
+                padding: 0 !important;
+            }
+            .emperor-row {
+                background: #f5f5f5 !important;
+                border-left-color: #942525 !important;
+                color: #121315 !important;
+            }
+            .col-emperor,
+            .col-china,
+            .col-world {
+                color: #121315 !important;
+            }
+            .col-emperor .year-range {
+                color: #555 !important;
+            }
+            .dynasty {
+                border-color: #ccc !important;
+                background: #fff !important;
+            }
+            .dynasty-header {
+                background: #eee !important;
+            }
+            .dynasty-name .years {
+                color: #666 !important;
+            }
+            .stats {
+                color: #666 !important;
+                border-bottom-color: #ddd !important;
+            }
+            .emperor-row.match {
+                background: #f0f0f0 !important;
+            }
+            .emperor-row.cross-year {
+                background: #faf0f0 !important;
+            }
+            .col-world {
+                color: #555 !important;
+            }
+            .search-match {
+                background: #ffd54f !important;
+                color: #121315 !important;
+            }
+            .col-china .bullet {
+                color: #942525 !important;
+            }
+            .col-world .bullet {
+                color: #bd8b2a !important;
+            }
+            .col-china .event-item,
+            .col-world .event-item {
+                cursor: default !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="app" id="app">
-    <header class="app-header">
-        <h1>華夏·萬國<br /><small>CHINA &amp; THE WORLD · 歷史年表</small></h1>
-    </header>
+    <div class="app" id="app">
+        <header class="app-header">
+            <h1>華夏·萬國<br /><small>CHINA &amp; THE WORLD · 歷史年表</small></h1>
+        </header>
 
-    <div class="sticky-toolbar">
-        <div class="toolbar">
-            <div class="search-wrap">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="搜尋朝代、皇帝、年號、事件…" autocomplete="off" />
-                <button class="clear-btn" id="clearBtn" aria-label="清除搜尋">✕</button>
-            </div>
-            <div class="controls-group">
-                <button class="toggle-all-btn" id="toggleAllBtn" aria-label="全部展開或收回">▾</button>
-                <span class="divider"></span>
-                <div class="font-controls">
-                    <button id="fontDecBtn" aria-label="縮小字級">A−</button>
-                    <span class="font-size-label" id="fontSizeLabel">160%</span>
-                    <button id="fontIncBtn" aria-label="放大字級">A+</button>
+        <div class="sticky-toolbar">
+            <div class="toolbar">
+                <div class="search-wrap">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="搜尋朝代、皇帝、年號、事件…" autocomplete="off" />
+                    <button class="clear-btn" id="clearBtn" aria-label="清除搜尋">✕</button>
+                </div>
+                <div class="controls-group">
+                    <button class="toggle-all-btn" id="toggleAllBtn" aria-label="全部展開或收回">▾</button>
+                    <span class="divider"></span>
+                    <div class="font-controls">
+                        <button id="fontDecBtn" aria-label="縮小字級">A−</button>
+                        <span class="font-size-label" id="fontSizeLabel">160%</span>
+                        <button id="fontIncBtn" aria-label="放大字級">A+</button>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <div class="stats">
+            <span class="count" id="statsCount">載入中…</span>
+            <span class="hint">點擊事件自動複製並 Google 搜尋</span>
+        </div>
+
+        <div id="timelineContainer"></div>
     </div>
 
-    <div class="stats">
-        <span class="count" id="statsCount">載入中…</span>
-        <span class="hint">點擊朝代標題展開／收回</span>
-    </div>
+    <!-- Toast 提示訊息 -->
+    <div class="toast" id="toast"><span class="icon">📋</span><span id="toastMsg">已複製，開啟搜尋…</span></div>
 
-    <div id="timelineContainer"></div>
-</div>
+    <script>
+        // ============================================================
+        //  完整數據 — 以事件起始年代決定放置位置
+        // ============================================================
+        const DATA = [
+            // ===== 上古文明 =====
+            {
+                id: 'ancient',
+                name: '上古文明',
+                start: -3500,
+                end: -2070,
+                emperors: [
+                    { name: '蘇美爾', era: '城邦時代', yearStart: -3500, yearEnd: -2372,
+                        chinaEvent: '傳說時代 · 三皇五帝',
+                        worldEvent: '蘇美爾人在兩河流域建立烏魯克等城邦 (約前3500)\n蘇美爾人發明楔形文字 (約前3200)\n古埃及古王國時期 (約前2686~前2181)\n古埃及金字塔建造 (約前2560)' },
+                    { name: '阿卡德', era: '薩爾貢', yearStart: -2371, yearEnd: -2190,
+                        chinaEvent: '傳說時代 · 黃帝、炎帝、堯舜',
+                        worldEvent: '薩爾貢統一兩河流域 · 建立阿卡德帝國 (前2371)\n人類歷史上第一個帝國' },
+                    { name: '烏爾第三王朝', era: '烏爾納姆', yearStart: -2112, yearEnd: -2004,
+                        chinaEvent: '傳說時代 · 夏朝建立前夕',
+                        worldEvent: '烏爾第三王朝 (約前2112~前2004)' }
+                ]
+            },
+            // ===== 夏朝 =====
+            {
+                id: 'xia',
+                name: '夏朝',
+                start: -2070,
+                end: -1600,
+                emperors: [
+                    { name: '夏禹', era: '禹', yearStart: -2070, yearEnd: -2060,
+                        chinaEvent: '大禹治水 · 建立夏朝', worldEvent: '' },
+                    { name: '夏啟', era: '啟', yearStart: -2060, yearEnd: -2050,
+                        chinaEvent: '啟繼位 · 家天下開始',
+                        worldEvent: '古埃及中王國時期 (約前2055~前1650)' },
+                    { name: '夏太康', era: '太康', yearStart: -1970, yearEnd: -1950,
+                        chinaEvent: '太康失國 · 后羿篡位',
+                        worldEvent: '兩河流域 · 巴比倫第一王朝 (約前1894~前1595)' },
+                    { name: '夏少康', era: '少康', yearStart: -1880, yearEnd: -1850,
+                        chinaEvent: '少康中興 · 復國',
+                        worldEvent: '漢摩拉比法典 (約前1792~前1750)' },
+                    { name: '夏桀', era: '桀', yearStart: -1600, yearEnd: -1600,
+                        chinaEvent: '夏桀暴政 · 商湯滅夏', worldEvent: '' }
+                ]
+            },
+            // ===== 商朝 =====
+            {
+                id: 'shang',
+                name: '商朝',
+                start: -1600,
+                end: -1046,
+                emperors: [
+                    { name: '商湯', era: '成湯', yearStart: -1600, yearEnd: -1580,
+                        chinaEvent: '商湯革命 · 建立商朝',
+                        worldEvent: '兩河流域 · 赫梯帝國崛起 (約前1600~前1178)\n古埃及新王國時期 (約前1550~前1069)' },
+                    { name: '商太甲', era: '太甲', yearStart: -1580, yearEnd: -1570,
+                        chinaEvent: '太甲悔過 · 伊尹輔政', worldEvent: '' },
+                    { name: '商祖乙', era: '祖乙', yearStart: -1500, yearEnd: -1480,
+                        chinaEvent: '祖乙遷都 · 商朝中興',
+                        worldEvent: '古埃及新王國時期 · 圖坦卡門 (約前1341~前1323)' },
+                    { name: '商盤庚', era: '盤庚', yearStart: -1300, yearEnd: -1275,
+                        chinaEvent: '盤庚遷殷 · 定都於殷', worldEvent: '' },
+                    { name: '商武丁', era: '武丁', yearStart: -1250, yearEnd: -1192,
+                        chinaEvent: '武丁中興 · 甲骨文',
+                        worldEvent: '特洛伊戰爭 (約前1184)\n兩河流域 · 亞述帝國崛起 (約前1244~前1076)' },
+                    { name: '商武乙', era: '武乙', yearStart: -1147, yearEnd: -1113,
+                        chinaEvent: '武乙伐周 · 商周衝突',
+                        worldEvent: '古埃及新王國末期 (約前1085~前664)' },
+                    { name: '商紂王', era: '帝辛', yearStart: -1075, yearEnd: -1046,
+                        chinaEvent: '紂王暴政 · 武王伐紂', worldEvent: '' }
+                ]
+            },
+            // ===== 西周 =====
+            {
+                id: 'western-zhou',
+                name: '西周',
+                start: -1046,
+                end: -771,
+                emperors: [
+                    { name: '周武王', era: '武王', yearStart: -1046, yearEnd: -1043,
+                        chinaEvent: '牧野之戰 · 滅商建周', worldEvent: '' },
+                    { name: '周成王', era: '成王', yearStart: -1042, yearEnd: -1021,
+                        chinaEvent: '周公攝政 · 東征平定', worldEvent: '' },
+                    { name: '周康王', era: '康王', yearStart: -1020, yearEnd: -996,
+                        chinaEvent: '成康之治', worldEvent: '' },
+                    { name: '周昭王', era: '昭王', yearStart: -995, yearEnd: -977,
+                        chinaEvent: '南征荊楚', worldEvent: '' },
+                    { name: '周穆王', era: '穆王', yearStart: -976, yearEnd: -922,
+                        chinaEvent: '西征犬戎 · 周遊天下',
+                        worldEvent: '古埃及第三中間期 (約前1069~前664)' },
+                    { name: '周厲王', era: '厲王', yearStart: -878, yearEnd: -841,
+                        chinaEvent: '國人暴動 · 共和行政', worldEvent: '' },
+                    { name: '周宣王', era: '宣王', yearStart: -827, yearEnd: -782,
+                        chinaEvent: '宣王中興',
+                        worldEvent: '希臘城邦 · 荷馬史詩 (約前800~前600)\n新亞述帝國鼎盛期 (約前883~前627)' },
+                    { name: '周幽王', era: '幽王', yearStart: -781, yearEnd: -771,
+                        chinaEvent: '烽火戲諸侯 · 西周滅亡', worldEvent: '' }
+                ]
+            },
+            // ===== 東周 =====
+            {
+                id: 'eastern-zhou',
+                name: '東周',
+                start: -770,
+                end: -256,
+                emperors: [
+                    { name: '周平王', era: '平王', yearStart: -770, yearEnd: -720,
+                        chinaEvent: '東遷洛邑 · 春秋開始', worldEvent: '' },
+                    { name: '周桓王', era: '桓王', yearStart: -719, yearEnd: -697,
+                        chinaEvent: '繻葛之戰 · 鄭國稱霸', worldEvent: '' },
+                    { name: '周莊王', era: '莊王', yearStart: -696, yearEnd: -682,
+                        chinaEvent: '齊桓公稱霸 (前685~前643)', worldEvent: '' },
+                    { name: '周惠王', era: '惠王', yearStart: -676, yearEnd: -652,
+                        chinaEvent: '晉獻公崛起', worldEvent: '' },
+                    { name: '周襄王', era: '襄王', yearStart: -651, yearEnd: -619,
+                        chinaEvent: '晉文公稱霸 · 城濮之戰 (前632)', worldEvent: '' },
+                    { name: '周定王', era: '定王', yearStart: -606, yearEnd: -586,
+                        chinaEvent: '楚莊王稱霸 · 問鼎中原', worldEvent: '' },
+                    { name: '周靈王', era: '靈王', yearStart: -571, yearEnd: -545,
+                        chinaEvent: '晉楚爭霸',
+                        worldEvent: '波斯帝國崛起 (約前550)' },
+                    { name: '周景王', era: '景王', yearStart: -544, yearEnd: -520,
+                        chinaEvent: '弭兵之會 · 晉楚休戰', worldEvent: '' },
+                    { name: '周敬王', era: '敬王', yearStart: -519, yearEnd: -476,
+                        chinaEvent: '吳越爭霸 · 春秋結束',
+                        worldEvent: '馬拉松戰役 (前490)\n溫泉關戰役 (前480)\n釋迦牟尼 (約前500)\n羅馬共和國崛起 (前509~前27)' },
+                    { name: '周元王', era: '元王', yearStart: -475, yearEnd: -469,
+                        chinaEvent: '戰國開始',
+                        worldEvent: '雅典 · 伯里克利時代 (前460~前429)' },
+                    { name: '周貞定王', era: '貞定王', yearStart: -468, yearEnd: -441,
+                        chinaEvent: '三家分晉 (前403)', worldEvent: '' },
+                    { name: '周威烈王', era: '威烈王', yearStart: -425, yearEnd: -402,
+                        chinaEvent: '正式承認三家分晉', worldEvent: '' },
+                    { name: '周顯王', era: '顯王', yearStart: -368, yearEnd: -321,
+                        chinaEvent: '商鞅變法 (前356~前338)',
+                        worldEvent: '亞歷山大大帝東征 (前336~前323)' },
+                    { name: '周慎靚王', era: '慎靚王', yearStart: -320, yearEnd: -315,
+                        chinaEvent: '五國相王', worldEvent: '' },
+                    { name: '周赧王', era: '赧王', yearStart: -314, yearEnd: -256,
+                        chinaEvent: '東周滅亡 · 秦滅周',
+                        worldEvent: '布匿戰爭 (前264~前146)\n漢尼拔翻越阿爾卑斯山 (前218)' }
+                ]
+            },
+            // ===== 秦朝 =====
+            {
+                id: 'qin',
+                name: '秦朝',
+                start: -221,
+                end: -206,
+                emperors: [
+                    { name: '秦始皇', era: '始皇帝', yearStart: -221, yearEnd: -210,
+                        chinaEvent: '統一六國 · 書同文車同軌', worldEvent: '' },
+                    { name: '秦二世', era: '二世', yearStart: -209, yearEnd: -207,
+                        chinaEvent: '陳勝吳廣起義', worldEvent: '' },
+                    { name: '秦王子嬰', era: '子嬰', yearStart: -206, yearEnd: -206,
+                        chinaEvent: '秦朝滅亡 · 劉邦入關', worldEvent: '' }
+                ]
+            },
+            // ===== 西漢 =====
+            {
+                id: 'western-han',
+                name: '西漢',
+                start: -202,
+                end: 9,
+                emperors: [
+                    { name: '漢高祖', era: '高祖', yearStart: -202, yearEnd: -195,
+                        chinaEvent: '漢朝建立 · 白登之圍', worldEvent: '' },
+                    { name: '漢惠帝', era: '惠帝', yearStart: -194, yearEnd: -188,
+                        chinaEvent: '呂后專政', worldEvent: '' },
+                    { name: '漢文帝', era: '文帝', yearStart: -179, yearEnd: -157,
+                        chinaEvent: '文景之治', worldEvent: '' },
+                    { name: '漢景帝', era: '景帝', yearStart: -156, yearEnd: -141,
+                        chinaEvent: '七國之亂 · 文景之治', worldEvent: '' },
+                    { name: '漢武帝', era: '建元', yearStart: -140, yearEnd: -135,
+                        chinaEvent: '即位 · 推行儒術', worldEvent: '' },
+                    { name: '漢武帝', era: '元光', yearStart: -134, yearEnd: -129,
+                        chinaEvent: '董仲舒「天人三策」\n馬邑之謀 (前133)', worldEvent: '' },
+                    { name: '漢武帝', era: '元朔', yearStart: -128, yearEnd: -123,
+                        chinaEvent: '衛青出擊匈奴\n收復河套', worldEvent: '' },
+                    { name: '漢武帝', era: '元狩', yearStart: -122, yearEnd: -117,
+                        chinaEvent: '霍去病收復河西走廊 (前121~前119)\n漠北之戰 (前119)', worldEvent: '' },
+                    { name: '漢武帝', era: '元鼎', yearStart: -116, yearEnd: -111,
+                        chinaEvent: '張騫第二次出使西域\n滅南越 (前111)', worldEvent: '' },
+                    { name: '漢武帝', era: '元封', yearStart: -110, yearEnd: -105,
+                        chinaEvent: '滅衛氏朝鮮 (前108)', worldEvent: '' },
+                    { name: '漢武帝', era: '太初', yearStart: -104, yearEnd: -101,
+                        chinaEvent: '李廣利征大宛 (前104~前101)', worldEvent: '' },
+                    { name: '漢武帝', era: '天漢', yearStart: -100, yearEnd: -97,
+                        chinaEvent: '漢匈戰爭持續',
+                        worldEvent: '凱撒誕生 (前100)' },
+                    { name: '漢武帝', era: '太始', yearStart: -96, yearEnd: -93,
+                        chinaEvent: '漢朝國力鼎盛', worldEvent: '' },
+                    { name: '漢武帝', era: '征和', yearStart: -92, yearEnd: -89,
+                        chinaEvent: '巫蠱之禍 (前91~前90)\n輪台詔 (前89)', worldEvent: '' },
+                    { name: '漢武帝', era: '後元', yearStart: -88, yearEnd: -87,
+                        chinaEvent: '漢武帝駕崩 (前87)', worldEvent: '' },
+                    { name: '漢昭帝', era: '始元', yearStart: -86, yearEnd: -74,
+                        chinaEvent: '鹽鐵會議 · 霍光輔政', worldEvent: '' },
+                    { name: '漢宣帝', era: '本始', yearStart: -73, yearEnd: -49,
+                        chinaEvent: '孝宣中興 · 匈奴歸附', worldEvent: '' },
+                    { name: '漢元帝', era: '初元', yearStart: -48, yearEnd: -33,
+                        chinaEvent: '昭君出塞',
+                        worldEvent: '凱撒遇刺 (前44)\n奧古斯都即位 (前27)' },
+                    { name: '漢成帝', era: '建始', yearStart: -32, yearEnd: -7,
+                        chinaEvent: '王氏外戚崛起', worldEvent: '' },
+                    { name: '漢哀帝', era: '建平', yearStart: -6, yearEnd: -1,
+                        chinaEvent: '王莽篡漢 前夕',
+                        worldEvent: '耶穌基督誕生 (約前4)' },
+                    { name: '漢平帝', era: '元始', yearStart: 1, yearEnd: 5,
+                        chinaEvent: '王莽專權', worldEvent: '' },
+                    { name: '孺子嬰', era: '孺子嬰', yearStart: 6, yearEnd: 8,
+                        chinaEvent: '王莽建立新朝', worldEvent: '' }
+                ]
+            },
+            // ===== 新朝 =====
+            {
+                id: 'xin',
+                name: '新朝',
+                start: 9,
+                end: 23,
+                emperors: [
+                    { name: '王莽', era: '始建國', yearStart: 9, yearEnd: 23,
+                        chinaEvent: '王莽改制 · 綠林赤眉起義', worldEvent: '' }
+                ]
+            },
+            // ===== 東漢 =====
+            {
+                id: 'eastern-han',
+                name: '東漢',
+                start: 25,
+                end: 220,
+                emperors: [
+                    { name: '漢光武帝', era: '建武', yearStart: 25, yearEnd: 57,
+                        chinaEvent: '光武中興 · 東漢建立', worldEvent: '' },
+                    { name: '漢明帝', era: '永平', yearStart: 58, yearEnd: 75,
+                        chinaEvent: '白馬寺 · 佛教傳入', worldEvent: '' },
+                    { name: '漢章帝', era: '建初', yearStart: 76, yearEnd: 88,
+                        chinaEvent: '章和之治',
+                        worldEvent: '羅馬帝國 · 龐貝古城 (79)' },
+                    { name: '漢和帝', era: '永元', yearStart: 89, yearEnd: 105,
+                        chinaEvent: '竇憲北伐 · 班超通西域', worldEvent: '' },
+                    { name: '漢安帝', era: '永初', yearStart: 107, yearEnd: 125,
+                        chinaEvent: '羌亂四起', worldEvent: '' },
+                    { name: '漢順帝', era: '永建', yearStart: 126, yearEnd: 144,
+                        chinaEvent: '宦官外戚相爭', worldEvent: '' },
+                    { name: '漢桓帝', era: '建和', yearStart: 147, yearEnd: 167,
+                        chinaEvent: '黨錮之禍', worldEvent: '' },
+                    { name: '漢靈帝', era: '建寧', yearStart: 168, yearEnd: 189,
+                        chinaEvent: '黃巾之亂 (184)', worldEvent: '' },
+                    { name: '漢獻帝', era: '初平', yearStart: 190, yearEnd: 220,
+                        chinaEvent: '三國鼎立 · 東漢滅亡', worldEvent: '' }
+                ]
+            },
+            // ===== 三國 =====
+            {
+                id: 'three-kingdoms',
+                name: '三國',
+                start: 220,
+                end: 280,
+                emperors: [
+                    { name: '魏文帝', era: '黃初', yearStart: 220, yearEnd: 226,
+                        chinaEvent: '曹魏建立 · 三國開始', worldEvent: '' },
+                    { name: '魏明帝', era: '太和', yearStart: 227, yearEnd: 239,
+                        chinaEvent: '諸葛亮北伐', worldEvent: '' },
+                    { name: '蜀漢昭烈帝', era: '章武', yearStart: 221, yearEnd: 223,
+                        chinaEvent: '蜀漢建立 · 夷陵之戰', worldEvent: '' },
+                    { name: '蜀漢後主', era: '建興', yearStart: 223, yearEnd: 263,
+                        chinaEvent: '諸葛亮輔政 · 蜀漢滅亡', worldEvent: '' },
+                    { name: '吳大帝', era: '黃武', yearStart: 222, yearEnd: 252,
+                        chinaEvent: '東吳建立 · 赤壁之戰', worldEvent: '' },
+                    { name: '吳末帝', era: '元興', yearStart: 264, yearEnd: 280,
+                        chinaEvent: '西晉滅吳 · 三國結束', worldEvent: '' }
+                ]
+            },
+            // ===== 西晉 =====
+            {
+                id: 'western-jin',
+                name: '西晉',
+                start: 265,
+                end: 316,
+                emperors: [
+                    { name: '晉武帝', era: '泰始', yearStart: 265, yearEnd: 290,
+                        chinaEvent: '西晉建立 · 統一三國', worldEvent: '' },
+                    { name: '晉惠帝', era: '永熙', yearStart: 290, yearEnd: 306,
+                        chinaEvent: '八王之亂 (291~306)', worldEvent: '' },
+                    { name: '晉懷帝', era: '永嘉', yearStart: 307, yearEnd: 313,
+                        chinaEvent: '永嘉之亂 · 五胡亂華', worldEvent: '' },
+                    { name: '晉愍帝', era: '建興', yearStart: 313, yearEnd: 316,
+                        chinaEvent: '西晉滅亡', worldEvent: '' }
+                ]
+            },
+            // ===== 東晉 =====
+            {
+                id: 'eastern-jin',
+                name: '東晉',
+                start: 317,
+                end: 420,
+                emperors: [
+                    { name: '晉元帝', era: '建武', yearStart: 317, yearEnd: 323,
+                        chinaEvent: '東晉建立 · 南渡', worldEvent: '' },
+                    { name: '晉明帝', era: '太寧', yearStart: 323, yearEnd: 325,
+                        chinaEvent: '王敦之亂', worldEvent: '' },
+                    { name: '晉成帝', era: '咸和', yearStart: 326, yearEnd: 342,
+                        chinaEvent: '蘇峻之亂', worldEvent: '' },
+                    { name: '晉孝武帝', era: '寧康', yearStart: 373, yearEnd: 396,
+                        chinaEvent: '淝水之戰 (383)', worldEvent: '' },
+                    { name: '晉安帝', era: '隆安', yearStart: 397, yearEnd: 419,
+                        chinaEvent: '東晉衰微 · 劉裕崛起',
+                        worldEvent: '民族大遷徙 · 阿提拉 (約406~453)' }
+                ]
+            },
+            // ===== 南北朝 =====
+            {
+                id: 'northern-southern',
+                name: '南北朝',
+                start: 420,
+                end: 589,
+                emperors: [
+                    { name: '宋武帝', era: '永初', yearStart: 420, yearEnd: 422,
+                        chinaEvent: '劉宋建立 · 南北朝開始', worldEvent: '' },
+                    { name: '宋文帝', era: '元嘉', yearStart: 424, yearEnd: 453,
+                        chinaEvent: '元嘉之治',
+                        worldEvent: '西羅馬帝國滅亡 (476)' },
+                    { name: '齊高帝', era: '建元', yearStart: 479, yearEnd: 482,
+                        chinaEvent: '南齊建立', worldEvent: '' },
+                    { name: '梁武帝', era: '天監', yearStart: 502, yearEnd: 549,
+                        chinaEvent: '梁朝建立 · 侯景之亂 (548)', worldEvent: '' },
+                    { name: '陳武帝', era: '永定', yearStart: 557, yearEnd: 559,
+                        chinaEvent: '陳朝建立', worldEvent: '' },
+                    { name: '北魏太武帝', era: '始光', yearStart: 424, yearEnd: 452,
+                        chinaEvent: '北魏統一北方', worldEvent: '' },
+                    { name: '北魏孝文帝', era: '太和', yearStart: 477, yearEnd: 499,
+                        chinaEvent: '孝文帝改革 · 漢化運動', worldEvent: '' },
+                    { name: '北齊文宣帝', era: '天保', yearStart: 550, yearEnd: 559,
+                        chinaEvent: '北齊建立', worldEvent: '' },
+                    { name: '北周武帝', era: '保定', yearStart: 561, yearEnd: 578,
+                        chinaEvent: '北周滅北齊 (577)', worldEvent: '' }
+                ]
+            },
+            // ===== 隋朝 =====
+            {
+                id: 'sui',
+                name: '隋朝',
+                start: 581,
+                end: 618,
+                emperors: [
+                    { name: '隋文帝', era: '開皇', yearStart: 581, yearEnd: 604,
+                        chinaEvent: '隋朝建立 · 統一南北', worldEvent: '' },
+                    { name: '隋煬帝', era: '大業', yearStart: 605, yearEnd: 618,
+                        chinaEvent: '開鑿大運河 · 三征高句麗',
+                        worldEvent: '伊斯蘭教興起 (610~632)\n伊斯蘭黃金時代 (8~13世紀)' },
+                    { name: '隋恭帝', era: '義寧', yearStart: 617, yearEnd: 618,
+                        chinaEvent: '隋朝滅亡 · 唐朝建立', worldEvent: '' }
+                ]
+            },
+            // ===== 唐朝 =====
+            {
+                id: 'tang',
+                name: '唐朝',
+                start: 618,
+                end: 907,
+                emperors: [
+                    { name: '唐高祖', era: '武德', yearStart: 618, yearEnd: 626,
+                        chinaEvent: '唐朝建立 · 統一戰爭', worldEvent: '' },
+                    { name: '唐太宗', era: '貞觀', yearStart: 627, yearEnd: 649,
+                        chinaEvent: '貞觀之治',
+                        worldEvent: '阿拉伯帝國擴張 (632~750)\n阿拉伯帝國征服波斯 (636~651)\n阿拉伯帝國征服北非 (640~700)' },
+                    { name: '唐高宗', era: '永徽', yearStart: 650, yearEnd: 655,
+                        chinaEvent: '永徽之治',
+                        worldEvent: '阿拉伯帝國 伍麥葉王朝 (661~750)' },
+                    { name: '武則天', era: '天授', yearStart: 690, yearEnd: 705,
+                        chinaEvent: '武周建立 (690~705)', worldEvent: '' },
+                    { name: '唐玄宗', era: '開元', yearStart: 713, yearEnd: 741,
+                        chinaEvent: '開元盛世',
+                        worldEvent: '查理·馬特 圖爾戰役 (732)' },
+                    { name: '唐玄宗', era: '天寶', yearStart: 742, yearEnd: 756,
+                        chinaEvent: '安史之亂 (755~763)',
+                        worldEvent: '法蘭克王國 卡洛林王朝 (751~987)\n倫巴第王國 敗亡' },
+                    { name: '唐肅宗', era: '至德', yearStart: 756, yearEnd: 758,
+                        chinaEvent: '平定安史之亂', worldEvent: '' },
+                    { name: '唐代宗', era: '寶應', yearStart: 762, yearEnd: 779,
+                        chinaEvent: '藩鎮割據開始', worldEvent: '' },
+                    { name: '唐德宗', era: '建中', yearStart: 780, yearEnd: 805,
+                        chinaEvent: '涇原兵變 · 奉天之難',
+                        worldEvent: '查理曼大帝加冕 (800)' },
+                    { name: '唐憲宗', era: '元和', yearStart: 806, yearEnd: 820,
+                        chinaEvent: '元和中興 · 平定藩鎮', worldEvent: '' },
+                    { name: '唐武宗', era: '會昌', yearStart: 841, yearEnd: 846,
+                        chinaEvent: '會昌滅佛', worldEvent: '' },
+                    { name: '唐宣宗', era: '大中', yearStart: 847, yearEnd: 859,
+                        chinaEvent: '大中之治', worldEvent: '' },
+                    { name: '唐懿宗', era: '咸通', yearStart: 860, yearEnd: 874,
+                        chinaEvent: '唐末衰微',
+                        worldEvent: '維京人征服英格蘭 (865~899)' },
+                    { name: '唐僖宗', era: '乾符', yearStart: 874, yearEnd: 888,
+                        chinaEvent: '黃巢之亂 (875~884)', worldEvent: '' },
+                    { name: '唐昭宗', era: '龍紀', yearStart: 889, yearEnd: 904,
+                        chinaEvent: '朱溫專權', worldEvent: '' },
+                    { name: '唐哀帝', era: '天祐', yearStart: 905, yearEnd: 907,
+                        chinaEvent: '唐朝滅亡 · 五代開始', worldEvent: '' }
+                ]
+            },
+            // ===== 宋朝 =====
+            {
+                id: 'song',
+                name: '宋朝',
+                start: 960,
+                end: 1279,
+                emperors: [
+                    { name: '宋太祖', era: '建隆', yearStart: 960, yearEnd: 963,
+                        chinaEvent: '宋朝建立 · 統一中原',
+                        worldEvent: '神聖羅馬帝國建立 (962)' },
+                    { name: '宋太宗', era: '太平興國', yearStart: 976, yearEnd: 984,
+                        chinaEvent: '統一南方 · 北伐契丹', worldEvent: '' },
+                    { name: '宋太宗', era: '端拱', yearStart: 988, yearEnd: 989,
+                        chinaEvent: '端拱之治',
+                        worldEvent: '基輔羅斯 基督教化 (988)' },
+                    { name: '宋真宗', era: '咸平', yearStart: 998, yearEnd: 1003,
+                        chinaEvent: '咸平之治 · 澶淵之盟',
+                        worldEvent: '匈牙利王國建立 (1000)' },
+                    { name: '宋真宗', era: '大中祥符', yearStart: 1008, yearEnd: 1016,
+                        chinaEvent: '大中祥符年間',
+                        worldEvent: '克努特大帝 統治北海帝國 (1016~1035)' },
+                    { name: '宋仁宗', era: '天聖', yearStart: 1023, yearEnd: 1032,
+                        chinaEvent: '慶曆新政 萌芽', worldEvent: '' },
+                    { name: '宋英宗', era: '治平', yearStart: 1064, yearEnd: 1067,
+                        chinaEvent: '治平年間',
+                        worldEvent: '諾曼征服英格蘭 (1066)' },
+                    { name: '宋神宗', era: '熙寧', yearStart: 1068, yearEnd: 1077,
+                        chinaEvent: '王安石變法 (1069~1085)', worldEvent: '' },
+                    { name: '宋哲宗', era: '紹聖', yearStart: 1094, yearEnd: 1098,
+                        chinaEvent: '紹聖年間',
+                        worldEvent: '十字軍東征 (1095~1291)\n第一次十字軍東征 (1096~1099)' },
+                    { name: '宋徽宗', era: '建中靖國', yearStart: 1101, yearEnd: 1125,
+                        chinaEvent: '宋金同盟 · 聯金滅遼', worldEvent: '' },
+                    { name: '宋高宗', era: '建炎', yearStart: 1127, yearEnd: 1162,
+                        chinaEvent: '南宋開始 · 偏安江南',
+                        worldEvent: '第二次十字軍東征 (1147~1149)' },
+                    { name: '宋孝宗', era: '淳熙', yearStart: 1174, yearEnd: 1189,
+                        chinaEvent: '淳熙年間',
+                        worldEvent: '第三次十字軍東征 (1189~1192)' },
+                    { name: '宋寧宗', era: '慶元', yearStart: 1195, yearEnd: 1224,
+                        chinaEvent: '慶元黨禁 · 開禧北伐',
+                        worldEvent: '蒙古帝國興起 (1206)\n大憲章簽署 (1215)' },
+                    { name: '宋理宗', era: '寶慶', yearStart: 1225, yearEnd: 1264,
+                        chinaEvent: '聯蒙滅金 (1234)', worldEvent: '' },
+                    { name: '宋度宗', era: '咸淳', yearStart: 1265, yearEnd: 1274,
+                        chinaEvent: '襄樊之戰', worldEvent: '' },
+                    { name: '宋恭帝', era: '德祐', yearStart: 1275, yearEnd: 1276,
+                        chinaEvent: '臨安陷落', worldEvent: '' },
+                    { name: '宋末帝', era: '祥興', yearStart: 1278, yearEnd: 1279,
+                        chinaEvent: '崖山之役 · 宋朝滅亡', worldEvent: '' }
+                ]
+            },
+            // ===== 元朝 =====
+            {
+                id: 'yuan',
+                name: '元朝',
+                start: 1271,
+                end: 1368,
+                emperors: [
+                    { name: '元世祖', era: '至元', yearStart: 1264, yearEnd: 1294,
+                        chinaEvent: '元朝建立 · 統一中國',
+                        worldEvent: '馬可波羅遊記 (1271~1295)' },
+                    { name: '元成宗', era: '元貞', yearStart: 1295, yearEnd: 1307,
+                        chinaEvent: '元成宗繼位 · 守成之治',
+                        worldEvent: '英格蘭議會 成立 (1295)' },
+                    { name: '元成宗', era: '大德', yearStart: 1297, yearEnd: 1307,
+                        chinaEvent: '大德年間',
+                        worldEvent: '但丁《神曲》 (1307~1321)' },
+                    { name: '元武宗', era: '至大', yearStart: 1308, yearEnd: 1311,
+                        chinaEvent: '元武宗繼位 · 改革鈔法',
+                        worldEvent: '阿維尼翁教廷 時期 (1309~1376)' },
+                    { name: '元仁宗', era: '皇慶', yearStart: 1312, yearEnd: 1320,
+                        chinaEvent: '延祐復科 · 漢化改革',
+                        worldEvent: '文藝復興 (14~16世紀)' },
+                    { name: '元順帝', era: '至順', yearStart: 1333, yearEnd: 1368,
+                        chinaEvent: '元末大亂 · 朱元璋起義',
+                        worldEvent: '百年戰爭 (1337~1453)\n黑死病肆虐歐洲 (1347~1353)' }
+                ]
+            },
+            // ===== 明朝 =====
+            {
+                id: 'ming',
+                name: '明朝',
+                start: 1368,
+                end: 1644,
+                emperors: [
+                    { name: '明太祖', era: '洪武', yearStart: 1368, yearEnd: 1398,
+                        chinaEvent: '明朝建立 · 驅逐蒙元', worldEvent: '' },
+                    { name: '明惠帝', era: '建文', yearStart: 1399, yearEnd: 1402,
+                        chinaEvent: '靖難之役 · 建文改制', worldEvent: '' },
+                    { name: '明成祖', era: '永樂', yearStart: 1403, yearEnd: 1424,
+                        chinaEvent: '鄭和下西洋 (1405~1433)',
+                        worldEvent: '聖女貞德 (1412~1431)' },
+                    { name: '明仁宗', era: '洪熙', yearStart: 1425, yearEnd: 1425,
+                        chinaEvent: '仁宣之治 開啟', worldEvent: '' },
+                    { name: '明宣宗', era: '宣德', yearStart: 1426, yearEnd: 1435,
+                        chinaEvent: '仁宣之治 盛世', worldEvent: '' },
+                    { name: '明英宗', era: '正統', yearStart: 1436, yearEnd: 1449,
+                        chinaEvent: '土木堡之變 (1449)', worldEvent: '' },
+                    { name: '明代宗', era: '景泰', yearStart: 1450, yearEnd: 1457,
+                        chinaEvent: '北京保衛戰',
+                        worldEvent: '百年戰爭 結束 (1453)\n君士坦丁堡陷落 (1453)' },
+                    { name: '明憲宗', era: '成化', yearStart: 1465, yearEnd: 1487,
+                        chinaEvent: '成化犁庭 · 西廠設立', worldEvent: '' },
+                    { name: '明孝宗', era: '弘治', yearStart: 1488, yearEnd: 1505,
+                        chinaEvent: '弘治中興',
+                        worldEvent: '哥倫布發現美洲 (1492)\n達伽馬抵達印度 (1498)' },
+                    { name: '明武宗', era: '正德', yearStart: 1506, yearEnd: 1521,
+                        chinaEvent: '劉瑾專權 · 寧王之亂',
+                        worldEvent: '馬丁·路德 宗教改革 (1517)\n宗教改革 (1517~1648)' },
+                    { name: '明世宗', era: '嘉靖', yearStart: 1522, yearEnd: 1566,
+                        chinaEvent: '嘉靖大倭寇 · 海禁',
+                        worldEvent: '伊莉莎白一世即位 (1558)' },
+                    { name: '明穆宗', era: '隆慶', yearStart: 1567, yearEnd: 1572,
+                        chinaEvent: '隆慶開關 · 海上貿易', worldEvent: '' },
+                    { name: '明神宗', era: '萬曆', yearStart: 1573, yearEnd: 1620,
+                        chinaEvent: '萬曆怠政 · 三大征',
+                        worldEvent: '英國擊敗無敵艦隊 (1588)\n三十年戰爭開始 (1618~1648)' },
+                    { name: '明光宗', era: '泰昌', yearStart: 1620, yearEnd: 1620,
+                        chinaEvent: '紅丸案', worldEvent: '' },
+                    { name: '明熹宗', era: '天啟', yearStart: 1621, yearEnd: 1627,
+                        chinaEvent: '魏忠賢專權', worldEvent: '' },
+                    { name: '明思宗', era: '崇禎', yearStart: 1628, yearEnd: 1644,
+                        chinaEvent: '明末民變 · 李自成攻陷北京',
+                        worldEvent: '英國革命 (1642~1651)' }
+                ]
+            },
+            // ===== 清朝 =====
+            {
+                id: 'qing',
+                name: '清朝',
+                start: 1644,
+                end: 1912,
+                emperors: [
+                    { name: '清世祖', era: '順治', yearStart: 1644, yearEnd: 1661,
+                        chinaEvent: '清軍入關 · 定鼎北京',
+                        worldEvent: '三十年戰爭結束 (1648)' },
+                    { name: '清聖祖', era: '康熙', yearStart: 1662, yearEnd: 1722,
+                        chinaEvent: '康熙盛世 · 平定三藩',
+                        worldEvent: '啟蒙運動 興起 (17~18世紀)\n牛頓 《自然哲學的數學原理》 (1687)\n伏爾泰 (1694~1778)\n盧梭 (1712~1778)' },
+                    { name: '清世宗', era: '雍正', yearStart: 1723, yearEnd: 1735,
+                        chinaEvent: '雍正改革 · 整頓吏治', worldEvent: '' },
+                    { name: '清高宗', era: '乾隆', yearStart: 1736, yearEnd: 1795,
+                        chinaEvent: '乾隆盛世 · 十全武功',
+                        worldEvent: '工業革命 萌芽 (1760~)\n美國獨立戰爭 (1775~1783)\n法國大革命 (1789~1799)' },
+                    { name: '清仁宗', era: '嘉慶', yearStart: 1796, yearEnd: 1820,
+                        chinaEvent: '嘉慶中衰 · 白蓮教亂',
+                        worldEvent: '拿破崙戰爭 (1799~1815)\n滑鐵盧戰役 (1815)' },
+                    { name: '清宣宗', era: '道光', yearStart: 1821, yearEnd: 1850,
+                        chinaEvent: '鴉片戰爭 (1840~1842)', worldEvent: '' },
+                    { name: '清文宗', era: '咸豐', yearStart: 1851, yearEnd: 1861,
+                        chinaEvent: '太平天國 (1851~1864)',
+                        worldEvent: '美國內戰 (1861~1865)\n達爾文 《物種起源》 (1859)' },
+                    { name: '清穆宗', era: '同治', yearStart: 1862, yearEnd: 1874,
+                        chinaEvent: '同治中興 · 洋務運動',
+                        worldEvent: '明治維新開始 (1868)\n德意志帝國建立 (1871)' },
+                    { name: '清德宗', era: '光緒', yearStart: 1875, yearEnd: 1908,
+                        chinaEvent: '戊戌變法 (1898) · 甲午戰爭 (1894)',
+                        worldEvent: '電燈發明 (1879)\n汽車發明 (1886)' },
+                    { name: '清遜帝', era: '宣統', yearStart: 1909, yearEnd: 1912,
+                        chinaEvent: '辛亥革命 · 清朝滅亡',
+                        worldEvent: '第一次世界大戰爆發 (1914)' }
+                ]
+            }
+        ];
 
-<script>
-// ============================================================
-//  完整數據 — 以事件起始年代決定放置位置
-// ============================================================
-const DATA = [
-// ===== 上古文明 =====
-{
-    id: 'ancient',
-    name: '上古文明',
-    start: -3500,
-    end: -2070,
-    emperors: [
-        { name: '蘇美爾', era: '城邦時代', yearStart: -3500, yearEnd: -2372,
-            chinaEvent: '傳說時代 · 三皇五帝',
-            worldEvent: '蘇美爾人在兩河流域建立烏魯克等城邦 (約前3500)\n蘇美爾人發明楔形文字 (約前3200)\n古埃及古王國時期 (約前2686~前2181)\n古埃及金字塔建造 (約前2560)' },
-        { name: '阿卡德', era: '薩爾貢', yearStart: -2371, yearEnd: -2190,
-            chinaEvent: '傳說時代 · 黃帝、炎帝、堯舜',
-            worldEvent: '薩爾貢統一兩河流域 · 建立阿卡德帝國 (前2371)\n人類歷史上第一個帝國' },
-        { name: '烏爾第三王朝', era: '烏爾納姆', yearStart: -2112, yearEnd: -2004,
-            chinaEvent: '傳說時代 · 夏朝建立前夕',
-            worldEvent: '烏爾第三王朝 (約前2112~前2004)' }
-    ]
-},
-// ===== 夏朝 =====
-{
-    id: 'xia',
-    name: '夏朝',
-    start: -2070,
-    end: -1600,
-    emperors: [
-        { name: '夏禹', era: '禹', yearStart: -2070, yearEnd: -2060,
-            chinaEvent: '大禹治水 · 建立夏朝', worldEvent: '' },
-        { name: '夏啟', era: '啟', yearStart: -2060, yearEnd: -2050,
-            chinaEvent: '啟繼位 · 家天下開始',
-            worldEvent: '古埃及中王國時期 (約前2055~前1650)' },
-        { name: '夏太康', era: '太康', yearStart: -1970, yearEnd: -1950,
-            chinaEvent: '太康失國 · 后羿篡位',
-            worldEvent: '兩河流域 · 巴比倫第一王朝 (約前1894~前1595)' },
-        { name: '夏少康', era: '少康', yearStart: -1880, yearEnd: -1850,
-            chinaEvent: '少康中興 · 復國',
-            worldEvent: '漢摩拉比法典 (約前1792~前1750)' },
-        { name: '夏桀', era: '桀', yearStart: -1600, yearEnd: -1600,
-            chinaEvent: '夏桀暴政 · 商湯滅夏', worldEvent: '' }
-    ]
-},
-// ===== 商朝 =====
-{
-    id: 'shang',
-    name: '商朝',
-    start: -1600,
-    end: -1046,
-    emperors: [
-        { name: '商湯', era: '成湯', yearStart: -1600, yearEnd: -1580,
-            chinaEvent: '商湯革命 · 建立商朝',
-            worldEvent: '兩河流域 · 赫梯帝國崛起 (約前1600~前1178)\n古埃及新王國時期 (約前1550~前1069)' },
-        { name: '商太甲', era: '太甲', yearStart: -1580, yearEnd: -1570,
-            chinaEvent: '太甲悔過 · 伊尹輔政', worldEvent: '' },
-        { name: '商祖乙', era: '祖乙', yearStart: -1500, yearEnd: -1480,
-            chinaEvent: '祖乙遷都 · 商朝中興',
-            worldEvent: '古埃及新王國時期 · 圖坦卡門 (約前1341~前1323)' },
-        { name: '商盤庚', era: '盤庚', yearStart: -1300, yearEnd: -1275,
-            chinaEvent: '盤庚遷殷 · 定都於殷', worldEvent: '' },
-        { name: '商武丁', era: '武丁', yearStart: -1250, yearEnd: -1192,
-            chinaEvent: '武丁中興 · 甲骨文',
-            worldEvent: '特洛伊戰爭 (約前1184)\n兩河流域 · 亞述帝國崛起 (約前1244~前1076)' },
-        { name: '商武乙', era: '武乙', yearStart: -1147, yearEnd: -1113,
-            chinaEvent: '武乙伐周 · 商周衝突',
-            worldEvent: '古埃及新王國末期 (約前1085~前664)' },
-        { name: '商紂王', era: '帝辛', yearStart: -1075, yearEnd: -1046,
-            chinaEvent: '紂王暴政 · 武王伐紂', worldEvent: '' }
-    ]
-},
-// ===== 西周 =====
-{
-    id: 'western-zhou',
-    name: '西周',
-    start: -1046,
-    end: -771,
-    emperors: [
-        { name: '周武王', era: '武王', yearStart: -1046, yearEnd: -1043,
-            chinaEvent: '牧野之戰 · 滅商建周', worldEvent: '' },
-        { name: '周成王', era: '成王', yearStart: -1042, yearEnd: -1021,
-            chinaEvent: '周公攝政 · 東征平定', worldEvent: '' },
-        { name: '周康王', era: '康王', yearStart: -1020, yearEnd: -996,
-            chinaEvent: '成康之治', worldEvent: '' },
-        { name: '周昭王', era: '昭王', yearStart: -995, yearEnd: -977,
-            chinaEvent: '南征荊楚', worldEvent: '' },
-        { name: '周穆王', era: '穆王', yearStart: -976, yearEnd: -922,
-            chinaEvent: '西征犬戎 · 周遊天下',
-            worldEvent: '古埃及第三中間期 (約前1069~前664)' },
-        { name: '周厲王', era: '厲王', yearStart: -878, yearEnd: -841,
-            chinaEvent: '國人暴動 · 共和行政', worldEvent: '' },
-        { name: '周宣王', era: '宣王', yearStart: -827, yearEnd: -782,
-            chinaEvent: '宣王中興',
-            worldEvent: '希臘城邦 · 荷馬史詩 (約前800~前600)\n新亞述帝國鼎盛期 (約前883~前627)' },
-        { name: '周幽王', era: '幽王', yearStart: -781, yearEnd: -771,
-            chinaEvent: '烽火戲諸侯 · 西周滅亡', worldEvent: '' }
-    ]
-},
-// ===== 東周 =====
-{
-    id: 'eastern-zhou',
-    name: '東周',
-    start: -770,
-    end: -256,
-    emperors: [
-        { name: '周平王', era: '平王', yearStart: -770, yearEnd: -720,
-            chinaEvent: '東遷洛邑 · 春秋開始', worldEvent: '' },
-        { name: '周桓王', era: '桓王', yearStart: -719, yearEnd: -697,
-            chinaEvent: '繻葛之戰 · 鄭國稱霸', worldEvent: '' },
-        { name: '周莊王', era: '莊王', yearStart: -696, yearEnd: -682,
-            chinaEvent: '齊桓公稱霸 (前685~前643)', worldEvent: '' },
-        { name: '周惠王', era: '惠王', yearStart: -676, yearEnd: -652,
-            chinaEvent: '晉獻公崛起', worldEvent: '' },
-        { name: '周襄王', era: '襄王', yearStart: -651, yearEnd: -619,
-            chinaEvent: '晉文公稱霸 · 城濮之戰 (前632)', worldEvent: '' },
-        { name: '周定王', era: '定王', yearStart: -606, yearEnd: -586,
-            chinaEvent: '楚莊王稱霸 · 問鼎中原', worldEvent: '' },
-        { name: '周靈王', era: '靈王', yearStart: -571, yearEnd: -545,
-            chinaEvent: '晉楚爭霸',
-            worldEvent: '波斯帝國崛起 (約前550)' },
-        { name: '周景王', era: '景王', yearStart: -544, yearEnd: -520,
-            chinaEvent: '弭兵之會 · 晉楚休戰', worldEvent: '' },
-        { name: '周敬王', era: '敬王', yearStart: -519, yearEnd: -476,
-            chinaEvent: '吳越爭霸 · 春秋結束',
-            worldEvent: '馬拉松戰役 (前490)\n溫泉關戰役 (前480)\n釋迦牟尼 (約前500)\n羅馬共和國崛起 (前509~前27)' },
-        { name: '周元王', era: '元王', yearStart: -475, yearEnd: -469,
-            chinaEvent: '戰國開始',
-            worldEvent: '雅典 · 伯里克利時代 (前460~前429)' },
-        { name: '周貞定王', era: '貞定王', yearStart: -468, yearEnd: -441,
-            chinaEvent: '三家分晉 (前403)', worldEvent: '' },
-        { name: '周威烈王', era: '威烈王', yearStart: -425, yearEnd: -402,
-            chinaEvent: '正式承認三家分晉', worldEvent: '' },
-        { name: '周顯王', era: '顯王', yearStart: -368, yearEnd: -321,
-            chinaEvent: '商鞅變法 (前356~前338)',
-            worldEvent: '亞歷山大大帝東征 (前336~前323)' },
-        { name: '周慎靚王', era: '慎靚王', yearStart: -320, yearEnd: -315,
-            chinaEvent: '五國相王', worldEvent: '' },
-        { name: '周赧王', era: '赧王', yearStart: -314, yearEnd: -256,
-            chinaEvent: '東周滅亡 · 秦滅周',
-            worldEvent: '布匿戰爭 (前264~前146)\n漢尼拔翻越阿爾卑斯山 (前218)' }
-    ]
-},
-// ===== 秦朝 =====
-{
-    id: 'qin',
-    name: '秦朝',
-    start: -221,
-    end: -206,
-    emperors: [
-        { name: '秦始皇', era: '始皇帝', yearStart: -221, yearEnd: -210,
-            chinaEvent: '統一六國 · 書同文車同軌', worldEvent: '' },
-        { name: '秦二世', era: '二世', yearStart: -209, yearEnd: -207,
-            chinaEvent: '陳勝吳廣起義', worldEvent: '' },
-        { name: '秦王子嬰', era: '子嬰', yearStart: -206, yearEnd: -206,
-            chinaEvent: '秦朝滅亡 · 劉邦入關', worldEvent: '' }
-    ]
-},
-// ===== 西漢 =====
-{
-    id: 'western-han',
-    name: '西漢',
-    start: -202,
-    end: 9,
-    emperors: [
-        { name: '漢高祖', era: '高祖', yearStart: -202, yearEnd: -195,
-            chinaEvent: '漢朝建立 · 白登之圍', worldEvent: '' },
-        { name: '漢惠帝', era: '惠帝', yearStart: -194, yearEnd: -188,
-            chinaEvent: '呂后專政', worldEvent: '' },
-        { name: '漢文帝', era: '文帝', yearStart: -179, yearEnd: -157,
-            chinaEvent: '文景之治', worldEvent: '' },
-        { name: '漢景帝', era: '景帝', yearStart: -156, yearEnd: -141,
-            chinaEvent: '七國之亂 · 文景之治', worldEvent: '' },
-        { name: '漢武帝', era: '建元', yearStart: -140, yearEnd: -135,
-            chinaEvent: '即位 · 推行儒術', worldEvent: '' },
-        { name: '漢武帝', era: '元光', yearStart: -134, yearEnd: -129,
-            chinaEvent: '董仲舒「天人三策」\n馬邑之謀 (前133)', worldEvent: '' },
-        { name: '漢武帝', era: '元朔', yearStart: -128, yearEnd: -123,
-            chinaEvent: '衛青出擊匈奴\n收復河套', worldEvent: '' },
-        { name: '漢武帝', era: '元狩', yearStart: -122, yearEnd: -117,
-            chinaEvent: '霍去病收復河西走廊 (前121~前119)\n漠北之戰 (前119)', worldEvent: '' },
-        { name: '漢武帝', era: '元鼎', yearStart: -116, yearEnd: -111,
-            chinaEvent: '張騫第二次出使西域\n滅南越 (前111)', worldEvent: '' },
-        { name: '漢武帝', era: '元封', yearStart: -110, yearEnd: -105,
-            chinaEvent: '滅衛氏朝鮮 (前108)', worldEvent: '' },
-        { name: '漢武帝', era: '太初', yearStart: -104, yearEnd: -101,
-            chinaEvent: '李廣利征大宛 (前104~前101)', worldEvent: '' },
-        { name: '漢武帝', era: '天漢', yearStart: -100, yearEnd: -97,
-            chinaEvent: '漢匈戰爭持續',
-            worldEvent: '凱撒誕生 (前100)' },
-        { name: '漢武帝', era: '太始', yearStart: -96, yearEnd: -93,
-            chinaEvent: '漢朝國力鼎盛', worldEvent: '' },
-        { name: '漢武帝', era: '征和', yearStart: -92, yearEnd: -89,
-            chinaEvent: '巫蠱之禍 (前91~前90)\n輪台詔 (前89)', worldEvent: '' },
-        { name: '漢武帝', era: '後元', yearStart: -88, yearEnd: -87,
-            chinaEvent: '漢武帝駕崩 (前87)', worldEvent: '' },
-        { name: '漢昭帝', era: '始元', yearStart: -86, yearEnd: -74,
-            chinaEvent: '鹽鐵會議 · 霍光輔政', worldEvent: '' },
-        { name: '漢宣帝', era: '本始', yearStart: -73, yearEnd: -49,
-            chinaEvent: '孝宣中興 · 匈奴歸附', worldEvent: '' },
-        { name: '漢元帝', era: '初元', yearStart: -48, yearEnd: -33,
-            chinaEvent: '昭君出塞',
-            worldEvent: '凱撒遇刺 (前44)\n奧古斯都即位 (前27)' },
-        { name: '漢成帝', era: '建始', yearStart: -32, yearEnd: -7,
-            chinaEvent: '王氏外戚崛起', worldEvent: '' },
-        { name: '漢哀帝', era: '建平', yearStart: -6, yearEnd: -1,
-            chinaEvent: '王莽篡漢 前夕',
-            worldEvent: '耶穌基督誕生 (約前4)' },
-        { name: '漢平帝', era: '元始', yearStart: 1, yearEnd: 5,
-            chinaEvent: '王莽專權', worldEvent: '' },
-        { name: '孺子嬰', era: '孺子嬰', yearStart: 6, yearEnd: 8,
-            chinaEvent: '王莽建立新朝', worldEvent: '' }
-    ]
-},
-// ===== 新朝 =====
-{
-    id: 'xin',
-    name: '新朝',
-    start: 9,
-    end: 23,
-    emperors: [
-        { name: '王莽', era: '始建國', yearStart: 9, yearEnd: 23,
-            chinaEvent: '王莽改制 · 綠林赤眉起義', worldEvent: '' }
-    ]
-},
-// ===== 東漢 =====
-{
-    id: 'eastern-han',
-    name: '東漢',
-    start: 25,
-    end: 220,
-    emperors: [
-        { name: '漢光武帝', era: '建武', yearStart: 25, yearEnd: 57,
-            chinaEvent: '光武中興 · 東漢建立', worldEvent: '' },
-        { name: '漢明帝', era: '永平', yearStart: 58, yearEnd: 75,
-            chinaEvent: '白馬寺 · 佛教傳入', worldEvent: '' },
-        { name: '漢章帝', era: '建初', yearStart: 76, yearEnd: 88,
-            chinaEvent: '章和之治',
-            worldEvent: '羅馬帝國 · 龐貝古城 (79)' },
-        { name: '漢和帝', era: '永元', yearStart: 89, yearEnd: 105,
-            chinaEvent: '竇憲北伐 · 班超通西域', worldEvent: '' },
-        { name: '漢安帝', era: '永初', yearStart: 107, yearEnd: 125,
-            chinaEvent: '羌亂四起', worldEvent: '' },
-        { name: '漢順帝', era: '永建', yearStart: 126, yearEnd: 144,
-            chinaEvent: '宦官外戚相爭', worldEvent: '' },
-        { name: '漢桓帝', era: '建和', yearStart: 147, yearEnd: 167,
-            chinaEvent: '黨錮之禍', worldEvent: '' },
-        { name: '漢靈帝', era: '建寧', yearStart: 168, yearEnd: 189,
-            chinaEvent: '黃巾之亂 (184)', worldEvent: '' },
-        { name: '漢獻帝', era: '初平', yearStart: 190, yearEnd: 220,
-            chinaEvent: '三國鼎立 · 東漢滅亡', worldEvent: '' }
-    ]
-},
-// ===== 三國 =====
-{
-    id: 'three-kingdoms',
-    name: '三國',
-    start: 220,
-    end: 280,
-    emperors: [
-        { name: '魏文帝', era: '黃初', yearStart: 220, yearEnd: 226,
-            chinaEvent: '曹魏建立 · 三國開始', worldEvent: '' },
-        { name: '魏明帝', era: '太和', yearStart: 227, yearEnd: 239,
-            chinaEvent: '諸葛亮北伐', worldEvent: '' },
-        { name: '蜀漢昭烈帝', era: '章武', yearStart: 221, yearEnd: 223,
-            chinaEvent: '蜀漢建立 · 夷陵之戰', worldEvent: '' },
-        { name: '蜀漢後主', era: '建興', yearStart: 223, yearEnd: 263,
-            chinaEvent: '諸葛亮輔政 · 蜀漢滅亡', worldEvent: '' },
-        { name: '吳大帝', era: '黃武', yearStart: 222, yearEnd: 252,
-            chinaEvent: '東吳建立 · 赤壁之戰', worldEvent: '' },
-        { name: '吳末帝', era: '元興', yearStart: 264, yearEnd: 280,
-            chinaEvent: '西晉滅吳 · 三國結束', worldEvent: '' }
-    ]
-},
-// ===== 西晉 =====
-{
-    id: 'western-jin',
-    name: '西晉',
-    start: 265,
-    end: 316,
-    emperors: [
-        { name: '晉武帝', era: '泰始', yearStart: 265, yearEnd: 290,
-            chinaEvent: '西晉建立 · 統一三國', worldEvent: '' },
-        { name: '晉惠帝', era: '永熙', yearStart: 290, yearEnd: 306,
-            chinaEvent: '八王之亂 (291~306)', worldEvent: '' },
-        { name: '晉懷帝', era: '永嘉', yearStart: 307, yearEnd: 313,
-            chinaEvent: '永嘉之亂 · 五胡亂華', worldEvent: '' },
-        { name: '晉愍帝', era: '建興', yearStart: 313, yearEnd: 316,
-            chinaEvent: '西晉滅亡', worldEvent: '' }
-    ]
-},
-// ===== 東晉 =====
-{
-    id: 'eastern-jin',
-    name: '東晉',
-    start: 317,
-    end: 420,
-    emperors: [
-        { name: '晉元帝', era: '建武', yearStart: 317, yearEnd: 323,
-            chinaEvent: '東晉建立 · 南渡', worldEvent: '' },
-        { name: '晉明帝', era: '太寧', yearStart: 323, yearEnd: 325,
-            chinaEvent: '王敦之亂', worldEvent: '' },
-        { name: '晉成帝', era: '咸和', yearStart: 326, yearEnd: 342,
-            chinaEvent: '蘇峻之亂', worldEvent: '' },
-        { name: '晉孝武帝', era: '寧康', yearStart: 373, yearEnd: 396,
-            chinaEvent: '淝水之戰 (383)', worldEvent: '' },
-        { name: '晉安帝', era: '隆安', yearStart: 397, yearEnd: 419,
-            chinaEvent: '東晉衰微 · 劉裕崛起',
-            worldEvent: '民族大遷徙 · 阿提拉 (約406~453)' }
-    ]
-},
-// ===== 南北朝 =====
-{
-    id: 'northern-southern',
-    name: '南北朝',
-    start: 420,
-    end: 589,
-    emperors: [
-        { name: '宋武帝', era: '永初', yearStart: 420, yearEnd: 422,
-            chinaEvent: '劉宋建立 · 南北朝開始', worldEvent: '' },
-        { name: '宋文帝', era: '元嘉', yearStart: 424, yearEnd: 453,
-            chinaEvent: '元嘉之治',
-            worldEvent: '西羅馬帝國滅亡 (476)' },
-        { name: '齊高帝', era: '建元', yearStart: 479, yearEnd: 482,
-            chinaEvent: '南齊建立', worldEvent: '' },
-        { name: '梁武帝', era: '天監', yearStart: 502, yearEnd: 549,
-            chinaEvent: '梁朝建立 · 侯景之亂 (548)', worldEvent: '' },
-        { name: '陳武帝', era: '永定', yearStart: 557, yearEnd: 559,
-            chinaEvent: '陳朝建立', worldEvent: '' },
-        { name: '北魏太武帝', era: '始光', yearStart: 424, yearEnd: 452,
-            chinaEvent: '北魏統一北方', worldEvent: '' },
-        { name: '北魏孝文帝', era: '太和', yearStart: 477, yearEnd: 499,
-            chinaEvent: '孝文帝改革 · 漢化運動', worldEvent: '' },
-        { name: '北齊文宣帝', era: '天保', yearStart: 550, yearEnd: 559,
-            chinaEvent: '北齊建立', worldEvent: '' },
-        { name: '北周武帝', era: '保定', yearStart: 561, yearEnd: 578,
-            chinaEvent: '北周滅北齊 (577)', worldEvent: '' }
-    ]
-},
-// ===== 隋朝 =====
-{
-    id: 'sui',
-    name: '隋朝',
-    start: 581,
-    end: 618,
-    emperors: [
-        { name: '隋文帝', era: '開皇', yearStart: 581, yearEnd: 604,
-            chinaEvent: '隋朝建立 · 統一南北', worldEvent: '' },
-        { name: '隋煬帝', era: '大業', yearStart: 605, yearEnd: 618,
-            chinaEvent: '開鑿大運河 · 三征高句麗',
-            worldEvent: '伊斯蘭教興起 (610~632)\n伊斯蘭黃金時代 (8~13世紀)' },
-        { name: '隋恭帝', era: '義寧', yearStart: 617, yearEnd: 618,
-            chinaEvent: '隋朝滅亡 · 唐朝建立', worldEvent: '' }
-    ]
-},
-// ===== 唐朝 =====
-{
-    id: 'tang',
-    name: '唐朝',
-    start: 618,
-    end: 907,
-    emperors: [
-        { name: '唐高祖', era: '武德', yearStart: 618, yearEnd: 626,
-            chinaEvent: '唐朝建立 · 統一戰爭', worldEvent: '' },
-        { name: '唐太宗', era: '貞觀', yearStart: 627, yearEnd: 649,
-            chinaEvent: '貞觀之治',
-            worldEvent: '阿拉伯帝國擴張 (632~750)\n阿拉伯帝國征服波斯 (636~651)\n阿拉伯帝國征服北非 (640~700)' },
-        { name: '唐高宗', era: '永徽', yearStart: 650, yearEnd: 655,
-            chinaEvent: '永徽之治',
-            worldEvent: '阿拉伯帝國 伍麥葉王朝 (661~750)' },
-        { name: '武則天', era: '天授', yearStart: 690, yearEnd: 705,
-            chinaEvent: '武周建立 (690~705)', worldEvent: '' },
-        { name: '唐玄宗', era: '開元', yearStart: 713, yearEnd: 741,
-            chinaEvent: '開元盛世',
-            worldEvent: '查理·馬特 圖爾戰役 (732)' },
-        { name: '唐玄宗', era: '天寶', yearStart: 742, yearEnd: 756,
-            chinaEvent: '安史之亂 (755~763)',
-            worldEvent: '法蘭克王國 卡洛林王朝 (751~987)\n倫巴第王國 敗亡' },
-        { name: '唐肅宗', era: '至德', yearStart: 756, yearEnd: 758,
-            chinaEvent: '平定安史之亂', worldEvent: '' },
-        { name: '唐代宗', era: '寶應', yearStart: 762, yearEnd: 779,
-            chinaEvent: '藩鎮割據開始', worldEvent: '' },
-        { name: '唐德宗', era: '建中', yearStart: 780, yearEnd: 805,
-            chinaEvent: '涇原兵變 · 奉天之難',
-            worldEvent: '查理曼大帝加冕 (800)' },
-        { name: '唐憲宗', era: '元和', yearStart: 806, yearEnd: 820,
-            chinaEvent: '元和中興 · 平定藩鎮', worldEvent: '' },
-        { name: '唐武宗', era: '會昌', yearStart: 841, yearEnd: 846,
-            chinaEvent: '會昌滅佛', worldEvent: '' },
-        { name: '唐宣宗', era: '大中', yearStart: 847, yearEnd: 859,
-            chinaEvent: '大中之治', worldEvent: '' },
-        { name: '唐懿宗', era: '咸通', yearStart: 860, yearEnd: 874,
-            chinaEvent: '唐末衰微',
-            worldEvent: '維京人征服英格蘭 (865~899)' },
-        { name: '唐僖宗', era: '乾符', yearStart: 874, yearEnd: 888,
-            chinaEvent: '黃巢之亂 (875~884)', worldEvent: '' },
-        { name: '唐昭宗', era: '龍紀', yearStart: 889, yearEnd: 904,
-            chinaEvent: '朱溫專權', worldEvent: '' },
-        { name: '唐哀帝', era: '天祐', yearStart: 905, yearEnd: 907,
-            chinaEvent: '唐朝滅亡 · 五代開始', worldEvent: '' }
-    ]
-},
-// ===== 宋朝 =====
-{
-    id: 'song',
-    name: '宋朝',
-    start: 960,
-    end: 1279,
-    emperors: [
-        { name: '宋太祖', era: '建隆', yearStart: 960, yearEnd: 963,
-            chinaEvent: '宋朝建立 · 統一中原',
-            worldEvent: '神聖羅馬帝國建立 (962)' },
-        { name: '宋太宗', era: '太平興國', yearStart: 976, yearEnd: 984,
-            chinaEvent: '統一南方 · 北伐契丹', worldEvent: '' },
-        { name: '宋太宗', era: '端拱', yearStart: 988, yearEnd: 989,
-            chinaEvent: '端拱之治',
-            worldEvent: '基輔羅斯 基督教化 (988)' },
-        { name: '宋真宗', era: '咸平', yearStart: 998, yearEnd: 1003,
-            chinaEvent: '咸平之治 · 澶淵之盟',
-            worldEvent: '匈牙利王國建立 (1000)' },
-        { name: '宋真宗', era: '大中祥符', yearStart: 1008, yearEnd: 1016,
-            chinaEvent: '大中祥符年間',
-            worldEvent: '克努特大帝 統治北海帝國 (1016~1035)' },
-        { name: '宋仁宗', era: '天聖', yearStart: 1023, yearEnd: 1032,
-            chinaEvent: '慶曆新政 萌芽', worldEvent: '' },
-        { name: '宋英宗', era: '治平', yearStart: 1064, yearEnd: 1067,
-            chinaEvent: '治平年間',
-            worldEvent: '諾曼征服英格蘭 (1066)' },
-        { name: '宋神宗', era: '熙寧', yearStart: 1068, yearEnd: 1077,
-            chinaEvent: '王安石變法 (1069~1085)', worldEvent: '' },
-        { name: '宋哲宗', era: '紹聖', yearStart: 1094, yearEnd: 1098,
-            chinaEvent: '紹聖年間',
-            worldEvent: '十字軍東征 (1095~1291)\n第一次十字軍東征 (1096~1099)' },
-        { name: '宋徽宗', era: '建中靖國', yearStart: 1101, yearEnd: 1125,
-            chinaEvent: '宋金同盟 · 聯金滅遼', worldEvent: '' },
-        { name: '宋高宗', era: '建炎', yearStart: 1127, yearEnd: 1162,
-            chinaEvent: '南宋開始 · 偏安江南',
-            worldEvent: '第二次十字軍東征 (1147~1149)' },
-        { name: '宋孝宗', era: '淳熙', yearStart: 1174, yearEnd: 1189,
-            chinaEvent: '淳熙年間',
-            worldEvent: '第三次十字軍東征 (1189~1192)' },
-        { name: '宋寧宗', era: '慶元', yearStart: 1195, yearEnd: 1224,
-            chinaEvent: '慶元黨禁 · 開禧北伐',
-            worldEvent: '蒙古帝國興起 (1206)\n大憲章簽署 (1215)' },
-        { name: '宋理宗', era: '寶慶', yearStart: 1225, yearEnd: 1264,
-            chinaEvent: '聯蒙滅金 (1234)', worldEvent: '' },
-        { name: '宋度宗', era: '咸淳', yearStart: 1265, yearEnd: 1274,
-            chinaEvent: '襄樊之戰', worldEvent: '' },
-        { name: '宋恭帝', era: '德祐', yearStart: 1275, yearEnd: 1276,
-            chinaEvent: '臨安陷落', worldEvent: '' },
-        { name: '宋末帝', era: '祥興', yearStart: 1278, yearEnd: 1279,
-            chinaEvent: '崖山之役 · 宋朝滅亡', worldEvent: '' }
-    ]
-},
-// ===== 元朝 =====
-{
-    id: 'yuan',
-    name: '元朝',
-    start: 1271,
-    end: 1368,
-    emperors: [
-        { name: '元世祖', era: '至元', yearStart: 1264, yearEnd: 1294,
-            chinaEvent: '元朝建立 · 統一中國',
-            worldEvent: '馬可波羅遊記 (1271~1295)' },
-        { name: '元成宗', era: '元貞', yearStart: 1295, yearEnd: 1307,
-            chinaEvent: '元成宗繼位 · 守成之治',
-            worldEvent: '英格蘭議會 成立 (1295)' },
-        { name: '元成宗', era: '大德', yearStart: 1297, yearEnd: 1307,
-            chinaEvent: '大德年間',
-            worldEvent: '但丁《神曲》 (1307~1321)' },
-        { name: '元武宗', era: '至大', yearStart: 1308, yearEnd: 1311,
-            chinaEvent: '元武宗繼位 · 改革鈔法',
-            worldEvent: '阿維尼翁教廷 時期 (1309~1376)' },
-        { name: '元仁宗', era: '皇慶', yearStart: 1312, yearEnd: 1320,
-            chinaEvent: '延祐復科 · 漢化改革',
-            worldEvent: '文藝復興 (14~16世紀)' },
-        { name: '元順帝', era: '至順', yearStart: 1333, yearEnd: 1368,
-            chinaEvent: '元末大亂 · 朱元璋起義',
-            worldEvent: '百年戰爭 (1337~1453)\n黑死病肆虐歐洲 (1347~1353)' }
-    ]
-},
-// ===== 明朝 =====
-{
-    id: 'ming',
-    name: '明朝',
-    start: 1368,
-    end: 1644,
-    emperors: [
-        { name: '明太祖', era: '洪武', yearStart: 1368, yearEnd: 1398,
-            chinaEvent: '明朝建立 · 驅逐蒙元', worldEvent: '' },
-        { name: '明惠帝', era: '建文', yearStart: 1399, yearEnd: 1402,
-            chinaEvent: '靖難之役 · 建文改制', worldEvent: '' },
-        { name: '明成祖', era: '永樂', yearStart: 1403, yearEnd: 1424,
-            chinaEvent: '鄭和下西洋 (1405~1433)',
-            worldEvent: '聖女貞德 (1412~1431)' },
-        { name: '明仁宗', era: '洪熙', yearStart: 1425, yearEnd: 1425,
-            chinaEvent: '仁宣之治 開啟', worldEvent: '' },
-        { name: '明宣宗', era: '宣德', yearStart: 1426, yearEnd: 1435,
-            chinaEvent: '仁宣之治 盛世', worldEvent: '' },
-        { name: '明英宗', era: '正統', yearStart: 1436, yearEnd: 1449,
-            chinaEvent: '土木堡之變 (1449)', worldEvent: '' },
-        { name: '明代宗', era: '景泰', yearStart: 1450, yearEnd: 1457,
-            chinaEvent: '北京保衛戰',
-            worldEvent: '百年戰爭 結束 (1453)\n君士坦丁堡陷落 (1453)' },
-        { name: '明憲宗', era: '成化', yearStart: 1465, yearEnd: 1487,
-            chinaEvent: '成化犁庭 · 西廠設立', worldEvent: '' },
-        { name: '明孝宗', era: '弘治', yearStart: 1488, yearEnd: 1505,
-            chinaEvent: '弘治中興',
-            worldEvent: '哥倫布發現美洲 (1492)\n達伽馬抵達印度 (1498)' },
-        { name: '明武宗', era: '正德', yearStart: 1506, yearEnd: 1521,
-            chinaEvent: '劉瑾專權 · 寧王之亂',
-            worldEvent: '馬丁·路德 宗教改革 (1517)\n宗教改革 (1517~1648)' },
-        { name: '明世宗', era: '嘉靖', yearStart: 1522, yearEnd: 1566,
-            chinaEvent: '嘉靖大倭寇 · 海禁',
-            worldEvent: '伊莉莎白一世即位 (1558)' },
-        { name: '明穆宗', era: '隆慶', yearStart: 1567, yearEnd: 1572,
-            chinaEvent: '隆慶開關 · 海上貿易', worldEvent: '' },
-        { name: '明神宗', era: '萬曆', yearStart: 1573, yearEnd: 1620,
-            chinaEvent: '萬曆怠政 · 三大征',
-            worldEvent: '英國擊敗無敵艦隊 (1588)\n三十年戰爭開始 (1618~1648)' },
-        { name: '明光宗', era: '泰昌', yearStart: 1620, yearEnd: 1620,
-            chinaEvent: '紅丸案', worldEvent: '' },
-        { name: '明熹宗', era: '天啟', yearStart: 1621, yearEnd: 1627,
-            chinaEvent: '魏忠賢專權', worldEvent: '' },
-        { name: '明思宗', era: '崇禎', yearStart: 1628, yearEnd: 1644,
-            chinaEvent: '明末民變 · 李自成攻陷北京',
-            worldEvent: '英國革命 (1642~1651)' }
-    ]
-},
-// ===== 清朝 =====
-{
-    id: 'qing',
-    name: '清朝',
-    start: 1644,
-    end: 1912,
-    emperors: [
-        { name: '清世祖', era: '順治', yearStart: 1644, yearEnd: 1661,
-            chinaEvent: '清軍入關 · 定鼎北京',
-            worldEvent: '三十年戰爭結束 (1648)' },
-        { name: '清聖祖', era: '康熙', yearStart: 1662, yearEnd: 1722,
-            chinaEvent: '康熙盛世 · 平定三藩',
-            worldEvent: '啟蒙運動 興起 (17~18世紀)\n牛頓 《自然哲學的數學原理》 (1687)\n伏爾泰 (1694~1778)\n盧梭 (1712~1778)' },
-        { name: '清世宗', era: '雍正', yearStart: 1723, yearEnd: 1735,
-            chinaEvent: '雍正改革 · 整頓吏治', worldEvent: '' },
-        { name: '清高宗', era: '乾隆', yearStart: 1736, yearEnd: 1795,
-            chinaEvent: '乾隆盛世 · 十全武功',
-            worldEvent: '工業革命 萌芽 (1760~)\n美國獨立戰爭 (1775~1783)\n法國大革命 (1789~1799)' },
-        { name: '清仁宗', era: '嘉慶', yearStart: 1796, yearEnd: 1820,
-            chinaEvent: '嘉慶中衰 · 白蓮教亂',
-            worldEvent: '拿破崙戰爭 (1799~1815)\n滑鐵盧戰役 (1815)' },
-        { name: '清宣宗', era: '道光', yearStart: 1821, yearEnd: 1850,
-            chinaEvent: '鴉片戰爭 (1840~1842)', worldEvent: '' },
-        { name: '清文宗', era: '咸豐', yearStart: 1851, yearEnd: 1861,
-            chinaEvent: '太平天國 (1851~1864)',
-            worldEvent: '美國內戰 (1861~1865)\n達爾文 《物種起源》 (1859)' },
-        { name: '清穆宗', era: '同治', yearStart: 1862, yearEnd: 1874,
-            chinaEvent: '同治中興 · 洋務運動',
-            worldEvent: '明治維新開始 (1868)\n德意志帝國建立 (1871)' },
-        { name: '清德宗', era: '光緒', yearStart: 1875, yearEnd: 1908,
-            chinaEvent: '戊戌變法 (1898) · 甲午戰爭 (1894)',
-            worldEvent: '電燈發明 (1879)\n汽車發明 (1886)' },
-        { name: '清遜帝', era: '宣統', yearStart: 1909, yearEnd: 1912,
-            chinaEvent: '辛亥革命 · 清朝滅亡',
-            worldEvent: '第一次世界大戰爆發 (1914)' }
-    ]
-}
-];
+        // ============================================================
+        //  工具函數
+        // ============================================================
+        function isCrossYear(text) {
+            if (!text) return false;
+            return /\(\d{3,4}~\d{3,4}\)/.test(text) || /\(\d{3,4}\)/.test(text);
+        }
 
-// ============================================================
-//  工具函數
-// ============================================================
-function isCrossYear(text) {
-    if (!text) return false;
-    return /\(\d{3,4}~\d{3,4}\)/.test(text) || /\(\d{3,4}\)/.test(text);
-}
-function splitEvents(text) {
-    if (!text || text.trim() === '') return [];
-    return text.split('\n').filter(item => item.trim() !== '');
-}
+        function splitEvents(text) {
+            if (!text || text.trim() === '') return [];
+            return text.split('\n').filter(item => item.trim() !== '');
+        }
 
-// ============================================================
-//  字級控制
-// ============================================================
-const MIN_FONT_SIZE = 12, MAX_FONT_SIZE = 38, STEP = 1, DEFAULT_FONT_SIZE = 28.8;
-function getCurrentFontSize() {
-    const html = document.documentElement;
-    const computed = window.getComputedStyle(html);
-    const size = parseFloat(computed.fontSize);
-    return isNaN(size) ? DEFAULT_FONT_SIZE : size;
-}
-function setFontSize(size) {
-    const clamped = Math.min(Math.max(size, MIN_FONT_SIZE), MAX_FONT_SIZE);
-    document.documentElement.style.fontSize = clamped + 'px';
-    updateFontLabel(clamped);
-}
-function updateFontLabel(size) {
-    const label = document.getElementById('fontSizeLabel');
-    if (label) {
-        const percent = Math.round((size / 18) * 100);
-        label.textContent = percent + '%';
-    }
-}
-function changeFontSize(delta) {
-    const current = getCurrentFontSize();
-    setFontSize(current + delta);
-}
+        function escapeAttr(text) {
+            return text.replace(/"/g, '&quot;').replace(/&/g, '&amp;');
+        }
 
-// ============================================================
-//  全部展開 / 全部收回
-// ============================================================
-let allExpanded = false;
-function toggleAll() {
-    allExpanded = !allExpanded;
-    const bodies = document.querySelectorAll('.dynasty-body');
-    const toggles = document.querySelectorAll('.dynasty-toggle');
-    const btn = document.getElementById('toggleAllBtn');
-    if (allExpanded) {
-        bodies.forEach(b => b.classList.add('open'));
-        toggles.forEach(t => t.classList.add('open'));
-        btn.classList.add('all-open');
-    } else {
-        bodies.forEach(b => b.classList.remove('open'));
-        toggles.forEach(t => t.classList.remove('open'));
-        btn.classList.remove('all-open');
-    }
-}
+        // ============================================================
+        //  點擊事件 → 複製 + Google 搜尋
+        // ============================================================
+        function searchEvent(el) {
+            const text = el.getAttribute('data-event-text');
+            if (!text || text.trim() === '' || text === '—') return;
 
-// ============================================================
-//  渲染引擎
-// ============================================================
-const container = document.getElementById('timelineContainer');
-const searchInput = document.getElementById('searchInput');
-const clearBtn = document.getElementById('clearBtn');
-const statsCount = document.getElementById('statsCount');
+            // 視覺反饋
+            el.classList.remove('flash');
+            void el.offsetWidth; // 觸發 reflow
+            el.classList.add('flash');
 
-function render(term) {
-    const search = (term || '').trim().toLowerCase();
-    let totalMatch = 0, totalEmperor = 0;
+            // 複製到剪貼簿
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).catch(() => {});
+            }
 
-    const filteredDynasties = DATA.map(dynasty => {
-        const dynastyNameMatch = dynasty.name.includes(search);
-        const matchedEmperors = dynasty.emperors.map(emp => {
-            const texts = [
-                dynasty.name, emp.name, emp.era,
-                String(emp.yearStart), String(emp.yearEnd),
-                emp.chinaEvent || '', emp.worldEvent || ''
-            ];
-            const fullText = texts.join(' ').toLowerCase();
-            const match = !search || fullText.includes(search) || dynastyNameMatch;
-            return { ...emp, match };
-        });
-        const hasMatch = matchedEmperors.some(e => e.match) || dynastyNameMatch;
-        return { ...dynasty, emperors: matchedEmperors, hasMatch, dynastyNameMatch };
-    });
+            // 顯示 Toast
+            showToast('📋 已複製，開啟搜尋…');
 
-    let totalRows = 0, matchRows = 0;
-    filteredDynasties.forEach(d => d.emperors.forEach(e => { totalRows++; if (e.match) matchRows++; }));
-    totalEmperor = totalRows; totalMatch = matchRows;
+            // 開啟 Google 搜尋（新分頁）
+            const url = 'https://www.google.com/search?q=' + encodeURIComponent(text);
+            window.open(url, '_blank');
+        }
 
-    if (search) statsCount.textContent = `找到 ${totalMatch} 筆 / 共 ${totalEmperor} 位皇帝`;
-    else statsCount.textContent = `共 ${totalEmperor} 位皇帝 · ${DATA.length} 個朝代`;
+        // ============================================================
+        //  Toast 訊息
+        // ============================================================
+        let toastTimer = null;
 
-    let html = '';
-    if (totalRows === 0 && search) {
-        html = `<div class="empty-state"><div class="icon">📜</div><p>沒有找到與「<strong style="color:rgba(252,251,250,0.5);">${term}</strong>」相關的內容</p><p style="font-size:0.8rem;margin-top:6px;opacity:0.5;">試試其他關鍵字</p></div>`;
-        container.innerHTML = html;
-        return;
-    }
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const msgEl = document.getElementById('toastMsg');
+            msgEl.textContent = msg;
+            toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
 
-    filteredDynasties.forEach((dynasty, di) => {
-        const shouldOpen = !search || dynasty.hasMatch;
-        const dynastyOpenClass = shouldOpen ? 'open' : '';
-        const toggleOpenClass = shouldOpen ? 'open' : '';
-        const highlightClass = dynasty.hasMatch && search ? 'highlight' : '';
+        // ============================================================
+        //  字級控制
+        // ============================================================
+        const MIN_FONT_SIZE = 12,
+            MAX_FONT_SIZE = 38,
+            STEP = 1,
+            DEFAULT_FONT_SIZE = 28.8;
 
-        html += `<div class="dynasty ${highlightClass}" data-dynasty-id="${dynasty.id}">
-            <div class="dynasty-header" data-toggle>
-                <span class="dynasty-name">
-                    ${dynasty.name}
-                    <span class="years">${dynasty.start} ~ ${dynasty.end}</span>
-                    <span class="badge">${dynasty.emperors.length} 帝</span>
-                </span>
-                <span class="dynasty-toggle ${toggleOpenClass}" aria-hidden="true">▾</span>
-            </div>
-            <div class="dynasty-body ${dynastyOpenClass}">
-                <div class="emperor-grid">`;
+        function getCurrentFontSize() {
+            const html = document.documentElement;
+            const computed = window.getComputedStyle(html);
+            const size = parseFloat(computed.fontSize);
+            return isNaN(size) ? DEFAULT_FONT_SIZE : size;
+        }
 
-        dynasty.emperors.forEach((emp, ei) => {
-            const isCross = isCrossYear(emp.chinaEvent) || isCrossYear(emp.worldEvent);
-            const matchClass = emp.match ? 'match' : '';
-            const crossClass = isCross ? 'cross-year' : '';
+        function setFontSize(size) {
+            const clamped = Math.min(Math.max(size, MIN_FONT_SIZE), MAX_FONT_SIZE);
+            document.documentElement.style.fontSize = clamped + 'px';
+            updateFontLabel(clamped);
+        }
 
-            const highlightText = (text) => {
-                if (!text || !search) return text || '';
-                const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const regex = new RegExp(`(${escaped})`, 'gi');
-                return text.replace(regex, '<span class="search-match">$1</span>');
-            };
+        function updateFontLabel(size) {
+            const label = document.getElementById('fontSizeLabel');
+            if (label) {
+                const percent = Math.round((size / 18) * 100);
+                label.textContent = percent + '%';
+            }
+        }
 
-            const chinaEvents = splitEvents(emp.chinaEvent);
-            let chinaHtml = '';
-            if (chinaEvents.length === 0) chinaHtml = '—';
-            else chinaEvents.forEach((event) => {
-                const hasYear = /\(\d{3,4}~\d{3,4}\)/.test(event) || /\(\d{3,4}\)/.test(event);
-                const crossTag = hasYear ? '<span class="cross-tag">跨年</span>' : '';
-                chinaHtml += `<span class="event-item"><span class="bullet">•</span>${crossTag}${highlightText(event)}</span>`;
+        function changeFontSize(delta) {
+            const current = getCurrentFontSize();
+            setFontSize(current + delta);
+        }
+
+        // ============================================================
+        //  全部展開 / 全部收回
+        // ============================================================
+        let allExpanded = false;
+
+        function toggleAll() {
+            allExpanded = !allExpanded;
+            const bodies = document.querySelectorAll('.dynasty-body');
+            const toggles = document.querySelectorAll('.dynasty-toggle');
+            const btn = document.getElementById('toggleAllBtn');
+            if (allExpanded) {
+                bodies.forEach(b => b.classList.add('open'));
+                toggles.forEach(t => t.classList.add('open'));
+                btn.classList.add('all-open');
+            } else {
+                bodies.forEach(b => b.classList.remove('open'));
+                toggles.forEach(t => t.classList.remove('open'));
+                btn.classList.remove('all-open');
+            }
+        }
+
+        // ============================================================
+        //  渲染引擎
+        // ============================================================
+        const container = document.getElementById('timelineContainer');
+        const searchInput = document.getElementById('searchInput');
+        const clearBtn = document.getElementById('clearBtn');
+        const statsCount = document.getElementById('statsCount');
+
+        function render(term) {
+            const search = (term || '').trim().toLowerCase();
+            let totalMatch = 0,
+                totalEmperor = 0;
+
+            const filteredDynasties = DATA.map(dynasty => {
+                const dynastyNameMatch = dynasty.name.includes(search);
+                const matchedEmperors = dynasty.emperors.map(emp => {
+                    const texts = [
+                        dynasty.name, emp.name, emp.era,
+                        String(emp.yearStart), String(emp.yearEnd),
+                        emp.chinaEvent || '', emp.worldEvent || ''
+                    ];
+                    const fullText = texts.join(' ').toLowerCase();
+                    const match = !search || fullText.includes(search) || dynastyNameMatch;
+                    return { ...emp, match };
+                });
+                const hasMatch = matchedEmperors.some(e => e.match) || dynastyNameMatch;
+                return { ...dynasty, emperors: matchedEmperors, hasMatch, dynastyNameMatch };
             });
 
-            const worldEvents = splitEvents(emp.worldEvent);
-            let worldHtml = '';
-            if (worldEvents.length === 0) worldHtml = '—';
-            else worldEvents.forEach((event) => {
-                worldHtml += `<span class="event-item"><span class="bullet">•</span>${highlightText(event)}</span>`;
+            let totalRows = 0,
+                matchRows = 0;
+            filteredDynasties.forEach(d => d.emperors.forEach(e => { totalRows++;
+                    if (e.match) matchRows++; }));
+            totalEmperor = totalRows;
+            totalMatch = matchRows;
+
+            if (search) statsCount.textContent = `找到 ${totalMatch} 筆 / 共 ${totalEmperor} 位皇帝`;
+            else statsCount.textContent = `共 ${totalEmperor} 位皇帝 · ${DATA.length} 個朝代`;
+
+            let html = '';
+            if (totalRows === 0 && search) {
+                html =
+                    `<div class="empty-state"><div class="icon">📜</div><p>沒有找到與「<strong style="color:rgba(252,251,250,0.5);">${term}</strong>」相關的內容</p><p style="font-size:0.8rem;margin-top:6px;opacity:0.5;">試試其他關鍵字</p></div>`;
+                container.innerHTML = html;
+                return;
+            }
+
+            filteredDynasties.forEach((dynasty, di) => {
+                const shouldOpen = !search || dynasty.hasMatch;
+                const dynastyOpenClass = shouldOpen ? 'open' : '';
+                const toggleOpenClass = shouldOpen ? 'open' : '';
+                const highlightClass = dynasty.hasMatch && search ? 'highlight' : '';
+
+                html += `<div class="dynasty ${highlightClass}" data-dynasty-id="${dynasty.id}">
+                    <div class="dynasty-header" data-toggle>
+                        <span class="dynasty-name">
+                            ${dynasty.name}
+                            <span class="years">${dynasty.start} ~ ${dynasty.end}</span>
+                            <span class="badge">${dynasty.emperors.length} 帝</span>
+                        </span>
+                        <span class="dynasty-toggle ${toggleOpenClass}" aria-hidden="true">▾</span>
+                    </div>
+                    <div class="dynasty-body ${dynastyOpenClass}">
+                        <div class="emperor-grid">`;
+
+                dynasty.emperors.forEach((emp, ei) => {
+                    const isCross = isCrossYear(emp.chinaEvent) || isCrossYear(emp.worldEvent);
+                    const matchClass = emp.match ? 'match' : '';
+                    const crossClass = isCross ? 'cross-year' : '';
+
+                    const highlightText = (text) => {
+                        if (!text || !search) return text || '';
+                        const escaped = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                        const regex = new RegExp(`(${escaped})`, 'gi');
+                        return text.replace(regex, '<span class="search-match">$1</span>');
+                    };
+
+                    // === 中國事件 ===
+                    const chinaEvents = splitEvents(emp.chinaEvent);
+                    let chinaHtml = '';
+                    if (chinaEvents.length === 0) {
+                        chinaHtml = '<span class="no-event">—</span>';
+                    } else {
+                        chinaEvents.forEach((event) => {
+                            const hasYear = /\(\d{3,4}~\d{3,4}\)/.test(event) || /\(\d{3,4}\)/.test(
+                            event);
+                            const crossTag = hasYear ? '<span class="cross-tag">跨年</span>' : '';
+                            const highlighted = highlightText(event);
+                            const eventText = event.replace(/"/g, '&quot;');
+                            chinaHtml +=
+                                `<span class="event-item" data-event-text="${eventText}" onclick="searchEvent(this)"><span class="bullet">•</span>${crossTag}${highlighted}</span>`;
+                        });
+                    }
+
+                    // === 西洋事件 ===
+                    const worldEvents = splitEvents(emp.worldEvent);
+                    let worldHtml = '';
+                    if (worldEvents.length === 0) {
+                        worldHtml = '<span class="no-event">—</span>';
+                    } else {
+                        worldEvents.forEach((event) => {
+                            const highlighted = highlightText(event);
+                            const eventText = event.replace(/"/g, '&quot;');
+                            worldHtml +=
+                                `<span class="event-item" data-event-text="${eventText}" onclick="searchEvent(this)"><span class="bullet">•</span>${highlighted}</span>`;
+                        });
+                    }
+
+                    const emperorDisplay = `
+                        <span class="emp-era">
+                            <span class="emp-name">${emp.name}</span>·
+                            <span class="era-name">${emp.era}</span>
+                        </span>
+                        <span class="year-range">（${emp.yearStart}~${emp.yearEnd}）</span>
+                    `;
+
+                    html += `<div class="emperor-row ${matchClass} ${crossClass}">
+                        <div class="col-emperor">${emperorDisplay}</div>
+                        <div class="col-china">${chinaHtml}</div>
+                        <div class="col-world">${worldHtml}</div>
+                    </div>`;
+                });
+
+                html += `</div></div></div>`;
             });
 
-            const emperorDisplay = `
-                <span class="emp-era">
-                    <span class="emp-name">${emp.name}</span>·
-                    <span class="era-name">${emp.era}</span>
-                </span>
-                <span class="year-range">（${emp.yearStart}~${emp.yearEnd}）</span>
-            `;
+            container.innerHTML = html;
 
-            html += `<div class="emperor-row ${matchClass} ${crossClass}">
-                <div class="col-emperor">${emperorDisplay}</div>
-                <div class="col-china">${chinaHtml}</div>
-                <div class="col-world">${worldHtml}</div>
-            </div>`;
+            if (search) {
+                document.querySelectorAll('.dynasty').forEach(el => {
+                    const body = el.querySelector('.dynasty-body');
+                    const toggle = el.querySelector('.dynasty-toggle');
+                    const hasMatch = el.querySelector('.emperor-row.match') !== null;
+                    if (hasMatch) { body.classList.add('open'); if (toggle) toggle.classList.add('open'); } else { body
+                            .classList.remove('open'); if (toggle) toggle.classList.remove('open'); }
+                });
+                allExpanded = false;
+                document.getElementById('toggleAllBtn').classList.remove('all-open');
+            }
+
+            document.querySelectorAll('.dynasty-header[data-toggle]').forEach(header => {
+                header.removeEventListener('click', toggleDynasty);
+                header.addEventListener('click', toggleDynasty);
+            });
+        }
+
+        // ============================================================
+        //  展開/收回
+        // ============================================================
+        function toggleDynasty(e) {
+            const header = e.currentTarget;
+            const dynasty = header.closest('.dynasty');
+            if (!dynasty) return;
+            const body = dynasty.querySelector('.dynasty-body');
+            const toggle = dynasty.querySelector('.dynasty-toggle');
+            if (!body) return;
+            const isOpen = body.classList.contains('open');
+            if (isOpen) { body.classList.remove('open'); if (toggle) toggle.classList.remove('open'); } else { body.classList
+                    .add('open'); if (toggle) toggle.classList.add('open'); }
+            updateAllToggleState();
+        }
+
+        function updateAllToggleState() {
+            const bodies = document.querySelectorAll('.dynasty-body');
+            const allOpen = bodies.length > 0 && Array.from(bodies).every(b => b.classList.contains('open'));
+            const btn = document.getElementById('toggleAllBtn');
+            if (allOpen) { btn.classList.add('all-open');
+                allExpanded = true; } else { btn.classList.remove('all-open');
+                allExpanded = false; }
+        }
+
+        // ============================================================
+        //  搜尋邏輯
+        // ============================================================
+        function doSearch() {
+            const term = searchInput.value;
+            if (term.trim()) clearBtn.classList.add('visible');
+            else clearBtn.classList.remove('visible');
+            render(term);
+        }
+        searchInput.addEventListener('input', doSearch);
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearBtn.classList.remove('visible');
+            render('');
+            searchInput.focus();
         });
 
-        html += `</div></div></div>`;
-    });
+        // ============================================================
+        //  初始化
+        // ============================================================
+        document.documentElement.style.fontSize = DEFAULT_FONT_SIZE + 'px';
+        render('');
 
-    container.innerHTML = html;
+        document.getElementById('fontIncBtn').addEventListener('click', () => changeFontSize(STEP));
+        document.getElementById('fontDecBtn').addEventListener('click', () => changeFontSize(-STEP));
+        document.getElementById('toggleAllBtn').addEventListener('click', toggleAll);
+        updateFontLabel(getCurrentFontSize());
 
-    if (search) {
-        document.querySelectorAll('.dynasty').forEach(el => {
-            const body = el.querySelector('.dynasty-body');
-            const toggle = el.querySelector('.dynasty-toggle');
-            const hasMatch = el.querySelector('.emperor-row.match') !== null;
-            if (hasMatch) { body.classList.add('open'); if (toggle) toggle.classList.add('open'); }
-            else { body.classList.remove('open'); if (toggle) toggle.classList.remove('open'); }
+        document.addEventListener('touchstart', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.closest('.search-wrap') === null) {
+                searchInput.blur();
+            }
         });
-        allExpanded = false;
-        document.getElementById('toggleAllBtn').classList.remove('all-open');
-    }
-
-    document.querySelectorAll('.dynasty-header[data-toggle]').forEach(header => {
-        header.removeEventListener('click', toggleDynasty);
-        header.addEventListener('click', toggleDynasty);
-    });
-}
-
-// ============================================================
-//  展開/收回
-// ============================================================
-function toggleDynasty(e) {
-    const header = e.currentTarget;
-    const dynasty = header.closest('.dynasty');
-    if (!dynasty) return;
-    const body = dynasty.querySelector('.dynasty-body');
-    const toggle = dynasty.querySelector('.dynasty-toggle');
-    if (!body) return;
-    const isOpen = body.classList.contains('open');
-    if (isOpen) { body.classList.remove('open'); if (toggle) toggle.classList.remove('open'); }
-    else { body.classList.add('open'); if (toggle) toggle.classList.add('open'); }
-    updateAllToggleState();
-}
-
-function updateAllToggleState() {
-    const bodies = document.querySelectorAll('.dynasty-body');
-    const allOpen = bodies.length > 0 && Array.from(bodies).every(b => b.classList.contains('open'));
-    const btn = document.getElementById('toggleAllBtn');
-    if (allOpen) { btn.classList.add('all-open'); allExpanded = true; }
-    else { btn.classList.remove('all-open'); allExpanded = false; }
-}
-
-// ============================================================
-//  搜尋邏輯
-// ============================================================
-function doSearch() {
-    const term = searchInput.value;
-    if (term.trim()) clearBtn.classList.add('visible');
-    else clearBtn.classList.remove('visible');
-    render(term);
-}
-searchInput.addEventListener('input', doSearch);
-clearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    clearBtn.classList.remove('visible');
-    render('');
-    searchInput.focus();
-});
-
-// ============================================================
-//  初始化
-// ============================================================
-document.documentElement.style.fontSize = DEFAULT_FONT_SIZE + 'px';
-render('');
-
-document.getElementById('fontIncBtn').addEventListener('click', () => changeFontSize(STEP));
-document.getElementById('fontDecBtn').addEventListener('click', () => changeFontSize(-STEP));
-document.getElementById('toggleAllBtn').addEventListener('click', toggleAll);
-updateFontLabel(getCurrentFontSize());
-
-document.addEventListener('touchstart', (e) => {
-    if (e.target.tagName !== 'INPUT' && e.target.closest('.search-wrap') === null) {
-        searchInput.blur();
-    }
-});
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.activeElement === searchInput) {
-        clearBtn.click();
-    }
-});
-console.log('📜 歷史年表已載入 — 以事件起始年代決定放置位置。');
-</script>
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.activeElement === searchInput) {
+                clearBtn.click();
+            }
+        });
+        console.log('📜 歷史年表已載入 — 點擊事件自動複製並 Google 搜尋。');
+    </script>
 
 </body>
 </html>
