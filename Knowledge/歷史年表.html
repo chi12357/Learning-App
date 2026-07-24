@@ -56,11 +56,19 @@
         .emperor-row:hover { background: rgba(252, 251, 250, 0.04); }
         .emperor-row.match { background: rgba(189, 139, 42, 0.08); border-left-color: #bd8b2a; }
         .emperor-row.cross-year { border-left-color: #942525; background: rgba(148, 37, 37, 0.06); }
-        .col-emperor { font-weight: 600; font-size: 1.425rem; color: #fcfbfa; letter-spacing: 0.5px; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding-top: 4px; line-height: 1.3; }
-        .col-emperor .emp-era { font-weight: 700; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 6px; }
+        .emperor-row.editing { background: rgba(189, 139, 42, 0.06); border-left-color: #bd8b2a; border-left-width: 4px; }
+
+        /* 皇帝欄位：增加「改」按鈕 */
+        .col-emperor { font-weight: 600; font-size: 1.425rem; color: #fcfbfa; letter-spacing: 0.5px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding-top: 4px; line-height: 1.3; width: 100%; }
+        .col-emperor .emp-era { font-weight: 700; display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 6px; width: 100%; }
         .col-emperor .emp-name { font-weight: 700; }
         .col-emperor .era-name { font-weight: 700; }
-        .col-emperor .year-range { font-weight: 400; color: rgba(252, 251, 250, 0.45); font-family: 'Inter', sans-serif; letter-spacing: 0.3px; font-size: 0.85rem; display: block; }
+        .col-emperor .year-range { font-weight: 400; color: rgba(252, 251, 250, 0.45); font-family: 'Inter', sans-serif; letter-spacing: 0.3px; font-size: 0.85rem; display: inline; margin-right: 8px; }
+        .col-emperor .edit-row-btn { font-size: 0.6rem; background: none; border: 1px solid rgba(189, 139, 42, 0.3); color: #bd8b2a; border-radius: 12px; padding: 0 8px; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s; line-height: 1.6; display: inline-block; vertical-align: middle; }
+        .col-emperor .edit-row-btn:hover { background: rgba(189, 139, 42, 0.15); }
+        .col-emperor .edit-row-btn.active { background: #bd8b2a; color: #121315; border-color: #bd8b2a; }
+        .col-emperor .edit-row-btn.active:hover { background: #d4a83a; }
+
         .col-china { font-size: 0.9rem; color: #fcfbfa; line-height: 1.6; }
         .col-world { font-size: 0.85rem; color: rgba(252, 251, 250, 0.7); line-height: 1.6; }
         .col-china .event-item, .col-world .event-item { display: block; padding: 2px 0; cursor: pointer; border-radius: 4px; transition: background 0.15s ease; -webkit-tap-highlight-color: transparent; user-select: none; }
@@ -86,23 +94,23 @@
         .error-state .retry-btn { margin-top: 16px; padding: 10px 28px; border-radius: 40px; border: 1px solid rgba(189, 139, 42, 0.3); background: rgba(189, 139, 42, 0.1); color: #fcfbfa; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; }
         .error-state .retry-btn:hover { background: rgba(189, 139, 42, 0.2); }
 
-        /* 編輯模式專用樣式 */
-        .edit-btn { background: rgba(189, 139, 42, 0.15); border: 1px solid #bd8b2a; color: #fcfbfa; padding: 6px 16px; border-radius: 30px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; }
-        .edit-btn:hover { background: rgba(189, 139, 42, 0.25); }
-        .edit-btn.active { background: #bd8b2a; color: #121315; }
-        .edit-btn.active:hover { background: #d4a83a; }
-
-        .event-edit { display: flex; align-items: center; gap: 6px; margin: 2px 0; flex-wrap: wrap; }
-        .event-edit input[type="text"] { flex: 1; min-width: 120px; background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.2); border-radius: 6px; color: #fcfbfa; padding: 4px 8px; font-size: 0.85rem; font-family: 'Noto Serif TC', serif; outline: none; transition: border-color 0.2s; }
+        /* 編輯模式專用樣式（僅在該行內生效） */
+        .event-edit { display: flex; align-items: center; gap: 4px; margin: 2px 0; flex-wrap: wrap; }
+        .event-edit input[type="text"] { flex: 1; min-width: 100px; background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.2); border-radius: 6px; color: #fcfbfa; padding: 2px 6px; font-size: 0.85rem; font-family: 'Noto Serif TC', serif; outline: none; transition: border-color 0.2s; }
         .event-edit input[type="text"]:focus { border-color: #bd8b2a; }
-        .event-edit .btn-sm { background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.15); border-radius: 4px; color: #fcfbfa; padding: 2px 8px; font-size: 0.6rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; line-height: 1.8; }
+        .event-edit .btn-sm { background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.15); border-radius: 4px; color: #fcfbfa; padding: 0 6px; font-size: 0.55rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; line-height: 1.8; white-space: nowrap; }
         .event-edit .btn-sm:hover { background: rgba(252, 251, 250, 0.16); }
         .event-edit .btn-sm.danger:hover { background: rgba(148, 37, 37, 0.3); border-color: #942525; }
         .event-edit .btn-sm.insert:hover { background: rgba(189, 139, 42, 0.2); border-color: #bd8b2a; }
-        .add-event-btn { margin: 4px 0; padding: 4px 12px; border-radius: 20px; border: 1px dashed rgba(252, 251, 250, 0.2); background: transparent; color: rgba(252, 251, 250, 0.4); font-size: 0.7rem; cursor: pointer; transition: background 0.2s, color 0.2s; font-family: 'Inter', sans-serif; }
+        .add-event-btn { margin: 4px 0; padding: 2px 10px; border-radius: 20px; border: 1px dashed rgba(252, 251, 250, 0.2); background: transparent; color: rgba(252, 251, 250, 0.4); font-size: 0.65rem; cursor: pointer; transition: background 0.2s, color 0.2s; font-family: 'Inter', sans-serif; display: inline-block; }
         .add-event-btn:hover { background: rgba(189, 139, 42, 0.1); color: #fcfbfa; border-color: rgba(189, 139, 42, 0.3); }
+        .row-edit-actions { display: flex; gap: 8px; margin: 4px 0 8px 0; flex-wrap: wrap; }
+        .row-edit-actions .btn-primary { background: rgba(189, 139, 42, 0.2); border: 1px solid #bd8b2a; color: #fcfbfa; padding: 2px 14px; border-radius: 16px; font-size: 0.7rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; }
+        .row-edit-actions .btn-primary:hover { background: rgba(189, 139, 42, 0.4); }
+        .row-edit-actions .btn-secondary { background: rgba(252, 251, 250, 0.05); border: 1px solid rgba(252, 251, 250, 0.15); color: rgba(252, 251, 250, 0.6); padding: 2px 14px; border-radius: 16px; font-size: 0.7rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; }
+        .row-edit-actions .btn-secondary:hover { background: rgba(252, 251, 250, 0.1); }
 
-        @media (max-width: 767px) { html { font-size: 25.6px; } body { padding: 8px 6px 24px; } .app-header h1 { font-size: 1.4rem; letter-spacing: 2px; } .app-header h1 small { font-size: 0.5rem; letter-spacing: 3px; } .sticky-toolbar { padding: 6px 0 4px; margin-bottom: 10px; } .toolbar { gap: 6px; } .search-wrap { min-width: 100px; flex: 1 1 100%; order: 1; } .search-wrap input { font-size: 0.85rem; padding: 8px 12px 8px 36px; } .search-wrap .search-icon { font-size: 0.9rem; left: 10px; } .search-wrap .clear-btn { font-size: 0.9rem; right: 8px; } .controls-group { order: 2; width: 100%; justify-content: flex-end; gap: 4px; } .controls-group .toggle-all-btn { width: 34px; height: 34px; font-size: 1.2rem; } .controls-group .divider { height: 22px; } .font-controls button { width: 34px; height: 34px; font-size: 1rem; } .font-controls .font-size-label { font-size: 0.55rem; min-width: 24px; } .stats { font-size: 0.65rem; padding: 0 2px 8px; margin-bottom: 10px; } .stats .hint { font-size: 0.6rem; } .dynasty-header { padding: 10px 12px; min-height: 48px; } .dynasty-name { font-size: 2.0rem; } .dynasty-name .years { font-size: 1.2rem; } .dynasty-name .badge { font-size: 0.9rem; } .dynasty-toggle { width: 32px; height: 32px; font-size: 1.3rem; } .emperor-row { grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 8px 10px; border-radius: 6px; min-height: 56px; grid-template-rows: auto auto auto; align-items: start; } .col-emperor { font-size: 1.2rem; grid-column: 1 / 3; grid-row: 1 / 2; padding-top: 2px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; } .col-emperor .emp-era { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; } .col-emperor .year-range { font-size: 0.75rem; display: inline; } .col-china { font-size: 0.78rem; grid-column: 1 / 3; grid-row: 2 / 3; padding-top: 4px; border-top: 1px solid rgba(252, 251, 250, 0.05); } .col-world { font-size: 0.72rem; grid-column: 1 / 3; grid-row: 3 / 4; color: rgba(252, 251, 250, 0.5); padding-top: 4px; border-top: none; display: block; } .col-china .cross-tag { font-size: 0.5rem; padding: 0 4px; } .toast { font-size: 0.7rem; padding: 8px 16px; bottom: 20px; } .event-edit input[type="text"] { font-size: 0.75rem; min-width: 80px; } .event-edit .btn-sm { font-size: 0.5rem; padding: 1px 6px; } }
+        @media (max-width: 767px) { html { font-size: 25.6px; } body { padding: 8px 6px 24px; } .app-header h1 { font-size: 1.4rem; letter-spacing: 2px; } .app-header h1 small { font-size: 0.5rem; letter-spacing: 3px; } .sticky-toolbar { padding: 6px 0 4px; margin-bottom: 10px; } .toolbar { gap: 6px; } .search-wrap { min-width: 100px; flex: 1 1 100%; order: 1; } .search-wrap input { font-size: 0.85rem; padding: 8px 12px 8px 36px; } .search-wrap .search-icon { font-size: 0.9rem; left: 10px; } .search-wrap .clear-btn { font-size: 0.9rem; right: 8px; } .controls-group { order: 2; width: 100%; justify-content: flex-end; gap: 4px; } .controls-group .toggle-all-btn { width: 34px; height: 34px; font-size: 1.2rem; } .controls-group .divider { height: 22px; } .font-controls button { width: 34px; height: 34px; font-size: 1rem; } .font-controls .font-size-label { font-size: 0.55rem; min-width: 24px; } .stats { font-size: 0.65rem; padding: 0 2px 8px; margin-bottom: 10px; } .stats .hint { font-size: 0.6rem; } .dynasty-header { padding: 10px 12px; min-height: 48px; } .dynasty-name { font-size: 2.0rem; } .dynasty-name .years { font-size: 1.2rem; } .dynasty-name .badge { font-size: 0.9rem; } .dynasty-toggle { width: 32px; height: 32px; font-size: 1.3rem; } .emperor-row { grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 8px 10px; border-radius: 6px; min-height: 56px; grid-template-rows: auto auto auto; align-items: start; } .col-emperor { font-size: 1.2rem; grid-column: 1 / 3; grid-row: 1 / 2; padding-top: 2px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; } .col-emperor .emp-era { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; width: auto; } .col-emperor .year-range { font-size: 0.75rem; display: inline; } .col-emperor .edit-row-btn { font-size: 0.5rem; } .col-china { font-size: 0.78rem; grid-column: 1 / 3; grid-row: 2 / 3; padding-top: 4px; border-top: 1px solid rgba(252, 251, 250, 0.05); } .col-world { font-size: 0.72rem; grid-column: 1 / 3; grid-row: 3 / 4; color: rgba(252, 251, 250, 0.5); padding-top: 4px; border-top: none; display: block; } .col-china .cross-tag { font-size: 0.5rem; padding: 0 4px; } .toast { font-size: 0.7rem; padding: 8px 16px; bottom: 20px; } .event-edit input[type="text"] { font-size: 0.75rem; min-width: 60px; } .event-edit .btn-sm { font-size: 0.45rem; padding: 0 4px; } }
         @media (max-width: 419px) { html { font-size: 22.4px; } body { padding: 4px 4px 16px; } .dynasty-name { font-size: 1.6rem; } .dynasty-name .years { font-size: 1.0rem; } .dynasty-name .badge { font-size: 0.75rem; } .emperor-row { padding: 6px 8px; gap: 2px 4px; } .col-emperor { font-size: 1.0rem; } .col-emperor .year-range { font-size: 0.6rem; } .col-china { font-size: 0.7rem; } .col-world { font-size: 0.65rem; } .dynasty-header { padding: 8px 10px; min-height: 40px; } .controls-group .toggle-all-btn { width: 30px; height: 30px; font-size: 1.0rem; } .font-controls button { width: 30px; height: 30px; font-size: 0.85rem; } .search-wrap input { font-size: 0.75rem; padding: 6px 10px 6px 30px; } .search-wrap .search-icon { font-size: 0.75rem; left: 8px; } .toast { font-size: 0.6rem; padding: 6px 12px; bottom: 16px; } }
         @media (min-width: 768px) { .emperor-row { grid-template-columns: 1.2fr 1.2fr 1.2fr 1.2fr; gap: 10px 14px; padding: 10px 18px; } .col-emperor { font-size: 1.5rem; } .col-emperor .year-range { font-size: 0.9rem; } .col-china { font-size: 0.95rem; } .col-world { font-size: 0.9rem; } .dynasty-header { padding: 16px 22px; } .dynasty-body.open { padding: 0 8px 12px; } .emperor-row .col-world { display: block; } }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -127,8 +135,6 @@
                     <button class="clear-btn" id="clearBtn" aria-label="清除搜尋">✕</button>
                 </div>
                 <div class="controls-group">
-                    <!-- 編輯按鈕 -->
-                    <button class="edit-btn" id="editToggleBtn">✎ 編輯</button>
                     <button class="toggle-all-btn" id="toggleAllBtn" aria-label="全部展開或收回">▾</button>
                     <span class="divider"></span>
                     <div class="font-controls">
@@ -160,7 +166,8 @@
         //  全域狀態
         // ============================================================
         let DATA = [];
-        let isEditing = false;
+        let editStates = {}; // key: 'dynastyIdx-emperorIdx' => true/false
+        let backupData = null; // 用於取消編輯時還原
 
         // ============================================================
         //  工具函數
@@ -174,6 +181,10 @@
             if (!text) return '';
             return text.replace(/"/g, '&quot;').replace(/&/g, '&amp;');
         }
+
+        function getKey(dIdx, eIdx) { return `${dIdx}-${eIdx}`; }
+
+        function isEditing(dIdx, eIdx) { return editStates[getKey(dIdx, eIdx)] === true; }
 
         // ============================================================
         //  Toast 訊息
@@ -195,7 +206,8 @@
         //  點擊事件 → 複製 + Google 搜尋（僅在非編輯模式）
         // ============================================================
         function searchEvent(el) {
-            if (isEditing) return;
+            const row = el.closest('.emperor-row');
+            if (row && row.classList.contains('editing')) return;
             const text = el.getAttribute('data-event-text');
             if (!text || text.trim() === '' || text === '—') return;
             el.classList.remove('flash');
@@ -265,25 +277,50 @@
         }
 
         // ============================================================
-        //  編輯模式切換
+        //  編輯模式：開啟 / 關閉 / 儲存 / 取消
         // ============================================================
-        function toggleEditMode() {
-            isEditing = !isEditing;
-            const btn = document.getElementById('editToggleBtn');
-            const hint = document.getElementById('modeHint');
-            if (isEditing) {
-                btn.textContent = '✓ 完成編輯';
-                btn.classList.add('active');
-                hint.textContent = '編輯模式：點擊事件可修改 / 刪除 / 插入';
+        function toggleRowEdit(dIdx, eIdx) {
+            const key = getKey(dIdx, eIdx);
+            if (editStates[key]) {
+                // 如果已在編輯，關閉（等同於取消編輯）
+                cancelRowEdit(dIdx, eIdx);
             } else {
-                btn.textContent = '✎ 編輯';
-                btn.classList.remove('active');
-                hint.textContent = '點擊事件自動複製並 Google 搜尋';
-                // 退出編輯模式 → 下載 JSON
-                downloadJSON();
+                // 備份目前 DATA（用於取消時還原）
+                backupData = JSON.parse(JSON.stringify(DATA));
+                editStates[key] = true;
+                render(searchInput.value);
+                // 滾動到該行
+                setTimeout(() => {
+                    const rows = document.querySelectorAll('.emperor-row');
+                    const targetRow = rows.find(r => {
+                        const d = parseInt(r.dataset.dynastyIdx);
+                        const e = parseInt(r.dataset.emperorIdx);
+                        return d === dIdx && e === eIdx;
+                    });
+                    if (targetRow) targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
             }
-            // 重新渲染（顯示編輯界面或普通界面）
+        }
+
+        function cancelRowEdit(dIdx, eIdx) {
+            const key = getKey(dIdx, eIdx);
+            if (backupData) {
+                DATA = backupData;
+                backupData = null;
+            }
+            editStates[key] = false;
             render(searchInput.value);
+            showToast('↩️ 已取消編輯');
+        }
+
+        function saveRowEdit(dIdx, eIdx) {
+            const key = getKey(dIdx, eIdx);
+            // 資料已透過 updateEventValue / deleteEvent / insertEvent 即時更新
+            backupData = null; // 清除備份，接受變更
+            editStates[key] = false;
+            render(searchInput.value);
+            downloadJSON();
+            showToast('✅ 已儲存並下載 JSON');
         }
 
         // ============================================================
@@ -300,14 +337,11 @@
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            showToast('✅ JSON 已下載');
         }
 
         // ============================================================
         //  事件增刪改（編輯模式專用）
         // ============================================================
-        // 以下函數透過 data-* 屬性定位到具體的朝代索引、皇帝索引、事件類型及事件索引
-
         function getIndices(el) {
             const row = el.closest('.emperor-row');
             if (!row) return null;
@@ -322,13 +356,13 @@
             const idx = getIndices(el);
             if (!idx) return;
             const { dynIdx, empIdx } = idx;
-            const events = (type === 'china') ? DATA[dynIdx].emperors[empIdx].chinaEvents : DATA[dynIdx].emperors[empIdx]
-                .worldEvents;
-            // 找到事件索引：從 el 的 data-event-idx 取得
+            const emp = DATA[dynIdx].emperors[empIdx];
+            const events = (type === 'china') ? emp.chinaEvents : emp.worldEvents;
             const eventIdx = parseInt(el.dataset.eventIdx);
             if (isNaN(eventIdx)) return;
             events.splice(eventIdx, 1);
             render(searchInput.value);
+            // 保持編輯狀態
         }
 
         function insertEvent(el, type, position) {
@@ -342,7 +376,6 @@
             const insertIdx = (position === 'before') ? eventIdx : eventIdx + 1;
             events.splice(insertIdx, 0, '新事件（請編輯）');
             render(searchInput.value);
-            // 自動聚焦到新輸入框
             setTimeout(() => {
                 const inputs = document.querySelectorAll(`.event-edit[data-dynasty="${dynIdx}"][data-emperor="${empIdx}"][data-type="${type}"] input[type="text"]`);
                 if (inputs[insertIdx]) inputs[insertIdx].focus();
@@ -378,7 +411,7 @@
         }
 
         // ============================================================
-        //  渲染引擎（支援編輯模式）
+        //  渲染引擎（支援行內編輯）
         // ============================================================
         const container = document.getElementById('timelineContainer');
         const searchInput = document.getElementById('searchInput');
@@ -450,12 +483,17 @@
                         <div class="emperor-grid">`;
 
                 dynasty.emperors.forEach((emp, ei) => {
+                    const realDynIdx = emp._dynastyIdx !== undefined ? emp._dynastyIdx : di;
+                    const realEmpIdx = emp._emperorIdx !== undefined ? emp._emperorIdx : ei;
+                    const isEditingRow = isEditing(realDynIdx, realEmpIdx);
+
                     // 檢查是否有事件包含年份區間（跨年）
                     let hasCross = false;
                     const allEvents = (emp.chinaEvents || []).concat(emp.worldEvents || []);
                     allEvents.forEach(e => { if (isCrossYear(e)) hasCross = true; });
                     const crossClass = hasCross ? 'cross-year' : '';
                     const matchClass = emp.match ? 'match' : '';
+                    const editingClass = isEditingRow ? 'editing' : '';
 
                     const highlightText = (text) => {
                         if (!text || !search) return text || '';
@@ -464,15 +502,11 @@
                         return text.replace(regex, '<span class="search-match">$1</span>');
                     };
 
-                    // 取得實際索引（用於編輯操作）
-                    const realDynIdx = emp._dynastyIdx !== undefined ? emp._dynastyIdx : di;
-                    const realEmpIdx = emp._emperorIdx !== undefined ? emp._emperorIdx : ei;
-
                     // === 中國事件 ===
                     let chinaHtml = '';
                     const chinaEvents = emp.chinaEvents || [];
                     if (chinaEvents.length === 0) {
-                        if (isEditing) {
+                        if (isEditingRow) {
                             chinaHtml =
                                 `<div class="add-event-btn" onclick="addNewEvent(this, 'china')" data-dynasty="${realDynIdx}" data-emperor="${realEmpIdx}">＋ 新增中國事件</div>`;
                         } else {
@@ -480,8 +514,7 @@
                         }
                     } else {
                         chinaEvents.forEach((event, idx) => {
-                            if (isEditing) {
-                                // 編輯模式：顯示輸入框 + 操作按鈕
+                            if (isEditingRow) {
                                 const hasYear = isCrossYear(event);
                                 const crossTag = hasYear ? '<span class="cross-tag">跨年</span>' : '';
                                 chinaHtml += `
@@ -494,7 +527,6 @@
                                     </div>
                                 `;
                             } else {
-                                // 普通模式
                                 const hasYear = isCrossYear(event);
                                 const crossTag = hasYear ? '<span class="cross-tag">跨年</span>' : '';
                                 const highlighted = highlightText(event);
@@ -503,8 +535,7 @@
                                     `<span class="event-item" data-event-text="${eventText}" onclick="searchEvent(this)"><span class="bullet">•</span>${crossTag}${highlighted}</span>`;
                             }
                         });
-                        // 編輯模式下，在最後一個事件後顯示「新增事件」按鈕
-                        if (isEditing) {
+                        if (isEditingRow) {
                             chinaHtml +=
                                 `<div class="add-event-btn" onclick="addNewEvent(this, 'china')" data-dynasty="${realDynIdx}" data-emperor="${realEmpIdx}">＋ 新增中國事件</div>`;
                         }
@@ -514,7 +545,7 @@
                     let worldHtml = '';
                     const worldEvents = emp.worldEvents || [];
                     if (worldEvents.length === 0) {
-                        if (isEditing) {
+                        if (isEditingRow) {
                             worldHtml =
                                 `<div class="add-event-btn" onclick="addNewEvent(this, 'world')" data-dynasty="${realDynIdx}" data-emperor="${realEmpIdx}">＋ 新增西洋事件</div>`;
                         } else {
@@ -522,7 +553,7 @@
                         }
                     } else {
                         worldEvents.forEach((event, idx) => {
-                            if (isEditing) {
+                            if (isEditingRow) {
                                 worldHtml += `
                                     <div class="event-edit" data-dynasty="${realDynIdx}" data-emperor="${realEmpIdx}" data-type="world" data-event-idx="${idx}">
                                         <span class="bullet">•</span>
@@ -539,10 +570,24 @@
                                     `<span class="event-item" data-event-text="${eventText}" onclick="searchEvent(this)"><span class="bullet">•</span>${highlighted}</span>`;
                             }
                         });
-                        if (isEditing) {
+                        if (isEditingRow) {
                             worldHtml +=
                                 `<div class="add-event-btn" onclick="addNewEvent(this, 'world')" data-dynasty="${realDynIdx}" data-emperor="${realEmpIdx}">＋ 新增西洋事件</div>`;
                         }
+                    }
+
+                    // 皇帝欄位：加上「改」按鈕
+                    const editBtnText = isEditingRow ? '儲存' : '改';
+                    const editBtnClass = isEditingRow ? 'edit-row-btn active' : 'edit-row-btn';
+                    const editBtnAction = isEditingRow ?
+                        `saveRowEdit(${realDynIdx}, ${realEmpIdx})` :
+                        `toggleRowEdit(${realDynIdx}, ${realEmpIdx})`;
+
+                    // 如果是編輯模式，加入「取消」按鈕
+                    let cancelBtnHtml = '';
+                    if (isEditingRow) {
+                        cancelBtnHtml =
+                            `<button class="edit-row-btn" onclick="cancelRowEdit(${realDynIdx}, ${realEmpIdx})" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);">取消</button>`;
                     }
 
                     const emperorDisplay = `
@@ -551,10 +596,11 @@
                             <span class="era-name">${emp.era}</span>
                         </span>
                         <span class="year-range">（${emp.yearStart}~${emp.yearEnd}）</span>
+                        <button class="${editBtnClass}" onclick="${editBtnAction}">${editBtnText}</button>
+                        ${cancelBtnHtml}
                     `;
 
-                    // 為每個皇帝行加上 data 屬性，以便編輯功能定位
-                    html += `<div class="emperor-row ${matchClass} ${crossClass}" data-dynasty-idx="${realDynIdx}" data-emperor-idx="${realEmpIdx}">
+                    html += `<div class="emperor-row ${matchClass} ${crossClass} ${editingClass}" data-dynasty-idx="${realDynIdx}" data-emperor-idx="${realEmpIdx}">
                         <div class="col-emperor">${emperorDisplay}</div>
                         <div class="col-china">${chinaHtml}</div>
                         <div class="col-world">${worldHtml}</div>
@@ -669,7 +715,6 @@
         document.getElementById('fontIncBtn').addEventListener('click', () => changeFontSize(STEP));
         document.getElementById('fontDecBtn').addEventListener('click', () => changeFontSize(-STEP));
         document.getElementById('toggleAllBtn').addEventListener('click', toggleAll);
-        document.getElementById('editToggleBtn').addEventListener('click', toggleEditMode);
 
         document.addEventListener('touchstart', (e) => {
             if (e.target.tagName !== 'INPUT' && e.target.closest('.search-wrap') === null) {
@@ -684,7 +729,7 @@
 
         // 開始載入資料
         loadData();
-        console.log('📜 歷史年表主程式已載入，編輯模式已啟用。');
+        console.log('📜 歷史年表已載入，每行皇帝都有專屬「改」按鈕。');
     </script>
 
 </body>
