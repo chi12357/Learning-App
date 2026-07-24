@@ -1,0 +1,205 @@
+[
+{"id":"ancient","name":"上古文明","start":-3500,"end":-2070,"emperors":[
+{"name":"蘇美爾","era":"城邦時代","yearStart":-3500,"yearEnd":-2372,"chinaEvents":["傳說時代 · 三皇五帝"],"worldEvents":["蘇美爾人在兩河流域建立烏魯克等城邦 (約前3500)","蘇美爾人發明楔形文字 (約前3200)","古埃及古王國時期 (約前2686~前2181)","古埃及金字塔建造 (約前2560)"]},
+{"name":"阿卡德","era":"薩爾貢","yearStart":-2371,"yearEnd":-2190,"chinaEvents":["傳說時代 · 黃帝、炎帝、堯舜"],"worldEvents":["薩爾貢統一兩河流域 · 建立阿卡德帝國 (前2371)","人類歷史上第一個帝國"]},
+{"name":"烏爾第三王朝","era":"烏爾納姆","yearStart":-2112,"yearEnd":-2004,"chinaEvents":["傳說時代 · 夏朝建立前夕"],"worldEvents":["烏爾第三王朝 (約前2112~前2004)"]}
+]},
+{"id":"xia","name":"夏朝","start":-2070,"end":-1600,"emperors":[
+{"name":"夏禹","era":"禹","yearStart":-2070,"yearEnd":-2060,"chinaEvents":["大禹治水 · 建立夏朝"],"worldEvents":[]},
+{"name":"夏啟","era":"啟","yearStart":-2060,"yearEnd":-2050,"chinaEvents":["啟繼位 · 家天下開始"],"worldEvents":["古埃及中王國時期 (約前2055~前1650)"]},
+{"name":"夏太康","era":"太康","yearStart":-1970,"yearEnd":-1950,"chinaEvents":["太康失國 · 后羿篡位"],"worldEvents":["兩河流域 · 巴比倫第一王朝 (約前1894~前1595)"]},
+{"name":"夏少康","era":"少康","yearStart":-1880,"yearEnd":-1850,"chinaEvents":["少康中興 · 復國"],"worldEvents":["漢摩拉比法典 (約前1792~前1750)"]},
+{"name":"夏桀","era":"桀","yearStart":-1600,"yearEnd":-1600,"chinaEvents":["夏桀暴政 · 商湯滅夏"],"worldEvents":[]}
+]},
+{"id":"shang","name":"商朝","start":-1600,"end":-1046,"emperors":[
+{"name":"商湯","era":"成湯","yearStart":-1600,"yearEnd":-1580,"chinaEvents":["商湯革命 · 建立商朝"],"worldEvents":["兩河流域 · 赫梯帝國崛起 (約前1600~前1178)","古埃及新王國時期 (約前1550~前1069)"]},
+{"name":"商太甲","era":"太甲","yearStart":-1580,"yearEnd":-1570,"chinaEvents":["太甲悔過 · 伊尹輔政"],"worldEvents":[]},
+{"name":"商祖乙","era":"祖乙","yearStart":-1500,"yearEnd":-1480,"chinaEvents":["祖乙遷都 · 商朝中興"],"worldEvents":["古埃及新王國時期 · 圖坦卡門 (約前1341~前1323)"]},
+{"name":"商盤庚","era":"盤庚","yearStart":-1300,"yearEnd":-1275,"chinaEvents":["盤庚遷殷 · 定都於殷"],"worldEvents":[]},
+{"name":"商武丁","era":"武丁","yearStart":-1250,"yearEnd":-1192,"chinaEvents":["武丁中興 · 甲骨文"],"worldEvents":["特洛伊戰爭 (約前1184)","兩河流域 · 亞述帝國崛起 (約前1244~前1076)"]},
+{"name":"商武乙","era":"武乙","yearStart":-1147,"yearEnd":-1113,"chinaEvents":["武乙伐周 · 商周衝突"],"worldEvents":["古埃及新王國末期 (約前1085~前664)"]},
+{"name":"商紂王","era":"帝辛","yearStart":-1075,"yearEnd":-1046,"chinaEvents":["紂王暴政 · 武王伐紂"],"worldEvents":[]}
+]},
+{"id":"western-zhou","name":"西周","start":-1046,"end":-771,"emperors":[
+{"name":"周武王","era":"武王","yearStart":-1046,"yearEnd":-1043,"chinaEvents":["牧野之戰 · 滅商建周"],"worldEvents":[]},
+{"name":"周成王","era":"成王","yearStart":-1042,"yearEnd":-1021,"chinaEvents":["周公攝政 · 東征平定"],"worldEvents":[]},
+{"name":"周康王","era":"康王","yearStart":-1020,"yearEnd":-996,"chinaEvents":["成康之治"],"worldEvents":[]},
+{"name":"周昭王","era":"昭王","yearStart":-995,"yearEnd":-977,"chinaEvents":["南征荊楚"],"worldEvents":[]},
+{"name":"周穆王","era":"穆王","yearStart":-976,"yearEnd":-922,"chinaEvents":["西征犬戎 · 周遊天下"],"worldEvents":["古埃及第三中間期 (約前1069~前664)"]},
+{"name":"周厲王","era":"厲王","yearStart":-878,"yearEnd":-841,"chinaEvents":["國人暴動 · 共和行政"],"worldEvents":[]},
+{"name":"周宣王","era":"宣王","yearStart":-827,"yearEnd":-782,"chinaEvents":["宣王中興"],"worldEvents":["希臘城邦 · 荷馬史詩 (約前800~前600)","新亞述帝國鼎盛期 (約前883~前627)"]},
+{"name":"周幽王","era":"幽王","yearStart":-781,"yearEnd":-771,"chinaEvents":["烽火戲諸侯 · 西周滅亡"],"worldEvents":[]}
+]},
+{"id":"eastern-zhou","name":"東周","start":-770,"end":-256,"emperors":[
+{"name":"周平王","era":"平王","yearStart":-770,"yearEnd":-720,"chinaEvents":["東遷洛邑 · 春秋開始"],"worldEvents":[]},
+{"name":"周桓王","era":"桓王","yearStart":-719,"yearEnd":-697,"chinaEvents":["繻葛之戰 · 鄭國稱霸"],"worldEvents":[]},
+{"name":"周莊王","era":"莊王","yearStart":-696,"yearEnd":-682,"chinaEvents":["齊桓公稱霸 (前685~前643)"],"worldEvents":[]},
+{"name":"周惠王","era":"惠王","yearStart":-676,"yearEnd":-652,"chinaEvents":["晉獻公崛起"],"worldEvents":[]},
+{"name":"周襄王","era":"襄王","yearStart":-651,"yearEnd":-619,"chinaEvents":["晉文公稱霸 · 城濮之戰 (前632)"],"worldEvents":[]},
+{"name":"周定王","era":"定王","yearStart":-606,"yearEnd":-586,"chinaEvents":["楚莊王稱霸 · 問鼎中原"],"worldEvents":[]},
+{"name":"周靈王","era":"靈王","yearStart":-571,"yearEnd":-545,"chinaEvents":["晉楚爭霸"],"worldEvents":["波斯帝國崛起 (約前550)"]},
+{"name":"周景王","era":"景王","yearStart":-544,"yearEnd":-520,"chinaEvents":["弭兵之會 · 晉楚休戰"],"worldEvents":[]},
+{"name":"周敬王","era":"敬王","yearStart":-519,"yearEnd":-476,"chinaEvents":["吳越爭霸 · 春秋結束"],"worldEvents":["馬拉松戰役 (前490)","溫泉關戰役 (前480)","釋迦牟尼 (約前500)","羅馬共和國崛起 (前509~前27)"]},
+{"name":"周元王","era":"元王","yearStart":-475,"yearEnd":-469,"chinaEvents":["戰國開始"],"worldEvents":["雅典 · 伯里克利時代 (前460~前429)"]},
+{"name":"周貞定王","era":"貞定王","yearStart":-468,"yearEnd":-441,"chinaEvents":["三家分晉 (前403)"],"worldEvents":[]},
+{"name":"周威烈王","era":"威烈王","yearStart":-425,"yearEnd":-402,"chinaEvents":["正式承認三家分晉"],"worldEvents":[]},
+{"name":"周顯王","era":"顯王","yearStart":-368,"yearEnd":-321,"chinaEvents":["商鞅變法 (前356~前338)"],"worldEvents":["亞歷山大大帝東征 (前336~前323)"]},
+{"name":"周慎靚王","era":"慎靚王","yearStart":-320,"yearEnd":-315,"chinaEvents":["五國相王"],"worldEvents":[]},
+{"name":"周赧王","era":"赧王","yearStart":-314,"yearEnd":-256,"chinaEvents":["東周滅亡 · 秦滅周"],"worldEvents":["布匿戰爭 (前264~前146)","漢尼拔翻越阿爾卑斯山 (前218)"]}
+]},
+{"id":"qin","name":"秦朝","start":-221,"end":-206,"emperors":[
+{"name":"秦始皇","era":"始皇帝","yearStart":-221,"yearEnd":-210,"chinaEvents":["統一六國 · 書同文車同軌"],"worldEvents":[]},
+{"name":"秦二世","era":"二世","yearStart":-209,"yearEnd":-207,"chinaEvents":["陳勝吳廣起義"],"worldEvents":[]},
+{"name":"秦王子嬰","era":"子嬰","yearStart":-206,"yearEnd":-206,"chinaEvents":["秦朝滅亡 · 劉邦入關"],"worldEvents":[]}
+]},
+{"id":"western-han","name":"西漢","start":-202,"end":9,"emperors":[
+{"name":"漢高祖","era":"高祖","yearStart":-202,"yearEnd":-195,"chinaEvents":["漢朝建立 · 白登之圍"],"worldEvents":[]},
+{"name":"漢惠帝","era":"惠帝","yearStart":-194,"yearEnd":-188,"chinaEvents":["呂后專政"],"worldEvents":[]},
+{"name":"漢文帝","era":"文帝","yearStart":-179,"yearEnd":-157,"chinaEvents":["文景之治"],"worldEvents":[]},
+{"name":"漢景帝","era":"景帝","yearStart":-156,"yearEnd":-141,"chinaEvents":["七國之亂 · 文景之治"],"worldEvents":[]},
+{"name":"漢武帝","era":"建元","yearStart":-140,"yearEnd":-135,"chinaEvents":["即位 · 推行儒術"],"worldEvents":[]},
+{"name":"漢武帝","era":"元光","yearStart":-134,"yearEnd":-129,"chinaEvents":["董仲舒「天人三策」","馬邑之謀 (前133)"],"worldEvents":[]},
+{"name":"漢武帝","era":"元朔","yearStart":-128,"yearEnd":-123,"chinaEvents":["衛青出擊匈奴","收復河套"],"worldEvents":[]},
+{"name":"漢武帝","era":"元狩","yearStart":-122,"yearEnd":-117,"chinaEvents":["霍去病收復河西走廊 (前121~前119)","漠北之戰 (前119)"],"worldEvents":[]},
+{"name":"漢武帝","era":"元鼎","yearStart":-116,"yearEnd":-111,"chinaEvents":["張騫第二次出使西域","滅南越 (前111)"],"worldEvents":[]},
+{"name":"漢武帝","era":"元封","yearStart":-110,"yearEnd":-105,"chinaEvents":["滅衛氏朝鮮 (前108)"],"worldEvents":[]},
+{"name":"漢武帝","era":"太初","yearStart":-104,"yearEnd":-101,"chinaEvents":["李廣利征大宛 (前104~前101)"],"worldEvents":[]},
+{"name":"漢武帝","era":"天漢","yearStart":-100,"yearEnd":-97,"chinaEvents":["漢匈戰爭持續"],"worldEvents":["凱撒誕生 (前100)"]},
+{"name":"漢武帝","era":"太始","yearStart":-96,"yearEnd":-93,"chinaEvents":["漢朝國力鼎盛"],"worldEvents":[]},
+{"name":"漢武帝","era":"征和","yearStart":-92,"yearEnd":-89,"chinaEvents":["巫蠱之禍 (前91~前90)","輪台詔 (前89)"],"worldEvents":[]},
+{"name":"漢武帝","era":"後元","yearStart":-88,"yearEnd":-87,"chinaEvents":["漢武帝駕崩 (前87)"],"worldEvents":[]},
+{"name":"漢昭帝","era":"始元","yearStart":-86,"yearEnd":-74,"chinaEvents":["鹽鐵會議 · 霍光輔政"],"worldEvents":[]},
+{"name":"漢宣帝","era":"本始","yearStart":-73,"yearEnd":-49,"chinaEvents":["孝宣中興 · 匈奴歸附"],"worldEvents":[]},
+{"name":"漢元帝","era":"初元","yearStart":-48,"yearEnd":-33,"chinaEvents":["昭君出塞"],"worldEvents":["凱撒遇刺 (前44)","奧古斯都即位 (前27)"]},
+{"name":"漢成帝","era":"建始","yearStart":-32,"yearEnd":-7,"chinaEvents":["王氏外戚崛起"],"worldEvents":[]},
+{"name":"漢哀帝","era":"建平","yearStart":-6,"yearEnd":-1,"chinaEvents":["王莽篡漢 前夕"],"worldEvents":["耶穌基督誕生 (約前4)"]},
+{"name":"漢平帝","era":"元始","yearStart":1,"yearEnd":5,"chinaEvents":["王莽專權"],"worldEvents":[]},
+{"name":"孺子嬰","era":"孺子嬰","yearStart":6,"yearEnd":8,"chinaEvents":["王莽建立新朝"],"worldEvents":[]}
+]},
+{"id":"xin","name":"新朝","start":9,"end":23,"emperors":[
+{"name":"王莽","era":"始建國","yearStart":9,"yearEnd":23,"chinaEvents":["王莽改制 · 綠林赤眉起義"],"worldEvents":[]}
+]},
+{"id":"eastern-han","name":"東漢","start":25,"end":220,"emperors":[
+{"name":"漢光武帝","era":"建武","yearStart":25,"yearEnd":57,"chinaEvents":["光武中興 · 東漢建立"],"worldEvents":[]},
+{"name":"漢明帝","era":"永平","yearStart":58,"yearEnd":75,"chinaEvents":["白馬寺 · 佛教傳入"],"worldEvents":[]},
+{"name":"漢章帝","era":"建初","yearStart":76,"yearEnd":88,"chinaEvents":["章和之治"],"worldEvents":["羅馬帝國 · 龐貝古城 (79)"]},
+{"name":"漢和帝","era":"永元","yearStart":89,"yearEnd":105,"chinaEvents":["竇憲北伐 · 班超通西域"],"worldEvents":[]},
+{"name":"漢安帝","era":"永初","yearStart":107,"yearEnd":125,"chinaEvents":["羌亂四起"],"worldEvents":[]},
+{"name":"漢順帝","era":"永建","yearStart":126,"yearEnd":144,"chinaEvents":["宦官外戚相爭"],"worldEvents":[]},
+{"name":"漢桓帝","era":"建和","yearStart":147,"yearEnd":167,"chinaEvents":["黨錮之禍"],"worldEvents":[]},
+{"name":"漢靈帝","era":"建寧","yearStart":168,"yearEnd":189,"chinaEvents":["黃巾之亂 (184)"],"worldEvents":[]},
+{"name":"漢獻帝","era":"初平","yearStart":190,"yearEnd":220,"chinaEvents":["三國鼎立 · 東漢滅亡"],"worldEvents":[]}
+]},
+{"id":"three-kingdoms","name":"三國","start":220,"end":280,"emperors":[
+{"name":"魏文帝","era":"黃初","yearStart":220,"yearEnd":226,"chinaEvents":["曹魏建立 · 三國開始"],"worldEvents":[]},
+{"name":"魏明帝","era":"太和","yearStart":227,"yearEnd":239,"chinaEvents":["諸葛亮北伐"],"worldEvents":[]},
+{"name":"蜀漢昭烈帝","era":"章武","yearStart":221,"yearEnd":223,"chinaEvents":["蜀漢建立 · 夷陵之戰"],"worldEvents":[]},
+{"name":"蜀漢後主","era":"建興","yearStart":223,"yearEnd":263,"chinaEvents":["諸葛亮輔政 · 蜀漢滅亡"],"worldEvents":[]},
+{"name":"吳大帝","era":"黃武","yearStart":222,"yearEnd":252,"chinaEvents":["東吳建立 · 赤壁之戰"],"worldEvents":[]},
+{"name":"吳末帝","era":"元興","yearStart":264,"yearEnd":280,"chinaEvents":["西晉滅吳 · 三國結束"],"worldEvents":[]}
+]},
+{"id":"western-jin","name":"西晉","start":265,"end":316,"emperors":[
+{"name":"晉武帝","era":"泰始","yearStart":265,"yearEnd":290,"chinaEvents":["西晉建立 · 統一三國"],"worldEvents":[]},
+{"name":"晉惠帝","era":"永熙","yearStart":290,"yearEnd":306,"chinaEvents":["八王之亂 (291~306)"],"worldEvents":[]},
+{"name":"晉懷帝","era":"永嘉","yearStart":307,"yearEnd":313,"chinaEvents":["永嘉之亂 · 五胡亂華"],"worldEvents":[]},
+{"name":"晉愍帝","era":"建興","yearStart":313,"yearEnd":316,"chinaEvents":["西晉滅亡"],"worldEvents":[]}
+]},
+{"id":"eastern-jin","name":"東晉","start":317,"end":420,"emperors":[
+{"name":"晉元帝","era":"建武","yearStart":317,"yearEnd":323,"chinaEvents":["東晉建立 · 南渡"],"worldEvents":[]},
+{"name":"晉明帝","era":"太寧","yearStart":323,"yearEnd":325,"chinaEvents":["王敦之亂"],"worldEvents":[]},
+{"name":"晉成帝","era":"咸和","yearStart":326,"yearEnd":342,"chinaEvents":["蘇峻之亂"],"worldEvents":[]},
+{"name":"晉孝武帝","era":"寧康","yearStart":373,"yearEnd":396,"chinaEvents":["淝水之戰 (383)"],"worldEvents":[]},
+{"name":"晉安帝","era":"隆安","yearStart":397,"yearEnd":419,"chinaEvents":["東晉衰微 · 劉裕崛起"],"worldEvents":["民族大遷徙 · 阿提拉 (約406~453)"]}
+]},
+{"id":"northern-southern","name":"南北朝","start":420,"end":589,"emperors":[
+{"name":"宋武帝","era":"永初","yearStart":420,"yearEnd":422,"chinaEvents":["劉宋建立 · 南北朝開始"],"worldEvents":[]},
+{"name":"宋文帝","era":"元嘉","yearStart":424,"yearEnd":453,"chinaEvents":["元嘉之治"],"worldEvents":["西羅馬帝國滅亡 (476)"]},
+{"name":"齊高帝","era":"建元","yearStart":479,"yearEnd":482,"chinaEvents":["南齊建立"],"worldEvents":[]},
+{"name":"梁武帝","era":"天監","yearStart":502,"yearEnd":549,"chinaEvents":["梁朝建立 · 侯景之亂 (548)"],"worldEvents":[]},
+{"name":"陳武帝","era":"永定","yearStart":557,"yearEnd":559,"chinaEvents":["陳朝建立"],"worldEvents":[]},
+{"name":"北魏太武帝","era":"始光","yearStart":424,"yearEnd":452,"chinaEvents":["北魏統一北方"],"worldEvents":[]},
+{"name":"北魏孝文帝","era":"太和","yearStart":477,"yearEnd":499,"chinaEvents":["孝文帝改革 · 漢化運動"],"worldEvents":[]},
+{"name":"北齊文宣帝","era":"天保","yearStart":550,"yearEnd":559,"chinaEvents":["北齊建立"],"worldEvents":[]},
+{"name":"北周武帝","era":"保定","yearStart":561,"yearEnd":578,"chinaEvents":["北周滅北齊 (577)"],"worldEvents":[]}
+]},
+{"id":"sui","name":"隋朝","start":581,"end":618,"emperors":[
+{"name":"隋文帝","era":"開皇","yearStart":581,"yearEnd":604,"chinaEvents":["隋朝建立 · 統一南北"],"worldEvents":[]},
+{"name":"隋煬帝","era":"大業","yearStart":605,"yearEnd":618,"chinaEvents":["開鑿大運河 · 三征高句麗"],"worldEvents":["伊斯蘭教興起 (610~632)","伊斯蘭黃金時代 (8~13世紀)"]},
+{"name":"隋恭帝","era":"義寧","yearStart":617,"yearEnd":618,"chinaEvents":["隋朝滅亡 · 唐朝建立"],"worldEvents":[]}
+]},
+{"id":"tang","name":"唐朝","start":618,"end":907,"emperors":[
+{"name":"唐高祖","era":"武德","yearStart":618,"yearEnd":626,"chinaEvents":["唐朝建立 · 統一戰爭"],"worldEvents":[]},
+{"name":"唐太宗","era":"貞觀","yearStart":627,"yearEnd":649,"chinaEvents":["貞觀之治"],"worldEvents":["阿拉伯帝國擴張 (632~750)","阿拉伯帝國征服波斯 (636~651)","阿拉伯帝國征服北非 (640~700)"]},
+{"name":"唐高宗","era":"永徽","yearStart":650,"yearEnd":655,"chinaEvents":["永徽之治"],"worldEvents":["阿拉伯帝國 伍麥葉王朝 (661~750)"]},
+{"name":"武則天","era":"天授","yearStart":690,"yearEnd":705,"chinaEvents":["武周建立 (690~705)"],"worldEvents":[]},
+{"name":"唐玄宗","era":"開元","yearStart":713,"yearEnd":741,"chinaEvents":["開元盛世"],"worldEvents":["查理·馬特 圖爾戰役 (732)"]},
+{"name":"唐玄宗","era":"天寶","yearStart":742,"yearEnd":756,"chinaEvents":["安史之亂 (755~763)"],"worldEvents":["法蘭克王國 卡洛林王朝 (751~987)","倫巴第王國 敗亡"]},
+{"name":"唐肅宗","era":"至德","yearStart":756,"yearEnd":758,"chinaEvents":["平定安史之亂"],"worldEvents":[]},
+{"name":"唐代宗","era":"寶應","yearStart":762,"yearEnd":779,"chinaEvents":["藩鎮割據開始"],"worldEvents":[]},
+{"name":"唐德宗","era":"建中","yearStart":780,"yearEnd":805,"chinaEvents":["涇原兵變 · 奉天之難"],"worldEvents":["查理曼大帝加冕 (800)"]},
+{"name":"唐憲宗","era":"元和","yearStart":806,"yearEnd":820,"chinaEvents":["元和中興 · 平定藩鎮"],"worldEvents":[]},
+{"name":"唐武宗","era":"會昌","yearStart":841,"yearEnd":846,"chinaEvents":["會昌滅佛"],"worldEvents":[]},
+{"name":"唐宣宗","era":"大中","yearStart":847,"yearEnd":859,"chinaEvents":["大中之治"],"worldEvents":[]},
+{"name":"唐懿宗","era":"咸通","yearStart":860,"yearEnd":874,"chinaEvents":["唐末衰微"],"worldEvents":["維京人征服英格蘭 (865~899)"]},
+{"name":"唐僖宗","era":"乾符","yearStart":874,"yearEnd":888,"chinaEvents":["黃巢之亂 (875~884)"],"worldEvents":[]},
+{"name":"唐昭宗","era":"龍紀","yearStart":889,"yearEnd":904,"chinaEvents":["朱溫專權"],"worldEvents":[]},
+{"name":"唐哀帝","era":"天祐","yearStart":905,"yearEnd":907,"chinaEvents":["唐朝滅亡 · 五代開始"],"worldEvents":[]}
+]},
+{"id":"song","name":"宋朝","start":960,"end":1279,"emperors":[
+{"name":"宋太祖","era":"建隆","yearStart":960,"yearEnd":963,"chinaEvents":["宋朝建立 · 統一中原"],"worldEvents":["神聖羅馬帝國建立 (962)"]},
+{"name":"宋太宗","era":"太平興國","yearStart":976,"yearEnd":984,"chinaEvents":["統一南方 · 北伐契丹"],"worldEvents":[]},
+{"name":"宋太宗","era":"端拱","yearStart":988,"yearEnd":989,"chinaEvents":["端拱之治"],"worldEvents":["基輔羅斯 基督教化 (988)"]},
+{"name":"宋真宗","era":"咸平","yearStart":998,"yearEnd":1003,"chinaEvents":["咸平之治 · 澶淵之盟"],"worldEvents":["匈牙利王國建立 (1000)"]},
+{"name":"宋真宗","era":"大中祥符","yearStart":1008,"yearEnd":1016,"chinaEvents":["大中祥符年間"],"worldEvents":["克努特大帝 統治北海帝國 (1016~1035)"]},
+{"name":"宋仁宗","era":"天聖","yearStart":1023,"yearEnd":1032,"chinaEvents":["慶曆新政 萌芽"],"worldEvents":[]},
+{"name":"宋英宗","era":"治平","yearStart":1064,"yearEnd":1067,"chinaEvents":["治平年間"],"worldEvents":["諾曼征服英格蘭 (1066)"]},
+{"name":"宋神宗","era":"熙寧","yearStart":1068,"yearEnd":1077,"chinaEvents":["王安石變法 (1069~1085)"],"worldEvents":[]},
+{"name":"宋哲宗","era":"紹聖","yearStart":1094,"yearEnd":1098,"chinaEvents":["紹聖年間"],"worldEvents":["十字軍東征 (1095~1291)","第一次十字軍東征 (1096~1099)"]},
+{"name":"宋徽宗","era":"建中靖國","yearStart":1101,"yearEnd":1125,"chinaEvents":["宋金同盟 · 聯金滅遼"],"worldEvents":[]},
+{"name":"宋高宗","era":"建炎","yearStart":1127,"yearEnd":1162,"chinaEvents":["南宋開始 · 偏安江南"],"worldEvents":["第二次十字軍東征 (1147~1149)"]},
+{"name":"宋孝宗","era":"淳熙","yearStart":1174,"yearEnd":1189,"chinaEvents":["淳熙年間"],"worldEvents":["第三次十字軍東征 (1189~1192)"]},
+{"name":"宋寧宗","era":"慶元","yearStart":1195,"yearEnd":1224,"chinaEvents":["慶元黨禁 · 開禧北伐"],"worldEvents":["蒙古帝國興起 (1206)","大憲章簽署 (1215)"]},
+{"name":"宋理宗","era":"寶慶","yearStart":1225,"yearEnd":1264,"chinaEvents":["聯蒙滅金 (1234)"],"worldEvents":[]},
+{"name":"宋度宗","era":"咸淳","yearStart":1265,"yearEnd":1274,"chinaEvents":["襄樊之戰"],"worldEvents":[]},
+{"name":"宋恭帝","era":"德祐","yearStart":1275,"yearEnd":1276,"chinaEvents":["臨安陷落"],"worldEvents":[]},
+{"name":"宋末帝","era":"祥興","yearStart":1278,"yearEnd":1279,"chinaEvents":["崖山之役 · 宋朝滅亡"],"worldEvents":[]}
+]},
+{"id":"yuan","name":"元朝","start":1271,"end":1368,"emperors":[
+{"name":"元世祖","era":"至元","yearStart":1264,"yearEnd":1294,"chinaEvents":["元朝建立 · 統一中國"],"worldEvents":["馬可波羅遊記 (1271~1295)"]},
+{"name":"元成宗","era":"元貞","yearStart":1295,"yearEnd":1307,"chinaEvents":["元成宗繼位 · 守成之治"],"worldEvents":["英格蘭議會 成立 (1295)"]},
+{"name":"元成宗","era":"大德","yearStart":1297,"yearEnd":1307,"chinaEvents":["大德年間"],"worldEvents":["但丁《神曲》 (1307~1321)"]},
+{"name":"元武宗","era":"至大","yearStart":1308,"yearEnd":1311,"chinaEvents":["元武宗繼位 · 改革鈔法"],"worldEvents":["阿維尼翁教廷 時期 (1309~1376)"]},
+{"name":"元仁宗","era":"皇慶","yearStart":1312,"yearEnd":1320,"chinaEvents":["延祐復科 · 漢化改革"],"worldEvents":["文藝復興 (14~16世紀)"]},
+{"name":"元順帝","era":"至順","yearStart":1333,"yearEnd":1368,"chinaEvents":["元末大亂 · 朱元璋起義"],"worldEvents":["百年戰爭 (1337~1453)","黑死病肆虐歐洲 (1347~1353)"]}
+]},
+{"id":"ming","name":"明朝","start":1368,"end":1644,"emperors":[
+{"name":"明太祖","era":"洪武","yearStart":1368,"yearEnd":1398,"chinaEvents":["明朝建立 · 驅逐蒙元"],"worldEvents":[]},
+{"name":"明惠帝","era":"建文","yearStart":1399,"yearEnd":1402,"chinaEvents":["靖難之役 · 建文改制"],"worldEvents":[]},
+{"name":"明成祖","era":"永樂","yearStart":1403,"yearEnd":1424,"chinaEvents":["鄭和下西洋 (1405~1433)"],"worldEvents":["聖女貞德 (1412~1431)"]},
+{"name":"明仁宗","era":"洪熙","yearStart":1425,"yearEnd":1425,"chinaEvents":["仁宣之治 開啟"],"worldEvents":[]},
+{"name":"明宣宗","era":"宣德","yearStart":1426,"yearEnd":1435,"chinaEvents":["仁宣之治 盛世"],"worldEvents":[]},
+{"name":"明英宗","era":"正統","yearStart":1436,"yearEnd":1449,"chinaEvents":["土木堡之變 (1449)"],"worldEvents":[]},
+{"name":"明代宗","era":"景泰","yearStart":1450,"yearEnd":1457,"chinaEvents":["北京保衛戰"],"worldEvents":["百年戰爭 結束 (1453)","君士坦丁堡陷落 (1453)"]},
+{"name":"明憲宗","era":"成化","yearStart":1465,"yearEnd":1487,"chinaEvents":["成化犁庭 · 西廠設立"],"worldEvents":[]},
+{"name":"明孝宗","era":"弘治","yearStart":1488,"yearEnd":1505,"chinaEvents":["弘治中興"],"worldEvents":["哥倫布發現美洲 (1492)","達伽馬抵達印度 (1498)"]},
+{"name":"明武宗","era":"正德","yearStart":1506,"yearEnd":1521,"chinaEvents":["劉瑾專權 · 寧王之亂"],"worldEvents":["馬丁·路德 宗教改革 (1517)","宗教改革 (1517~1648)"]},
+{"name":"明世宗","era":"嘉靖","yearStart":1522,"yearEnd":1566,"chinaEvents":["嘉靖大倭寇 · 海禁"],"worldEvents":["伊莉莎白一世即位 (1558)"]},
+{"name":"明穆宗","era":"隆慶","yearStart":1567,"yearEnd":1572,"chinaEvents":["隆慶開關 · 海上貿易"],"worldEvents":[]},
+{"name":"明神宗","era":"萬曆","yearStart":1573,"yearEnd":1620,"chinaEvents":["萬曆怠政 · 三大征"],"worldEvents":["英國擊敗無敵艦隊 (1588)","三十年戰爭開始 (1618~1648)"]},
+{"name":"明光宗","era":"泰昌","yearStart":1620,"yearEnd":1620,"chinaEvents":["紅丸案"],"worldEvents":[]},
+{"name":"明熹宗","era":"天啟","yearStart":1621,"yearEnd":1627,"chinaEvents":["魏忠賢專權"],"worldEvents":[]},
+{"name":"明思宗","era":"崇禎","yearStart":1628,"yearEnd":1644,"chinaEvents":["明末民變 · 李自成攻陷北京"],"worldEvents":["英國革命 (1642~1651)"]}
+]},
+{"id":"qing","name":"清朝","start":1644,"end":1912,"emperors":[
+{"name":"清世祖","era":"順治","yearStart":1644,"yearEnd":1661,"chinaEvents":["清軍入關 · 定鼎北京"],"worldEvents":["三十年戰爭結束 (1648)"]},
+{"name":"清聖祖","era":"康熙","yearStart":1662,"yearEnd":1722,"chinaEvents":["康熙盛世 · 平定三藩"],"worldEvents":["啟蒙運動 興起 (17~18世紀)","牛頓 《自然哲學的數學原理》 (1687)","伏爾泰 (1694~1778)","盧梭 (1712~1778)"]},
+{"name":"清世宗","era":"雍正","yearStart":1723,"yearEnd":1735,"chinaEvents":["雍正改革 · 整頓吏治"],"worldEvents":[]},
+{"name":"清高宗","era":"乾隆","yearStart":1736,"yearEnd":1795,"chinaEvents":["乾隆盛世 · 十全武功"],"worldEvents":["工業革命 萌芽 (1760~)","美國獨立戰爭 (1775~1783)","法國大革命 (1789~1799)"]},
+{"name":"清仁宗","era":"嘉慶","yearStart":1796,"yearEnd":1820,"chinaEvents":["嘉慶中衰 · 白蓮教亂"],"worldEvents":["拿破崙戰爭 (1799~1815)","滑鐵盧戰役 (1815)"]},
+{"name":"清宣宗","era":"道光","yearStart":1821,"yearEnd":1850,"chinaEvents":["鴉片戰爭 (1840~1842)"],"worldEvents":[]},
+{"name":"清文宗","era":"咸豐","yearStart":1851,"yearEnd":1861,"chinaEvents":["太平天國 (1851~1864)"],"worldEvents":["美國內戰 (1861~1865)","達爾文 《物種起源》 (1859)"]},
+{"name":"清穆宗","era":"同治","yearStart":1862,"yearEnd":1874,"chinaEvents":["同治中興 · 洋務運動"],"worldEvents":["明治維新開始 (1868)","德意志帝國建立 (1871)"]},
+{"name":"清德宗","era":"光緒","yearStart":1875,"yearEnd":1908,"chinaEvents":["戊戌變法 (1898) · 甲午戰爭 (1894)"],"worldEvents":["電燈發明 (1879)","汽車發明 (1886)"]},
+{"name":"清遜帝","era":"宣統","yearStart":1909,"yearEnd":1912,"chinaEvents":["辛亥革命 · 清朝滅亡"],"worldEvents":["第一次世界大戰爆發 (1914)"]}
+]}
+]
