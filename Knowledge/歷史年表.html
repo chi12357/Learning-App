@@ -660,35 +660,36 @@
         //  載入 JSON 資料
         // ============================================================
         function loadData() {
-            const jsonPath = '../Data/timeline_data.json';
+    // 加入時間戳，強制跳過瀏覽器快取
+    const timestamp = new Date().getTime();
+    const jsonPath = '../Data/timeline_data.json?t=' + timestamp;
 
-            fetch(jsonPath)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP ${response.status} - ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    DATA = data;
-                    render('');
-                    const total = DATA.reduce((sum, d) => sum + d.emperors.length, 0);
-                    statsCount.textContent = `共 ${total} 位皇帝 · ${DATA.length} 個朝代`;
-                })
-                .catch(error => {
-                    console.error('載入資料失敗:', error);
-                    container.innerHTML = `
-                        <div class="error-state">
-                            <div class="icon">⚠️</div>
-                            <p>無法載入歷史資料</p>
-                            <p style="font-size:0.7rem;opacity:0.6;margin-top:4px;">${error.message}</p>
-                            <p style="font-size:0.7rem;opacity:0.5;margin-top:2px;">請確認 Data/timeline_data.json 存在且格式正確</p>
-                            <button class="retry-btn" onclick="loadData()">重新載入</button>
-                        </div>
-                    `;
-                });
-        }
-
+    fetch(jsonPath)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            DATA = data;
+            render('');
+            const total = DATA.reduce((sum, d) => sum + d.emperors.length, 0);
+            statsCount.textContent = `共 ${total} 位皇帝 · ${DATA.length} 個朝代`;
+        })
+        .catch(error => {
+            console.error('載入資料失敗:', error);
+            container.innerHTML = `
+                <div class="error-state">
+                    <div class="icon">⚠️</div>
+                    <p>無法載入歷史資料</p>
+                    <p style="font-size:0.7rem;opacity:0.6;margin-top:4px;">${error.message}</p>
+                    <p style="font-size:0.7rem;opacity:0.5;margin-top:2px;">請確認 Data/timeline_data.json 存在且格式正確</p>
+                    <button class="retry-btn" onclick="loadData()">重新載入</button>
+                </div>
+            `;
+        });
+}
         // ============================================================
         //  搜尋邏輯
         // ============================================================
