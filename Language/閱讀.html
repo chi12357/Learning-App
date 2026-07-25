@@ -1042,7 +1042,7 @@ let currentTopPanel = { original:"", translation:"", originalLang:"", translatio
 // ============================================================
 // 語言偵測 - fr 優先於 en
 // ============================================================
-const LANG_FIELDS = ['fr', 'en', 'zh', 'ja', 'es', 'de', 'it', 'pt', 'ru', 'ar', 'ko', 'vi', 'th'];
+const LANG_FIELDS = ['fr', 'en', 'ja','zh',  'es', 'de', 'it', 'pt', 'ru', 'ar', 'ko', 'vi', 'th'];
 
 function detectOriginalField(s) {
   for (const f of LANG_FIELDS) { if (s[f]) return f; }
