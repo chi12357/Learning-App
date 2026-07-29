@@ -184,6 +184,59 @@
     font-size:17px; cursor:pointer; font-family:inherit;
   }
 
+  #playlist-panel, #playlist-edit-panel{
+    position:absolute; inset:0; background:rgba(0,0,0,.72);
+    display:none; align-items:center; justify-content:center; z-index:25;
+    padding:20px;
+  }
+  #playlist-card, #playlist-edit-card{
+    background:var(--surface); border-radius:20px; padding:28px 26px;
+    width:min(560px, 100%); max-height:86vh; overflow-y:auto;
+    display:flex; flex-direction:column; gap:16px; color:var(--text);
+  }
+  #playlist-card h2, #playlist-edit-card h2{ margin:0; font-size:22px; }
+  #playlist-edit-card h3{ margin:8px 0 0; font-size:16px; color:var(--text-dim); font-weight:500; }
+  .panel-hint{ margin:0; font-size:14px; color:var(--text-dim); line-height:1.6; }
+  #close-playlist-panel, #close-playlist-edit{
+    align-self:center; margin-top:6px; padding:12px 30px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--bg); font-weight:900;
+    font-size:17px; cursor:pointer; font-family:inherit;
+  }
+  .small-btn{
+    padding:8px 16px; border-radius:999px; border:1.5px solid var(--surface-2);
+    background:transparent; color:var(--text); font-family:inherit; font-size:14px;
+    cursor:pointer;
+  }
+  .wide-btn{ width:100%; min-height:64px; flex-direction:row; gap:10px; }
+  .wide-btn .icon{ font-size:24px; }
+
+  .playlist-item{
+    background:var(--surface-2); border-radius:14px; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    flex-wrap:wrap;
+  }
+  .playlist-item + .playlist-item{ margin-top:10px; }
+  .playlist-item .meta{ flex:1; min-width:160px; }
+  .playlist-item .meta .name{ font-size:18px; font-weight:700; }
+  .playlist-item .meta .count{ font-size:13px; color:var(--text-dim); }
+  .playlist-item .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .playlist-empty{ color:var(--text-dim); font-size:15px; text-align:center; padding:12px; }
+
+  .dir-list{ display:flex; flex-direction:column; gap:8px; }
+  .dir-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:15px;
+  }
+  .dir-row .dir-remove{
+    border:none; background:transparent; color:var(--accent2); font-size:20px;
+    cursor:pointer; line-height:1; padding:0 4px;
+  }
+  .dir-row .actions{ display:flex; align-items:center; gap:8px; }
+  .dir-row-pending{
+    background:transparent; border:1.5px dashed var(--accent); color:var(--text-dim);
+  }
+  .dir-list-empty{ color:var(--text-dim); font-size:14px; padding:6px 2px; }
+
   @media (max-width:520px){
     :root{ --ctrl-size:60px; }
     .ctrl-btn .lb{ display:none; }
@@ -197,6 +250,14 @@
   <div id="start-screen">
     <h1>相簿播放器</h1>
     <p class="sub">選好相片和音樂資料夾，就可以開始播放</p>
+
+    <div class="picker-row">
+      <button class="big-btn" id="open-playlists-btn" style="display:none;">
+        <span class="icon">📚</span>
+        <span>播放清單</span>
+        <span class="status" id="playlist-status">尚未使用清單</span>
+      </button>
+    </div>
 
     <div class="picker-row">
       <button class="big-btn" id="pick-photos">
@@ -339,9 +400,46 @@
           <button class="big-btn" id="reselect-photos"><span class="icon">🖼️</span><span>重新選相片資料夾</span></button>
           <button class="big-btn" id="reselect-photos-library" style="display:none;"><span class="icon">📷</span><span>從照片圖庫重新選</span></button>
           <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>重新選音樂資料夾</span></button>
+          <button class="big-btn" id="open-playlists-btn-2" style="display:none;"><span class="icon">📚</span><span>播放清單</span></button>
         </div>
         <button id="close-settings">關閉設定</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLAYLISTS ===================== -->
+  <div id="playlist-panel">
+    <div id="playlist-card">
+      <h2>播放清單</h2>
+      <p class="panel-hint">一個清單可以包含好幾個相片／音樂資料夾，播放時會把它們合併在一起輪流播放。（需要瀏覽器支援資料夾授權，例如電腦版 Chrome / Edge）</p>
+      <div id="playlist-list"></div>
+      <div class="settings-btn-row">
+        <button class="big-btn" id="new-playlist-btn"><span class="icon">➕</span><span>新增清單</span></button>
+        <button class="big-btn" id="import-playlist-btn"><span class="icon">📥</span><span>匯入清單</span></button>
+      </div>
+      <button id="close-playlist-panel">關閉</button>
+    </div>
+    <input type="file" id="playlist-import-input" accept="application/json,.json" style="display:none">
+  </div>
+
+  <div id="playlist-edit-panel">
+    <div id="playlist-edit-card">
+      <div class="settings-row">
+        <h2 id="playlist-edit-title">清單內容</h2>
+        <button id="rename-playlist-btn" class="small-btn">重新命名</button>
+      </div>
+      <h3>相片資料夾</h3>
+      <div id="playlist-photo-dirs" class="dir-list"></div>
+      <button class="big-btn wide-btn" id="add-photo-dir-btn"><span class="icon">🖼️</span><span>新增相片資料夾</span></button>
+      <h3>音樂資料夾</h3>
+      <div id="playlist-music-dirs" class="dir-list"></div>
+      <button class="big-btn wide-btn" id="add-music-dir-btn"><span class="icon">🎵</span><span>新增音樂資料夾</span></button>
+      <div class="settings-btn-row">
+        <button class="big-btn" id="use-playlist-btn"><span class="icon">▶️</span><span>使用這個清單</span></button>
+        <button class="big-btn" id="export-playlist-btn"><span class="icon">📤</span><span>匯出清單</span></button>
+        <button class="big-btn" id="delete-playlist-btn"><span class="icon">🗑️</span><span>刪除清單</span></button>
+      </div>
+      <button id="close-playlist-edit">返回清單</button>
     </div>
   </div>
 
@@ -402,17 +500,27 @@
     document.getElementById('pick-photos-library').style.display = '';
     document.getElementById('reselect-photos').style.display = 'none';
     document.getElementById('reselect-photos-library').style.display = '';
+  } else {
+    document.getElementById('open-playlists-btn').style.display = '';
+    document.getElementById('open-playlists-btn-2').style.display = '';
   }
 
   /* ---------------------------------------------------------------
-     Tiny IndexedDB helper (stores directory handles only)
+     Tiny IndexedDB helper. Two stores:
+     - 'handles': the single last-used photo/music folder (quick resume)
+     - 'playlists': named playlists, each holding several folder handles
   --------------------------------------------------------------- */
   const DB_NAME = 'slideshow-app-db';
   const STORE = 'handles';
+  const PLAYLIST_STORE = 'playlists';
   function idbOpen(){
     return new Promise((resolve, reject) => {
-      const req = indexedDB.open(DB_NAME, 1);
-      req.onupgradeneeded = () => { req.result.createObjectStore(STORE); };
+      const req = indexedDB.open(DB_NAME, 2);
+      req.onupgradeneeded = (e) => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+        if (!db.objectStoreNames.contains(PLAYLIST_STORE)) db.createObjectStore(PLAYLIST_STORE, { keyPath: 'id' });
+      };
       req.onsuccess = () => resolve(req.result);
       req.onerror = () => reject(req.error);
     });
@@ -433,6 +541,42 @@
       const req = tx.objectStore(STORE).get(key);
       req.onsuccess = () => resolve(req.result || null);
       req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGetAllPlaylists(){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readonly');
+      const req = tx.objectStore(PLAYLIST_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGetPlaylist(id){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readonly');
+      const req = tx.objectStore(PLAYLIST_STORE).get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbPutPlaylist(playlist){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).put(playlist);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbDeletePlaylist(id){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -499,6 +643,7 @@
     musicDirKey: '',
     savedPhotoHandle: null, // detected saved handle, not yet loaded/permitted
     savedMusicHandle: null,
+    activePlaylistId: null, // set when the current photo/music set came from a playlist
     currentObjectUrl: null,
     activeLayer: 'a',
     timerHandle: null,
@@ -733,6 +878,62 @@
     state.musicDirKey = folderKeyFromFiles(files);
     musicStatusEl.textContent = files.length ? (dirHandle.name + '（' + files.length + ' 首）') : '找不到音樂';
     pickMusicBtn.classList.toggle('ready', files.length > 0);
+  }
+
+  /* Combine every folder in a playlist into one photo set and one
+     music set. Each entry needs a fresh read-permission check since
+     permissions aren't guaranteed to persist between sessions. */
+  async function usePlaylist(playlist){
+    const photoFiles = [];
+    for (const entry of playlist.photoDirs){
+      try{
+        const perm = await entry.handle.requestPermission({ mode:'read' });
+        if (perm !== 'granted') continue;
+        const files = await scanDirHandle(entry.handle, PHOTO_EXT);
+        files.forEach(f => photoFiles.push({ name: entry.name + '/' + f.name, getFile: f.getFile }));
+      }catch(e){ /* skip folders we can't access */ }
+    }
+    const musicFiles = [];
+    for (const entry of playlist.musicDirs){
+      try{
+        const perm = await entry.handle.requestPermission({ mode:'read' });
+        if (perm !== 'granted') continue;
+        const files = await scanDirHandle(entry.handle, MUSIC_EXT);
+        files.forEach(f => musicFiles.push({ name: entry.name + '/' + f.name, getFile: f.getFile }));
+      }catch(e){ /* skip folders we can't access */ }
+    }
+    state.photoFiles = photoFiles;
+    state.musicFiles = musicFiles;
+    state.photoDirLabel = playlist.name;
+    state.musicDirLabel = playlist.name;
+    state.photoDirKey = 'playlist:' + playlist.id;
+    state.musicDirKey = 'playlist:' + playlist.id;
+    state.activePlaylistId = playlist.id;
+    state.savedPhotoHandle = null;
+    state.savedMusicHandle = null;
+    photoStatusEl.textContent = photoFiles.length ? ('清單「' + playlist.name + '」（' + photoFiles.length + ' 張）') : '這個清單沒有相片';
+    musicStatusEl.textContent = musicFiles.length ? ('清單「' + playlist.name + '」（' + musicFiles.length + ' 首）') : '（沒有音樂）';
+    document.getElementById('playlist-status').textContent = '目前使用：「' + playlist.name + '」';
+    pickPhotosBtn.classList.toggle('ready', photoFiles.length > 0);
+    pickMusicBtn.classList.toggle('ready', musicFiles.length > 0);
+    updateStartButton();
+
+    if (stageEl.style.display === 'block'){
+      state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+      state.photoPos = 0;
+      if (state.photoFiles.length) showPhoto(state.photoOrder[0]);
+
+      state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+      state.musicPos = 0;
+      if (state.musicFiles.length){
+        playMusicTrack(state.musicOrder[0], 0);
+      } else {
+        audioEl.pause();
+        audioEl.removeAttribute('src');
+        audioEl.load();
+      }
+      persistNow();
+    }
   }
 
   pickPhotosBtn.addEventListener('click', choosePhotoFolder);
@@ -1304,6 +1505,232 @@
     state.musicPos = 0;
     playMusicTrack(state.musicOrder[0], 0);
     persistNow();
+  });
+
+  /* ---- Playlists: named groups of several photo/music folders ---- */
+  const playlistPanel = document.getElementById('playlist-panel');
+  const playlistEditPanel = document.getElementById('playlist-edit-panel');
+  const playlistListEl = document.getElementById('playlist-list');
+  let editingPlaylistId = null;
+
+  function openPlaylistPanel(){
+    settingsPanel.style.display = 'none';
+    refreshPlaylistList();
+    playlistPanel.style.display = 'flex';
+  }
+  function closePlaylistPanel(){ playlistPanel.style.display = 'none'; }
+
+  async function refreshPlaylistList(){
+    const playlists = await idbGetAllPlaylists();
+    playlistListEl.innerHTML = '';
+    if (playlists.length === 0){
+      playlistListEl.innerHTML = '<p class="playlist-empty">還沒有任何播放清單</p>';
+      return;
+    }
+    playlists.forEach(pl => {
+      const row = document.createElement('div');
+      row.className = 'playlist-item';
+      row.innerHTML =
+        '<div class="meta"><div class="name"></div><div class="count"></div></div>' +
+        '<div class="actions">' +
+          '<button class="small-btn" data-act="use">使用</button>' +
+          '<button class="small-btn" data-act="view">查看內容</button>' +
+        '</div>';
+      row.querySelector('.name').textContent = pl.name;
+      row.querySelector('.count').textContent =
+        '相片資料夾 ' + pl.photoDirs.length + ' 個，音樂資料夾 ' + pl.musicDirs.length + ' 個';
+      row.querySelector('[data-act="use"]').addEventListener('click', async () => {
+        if (pl.photoDirs.length === 0){
+          const pending = pl.pendingPhotoNames || [];
+          alert(pending.length > 0
+            ? '這個清單裡的相片資料夾還沒有連結，請先「查看內容」把它們連結起來。'
+            : '這個清單還沒有加入任何相片資料夾，請先「查看內容」新增。');
+          openPlaylistEdit(pl.id);
+          return;
+        }
+        await usePlaylist(pl);
+        closePlaylistPanel();
+      });
+      row.querySelector('[data-act="view"]').addEventListener('click', () => openPlaylistEdit(pl.id));
+      playlistListEl.appendChild(row);
+    });
+  }
+
+  async function openPlaylistEdit(id){
+    editingPlaylistId = id;
+    playlistPanel.style.display = 'none';
+    await renderPlaylistEdit();
+    playlistEditPanel.style.display = 'flex';
+  }
+  function closePlaylistEdit(){
+    playlistEditPanel.style.display = 'none';
+    editingPlaylistId = null;
+    openPlaylistPanel();
+  }
+
+  function renderDirRows(container, pl, kind){
+    container.innerHTML = '';
+    const dirs = kind === 'photo' ? pl.photoDirs : pl.musicDirs;
+    const pending = kind === 'photo' ? (pl.pendingPhotoNames || []) : (pl.pendingMusicNames || []);
+    if (dirs.length === 0 && pending.length === 0){
+      container.innerHTML = '<p class="dir-list-empty">尚未加入' + (kind === 'photo' ? '相片' : '音樂') + '資料夾</p>';
+      return;
+    }
+    dirs.forEach((d, i) => {
+      const row = document.createElement('div');
+      row.className = 'dir-row';
+      row.innerHTML = '<span></span><button class="dir-remove" title="移除">×</button>';
+      row.querySelector('span').textContent = d.name;
+      row.querySelector('.dir-remove').addEventListener('click', async () => {
+        dirs.splice(i, 1);
+        await idbPutPlaylist(pl);
+        renderPlaylistEdit();
+      });
+      container.appendChild(row);
+    });
+    pending.forEach((name, i) => {
+      const row = document.createElement('div');
+      row.className = 'dir-row dir-row-pending';
+      row.innerHTML =
+        '<span>' + '「' + name + '」尚未連結' + '</span>' +
+        '<span class="actions"><button class="small-btn" data-a="link">選擇資料夾</button><button class="dir-remove" title="移除提醒">×</button></span>';
+      row.querySelector('[data-a="link"]').addEventListener('click', async () => {
+        try{
+          const handle = await window.showDirectoryPicker({ id: 'playlist-' + kind + 's', mode:'read' });
+          pending.splice(i, 1);
+          dirs.push({ name: handle.name, handle });
+          await idbPutPlaylist(pl);
+          renderPlaylistEdit();
+        }catch(e){ /* user cancelled */ }
+      });
+      row.querySelector('.dir-remove').addEventListener('click', async () => {
+        pending.splice(i, 1);
+        await idbPutPlaylist(pl);
+        renderPlaylistEdit();
+      });
+      container.appendChild(row);
+    });
+  }
+
+  async function renderPlaylistEdit(){
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl){ closePlaylistEdit(); return; }
+    document.getElementById('playlist-edit-title').textContent = pl.name;
+    renderDirRows(document.getElementById('playlist-photo-dirs'), pl, 'photo');
+    renderDirRows(document.getElementById('playlist-music-dirs'), pl, 'music');
+  }
+
+  document.getElementById('open-playlists-btn').addEventListener('click', openPlaylistPanel);
+  document.getElementById('open-playlists-btn-2').addEventListener('click', openPlaylistPanel);
+  document.getElementById('close-playlist-panel').addEventListener('click', closePlaylistPanel);
+  document.getElementById('close-playlist-edit').addEventListener('click', closePlaylistEdit);
+
+  document.getElementById('new-playlist-btn').addEventListener('click', async () => {
+    const name = prompt('請輸入新播放清單的名稱：', '我的清單');
+    if (!name) return;
+    const pl = { id: 'pl_' + Date.now(), name: name.trim() || '我的清單', photoDirs: [], musicDirs: [] };
+    await idbPutPlaylist(pl);
+    await openPlaylistEdit(pl.id);
+  });
+
+  document.getElementById('rename-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    const name = prompt('重新命名這個清單：', pl.name);
+    if (!name) return;
+    pl.name = name.trim() || pl.name;
+    await idbPutPlaylist(pl);
+    renderPlaylistEdit();
+  });
+
+  document.getElementById('add-photo-dir-btn').addEventListener('click', async () => {
+    try{
+      const handle = await window.showDirectoryPicker({ id: 'playlist-photos', mode: 'read' });
+      const pl = await idbGetPlaylist(editingPlaylistId);
+      pl.photoDirs.push({ name: handle.name, handle });
+      await idbPutPlaylist(pl);
+      renderPlaylistEdit();
+    }catch(e){ /* user cancelled */ }
+  });
+  document.getElementById('add-music-dir-btn').addEventListener('click', async () => {
+    try{
+      const handle = await window.showDirectoryPicker({ id: 'playlist-music', mode: 'read' });
+      const pl = await idbGetPlaylist(editingPlaylistId);
+      pl.musicDirs.push({ name: handle.name, handle });
+      await idbPutPlaylist(pl);
+      renderPlaylistEdit();
+    }catch(e){ /* user cancelled */ }
+  });
+
+  document.getElementById('use-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    if (pl.photoDirs.length === 0){
+      const pending = pl.pendingPhotoNames || [];
+      if (pending.length > 0){
+        alert('相片資料夾「' + pending.join('、') + '」還沒有連結，請先按下方的「選擇資料夾」把它們連結起來，才能使用這個清單。');
+      } else {
+        alert('這個清單還沒有加入任何相片資料夾，請先按「新增相片資料夾」。');
+      }
+      return;
+    }
+    await usePlaylist(pl);
+    playlistEditPanel.style.display = 'none';
+    editingPlaylistId = null;
+  });
+
+  document.getElementById('delete-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    if (!confirm('確定要刪除播放清單「' + pl.name + '」嗎？（不會刪除實際的相片或音樂檔案）')) return;
+    const db = await idbOpen();
+    await new Promise((resolve) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).delete(editingPlaylistId);
+      tx.oncomplete = resolve;
+    });
+    closePlaylistEdit();
+  });
+
+  document.getElementById('export-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    const manifest = {
+      name: pl.name,
+      photoDirNames: pl.photoDirs.map(d => d.name),
+      musicDirNames: pl.musicDirs.map(d => d.name),
+    };
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = pl.name + '.playlist.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+
+  document.getElementById('import-playlist-btn').addEventListener('click', () => {
+    document.getElementById('playlist-import-input').click();
+  });
+  document.getElementById('playlist-import-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try{
+      const text = await file.text();
+      const manifest = JSON.parse(text);
+      const pl = {
+        id: 'pl_' + Date.now(),
+        name: (manifest.name || '匯入的清單'),
+        photoDirs: [], musicDirs: [],
+        pendingPhotoNames: (manifest.photoDirNames || []).slice(),
+        pendingMusicNames: (manifest.musicDirNames || []).slice(),
+      };
+      await idbPutPlaylist(pl);
+      await openPlaylistEdit(pl.id);
+    }catch(err){
+      alert('匯入失敗，檔案格式不正確。');
+    }
+    e.target.value = '';
   });
 
   /* ---- Auto-hide controls ---- */
