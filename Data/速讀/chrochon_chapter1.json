@@ -1,0 +1,1007 @@
+{
+  "articles": [
+    {
+      "id": "art_chrochon_1784017009881",
+      "title": "chrochon",
+      "author": "",
+      "language": "fr",
+      "category": "Fable",
+      "difficulty": "Intermédiaire",
+      "recommendedWPM": 280,
+      "content": {
+        "chapters": [
+          {
+            "id": "ch1",
+            "title": "Chapter 1 — Classic Fable “Les Trois Petits Cochons”",
+            "order": 1,
+            "estimatedReadingTimeSec": 60,
+            "sections": [
+              {
+                "id": "ch1_sec1",
+                "title": "Section 1",
+                "order": 1,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec1_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec1_p1_c1",
+                        "text": "Il était une fois  une  maman cochon  qui  avait trois petits cochons .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il était une fois",
+                          " une ",
+                          "maman cochon",
+                          " qui ",
+                          "avait",
+                          "trois petits cochons",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec1_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec1_p2_c1",
+                        "text": "Elle les aimait beaucoup , mais comme  il n'y avait pas assez de nourriture  pour qu'ils puissent tous manger à leur faim , elle les a envoyé  tenter leur chance  dans le vaste monde .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Elle les aimait beaucoup",
+                          ", mais comme ",
+                          "il n'y avait pas assez de nourriture",
+                          " pour qu'ils puissent tous manger à leur faim",
+                          ", elle les a envoyé",
+                          " tenter leur chance",
+                          " dans le vaste monde",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec2",
+                "title": "Section 2",
+                "order": 2,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec2_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec2_p1_c1",
+                        "text": "Le premier petit cochon  a décidé d'aller  vers le Sud .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le premier petit cochon",
+                          " a décidé d'aller",
+                          " vers le Sud",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec2_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec2_p2_c1",
+                        "text": "Alors qu'il marchait  le long de la route , il a rencontré  un  fermier  qui portait  une botte de paille .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors qu'il marchait",
+                          " le long de la route",
+                          ", il a rencontré",
+                          " un ",
+                          "fermier",
+                          " qui portait",
+                          " une botte de paille",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec2_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec2_p3_c1",
+                        "text": "Il lui a alors demandé poliment  : «  Pourriez-vous s'il vous plaît me donner cette paille ,  que je puisse construire une maison  ? »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il lui a alors demandé poliment",
+                          " : « ",
+                          "Pourriez-vous",
+                          "s'il vous plaît",
+                          "me donner cette paille",
+                          ", ",
+                          "que je puisse construire une maison",
+                          " ? »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec2_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec2_p4_c1",
+                        "text": "Comme le petit cochon avait dit  « s'il vous plaît » , le fermier lui a donné la paille , et le petit cochon l'a utilisée  pour construire une belle maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Comme le petit cochon avait dit",
+                          " « s'il vous plaît »",
+                          ", le fermier lui a donné la paille",
+                          ", et le petit cochon l'a utilisée",
+                          " pour construire une belle maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec2_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec2_p5_c1",
+                        "text": "La maison avait  des murs en paille , un plancher en paille , et à l'intérieur...  un confortable lit en paille .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "La maison avait",
+                          " des murs en paille",
+                          ", un plancher en paille",
+                          ", et à l'intérieur...",
+                          " un confortable lit en paille",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec3",
+                "title": "Section 3",
+                "order": 3,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec3_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p1_c1",
+                        "text": "Alors que  le petit cochon venait juste de finir de construire sa maison  et qu'il s'était allongé pour faire une sieste  dans son lit en paille ,  le grand méchant loup  est arrivé près de la maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors que",
+                          " le petit cochon venait juste de finir de construire sa maison",
+                          " et qu'il s'était allongé pour faire une sieste",
+                          " dans son lit en paille",
+                          ", ",
+                          "le grand méchant loup",
+                          " est arrivé près de la maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p2_c1",
+                        "text": "Il a senti  l'odeur du cochon  à l'intérieur de la maison , et cela lui a mis l'eau à la bouche .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il a senti",
+                          " l'odeur du cochon",
+                          " à l'intérieur de la maison",
+                          ", et cela lui a mis l'eau à la bouche",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p3_c1",
+                        "text": "« Mmm...  Des sandwichs au bacon ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "« Mmm... ",
+                          "Des sandwichs au bacon",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p4_c1",
+                        "text": "le loup a frappé à la porte de la maison en paille et a dit : « Petit cochon! Petit cochon!  Laisse-moi entrer ! Laisse-moi entrer! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "le loup a frappé à la porte",
+                          "de la maison en paille",
+                          "et a dit",
+                          ": « Petit cochon! Petit cochon! ",
+                          "Laisse-moi entrer",
+                          "! Laisse-moi entrer! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p5_c1",
+                        "text": "Mais comme le petit cochon avait vu les grandes griffes du loup à travers la serrure ,  il a répondu : « Non, non, non!  Par les poils de mon menton ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Mais comme le petit cochon avait vu",
+                          "les grandes griffes du loup",
+                          "à travers la serrure",
+                          ", ",
+                          "il a répondu",
+                          ": « Non, non, non! ",
+                          "Par les poils de mon menton",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p6",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p6_c1",
+                        "text": "Alors le loup a montré ses dents et a dit : « Alors  je vais souffler et souffler et ta maison va s'effondrer ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors le loup a montré ses dents",
+                          "et a dit",
+                          ": « Alors ",
+                          "je vais souffler et souffler",
+                          "et ta maison va s'effondrer",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p7",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p7_c1",
+                        "text": "Alors il a soufflé et soufflé  et la maison s'est effondrée .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors il a soufflé et soufflé",
+                          " et la maison s'est effondrée",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec3_p8",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec3_p8_c1",
+                        "text": "Le petit cochon est revenu en courant  chez lui  auprès de sa mère .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le petit cochon est revenu en courant",
+                          " chez lui",
+                          " auprès de sa mère",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec4",
+                "title": "Section 4",
+                "order": 4,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec4_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec4_p1_c1",
+                        "text": "Le deuxième petit cochon  a décidé d'aller  vers le Nord .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le deuxième petit cochon",
+                          " a décidé d'aller",
+                          " vers le Nord",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec4_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec4_p2_c1",
+                        "text": "Alors qu'il marchait le long de la route , il a rencontré un fermier  qui portait un fagot de bois .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors qu'il marchait le long de la route",
+                          ", il a rencontré un fermier",
+                          " qui portait un fagot de bois",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec4_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec4_p3_c1",
+                        "text": "Il lui a alors demandé poliment  : «  Excusez-moi ,  puis-je avoir ce bois pour construire une maison  ? »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il lui a alors demandé poliment",
+                          " : « ",
+                          "Excusez-moi",
+                          ", ",
+                          "puis-je avoir ce bois",
+                          "pour construire une maison",
+                          " ? »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec4_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec4_p4_c1",
+                        "text": "Comme le petit cochon avait dit « excusez-moi » , le fermier lui a donné le bois , et le petit cochon l'a utilisé  pour construire une belle maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Comme le petit cochon avait dit « excusez-moi »",
+                          ", le fermier lui a donné le bois",
+                          ", et le petit cochon l'a utilisé",
+                          " pour construire une belle maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec4_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec4_p5_c1",
+                        "text": "La maison avait  des murs en bois , un plancher en bois , et à l'intérieur...  une solide table en bois .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "La maison avait",
+                          " des murs en bois",
+                          ", un plancher en bois",
+                          ", et à l'intérieur...",
+                          " une solide table en bois",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec5",
+                "title": "Section 5",
+                "order": 5,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec5_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p1_c1",
+                        "text": "Alors que le petit cochon venait juste de finir de construire sa maison  et qu'il faisait un bouquet  pour sa solide table en bois ,  le grand méchant loup est arrivé près de la maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors que le petit cochon venait juste de finir de construire sa maison",
+                          " et qu'il faisait un bouquet",
+                          " pour sa solide table en bois",
+                          ", ",
+                          "le grand méchant loup est arrivé près de la maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p2_c1",
+                        "text": "Il a senti l'odeur du cochon à l'intérieur de la maison , et son estomac s'est mis à gronder .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il a senti l'odeur du cochon à l'intérieur de la maison",
+                          ", et son estomac s'est mis à gronder",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p3_c1",
+                        "text": "« Mmm...  Du rôti de porc ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "« Mmm... ",
+                          "Du rôti de porc",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p4_c1",
+                        "text": "Alors le loup a frappé à la porte de la maison en bois et a dit : « Petit cochon! Petit cochon!  Laisse-moi entrer ! Laisse-moi entrer! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors le loup a frappé à la porte de la maison en bois",
+                          "et a dit",
+                          ": « Petit cochon! Petit cochon! ",
+                          "Laisse-moi entrer",
+                          "! Laisse-moi entrer! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p5_c1",
+                        "text": "Mais comme le petit cochon avait vu le long nez du loup à travers la serrure ,  il a répondu : « Non, non, non!  Par les poils de mon menton ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Mais comme le petit cochon avait vu",
+                          "le long nez du loup",
+                          "à travers la serrure",
+                          ", ",
+                          "il a répondu",
+                          ": « Non, non, non! ",
+                          "Par les poils de mon menton",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p6",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p6_c1",
+                        "text": "Alors le loup a montré ses dents et a dit : « Alors  je vais souffler et souffler et ta maison va s'effondrer ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors le loup a montré ses dents et a dit",
+                          ": « Alors ",
+                          "je vais souffler et souffler et ta maison va s'effondrer",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p7",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p7_c1",
+                        "text": "Alors il a soufflé et soufflé  et la maison s'est effondrée .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors il a soufflé et soufflé",
+                          " et la maison s'est effondrée",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec5_p8",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec5_p8_c1",
+                        "text": "Le petit cochon est revenu en courant chez lui auprès de sa mère ,  qui n'était pas contente !",
+                        "punctuation": "!",
+                        "tokens": [
+                          "Le petit cochon est revenu en courant chez lui auprès de sa mère",
+                          ", ",
+                          "qui n'était pas contente",
+                          "!"
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec6",
+                "title": "Section 6",
+                "order": 6,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec6_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec6_p1_c1",
+                        "text": "Le troisième petit cochon  a décidé d'aller  vers l'Ouest .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le troisième petit cochon",
+                          " a décidé d'aller",
+                          " vers l'Ouest",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec6_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec6_p2_c1",
+                        "text": "Alors qu'il marchait le long de la route, il a rencontré un fermier  qui portait un chargement de briques .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors qu'il marchait le long de la route, il a rencontré un fermier",
+                          " qui portait un chargement de briques",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec6_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec6_p3_c1",
+                        "text": "Il lui a alors demandé poliment  : «  Bonjour monsieur ,  puis-je avoir quelques-unes de ces briques pour construire une maison  ? »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il lui a alors demandé poliment",
+                          " : « ",
+                          "Bonjour monsieur",
+                          ", ",
+                          "puis-je avoir quelques-unes de ces briques",
+                          "pour construire une maison",
+                          " ? »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec6_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec6_p4_c1",
+                        "text": "Comme le fermier appréciait qu'on l'appelle « monsieur » , il a donné au petit cochon quelques briques , et le petit cochon les a utilisées  pour construire une belle maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Comme le fermier appréciait qu'on l'appelle « monsieur »",
+                          ", il a donné au petit cochon quelques briques",
+                          ", et le petit cochon les a utilisées",
+                          " pour construire une belle maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec6_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec6_p5_c1",
+                        "text": "La maison avait  des murs en brique , un plancher en brique , et à l'intérieur...  une grande cheminée en brique .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "La maison avait",
+                          " des murs en brique",
+                          ", un plancher en brique",
+                          ", et à l'intérieur...",
+                          " une grande cheminée en brique",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec7",
+                "title": "Section 7",
+                "order": 7,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec7_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p1_c1",
+                        "text": "Alors que le petit cochon venait juste de finir de construire sa maison  et qu'il préparait une grande marmite de soupe  dans sa cheminée en brique ,  le grand méchant loup est arrivé près de la maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors que le petit cochon venait juste de finir de construire sa maison",
+                          " et qu'il préparait une grande marmite de soupe",
+                          " dans sa cheminée en brique",
+                          ", ",
+                          "le grand méchant loup est arrivé près de la maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p2_c1",
+                        "text": "Il a senti l'odeur du cochon à l'intérieur de la maison , et s'est léché les babines .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il a senti l'odeur du cochon à l'intérieur de la maison",
+                          ", et s'est léché les babines",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p3_c1",
+                        "text": "« Mmm...  Des côtelettes de porc avec de la sauce barbecue et des haricots verts ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "« Mmm... ",
+                          "Des côtelettes de porc",
+                          "avec de la sauce barbecue",
+                          "et des haricots verts",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p4_c1",
+                        "text": "Alors le loup a frappé à la porte de la maison en brique et a dit : « Petit cochon! Petit cochon!  Laisse-moi entrer ! Laisse-moi entrer! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors le loup a frappé à la porte de la maison en brique",
+                          "et a dit",
+                          ": « Petit cochon! Petit cochon! ",
+                          "Laisse-moi entrer",
+                          "! Laisse-moi entrer! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p5_c1",
+                        "text": "Mais le petit cochon a vu les grandes oreilles du loup à travers la serrure ,  il a donc répondu : « Non, non, non!  Par les poils de mon menton ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Mais le petit cochon a vu",
+                          "les grandes oreilles du loup",
+                          "à travers la serrure",
+                          ", ",
+                          "il a donc répondu",
+                          ": « Non, non, non! ",
+                          "Par les poils de mon menton",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p6",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p6_c1",
+                        "text": "Alors le loup a montré ses dents et a dit : « Alors  je vais souffler et souffler et ta maison va s'effondrer ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors le loup a montré ses dents et a dit",
+                          ": « Alors ",
+                          "je vais souffler et souffler et ta maison va s'effondrer",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p7",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p7_c1",
+                        "text": "Alors il a soufflé et soufflé , encore et encore .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Alors il a soufflé et soufflé",
+                          ", encore et encore",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p8",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p8_c1",
+                        "text": "Mais il n'a pas réussi  à faire s'effondrer la maison .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Mais il n'a pas réussi",
+                          " à faire s'effondrer la maison",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p9",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p9_c1",
+                        "text": "À la fin  il était tellement essoufflé  qu'il ne pouvait plus du tout souffler .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "À la fin",
+                          " il était tellement essoufflé",
+                          " qu'il ne pouvait plus du tout souffler",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec7_p10",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec7_p10_c1",
+                        "text": "Le petit cochon se contentait de remuer sa grande marmite de soupe , et de rire .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le petit cochon se contentait de remuer sa grande marmite de soupe",
+                          ", et de rire",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              },
+              {
+                "id": "ch1_sec8",
+                "title": "Section 8",
+                "order": 8,
+                "paragraphs": [
+                  {
+                    "id": "ch1_sec8_p1",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p1_c1",
+                        "text": "Mais le loup avait tellement envie de manger des côtelettes de porc ...  il ne voulait pas abandonner !",
+                        "punctuation": "!",
+                        "tokens": [
+                          "Mais le loup avait tellement envie de manger des côtelettes de porc",
+                          "... ",
+                          "il ne voulait pas abandonner",
+                          "!"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p2",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p2_c1",
+                        "text": "Il s'est faufilé derrière la maison  et a grimpé sur le toit .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Il s'est faufilé derrière la maison",
+                          " et a grimpé sur le toit",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p3",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p3_c1",
+                        "text": "«  À présent ,  j'aurai ce cochon ,  c'est certain ! »",
+                        "punctuation": ".",
+                        "tokens": [
+                          "« ",
+                          "À présent",
+                          ", ",
+                          "j'aurai ce cochon",
+                          ", ",
+                          "c'est certain",
+                          "! »"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p4",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p4_c1",
+                        "text": "Le loup s'est laissé glisser dans la grande cheminée en brique et a atterri ... PLOUF!",
+                        "punctuation": "!",
+                        "tokens": [
+                          "Le loup s'est laissé glisser",
+                          "dans la grande cheminée en brique",
+                          "et a atterri",
+                          "... PLOUF!"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p5",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p5_c1",
+                        "text": "Les fesses les premières dans la grande marmite de soupe du petit cochon ...  qui était alors très chaude !",
+                        "punctuation": "!",
+                        "tokens": [
+                          "Les fesses les premières",
+                          "dans la grande marmite de soupe du petit cochon",
+                          "... ",
+                          "qui était alors très chaude",
+                          "!"
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p6",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p6_c1",
+                        "text": "Le loup a hurlé et a bondi hors de la marmite , puis est sorti en courant de la maison  et a dévalé la route , serrant très fort ses fesses brûlées .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le loup a hurlé et a bondi hors de la marmite",
+                          ", puis est sorti en courant de la maison",
+                          " et a dévalé la route",
+                          ", serrant très fort ses fesses brûlées",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p7",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p7_c1",
+                        "text": "Le petit cochon a appelé sa mère et ses deux frères  sur son téléphone portable en brique , et les a invité  à partager un délicieux dîner de soupe aux fesses de loup .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le petit cochon a appelé sa mère et ses deux frères",
+                          " sur son téléphone portable en brique",
+                          ", et les a invité",
+                          " à partager un délicieux dîner de soupe aux fesses de loup",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p8",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p8_c1",
+                        "text": "La soupe aux fesses de loup était si savoureuse  que bientôt tous les gens à cent kilomètres à la ronde  ont voulu attraper le loup  et le faire s'asseoir dans leur soupe .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "La soupe aux fesses de loup était si savoureuse",
+                          " que bientôt tous les gens à cent kilomètres à la ronde",
+                          " ont voulu attraper le loup",
+                          " et le faire s'asseoir dans leur soupe",
+                          "."
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ch1_sec8_p9",
+                    "clauses": [
+                      {
+                        "id": "ch1_sec8_p9_c1",
+                        "text": "Le pauvre loup a dû s'enfuir très loin  jusqu'à la sombre forêt profonde  où il a pu vivre en paix et dans le calme .",
+                        "punctuation": ".",
+                        "tokens": [
+                          "Le pauvre loup a dû s'enfuir très loin",
+                          " jusqu'à la sombre forêt profonde",
+                          " où il a pu vivre en paix et dans le calme",
+                          "."
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "quiz": {
+                  "questions": []
+                }
+              }
+            ],
+            "quiz": {
+              "questions": []
+            }
+          }
+        ]
+      },
+      "quiz": {
+        "questions": []
+      }
+    }
+  ],
+  "userProgress": {
+    "userId": "local_user",
+    "records": [],
+    "stats": {
+      "averageWPM": 0,
+      "averageAccuracy": 0,
+      "totalArticlesRead": 0
+    }
+  }
+}
