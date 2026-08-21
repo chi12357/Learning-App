@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>主題語言測驗</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== 基礎變量 ===== */
+        :root {
+            --ink: #121315;
+            --cinnabar: #942525;
+            --gold: #bd8b2a;
+            --jade: #fcfbfa;
+            --green: #2d6a4f;
+            --green-light: #52b788;
+            --red-light: #c0392b;
+            --surface: #1a1b1e;
+            --surface-hover: #222326;
+            --font-scale: 1;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html,
+        body {
+            height: 100%;
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* ===== Header ===== */
+        .app-header {
+            text-align: center;
+            padding: 20px 0 14px;
+            border-bottom: 1.5px solid rgba(189, 139, 42, 0.2);
+            margin-bottom: 12px;
+        }
+
+        .app-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: var(--jade);
+            letter-spacing: 0.15em;
+            margin-bottom: 4px;
+        }
+
+        .app-subtitle {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            letter-spacing: 0.08em;
+            font-weight: 500;
+        }
+
+        /* ===== 字型控制欄 ===== */
+        .font-control-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 16px;
+            margin-bottom: 16px;
+            background: rgba(26, 27, 30, 0.8);
+            border-radius: 40px;
+            border: 1px solid rgba(189, 139, 42, 0.15);
+            backdrop-filter: blur(4px);
+            flex-wrap: wrap;
+        }
+
+        .font-control-label {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: rgba(252, 251, 250, 0.6);
+            letter-spacing: 0.05em;
+            margin-right: 4px;
+        }
+
+        .font-control-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 2px solid rgba(189, 139, 42, 0.25);
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+
+        .font-control-btn:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+            transform: scale(1.06);
+        }
+
+        .font-control-btn:active {
+            transform: scale(0.94);
+        }
+
+        .font-control-btn.active {
+            border-color: var(--gold);
+            background: rgba(189, 139, 42, 0.15);
+            color: var(--gold);
+        }
+
+        .font-scale-display {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+            min-width: 48px;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== Screens ===== */
+        .screen {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            animation: fadeIn 0.4s ease;
+        }
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Cards ===== */
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px 20px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(189, 139, 42, 0.1);
+        }
+
+        .card-title {
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--gold);
+            margin-bottom: 16px;
+            text-align: center;
+            letter-spacing: 0.1em;
+        }
+
+        /* ===== Select / Dropdown ===== */
+        .select-group {
+            margin-bottom: 20px;
+        }
+
+        .select-label {
+            display: block;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--jade);
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .select-label .hint {
+            font-size: 1.15rem;
+            color: rgba(252, 251, 250, 0.5);
+            font-weight: 400;
+            margin-left: 6px;
+        }
+
+        .styled-select {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid rgba(252, 251, 250, 0.15);
+            border-radius: 14px;
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23bd8b2a' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 22px;
+            padding-right: 46px;
+        }
+
+        .styled-select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(189, 139, 42, 0.15);
+        }
+
+        .styled-select option {
+            background: var(--surface);
+            color: var(--jade);
+            font-size: 1.3rem;
+            padding: 10px;
+        }
+
+        /* ===== Option Rows ===== */
+        .option-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .option-btn {
+            flex: 1;
+            min-width: 72px;
+            padding: 14px 10px;
+            border: 2.5px solid rgba(252, 251, 250, 0.15);
+            border-radius: 14px;
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: calc(1.4rem * var(--font-scale));
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+
+        .option-btn:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+        }
+
+        .option-btn.selected {
+            border-color: var(--gold);
+            background: rgba(189, 139, 42, 0.12);
+            color: var(--gold);
+            box-shadow: 0 0 14px rgba(189, 139, 42, 0.15);
+        }
+
+        /* ===== Action Buttons ===== */
+        .action-btn {
+            width: 100%;
+            padding: 20px 20px;
+            border: none;
+            border-radius: 16px;
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.1em;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--gold), #d4a84a);
+            color: var(--ink);
+        }
+
+        .action-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(189, 139, 42, 0.3);
+        }
+
+        .action-btn.primary:active {
+            transform: translateY(0);
+        }
+
+        .action-btn.secondary {
+            background: var(--surface);
+            color: var(--jade);
+            border: 2.5px solid rgba(252, 251, 250, 0.2);
+        }
+
+        .action-btn.secondary:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+        }
+
+        .action-btn.danger {
+            background: rgba(148, 37, 37, 0.15);
+            color: #e74c3c;
+            border: 2.5px solid rgba(148, 37, 37, 0.3);
+        }
+
+        .action-btn.danger:hover {
+            background: rgba(148, 37, 37, 0.25);
+        }
+
+        /* ===== Display Area ===== */
+        .display-area {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 34px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1.5px solid rgba(189, 139, 42, 0.15);
+            min-height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .display-area.small {
+            min-height: 100px;
+            padding: 20px 16px;
+            margin-bottom: 16px;
+        }
+
+        .display-lang-label {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .display-text {
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: calc(2.4rem * var(--font-scale));
+            font-weight: 700;
+            color: var(--jade);
+            letter-spacing: 0.05em;
+            line-height: 1.3;
+            word-break: break-all;
+        }
+
+        .display-area.small .display-text {
+            font-size: calc(1.6rem * var(--font-scale));
+        }
+
+        .display-sub {
+            font-family: 'Noto Serif TC', serif;
+            font-size: calc(1.3rem * var(--font-scale));
+            color: rgba(252, 251, 250, 0.55);
+            margin-top: 8px;
+        }
+
+        .display-speaker {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: rgba(189, 139, 42, 0.12);
+            border: 1.5px solid var(--gold);
+            color: var(--gold);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .display-speaker:hover {
+            background: rgba(189, 139, 42, 0.25);
+            transform: scale(1.08);
+        }
+
+        .display-speaker:active {
+            transform: scale(0.95);
+        }
+
+        /* ===== Next Button ===== */
+        .next-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            padding: 10px 18px;
+            border-radius: 28px;
+            background: linear-gradient(135deg, var(--gold), #d4a84a);
+            color: var(--ink);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: calc(0.9rem * var(--font-scale));
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            letter-spacing: 0.08em;
+            display: none;
+        }
+
+        .next-btn.show {
+            display: block;
+        }
+
+        .next-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(189, 139, 42, 0.35);
+        }
+
+        .next-btn:active {
+            transform: scale(0.97);
+        }
+
+        /* ===== Timer Badge ===== */
+        .timer-badge {
+            position: absolute;
+            top: 14px;
+            left: 14px;
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(189, 139, 42, 0.12);
+            border: 1.5px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: none;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.05em;
+        }
+
+        .timer-badge.show {
+            display: flex;
+        }
+
+        .timer-badge.warning {
+            border-color: #e74c3c;
+            color: #e74c3c;
+            background: rgba(148, 37, 37, 0.2);
+            animation: pulse 0.6s ease infinite alternate;
+        }
+
+        @keyframes pulse {
+            from {
+                opacity: 0.6;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+        }
+
+        /* ===== Options Grid (3x4) ===== */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .option-grid-btn {
+            aspect-ratio: 1 / 1;
+            border: 2.5px solid rgba(252, 251, 250, 0.12);
+            border-radius: 16px;
+            background: var(--surface);
+            color: var(--jade);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: calc(1.4rem * var(--font-scale));
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 4px;
+            text-align: center;
+            line-height: 1.3;
+            letter-spacing: 0.02em;
+            word-break: break-all;
+        }
+
+        .option-grid-btn:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+            transform: translateY(-2px);
+        }
+
+        .option-grid-btn:active {
+            transform: scale(0.97);
+        }
+
+        .option-grid-btn.correct {
+            border-color: var(--green) !important;
+            background: rgba(45, 106, 79, 0.15) !important;
+            color: var(--green-light) !important;
+            animation: correctPulse 0.4s ease;
+        }
+
+        .option-grid-btn.wrong {
+            border-color: var(--cinnabar) !important;
+            background: rgba(148, 37, 37, 0.15) !important;
+            color: #e74c3c !important;
+            animation: wrongShake 0.4s ease;
+        }
+
+        .option-grid-btn.wrong-strong {
+            border: 4px solid var(--cinnabar) !important;
+            background: rgba(148, 37, 37, 0.25) !important;
+            color: #ff6b6b !important;
+            font-weight: 700 !important;
+            box-shadow: 0 0 14px rgba(148, 37, 37, 0.3) !important;
+        }
+
+        .option-grid-btn.review-correct {
+            border-color: var(--green) !important;
+            background: rgba(45, 106, 79, 0.08) !important;
+            color: var(--green-light) !important;
+        }
+
+        .option-grid-btn.review-correct:hover {
+            background: rgba(45, 106, 79, 0.2) !important;
+            transform: translateY(-2px);
+        }
+
+        .option-grid-btn.review-wrong-then-correct {
+            border-color: var(--gold) !important;
+            background: rgba(189, 139, 42, 0.15) !important;
+            color: var(--gold) !important;
+            box-shadow: 0 0 12px rgba(189, 139, 42, 0.15);
+        }
+
+        .option-grid-btn.review-wrong-then-correct:hover {
+            background: rgba(189, 139, 42, 0.25) !important;
+            transform: translateY(-2px);
+        }
+
+        .option-grid-btn.result-correct {
+            border-color: var(--green) !important;
+            background: rgba(45, 106, 79, 0.15) !important;
+            color: var(--green-light) !important;
+        }
+
+        .option-grid-btn.result-wrong {
+            border-color: var(--cinnabar) !important;
+            background: rgba(148, 37, 37, 0.2) !important;
+            color: #e74c3c !important;
+            border-width: 3.5px !important;
+        }
+
+        @keyframes correctPulse {
+            0% {
+                transform: scale(1);
+            }
+            40% {
+                transform: scale(1.06);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes wrongShake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            20% {
+                transform: translateX(-6px);
+            }
+            40% {
+                transform: translateX(6px);
+            }
+            60% {
+                transform: translateX(-4px);
+            }
+            80% {
+                transform: translateX(4px);
+            }
+        }
+
+        /* ===== Progress ===== */
+        .progress-area {
+            margin-bottom: 16px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+            color: rgba(252, 251, 250, 0.6);
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: rgba(252, 251, 250, 0.08);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #d4a84a);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* ===== Score Screen ===== */
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            border: 4px solid var(--gold);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 20px auto;
+            background: rgba(189, 139, 42, 0.05);
+        }
+
+        .score-number {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--gold);
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 1.15rem;
+            color: rgba(252, 251, 250, 0.6);
+            margin-top: 4px;
+            letter-spacing: 0.1em;
+        }
+
+        .score-message {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--jade);
+            margin-bottom: 20px;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== File Input ===== */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            width: 100%;
+            padding: 18px 20px;
+            border: 2.5px dashed rgba(189, 139, 42, 0.3);
+            border-radius: 16px;
+            background: var(--surface);
+            color: var(--gold);
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            font-size: 1.35rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.05em;
+        }
+
+        .file-input-label:hover {
+            border-color: var(--gold);
+            background: rgba(189, 139, 42, 0.08);
+        }
+
+        /* ===== Status Badges ===== */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 24px;
+            font-size: 1.15rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .status-badge.learning {
+            background: rgba(189, 139, 42, 0.12);
+            color: var(--gold);
+            border: 1.5px solid rgba(189, 139, 42, 0.25);
+        }
+
+        .status-badge.quiz {
+            background: rgba(148, 37, 37, 0.12);
+            color: #e74c3c;
+            border: 1.5px solid rgba(148, 37, 37, 0.25);
+        }
+
+        .status-badge.review {
+            background: rgba(45, 106, 79, 0.12);
+            color: var(--green-light);
+            border: 1.5px solid rgba(45, 106, 79, 0.25);
+        }
+
+        .status-badge.timed {
+            background: rgba(189, 139, 42, 0.15);
+            color: var(--gold);
+            border: 1.5px solid var(--gold);
+        }
+
+        /* ===== Round Info ===== */
+        .round-info {
+            text-align: center;
+            font-size: 1.3rem;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 0.08em;
+        }
+
+        /* ===== Legend ===== */
+        .legend-row {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-bottom: 12px;
+            font-size: 1.1rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: rgba(252, 251, 250, 0.6);
+        }
+
+        .legend-box {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 2.5px solid;
+        }
+
+        .legend-box.green {
+            border-color: var(--green);
+            background: rgba(45, 106, 79, 0.15);
+        }
+        .legend-box.gold {
+            border-color: var(--gold);
+            background: rgba(189, 139, 42, 0.15);
+        }
+        .legend-box.red-strong {
+            border: 3.5px solid var(--cinnabar);
+            background: rgba(148, 37, 37, 0.25);
+        }
+
+        /* ===== Utility ===== */
+        .text-center {
+            text-align: center;
+        }
+        .mb-1 {
+            margin-bottom: 8px;
+        }
+        .mb-2 {
+            margin-bottom: 16px;
+        }
+        .mt-1 {
+            margin-top: 8px;
+        }
+
+        .divider {
+            height: 1.5px;
+            background: rgba(189, 139, 42, 0.15);
+            margin: 20px 0;
+        }
+
+        .hint-text {
+            font-size: 1.15rem;
+            color: rgba(252, 251, 250, 0.45);
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* ===== Scrollable topic list ===== */
+        .scroll-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border-radius: 14px;
+            border: 1.5px solid rgba(189, 139, 42, 0.15);
+            background: var(--surface);
+        }
+
+        .scroll-list-item {
+            padding: 14px 18px;
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: var(--jade);
+            border-bottom: 1px solid rgba(252, 251, 250, 0.06);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scroll-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .scroll-list-item:hover {
+            background: var(--surface-hover);
+            color: var(--gold);
+        }
+
+        .scroll-list-item.selected {
+            background: rgba(189, 139, 42, 0.1);
+            color: var(--gold);
+        }
+
+        /* ===== 微調計時器專用樣式 ===== */
+        .timer-adjust-group {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .timer-adjust-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(189, 139, 42, 0.3);
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            flex: 0 0 auto;
+        }
+
+        .timer-adjust-btn:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+            transform: scale(1.06);
+        }
+
+        .timer-adjust-btn:active {
+            transform: scale(0.94);
+        }
+
+        .timer-value {
+            font-family: 'Inter', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--gold);
+            min-width: 60px;
+            text-align: center;
+            letter-spacing: 0.04em;
+        }
+
+        .timer-unit {
+            font-size: 1.4rem;
+            color: rgba(252, 251, 250, 0.6);
+            font-weight: 500;
+        }
+
+        .quick-timer-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 6px;
+        }
+
+        .quick-timer-btn {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 2px solid rgba(252, 251, 250, 0.12);
+            background: var(--ink);
+            color: var(--jade);
+            font-family: 'Inter', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 0 1 auto;
+            min-width: 50px;
+        }
+
+        .quick-timer-btn:hover {
+            border-color: var(--gold);
+            background: var(--surface-hover);
+        }
+
+        .quick-timer-btn.selected {
+            border-color: var(--gold);
+            background: rgba(189, 139, 42, 0.12);
+            color: var(--gold);
+            box-shadow: 0 0 12px rgba(189, 139, 42, 0.15);
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 380px) {
+            .app-title {
+                font-size: 2.2rem;
+            }
+            .display-text {
+                font-size: calc(2rem * var(--font-scale));
+            }
+            .option-grid-btn {
+                font-size: calc(1.2rem * var(--font-scale));
+            }
+            .action-btn {
+                font-size: 1.35rem;
+            }
+            .font-control-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1.3rem;
+            }
+            .timer-adjust-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1.6rem;
+            }
+            .timer-value {
+                font-size: 2.2rem;
+                min-width: 50px;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--ink);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+
+        <!-- ===== HEADER ===== -->
+        <header class="app-header">
+            <h1 class="app-title">主題語言測驗</h1>
+            <p class="app-subtitle">Language Learning Quiz</p>
+        </header>
+
+        <!-- ===== 字型控制欄 ===== -->
+        <div class="font-control-bar">
+            <span class="font-control-label">🔤 字型</span>
+            <button class="font-control-btn" id="font-decrease" title="縮小字型" onclick="adjustFontScale(-0.1)">A−</button>
+            <button class="font-control-btn active" id="font-reset" title="重設字型" onclick="resetFontScale()">A</button>
+            <button class="font-control-btn" id="font-increase" title="放大字型" onclick="adjustFontScale(0.1)">A+</button>
+            <span class="font-scale-display" id="font-scale-display">1.0×</span>
+        </div>
+
+        <!-- ===== HOME ===== -->
+        <div id="screen-home" class="screen active">
+            <div class="card">
+                <div class="card-title">選擇主題</div>
+                <div class="select-group">
+                    <label class="select-label">主題</label>
+                    <select class="styled-select" id="topic-select" onchange="onTopicSelect()">
+                        <option value="">請選擇主題</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">學習設定</div>
+                <div class="select-group">
+                    <label class="select-label">學習語言<span class="hint">（朗讀與題目）</span></label>
+                    <div class="option-row">
+                        <button class="option-btn" data-lang="en" onclick="selectLearningLang('en')">英語</button>
+                        <button class="option-btn" data-lang="ja" onclick="selectLearningLang('ja')">日語</button>
+                        <button class="option-btn" data-lang="fr" onclick="selectLearningLang('fr')">法語</button>
+                    </div>
+                </div>
+                <div class="select-group">
+                    <label class="select-label">選項顯示語言<span class="hint">（按鈕文字）</span></label>
+                    <div class="option-row">
+                        <button class="option-btn" data-opt="zh" onclick="selectOptionLang('zh')">中文</button>
+                        <button class="option-btn" data-opt="en" onclick="selectOptionLang('en')">英語</button>
+                        <button class="option-btn" data-opt="ja" onclick="selectOptionLang('ja')">日語</button>
+                        <button class="option-btn" data-opt="fr" onclick="selectOptionLang('fr')">法語</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="action-btn primary" onclick="goToLearning()">開始學習</button>
+            <button class="action-btn secondary" onclick="goToQuiz()">開始測驗</button>
+
+            <div class="divider"></div>
+
+            <!-- ===== 限時測驗區塊 (已更新微調) ===== -->
+            <div class="card">
+                <div class="card-title">⏱️ 限時測驗</div>
+                <div class="select-group">
+                    <label class="select-label">每題時間</label>
+                    <!-- 微調區 -->
+                    <div class="timer-adjust-group">
+                        <button class="timer-adjust-btn" onclick="adjustTimer(-1)" aria-label="減少1秒">−</button>
+                        <span class="timer-value" id="timer-display-value">10</span>
+                        <span class="timer-unit">秒</span>
+                        <button class="timer-adjust-btn" onclick="adjustTimer(1)" aria-label="增加1秒">+</button>
+                    </div>
+                    <!-- 快速按鈕 -->
+                    <div class="quick-timer-row">
+                        <button class="quick-timer-btn" data-timer="5" onclick="selectTimer(5)">5</button>
+                        <button class="quick-timer-btn selected" data-timer="10" onclick="selectTimer(10)">10</button>
+                        <button class="quick-timer-btn" data-timer="15" onclick="selectTimer(15)">15</button>
+                    </div>
+                </div>
+                <button class="action-btn primary" onclick="startTimedQuiz()">🚀 開始限時測驗</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="card">
+                <div class="card-title">匯入測驗</div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="json-upload" accept=".json" onchange="handleFileUpload(event)">
+                    <label for="json-upload" class="file-input-label">📁 選擇 JSON 檔案</label>
+                </div>
+                <p class="hint-text mt-1">支援自訂測驗 JSON 格式</p>
+            </div>
+        </div>
+
+        <!-- ===== LEARNING ===== -->
+        <div id="screen-learning" class="screen">
+            <div class="text-center mb-1">
+                <span class="status-badge learning">學習模式</span>
+            </div>
+            <div class="display-area">
+                <div class="display-speaker" onclick="speakCurrent()" title="朗讀">🔊</div>
+                <div class="display-lang-label" id="display-lang-label">法語</div>
+                <div class="display-text" id="learning-display">—</div>
+                <div class="display-sub" id="learning-sub">點擊下方按鈕開始學習</div>
+            </div>
+            <div class="options-grid" id="learning-grid"></div>
+            <button class="action-btn secondary" onclick="backToHome()">返回首頁</button>
+            <button class="action-btn primary" onclick="goToQuiz()">進入測驗</button>
+        </div>
+
+        <!-- ===== QUIZ (一般與限時共用) ===== -->
+        <div id="screen-quiz" class="screen">
+            <div class="text-center mb-1">
+                <span class="status-badge quiz" id="quiz-badge">測驗模式</span>
+            </div>
+            <div class="round-info" id="round-info"></div>
+            <div class="progress-area">
+                <div class="progress-info">
+                    <span id="quiz-progress-text">第 1 輪</span>
+                    <span id="quiz-score-text">得分：0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="quiz-progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            <div class="display-area">
+                <div class="timer-badge" id="timer-badge">⏱️ <span id="timer-seconds">10</span>s</div>
+                <div class="display-speaker" id="quiz-speaker" onclick="speakQuizQuestion()" title="朗讀題目">🔊</div>
+                <button class="next-btn" id="next-btn" onclick="onNextQuestion()">下一題 ➜</button>
+                <div class="display-lang-label" id="quiz-lang-label">請聽題目</div>
+                <div class="display-text" id="quiz-display">—</div>
+                <div class="display-sub" id="quiz-sub">點擊喇叭圖示或等待朗讀</div>
+            </div>
+            <div class="options-grid" id="quiz-grid"></div>
+            <button class="action-btn danger" onclick="quitQuiz()">結束測驗</button>
+        </div>
+
+        <!-- ===== RESULT ===== -->
+        <div id="screen-result" class="screen">
+            <div class="card">
+                <div class="card-title">測驗結果</div>
+                <div class="score-circle">
+                    <div class="score-number" id="result-score">0</div>
+                    <div class="score-label">%</div>
+                </div>
+                <div class="score-message" id="result-message">—</div>
+            </div>
+            <div class="card">
+                <div class="card-title">題目回顧</div>
+                <div class="hint-text mb-2">點擊選項可查看學習語並朗讀（如學習模式）</div>
+                <div class="legend-row" id="result-legend">
+                    <div class="legend-item"><div class="legend-box green"></div>正確</div>
+                    <div class="legend-item"><div class="legend-box red-strong"></div>錯誤 / 超時</div>
+                </div>
+                <div class="display-area small" id="result-display-area" style="display:none;">
+                    <div class="display-lang-label" id="result-display-label"></div>
+                    <div class="display-text" id="result-display-text"></div>
+                </div>
+                <div class="options-grid" id="result-grid"></div>
+            </div>
+            <button class="action-btn primary" onclick="restartQuiz()">再測一次</button>
+            <button class="action-btn secondary" onclick="backToHome()">返回首頁</button>
+        </div>
+
+    </div>
+
+    <script>
+        // ========================
+        // Built-in Topics (8 core)
+        // ========================
+        const BUILTIN_TOPICS = {
+            alphabet: {
+                title: "字母",
+                category: "alphabet",
+                learningLang: "fr",
+                items: [
+                    { zh: "A", en: "A", ja: "エー", fr: "a" },
+                    { zh: "B", en: "B", ja: "ビー", fr: "bé" },
+                    { zh: "C", en: "C", ja: "シー", fr: "cé" },
+                    { zh: "D", en: "D", ja: "ディー", fr: "dé" },
+                    { zh: "E", en: "E", ja: "イー", fr: "e" },
+                    { zh: "F", en: "F", ja: "エフ", fr: "effe" },
+                    { zh: "G", en: "G", ja: "ジー", fr: "gé" },
+                    { zh: "H", en: "H", ja: "エイチ", fr: "hache" },
+                    { zh: "I", en: "I", ja: "アイ", fr: "i" },
+                    { zh: "J", en: "J", ja: "ジェー", fr: "ji" },
+                    { zh: "K", en: "K", ja: "ケー", fr: "ka" },
+                    { zh: "L", en: "L", ja: "エル", fr: "elle" },
+                ]
+            },
+            numbers: {
+                title: "數字",
+                category: "numbers",
+                learningLang: "fr",
+                items: [
+                    { zh: "一", en: "one", ja: "いち", fr: "un" },
+                    { zh: "二", en: "two", ja: "に", fr: "deux" },
+                    { zh: "三", en: "three", ja: "さん", fr: "trois" },
+                    { zh: "四", en: "four", ja: "し", fr: "quatre" },
+                    { zh: "五", en: "five", ja: "ご", fr: "cinq" },
+                    { zh: "六", en: "six", ja: "ろく", fr: "six" },
+                    { zh: "七", en: "seven", ja: "なな", fr: "sept" },
+                    { zh: "八", en: "eight", ja: "はち", fr: "huit" },
+                    { zh: "九", en: "nine", ja: "きゅう", fr: "neuf" },
+                    { zh: "十", en: "ten", ja: "じゅう", fr: "dix" },
+                    { zh: "十一", en: "eleven", ja: "じゅういち", fr: "onze" },
+                    { zh: "十二", en: "twelve", ja: "じゅうに", fr: "douze" },
+                ]
+            },
+            days: {
+                title: "星期",
+                category: "days",
+                learningLang: "fr",
+                items: [
+                    { zh: "星期一", en: "Monday", ja: "月曜日", fr: "lundi" },
+                    { zh: "星期二", en: "Tuesday", ja: "火曜日", fr: "mardi" },
+                    { zh: "星期三", en: "Wednesday", ja: "水曜日", fr: "mercredi" },
+                    { zh: "星期四", en: "Thursday", ja: "木曜日", fr: "jeudi" },
+                    { zh: "星期五", en: "Friday", ja: "金曜日", fr: "vendredi" },
+                    { zh: "星期六", en: "Saturday", ja: "土曜日", fr: "samedi" },
+                    { zh: "星期日", en: "Sunday", ja: "日曜日", fr: "dimanche" },
+                    { zh: "今天", en: "today", ja: "今日", fr: "aujourd'hui" },
+                    { zh: "昨天", en: "yesterday", ja: "昨日", fr: "hier" },
+                    { zh: "明天", en: "tomorrow", ja: "明日", fr: "demain" },
+                    { zh: "早上", en: "morning", ja: "朝", fr: "le matin" },
+                    { zh: "晚上", en: "evening", ja: "夜", fr: "le soir" },
+                ]
+            },
+            months: {
+                title: "月份",
+                category: "months",
+                learningLang: "fr",
+                items: [
+                    { zh: "一月", en: "January", ja: "一月", fr: "janvier" },
+                    { zh: "二月", en: "February", ja: "二月", fr: "février" },
+                    { zh: "三月", en: "March", ja: "三月", fr: "mars" },
+                    { zh: "四月", en: "April", ja: "四月", fr: "avril" },
+                    { zh: "五月", en: "May", ja: "五月", fr: "mai" },
+                    { zh: "六月", en: "June", ja: "六月", fr: "juin" },
+                    { zh: "七月", en: "July", ja: "七月", fr: "juillet" },
+                    { zh: "八月", en: "August", ja: "八月", fr: "août" },
+                    { zh: "九月", en: "September", ja: "九月", fr: "septembre" },
+                    { zh: "十月", en: "October", ja: "十月", fr: "octobre" },
+                    { zh: "十一月", en: "November", ja: "十一月", fr: "novembre" },
+                    { zh: "十二月", en: "December", ja: "十二月", fr: "décembre" },
+                ]
+            },
+            seasons: {
+                title: "季節",
+                category: "seasons",
+                learningLang: "fr",
+                items: [
+                    { zh: "春天", en: "spring", ja: "春", fr: "le printemps" },
+                    { zh: "夏天", en: "summer", ja: "夏", fr: "l'été" },
+                    { zh: "秋天", en: "autumn", ja: "秋", fr: "l'automne" },
+                    { zh: "冬天", en: "winter", ja: "冬", fr: "l'hiver" },
+                    { zh: "晴天", en: "sunny", ja: "晴れ", fr: "ensoleillé" },
+                    { zh: "雨天", en: "rainy", ja: "雨", fr: "pluvieux" },
+                    { zh: "雪", en: "snow", ja: "雪", fr: "la neige" },
+                    { zh: "風", en: "wind", ja: "風", fr: "le vent" },
+                    { zh: "雲", en: "cloud", ja: "雲", fr: "le nuage" },
+                    { zh: "雷", en: "thunder", ja: "雷", fr: "le tonnerre" },
+                    { zh: "冷", en: "cold", ja: "寒い", fr: "froid" },
+                    { zh: "熱", en: "hot", ja: "暑い", fr: "chaud" },
+                ]
+            },
+            colors: {
+                title: "顏色",
+                category: "colors",
+                learningLang: "fr",
+                items: [
+                    { zh: "紅色", en: "red", ja: "赤", fr: "rouge" },
+                    { zh: "藍色", en: "blue", ja: "青", fr: "bleu" },
+                    { zh: "綠色", en: "green", ja: "緑", fr: "vert" },
+                    { zh: "黃色", en: "yellow", ja: "黄", fr: "jaune" },
+                    { zh: "橙色", en: "orange", ja: "橙", fr: "orange" },
+                    { zh: "紫色", en: "purple", ja: "紫", fr: "violet" },
+                    { zh: "粉紅色", en: "pink", ja: "桃色", fr: "rose" },
+                    { zh: "黑色", en: "black", ja: "黒", fr: "noir" },
+                    { zh: "白色", en: "white", ja: "白", fr: "blanc" },
+                    { zh: "灰色", en: "gray", ja: "灰色", fr: "gris" },
+                    { zh: "棕色", en: "brown", ja: "茶色", fr: "marron" },
+                    { zh: "金色", en: "gold", ja: "金色", fr: "doré" },
+                ]
+            },
+            animals: {
+                title: "動物",
+                category: "animals",
+                learningLang: "fr",
+                items: [
+                    { zh: "貓", en: "cat", ja: "猫", fr: "le chat" },
+                    { zh: "狗", en: "dog", ja: "犬", fr: "le chien" },
+                    { zh: "鳥", en: "bird", ja: "鳥", fr: "l'oiseau" },
+                    { zh: "魚", en: "fish", ja: "魚", fr: "le poisson" },
+                    { zh: "兔子", en: "rabbit", ja: "兎", fr: "le lapin" },
+                    { zh: "馬", en: "horse", ja: "馬", fr: "le cheval" },
+                    { zh: "牛", en: "cow", ja: "牛", fr: "la vache" },
+                    { zh: "羊", en: "sheep", ja: "羊", fr: "le mouton" },
+                    { zh: "豬", en: "pig", ja: "豚", fr: "le cochon" },
+                    { zh: "雞", en: "chicken", ja: "鶏", fr: "la poule" },
+                    { zh: "鴨子", en: "duck", ja: "鴨", fr: "le canard" },
+                    { zh: "老鼠", en: "mouse", ja: "鼠", fr: "la souris" },
+                ]
+            },
+            plants: {
+                title: "植物",
+                category: "plants",
+                learningLang: "fr",
+                items: [
+                    { zh: "玫瑰", en: "rose", ja: "薔薇", fr: "la rose" },
+                    { zh: "鬱金香", en: "tulip", ja: "チューリップ", fr: "la tulipe" },
+                    { zh: "向日葵", en: "sunflower", ja: "向日葵", fr: "le tournesol" },
+                    { zh: "樹", en: "tree", ja: "木", fr: "l'arbre" },
+                    { zh: "花", en: "flower", ja: "花", fr: "la fleur" },
+                    { zh: "草", en: "grass", ja: "草", fr: "l'herbe" },
+                    { zh: "葉子", en: "leaf", ja: "葉", fr: "la feuille" },
+                    { zh: "蘋果樹", en: "apple tree", ja: "林檎の木", fr: "le pommier" },
+                    { zh: "橡樹", en: "oak", ja: "樫", fr: "le chêne" },
+                    { zh: "紫丁香", en: "lilac", ja: "ライラック", fr: "le lilas" },
+                    { zh: "百合", en: "lily", ja: "百合", fr: "le lys" },
+                    { zh: "蘭花", en: "orchid", ja: "蘭", fr: "l'orchidée" },
+                ]
+            }
+        };
+
+        const LANG_NAMES = { zh: "中文", en: "英語", ja: "日語", fr: "法語" };
+        const AUDIO_LANGS = { zh: "zh-TW", en: "en-US", ja: "ja-JP", fr: "fr-FR" };
+
+        // ========================
+        // State
+        // ========================
+        let allTopics = { ...BUILTIN_TOPICS };
+        let currentTopic = null;
+        let currentTopicKey = null;
+        let learningLang = "fr";
+        let optionLang = "zh";
+        let currentData = null;
+
+        // Quiz state
+        let quizItems = [];
+        let quizPool = [];
+        let quizRound = 1;
+        let quizScore = 0;
+        let quizTotalAnswered = 0;
+        let quizWrongItems = new Set();
+        let itemEverWrong = new Set();
+        let itemFinalCorrect = new Set();
+        let currentQuestion = null;
+        let isAnswering = false;
+
+        // Timed mode state
+        let isTimedMode = false;
+        let timeLimit = 10;
+        let timeLeft = 10;
+        let timerInterval = null;
+        let quizResults = [];
+
+        // ========================
+        // 字型控制
+        // ========================
+        let fontScale = 1.0;
+        const MIN_SCALE = 0.7;
+        const MAX_SCALE = 1.5;
+
+        function applyFontScale() {
+            document.documentElement.style.setProperty('--font-scale', fontScale);
+            document.getElementById('font-scale-display').textContent = fontScale.toFixed(1) + '×';
+            document.querySelectorAll('.font-control-btn').forEach(b => b.classList.remove('active'));
+            if (fontScale === 1.0) {
+                document.getElementById('font-reset').classList.add('active');
+            } else if (fontScale < 1.0) {
+                document.getElementById('font-decrease').classList.add('active');
+            } else {
+                document.getElementById('font-increase').classList.add('active');
+            }
+        }
+
+        function adjustFontScale(delta) {
+            let newScale = fontScale + delta;
+            if (newScale < MIN_SCALE) newScale = MIN_SCALE;
+            if (newScale > MAX_SCALE) newScale = MAX_SCALE;
+            fontScale = Math.round(newScale * 10) / 10;
+            applyFontScale();
+        }
+
+        function resetFontScale() {
+            fontScale = 1.0;
+            applyFontScale();
+        }
+
+        // ========================
+        // Init
+        // ========================
+        function init() {
+            populateTopicSelect();
+            selectLearningLang("fr");
+            selectOptionLang("zh");
+            applyFontScale();
+            selectTimer(10); // 預設10秒
+        }
+
+        function populateTopicSelect() {
+            const sel = document.getElementById("topic-select");
+            sel.innerHTML = '<option value="">請選擇主題</option>';
+            for (const [key, topic] of Object.entries(allTopics)) {
+                const opt = document.createElement("option");
+                opt.value = key;
+                opt.textContent = topic.title;
+                sel.appendChild(opt);
+            }
+        }
+
+        function onTopicSelect() {
+            const sel = document.getElementById("topic-select");
+            const key = sel.value;
+            if (key && allTopics[key]) {
+                currentTopicKey = key;
+                currentTopic = allTopics[key];
+                currentData = currentTopic.items;
+            } else {
+                currentTopicKey = null;
+                currentTopic = null;
+                currentData = null;
+            }
+        }
+
+        function selectLearningLang(lang) {
+            learningLang = lang;
+            document.querySelectorAll(".option-btn[data-lang]").forEach(btn => {
+                btn.classList.toggle("selected", btn.dataset.lang === lang);
+            });
+        }
+
+        function selectOptionLang(lang) {
+            optionLang = lang;
+            document.querySelectorAll(".option-btn[data-opt]").forEach(btn => {
+                btn.classList.toggle("selected", btn.dataset.opt === lang);
+            });
+        }
+
+        // ========================
+        // 計時器微調
+        // ========================
+        function selectTimer(sec) {
+            sec = Math.min(15, Math.max(1, sec));
+            timeLimit = sec;
+            // 更新顯示
+            document.getElementById('timer-display-value').textContent = sec;
+            // 更新快速按鈕選中狀態
+            document.querySelectorAll('.quick-timer-btn').forEach(btn => {
+                btn.classList.toggle('selected', parseInt(btn.dataset.timer) === sec);
+            });
+        }
+
+        function adjustTimer(delta) {
+            let newVal = timeLimit + delta;
+            if (newVal < 1) newVal = 1;
+            if (newVal > 15) newVal = 15;
+            selectTimer(newVal);
+        }
+
+        // ========================
+        // Navigation
+        // ========================
+        function showScreen(id) {
+            document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+            document.getElementById(id).classList.add("active");
+        }
+
+        function backToHome() {
+            stopTimer();
+            showScreen("screen-home");
+        }
+
+        // ========================
+        // Speech
+        // ========================
+        function speak(text, lang) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            const utter = new SpeechSynthesisUtterance(text);
+            utter.lang = AUDIO_LANGS[lang] || lang;
+            utter.rate = 0.85;
+            utter.pitch = 1.0;
+            window.speechSynthesis.speak(utter);
+        }
+
+        // ========================
+        // Learning Mode
+        // ========================
+        function goToLearning() {
+            if (!currentTopic) { alert("請先選擇一個主題"); return; }
+            showScreen("screen-learning");
+            document.getElementById("display-lang-label").textContent = LANG_NAMES[learningLang];
+            document.getElementById("learning-display").textContent = "—";
+            document.getElementById("learning-sub").textContent = "點擊下方按鈕開始學習";
+            renderLearningGrid();
+        }
+
+        function renderLearningGrid() {
+            const grid = document.getElementById("learning-grid");
+            grid.innerHTML = "";
+            currentData.forEach((item, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-grid-btn";
+                btn.textContent = item[optionLang];
+                btn.onclick = () => onLearningClick(idx);
+                grid.appendChild(btn);
+            });
+        }
+
+        function onLearningClick(idx) {
+            const item = currentData[idx];
+            document.getElementById("learning-display").textContent = item[learningLang];
+            document.getElementById("learning-sub").textContent = `中文：${item.zh}`;
+            speak(item[learningLang], learningLang);
+        }
+
+        function speakCurrent() {
+            const text = document.getElementById("learning-display").textContent;
+            if (text && text !== "—") speak(text, learningLang);
+        }
+
+        // ========================
+        // Timer Functions
+        // ========================
+        function startTimer() {
+            stopTimer();
+            timeLeft = timeLimit;
+            updateTimerDisplay();
+            const badge = document.getElementById("timer-badge");
+            badge.classList.add("show");
+            badge.classList.remove("warning");
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                if (timeLeft <= 3) {
+                    badge.classList.add("warning");
+                } else {
+                    badge.classList.remove("warning");
+                }
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            const badge = document.getElementById("timer-badge");
+            badge.classList.remove("show", "warning");
+        }
+
+        function updateTimerDisplay() {
+            document.getElementById("timer-seconds").textContent = Math.max(0, timeLeft);
+        }
+
+        function handleTimeout() {
+            if (!isAnswering || currentQuestion === null) return;
+            quizTotalAnswered++;
+            quizResults[currentQuestion] = 'wrong';
+            quizWrongItems.add(currentQuestion);
+            itemEverWrong.add(currentQuestion);
+            itemFinalCorrect.delete(currentQuestion);
+            isAnswering = false;
+
+            const item = quizItems[currentQuestion];
+            const correctBtn = document.querySelector(`#quiz-grid .option-grid-btn[data-idx="${currentQuestion}"]`);
+            if (correctBtn) {
+                correctBtn.classList.add("correct");
+            }
+            document.querySelectorAll("#quiz-grid .option-grid-btn").forEach(btn => {
+                btn.style.pointerEvents = 'none';
+            });
+
+            document.getElementById("quiz-display").textContent = item[learningLang];
+            document.getElementById("quiz-lang-label").textContent = LANG_NAMES[learningLang];
+            document.getElementById("quiz-sub").textContent = "⏰ 時間到！";
+
+            updateScoreDisplay();
+
+            setTimeout(() => {
+                document.querySelectorAll("#quiz-grid .option-grid-btn").forEach(btn => {
+                    btn.style.pointerEvents = 'auto';
+                });
+                nextQuestion();
+            }, 1200);
+        }
+
+        // ========================
+        // Quiz Core
+        // ========================
+        function initQuiz() {
+            quizItems = [...currentData];
+            quizPool = quizItems.map((_, i) => i);
+            quizRound = 1;
+            quizScore = 0;
+            quizTotalAnswered = 0;
+            quizWrongItems = new Set();
+            itemEverWrong = new Set();
+            itemFinalCorrect = new Set();
+            currentQuestion = null;
+            isAnswering = false;
+            quizResults = new Array(quizItems.length).fill(null);
+            stopTimer();
+            renderQuizGrid();
+        }
+
+        function renderQuizGrid() {
+            const grid = document.getElementById("quiz-grid");
+            grid.innerHTML = "";
+            quizItems.forEach((item, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-grid-btn";
+                btn.dataset.idx = idx;
+                btn.textContent = item[optionLang];
+                btn.onclick = () => onQuizAnswer(idx);
+                grid.appendChild(btn);
+            });
+        }
+
+        function updateRoundInfo() {
+            const info = document.getElementById("round-info");
+            const badge = document.getElementById("quiz-badge");
+            if (isTimedMode) {
+                info.textContent = `⏱️ 限時測驗 · 每題 ${timeLimit} 秒`;
+                badge.textContent = "限時模式";
+                badge.className = "status-badge timed";
+                return;
+            }
+            if (quizRound === 1) {
+                info.textContent = "第一輪測驗";
+                badge.textContent = "測驗模式";
+                badge.className = "status-badge quiz";
+            } else {
+                info.textContent = `第 ${quizRound} 輪重測（錯題複習）`;
+                badge.textContent = "重測模式";
+                badge.className = "status-badge review";
+            }
+        }
+
+        function showNextBtn(show) {
+            const speaker = document.getElementById("quiz-speaker");
+            const nextBtn = document.getElementById("next-btn");
+            if (show) {
+                speaker.style.display = "none";
+                nextBtn.classList.add("show");
+            } else {
+                speaker.style.display = "flex";
+                nextBtn.classList.remove("show");
+            }
+        }
+
+        function getDisplayLangForAnswer() {
+            return optionLang === learningLang ? "zh" : learningLang;
+        }
+
+        function getDisplayLangLabelForAnswer() {
+            return LANG_NAMES[getDisplayLangForAnswer()];
+        }
+
+        function updateScoreDisplay() {
+            let pct = 0;
+            if (quizTotalAnswered > 0) {
+                pct = Math.round((quizScore / quizTotalAnswered) * 100);
+            }
+            document.getElementById("quiz-score-text").textContent = `得分：${pct}%`;
+        }
+
+        function nextQuestion() {
+            document.querySelectorAll("#quiz-grid .option-grid-btn").forEach(btn => {
+                btn.classList.remove("correct", "wrong");
+                btn.style.pointerEvents = 'auto';
+            });
+
+            showNextBtn(false);
+            updateRoundInfo();
+
+            if (isTimedMode) {
+                if (quizPool.length === 0) {
+                    finishQuiz();
+                    return;
+                }
+                const randPos = Math.floor(Math.random() * quizPool.length);
+                currentQuestion = quizPool[randPos];
+                quizPool.splice(randPos, 1);
+                isAnswering = true;
+
+                document.getElementById("quiz-display").textContent = "?";
+                document.getElementById("quiz-sub").textContent = "請選擇對應的選項";
+                document.getElementById("quiz-lang-label").textContent = "請聽題目";
+                document.getElementById("quiz-progress-text").textContent = `剩餘 ${quizPool.length + 1} 題`;
+                updateScoreDisplay();
+                const total = quizItems.length;
+                const answered = quizTotalAnswered;
+                document.getElementById("quiz-progress-bar").style.width = `${Math.min((answered / total) * 100, 100)}%`;
+
+                setTimeout(() => {
+                    const item = quizItems[currentQuestion];
+                    speak(item[learningLang], learningLang);
+                    document.getElementById("quiz-lang-label").textContent = LANG_NAMES[learningLang];
+                    startTimer();
+                }, 400);
+                return;
+            }
+
+            // 一般模式
+            if (quizPool.length === 0) {
+                if (quizWrongItems.size === 0) {
+                    finishQuiz();
+                    return;
+                }
+                quizPool = Array.from(quizWrongItems);
+                quizWrongItems = new Set();
+                quizRound++;
+                updateRoundInfo();
+            }
+
+            const randPos = Math.floor(Math.random() * quizPool.length);
+            currentQuestion = quizPool[randPos];
+            quizPool.splice(randPos, 1);
+            isAnswering = true;
+
+            document.getElementById("quiz-display").textContent = "?";
+            document.getElementById("quiz-sub").textContent = "請選擇對應的選項";
+            document.getElementById("quiz-lang-label").textContent = "請聽題目";
+
+            const total = quizItems.length;
+            document.getElementById("quiz-progress-text").textContent = `第 ${quizRound} 輪 · 剩 ${quizPool.length + 1} 題`;
+            updateScoreDisplay();
+            document.getElementById("quiz-progress-bar").style.width = `${Math.min((quizTotalAnswered / total) * 100, 100)}%`;
+
+            setTimeout(() => {
+                const item = quizItems[currentQuestion];
+                speak(item[learningLang], learningLang);
+                document.getElementById("quiz-lang-label").textContent = LANG_NAMES[learningLang];
+            }, 400);
+        }
+
+        function speakQuizQuestion() {
+            if (currentQuestion !== null && currentQuestion !== undefined) {
+                const item = quizItems[currentQuestion];
+                speak(item[learningLang], learningLang);
+            }
+        }
+
+        function onQuizAnswer(selectedIdx) {
+            const item = quizItems[selectedIdx];
+            speak(item[learningLang], learningLang);
+
+            if (!isAnswering) {
+                const displayLang = getDisplayLangForAnswer();
+                document.getElementById("quiz-display").textContent = item[displayLang];
+                document.getElementById("quiz-lang-label").textContent = getDisplayLangLabelForAnswer();
+                document.getElementById("quiz-sub").textContent = "點擊「下一題」繼續";
+                return;
+            }
+
+            if (isTimedMode) {
+                stopTimer();
+            }
+
+            quizTotalAnswered++;
+            const correctBtn = document.querySelector(`#quiz-grid .option-grid-btn[data-idx="${currentQuestion}"]`);
+            const selectedBtn = document.querySelector(`#quiz-grid .option-grid-btn[data-idx="${selectedIdx}"]`);
+
+            let isCorrect = (selectedIdx === currentQuestion);
+            if (isCorrect) {
+                selectedBtn.classList.add("correct");
+                quizScore++;
+                itemFinalCorrect.add(currentQuestion);
+                quizResults[currentQuestion] = 'correct';
+            } else {
+                selectedBtn.classList.add("wrong");
+                correctBtn.classList.add("correct");
+                quizWrongItems.add(currentQuestion);
+                itemEverWrong.add(currentQuestion);
+                itemFinalCorrect.delete(currentQuestion);
+                quizResults[currentQuestion] = 'wrong';
+            }
+
+            isAnswering = false;
+            updateScoreDisplay();
+
+            const displayLang = getDisplayLangForAnswer();
+            document.getElementById("quiz-display").textContent = item[displayLang];
+            document.getElementById("quiz-lang-label").textContent = getDisplayLangLabelForAnswer();
+            document.getElementById("quiz-sub").textContent = isCorrect ? "答對了！" : "答錯了，請記住正確答案";
+
+            if (isTimedMode) {
+                document.querySelectorAll("#quiz-grid .option-grid-btn").forEach(btn => {
+                    btn.style.pointerEvents = 'none';
+                });
+                setTimeout(() => {
+                    document.querySelectorAll("#quiz-grid .option-grid-btn").forEach(btn => {
+                        btn.style.pointerEvents = 'auto';
+                    });
+                    nextQuestion();
+                }, 1000);
+            } else {
+                showNextBtn(true);
+            }
+        }
+
+        function onNextQuestion() {
+            nextQuestion();
+        }
+
+        function quitQuiz() {
+            if (confirm("確定要結束測驗嗎？")) {
+                stopTimer();
+                finishQuiz();
+            }
+        }
+
+        function finishQuiz() {
+            stopTimer();
+            showScreen("screen-result");
+
+            let pct = 0;
+            if (quizTotalAnswered > 0) {
+                pct = Math.round((quizScore / quizTotalAnswered) * 100);
+            }
+            document.getElementById("result-score").textContent = pct;
+
+            let msg = "";
+            if (pct === 100) msg = "太棒了！全部答對！🎉";
+            else if (pct >= 80) msg = `表現優異！正確率 ${pct}%`;
+            else if (pct >= 50) msg = `繼續加油！正確率 ${pct}%`;
+            else msg = `再練習一下吧！正確率 ${pct}%`;
+            if (quizRound > 1 && !isTimedMode) msg += `（共 ${quizRound} 輪）`;
+            if (isTimedMode) msg += ` ⏱️ 限時挑戰`;
+            document.getElementById("result-message").textContent = msg;
+
+            const grid = document.getElementById("result-grid");
+            grid.innerHTML = "";
+            const legend = document.getElementById("result-legend");
+            if (isTimedMode) {
+                legend.innerHTML = `
+                    <div class="legend-item"><div class="legend-box green"></div>正確</div>
+                    <div class="legend-item"><div class="legend-box red-strong"></div>錯誤 / 超時</div>
+                `;
+            } else {
+                legend.innerHTML = `
+                    <div class="legend-item"><div class="legend-box green"></div>全對</div>
+                    <div class="legend-item"><div class="legend-box gold"></div>錯過後對</div>
+                    <div class="legend-item"><div class="legend-box red-strong"></div>始終未對</div>
+                `;
+            }
+
+            quizItems.forEach((item, idx) => {
+                const btn = document.createElement("button");
+                btn.className = "option-grid-btn";
+                btn.textContent = item[optionLang];
+
+                if (isTimedMode) {
+                    if (quizResults[idx] === 'correct') {
+                        btn.classList.add("result-correct");
+                    } else {
+                        btn.classList.add("result-wrong");
+                    }
+                } else {
+                    if (itemEverWrong.has(idx)) {
+                        if (itemFinalCorrect.has(idx)) {
+                            btn.classList.add("review-wrong-then-correct");
+                        } else {
+                            btn.classList.add("wrong-strong");
+                        }
+                    } else {
+                        btn.classList.add("review-correct");
+                    }
+                }
+
+                btn.onclick = () => {
+                    speak(item[learningLang], learningLang);
+                    const displayArea = document.getElementById("result-display-area");
+                    document.getElementById("result-display-label").textContent = LANG_NAMES[learningLang];
+                    document.getElementById("result-display-text").textContent = item[learningLang];
+                    displayArea.style.display = "flex";
+                };
+                grid.appendChild(btn);
+            });
+        }
+
+        function restartQuiz() {
+            if (isTimedMode) {
+                startTimedQuiz();
+            } else {
+                initQuiz();
+                showScreen("screen-quiz");
+                nextQuestion();
+            }
+        }
+
+        // ========================
+        // Timed Quiz Entry
+        // ========================
+        function startTimedQuiz() {
+            if (!currentTopic) { alert("請先選擇一個主題"); return; }
+            isTimedMode = true;
+            initQuiz();
+            quizPool = quizItems.map((_, i) => i);
+            for (let i = quizPool.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [quizPool[i], quizPool[j]] = [quizPool[j], quizPool[i]];
+            }
+            showScreen("screen-quiz");
+            document.getElementById("next-btn").classList.remove("show");
+            document.getElementById("quiz-speaker").style.display = "flex";
+            nextQuestion();
+        }
+
+        // ========================
+        // 一般測驗 Entry
+        // ========================
+        function goToQuiz() {
+            if (!currentTopic) { alert("請先選擇一個主題"); return; }
+            isTimedMode = false;
+            initQuiz();
+            showScreen("screen-quiz");
+            document.getElementById("next-btn").classList.remove("show");
+            document.getElementById("quiz-speaker").style.display = "flex";
+            nextQuestion();
+        }
+
+        // ========================
+        // File Upload
+        // ========================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    let importedCount = 0;
+
+                    if (data.topics && Array.isArray(data.topics)) {
+                        for (const topic of data.topics) {
+                            if (topic.items && topic.items.length > 0) {
+                                const key = topic.category || `imported_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+                                allTopics[key] = topic;
+                                importedCount++;
+                            }
+                        }
+                    } else if (data.items && Array.isArray(data.items) && data.items.length > 0) {
+                        const key = data.category || `imported_${Date.now()}`;
+                        allTopics[key] = data;
+                        importedCount = 1;
+                    }
+
+                    if (importedCount > 0) {
+                        populateTopicSelect();
+                        alert(`已載入 ${importedCount} 個主題`);
+                    } else {
+                        alert("JSON 格式不正確，請確認包含 items 陣列");
+                    }
+                } catch (err) {
+                    alert("無法解析 JSON 檔案：" + err.message);
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ========================
+        // Start
+        // ========================
+        init();
+    </script>
+</body>
+</html>

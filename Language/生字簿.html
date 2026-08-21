@@ -1,0 +1,2814 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>生字簿</title>
+<meta name="theme-color" content="#121315">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;
+    --vermilion:#942525;
+    --gold:#bd8b2a;
+    --jade:#fcfbfa;
+    --ink-2:#1c1e21;
+    --ink-3:#26282c;
+    --gold-dim:rgba(189,139,42,0.35);
+    --vermilion-dim:rgba(148,37,37,0.35);
+    --green:#4caf6d;
+    --green-dim:rgba(76,175,109,0.35);
+
+    --fs-scale: 1;
+    --fs-base: 17px;
+    --fs-card: 24px;
+    --fs-trans: 16px;
+    --fs-h1: 22px;
+    --fs-btn: 16px;
+    --fs-quiz: 34px;
+    --fs-word: calc(24px * var(--fs-scale));
+    --fs-word-sub: calc(16px * var(--fs-scale));
+    --fs-word-quiz: calc(34px * var(--fs-scale));
+  }
+
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:var(--ink);
+    color:var(--jade);
+    font-family:'Noto Serif TC', serif;
+    font-size:var(--fs-base);
+    overscroll-behavior:none;
+  }
+  body{
+    display:flex; flex-direction:column;
+    height:100dvh;
+  }
+  .en{ font-family:'Cormorant Garamond','Inter',serif; }
+
+  header{
+    flex:0 0 auto;
+    padding: max(10px, env(safe-area-inset-top)) 14px 10px 10px;
+    background:linear-gradient(180deg, var(--ink-2), var(--ink));
+    border-bottom:1px solid var(--gold-dim);
+    display:flex; flex-direction:column; gap:8px;
+    position:relative;
+  }
+  .title-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .title-row h1{
+    margin:0; font-size:var(--fs-h1); font-weight:700; letter-spacing:0.08em;
+    color:var(--jade);
+    display:flex; align-items:center; gap:8px;
+  }
+  .title-row h1 .dot{ color:var(--gold); }
+  .card-count-badge{
+    font-size:13px; font-weight:600; color:var(--gold); background:rgba(189,139,42,0.18);
+    border:1px solid var(--gold-dim); border-radius:20px; padding:2px 10px;
+    letter-spacing:normal; font-family:'Inter',sans-serif;
+  }
+  .icon-btn{
+    background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:12px; width:42px; height:42px; flex:0 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    font-size:19px; cursor:pointer;
+  }
+  .icon-btn:active{ background:var(--gold-dim); }
+  .icon-btn.active{ background:var(--gold); color:var(--ink); border-color:var(--gold); }
+  .header-controls{ display:flex; align-items:center; gap:8px; flex-wrap:nowrap; }
+
+  .mode-toggle-fixed{ display:flex; justify-content:flex-end; }
+  .mode-toggle-fixed-inner{
+    display:flex; background:var(--ink-3); border-radius:12px; padding:3px; border:1px solid var(--gold-dim);
+  }
+  .mode-toggle-fixed-inner button{
+    border:none; background:transparent; color:var(--jade); padding:8px 16px;
+    font-size:var(--fs-btn); font-family:'Noto Serif TC',serif; font-weight:600;
+    border-radius:9px; cursor:pointer; white-space:nowrap;
+  }
+  .mode-toggle-fixed-inner button.active{ background:var(--gold); color:var(--ink); }
+
+  .fontsize-group{ display:flex; align-items:center; gap:4px; background:var(--ink-3); border:1px solid var(--gold-dim); border-radius:12px; padding:3px; }
+  .fontsize-group button{
+    width:32px; height:32px; border:none; background:transparent; color:var(--jade); border-radius:8px;
+    font-size:15px; cursor:pointer; font-weight:700;
+  }
+  .fontsize-group button:active{ background:var(--gold-dim); }
+
+  .search-bar{ display:none; }
+  .search-bar.open{ display:flex; gap:8px; }
+  .search-bar input{
+    flex:1; background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:12px; padding:10px 12px; font-size:var(--fs-btn); font-family:inherit;
+  }
+  .search-bar input:focus{ outline:none; border-color:var(--gold); }
+
+  .filter-group{
+    display:flex; align-items:center; gap:6px; flex:1 1 0; min-width:0;
+    background:var(--ink-3); padding:4px 8px; border-radius:12px; border:1px solid var(--gold-dim);
+  }
+  .filter-group label{ font-size:var(--fs-trans); color:var(--gold); flex:0 0 auto; white-space:nowrap; }
+  .filter-group select{
+    background:transparent; border:none; color:var(--jade); font-size:var(--fs-btn);
+    padding:4px 0; font-family:inherit; outline:none; cursor:pointer;
+    flex:1 1 0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .filter-group select option{ background:var(--ink-2); }
+  .manage-btn{
+    background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:8px; width:30px; height:30px; flex-shrink:0; font-size:14px; cursor:pointer;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .manage-btn:active{ transform:scale(0.95); }
+  .manage-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:10px 4px; border-bottom:1px solid rgba(255,255,255,0.06);
+  }
+  .manage-row:last-child{ border-bottom:none; }
+  .manage-row-label{ color:var(--jade); font-size:var(--fs-trans); flex:1; word-break:break-word; }
+  .manage-row-actions{ display:flex; gap:6px; flex-shrink:0; }
+  .manage-row-actions button{
+    border:none; border-radius:8px; padding:7px 10px; font-size:13px; cursor:pointer;
+    background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+  }
+  .manage-row-actions button.manage-delete-btn{ border-color:var(--vermilion); color:var(--vermilion); }
+
+  main{
+    flex:1 1 auto; overflow-y:auto; padding:12px 12px 100px 12px;
+    -webkit-overflow-scrolling:touch;
+  }
+  .empty-state{
+    text-align:center; margin-top:60px; color:var(--gold-dim); font-size:var(--fs-card);
+    line-height:1.8;
+  }
+  .empty-state .en{ font-size:0.55em; opacity:0.8; }
+
+  .card{
+    background:var(--ink-2); border:1px solid var(--gold-dim); border-radius:16px;
+    padding:14px 14px 10px 14px; margin-bottom:12px;
+    position:relative;
+  }
+  .card.marked{ border-color:var(--gold); border-width:2px; padding:13px 13px 9px 13px; }
+  .card.jump-highlight{ animation:jump-flash 1.4s ease-out; }
+  @keyframes jump-flash{
+    0%{ box-shadow:0 0 0 3px var(--gold); }
+    100%{ box-shadow:0 0 0 0 rgba(189,139,42,0); }
+  }
+  .card .source-text{
+    font-size:var(--fs-word); line-height:1.5; word-break:break-word;
+    display:inline;
+    padding-bottom:3px;
+    cursor:pointer;
+  }
+  .source-text.type-word{ border-bottom:3px solid var(--gold); }
+  .source-text.type-phrase{ border-bottom:3px solid var(--vermilion); }
+  .source-text.type-sentence{ border-bottom:none; }
+  .source-text.hidden-placeholder{
+    color:var(--gold-dim);
+    font-style:italic;
+    border-bottom:1px dashed var(--gold-dim);
+  }
+
+  .card .target-text{
+    margin-top:8px; color:var(--gold); opacity:0.92; font-size:var(--fs-word-sub);
+    line-height:1.5; word-break:break-word;
+  }
+  .card .meta-row{
+    display:flex; align-items:center; justify-content:space-between; margin-top:10px;
+    border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;
+    flex-wrap:wrap; gap:6px;
+  }
+  /* 移除原有的 .lang-tag 與 .chapter-tag 樣式，因為已不用，但保留以防其他用途 */
+  .lang-tag{
+    font-size:var(--fs-btn); color:var(--ink); background:var(--gold-dim);
+    background:rgba(189,139,42,0.22); color:var(--gold); padding:3px 9px; border-radius:20px;
+    font-family:'Inter',sans-serif; letter-spacing:0.03em;
+  }
+  .chapter-tag{
+    font-size:var(--fs-btn);
+    background:rgba(148,37,37,0.2); color:var(--vermilion);
+    padding:2px 8px; border-radius:20px;
+    font-family:'Inter',sans-serif;
+  }
+
+  .card-actions{ display:flex; gap:4px; flex-shrink:0; }
+  .card-actions button{
+    background:transparent; border:none; color:var(--jade); opacity:0.85;
+    width:34px; height:34px; border-radius:9px; font-size:16px; cursor:pointer;
+  }
+  .card-actions button:active{ background:var(--ink-3); }
+  .card-actions button.mark-btn{ opacity:0.4; }
+  .card-actions button.mark-btn.active{ opacity:1; filter:drop-shadow(0 0 2px var(--gold)); }
+
+  /* 拖曳把手放在左側 */
+  .drag-handle{
+    width:34px; height:34px; border-radius:9px;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:var(--gold); font-size:21px; font-weight:700; cursor:grab; user-select:none;
+    background:rgba(189,139,42,0.18); border:1px solid var(--gold-dim);
+    touch-action:none;
+    flex-shrink:0;
+  }
+  .drag-handle:active{ background:var(--gold-dim); color:var(--ink); }
+
+  .fab{
+    position:fixed; right:20px; bottom:calc(24px + env(safe-area-inset-bottom));
+    width:58px; height:58px; border-radius:50%;
+    background:var(--gold); color:var(--ink); border:none;
+    font-size:28px; font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,0.5);
+    display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:20;
+  }
+  .fab:active{ transform:scale(0.94); }
+
+  /* ---- 長按拖曳排序 ---- */
+  .card.dragging-source{ opacity:0.3; }
+  .card-drag-clone{
+    position:fixed; z-index:1500; pointer-events:none;
+    box-shadow:0 10px 28px rgba(0,0,0,0.55);
+    transform:scale(1.03);
+    opacity:0.98;
+  }
+  .drop-insertion-line{
+    height:3px; background:var(--gold); border-radius:2px; margin:0 0 12px 0;
+    box-shadow:0 0 8px var(--gold);
+  }
+  .drag-position-bar{
+    position:fixed; right:8px; top:50%; transform:translateY(-50%);
+    display:none; flex-direction:column; align-items:center; gap:8px;
+    z-index:1600; pointer-events:none;
+  }
+  .drag-position-bar.active{ display:flex; }
+  .drag-position-track{
+    width:5px; height:55vh; background:rgba(255,255,255,0.1); border-radius:4px; position:relative;
+  }
+  .drag-position-thumb{
+    position:absolute; left:50%; transform:translate(-50%,-50%);
+    width:16px; height:16px; border-radius:50%; background:var(--gold);
+    box-shadow:0 0 8px rgba(189,139,42,0.8); top:0%;
+  }
+  .drag-position-label{
+    font-size:12px; color:var(--gold); background:var(--ink-2); border:1px solid var(--gold-dim);
+    padding:3px 9px; border-radius:10px; font-family:'Inter',sans-serif; white-space:nowrap;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:50;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .overlay.open{ display:flex; }
+  .sheet{
+    background:var(--ink-2); width:100%; max-width:520px; border-radius:20px 20px 0 0;
+    padding:18px 18px calc(18px + env(safe-area-inset-bottom)) 18px;
+    border-top:1px solid var(--gold-dim); border-left:1px solid var(--gold-dim); border-right:1px solid var(--gold-dim);
+    max-height:88vh; overflow-y:auto;
+  }
+  .sheet h2{ margin:0 0 14px 0; font-size:var(--fs-h1); color:var(--gold); text-align:center; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:var(--fs-trans); color:var(--gold); margin-bottom:6px; }
+  .field textarea, .field input[type=text], .field select{
+    width:100%; background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:12px; padding:11px 12px; font-size:var(--fs-btn); font-family:'Noto Serif TC',serif;
+    resize:vertical;
+  }
+  .field textarea:focus, .field input:focus, .field select:focus{ outline:none; border-color:var(--gold); }
+
+  .chapter-row{ display:flex; gap:8px; align-items:center; }
+  .chapter-row select{ flex:1; }
+  .chapter-row input{ flex:1; }
+  .chapter-row button{
+    flex:0 0 auto;
+    background:var(--gold); color:var(--ink); border:none;
+    border-radius:12px; padding:11px 16px; font-size:var(--fs-btn);
+    font-weight:700; cursor:pointer; font-family:'Noto Serif TC',serif;
+  }
+  .chapter-row button:active{ transform:scale(0.95); }
+  .chapter-row button.gh-clear-btn{
+    background:var(--ink-3); color:var(--vermilion); border:1px solid var(--gold-dim);
+    padding:11px 14px;
+  }
+
+  .lang-row{ display:flex; gap:10px; }
+  .lang-row .field{ flex:1; margin-bottom:0; }
+
+  .type-select{ display:flex; gap:8px; }
+  .type-select button{
+    flex:1; padding:10px 4px; border-radius:10px; border:1px solid var(--gold-dim);
+    background:var(--ink-3); color:var(--jade); font-size:var(--fs-btn); font-family:'Noto Serif TC',serif; cursor:pointer;
+  }
+  .type-select button.sel[data-t="word"]{ background:var(--gold); color:var(--ink); border-color:var(--gold); }
+  .type-select button.sel[data-t="phrase"]{ background:var(--vermilion); color:var(--jade); border-color:var(--vermilion); }
+  .type-select button.sel[data-t="sentence"]{ background:var(--jade); color:var(--ink); border-color:var(--jade); }
+
+  .sheet-actions{ display:flex; gap:10px; margin-top:6px; }
+  .btn{
+    flex:1; padding:13px; border-radius:12px; border:none; font-size:var(--fs-btn); font-weight:700;
+    font-family:'Noto Serif TC',serif; cursor:pointer;
+  }
+  .btn.primary{ background:var(--gold); color:var(--ink); }
+  .btn.ghost{ background:var(--ink-3); color:var(--jade); border:1px solid var(--gold-dim); }
+  .btn.danger{ background:var(--vermilion); color:var(--jade); }
+  .btn:active{ transform:scale(0.97); }
+
+  .export-checkbox-group{
+    display:grid; grid-template-columns:1fr 1fr; gap:6px;
+    margin:6px 0 12px 0;
+  }
+  .export-checkbox-group label{
+    display:flex; align-items:center; gap:6px; font-size:var(--fs-btn);
+    color:var(--jade); cursor:pointer;
+  }
+  .export-checkbox-group input[type="checkbox"]{
+    width:18px; height:18px; accent-color:var(--gold);
+  }
+
+  .quiz-wrap{ display:none; }
+  .quiz-wrap.open{ display:block; }
+  .quiz-filters{ display:none; gap:6px; width:100%; }
+  .quiz-filters.open{ display:flex; }
+  .quiz-filters select{
+    flex:1 1 0; min-width:0; background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:10px; padding:8px 4px; font-size:var(--fs-btn); font-family:'Noto Serif TC',serif;
+    text-overflow:ellipsis;
+  }
+  .quiz-filters select option{ background:var(--ink-2); }
+  .quiz-mark-toggle{
+    flex:1 1 0; min-width:0; background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:10px; padding:8px 4px; font-size:var(--fs-btn); font-family:'Noto Serif TC',serif;
+    cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .quiz-mark-toggle.active{ background:var(--gold); color:var(--ink); border-color:var(--gold); font-weight:700; }
+
+  .quiz-inner{ max-width:520px; margin:0 auto; padding:16px 12px 40px 12px; }
+  .quiz-empty{ text-align:center; margin-top:60px; color:var(--gold-dim); font-size:var(--fs-card); line-height:1.8; }
+
+  .quiz-card{
+    background:var(--ink-2); border:1px solid var(--gold-dim);
+    border-radius:18px; padding:18px 16px 16px; position:relative; min-height:260px;
+  }
+  .quiz-card.correct{ border-color:var(--green); box-shadow:0 0 0 2px var(--green-dim); }
+  .quiz-card.wrong{ border-color:var(--vermilion); box-shadow:0 0 0 2px var(--vermilion-dim); }
+  .quiz-topbar{ display:flex; align-items:center; justify-content:space-between; min-height:34px; margin-bottom:6px; gap:8px; }
+  .quiz-progress{ font-weight:700; color:var(--jade); font-size:var(--fs-btn); font-family:'Inter',sans-serif; }
+  .quiz-correct-count{ font-weight:700; color:var(--green); font-size:calc(var(--fs-btn) * 1.15); font-family:'Inter',sans-serif; }
+  .quiz-timer{ font-weight:700; font-size:var(--fs-btn); color:var(--gold); font-variant-numeric:tabular-nums; font-family:'Inter',sans-serif; }
+  .quiz-timer.low{ color:var(--vermilion); }
+  .quiz-topbar-actions{ display:flex; gap:8px; }
+  .quiz-topbar-actions button{
+    border:none; border-radius:8px; padding:7px 12px; font-size:var(--fs-btn); font-weight:700;
+    font-family:'Noto Serif TC',serif; cursor:pointer;
+  }
+  .quiz-topbar-actions .qa-translate{ background:var(--gold); color:var(--ink); }
+  .quiz-topbar-actions .qa-next{ background:var(--vermilion); color:var(--jade); }
+
+  .quiz-lang-tag{ display:inline-block; margin-bottom:8px; }
+  .quiz-question{
+    text-align:center; font-size:var(--fs-word-quiz); line-height:1.35; margin:14px 0 20px;
+    min-height:1.8em; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .quiz-question-inner{ word-break:break-word; white-space:pre-wrap; }
+  .quiz-question .speaker-icon-big{ font-size:calc(var(--fs-word-quiz) * 1.15); }
+  .quiz-cloze-hint{ text-align:center; color:var(--gold-dim); font-size:var(--fs-word-sub); margin:-10px 0 16px; }
+  .quiz-options{ display:flex; flex-direction:column; gap:10px; }
+  .quiz-opt{
+    background:var(--ink-3); border:1px solid var(--gold-dim); border-radius:12px;
+    padding:12px 14px; font-size:var(--fs-word-sub); text-align:left; color:var(--jade);
+    display:flex; align-items:center; cursor:pointer; font-family:'Noto Serif TC',serif;
+  }
+  .quiz-opt.opt-line-1{ min-height:2.6em; }
+  .quiz-opt.opt-line-2{ min-height:4.2em; }
+  .quiz-opt-inner{ width:100%; line-height:1.3; word-break:break-word; white-space:pre-wrap; }
+  .quiz-opt:active{ transform:scale(0.99); }
+  .quiz-opt.selected{ border-color:var(--gold); background:rgba(189,139,42,0.18); }
+  .quiz-opt.correct-answer{ border-color:var(--green); background:rgba(76,175,109,0.15); }
+  .quiz-opt.correct-missed{ border-color:var(--green); background:transparent; box-shadow:inset 0 0 0 1px var(--green); }
+  .quiz-opt.wrong-answer{ border-color:var(--vermilion); background:rgba(148,37,37,0.15); }
+  .qa-confirm{
+    margin-top:12px; width:100%; border:none; border-radius:12px; padding:12px; font-size:var(--fs-btn);
+    font-weight:700; font-family:'Noto Serif TC',serif; cursor:pointer; background:var(--gold); color:var(--ink);
+  }
+  .qa-confirm:active{ transform:scale(0.99); }
+
+  .quiz-summary{ background:var(--ink-2); border:1px solid var(--gold-dim); border-radius:18px; padding:28px 20px; text-align:center; }
+  .quiz-score{ font-size:calc(var(--fs-quiz) * 1.3); font-weight:900; color:var(--gold); font-family:'Cormorant Garamond',serif; }
+  .quiz-score-label{ color:var(--gold-dim); font-size:var(--fs-trans); margin-bottom:6px; }
+  .all-clear{ color:var(--green); font-weight:700; font-size:var(--fs-btn); margin:10px 0; }
+  .wrong-list{ text-align:left; margin:18px 0; padding:12px 14px; background:var(--ink-3); border-radius:12px; }
+  .wrong-list-item{ padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:var(--fs-word-sub); }
+  .wrong-list-item:last-child{ border-bottom:none; }
+  .wrong-list-item .wsrc{ font-size:calc(var(--fs-word-sub) * 1.1); cursor:pointer; color:var(--jade); }
+  .wrong-list-item .wtgt{ color:var(--gold); opacity:0.9; font-size:calc(var(--fs-word-sub) * 0.9); margin-top:2px; }
+  .summary-actions{ display:flex; gap:10px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+  .summary-actions button{
+    border:none; border-radius:12px; padding:12px 20px; font-size:var(--fs-btn); font-weight:700;
+    font-family:'Noto Serif TC',serif; cursor:pointer;
+  }
+  .btn-retest{ background:var(--vermilion); color:var(--jade); }
+  .btn-next10{ background:var(--gold); color:var(--ink); }
+
+  ::-webkit-scrollbar{ width:0; height:0; }
+
+  .io-group{ display:flex; gap:4px; flex-wrap:wrap; align-items:center; }
+  .io-group button{
+    background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:10px; padding:0 10px; font-size:var(--fs-btn);
+    cursor:pointer; font-family:inherit;
+    height:40px; box-sizing:border-box;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .io-group button:active{ background:var(--gold-dim); }
+  .io-group .gt-btn{
+    background:var(--ink-3); border:1px solid var(--gold-dim); color:var(--jade);
+    border-radius:10px; padding:0 10px; font-size:var(--fs-btn);
+    cursor:pointer; font-family:inherit;
+    height:40px; box-sizing:border-box;
+    display:inline-flex; align-items:center; justify-content:center;
+    line-height:1;
+  }
+  .io-group .gt-btn:active{ background:var(--gold-dim); }
+  .io-group .pos-btn{
+    background:var(--gold); color:var(--ink); border:1px solid var(--gold);
+    border-radius:10px; padding:0 10px; font-size:var(--fs-btn);
+    cursor:pointer; font-family:inherit;
+    height:40px; box-sizing:border-box;
+    display:inline-flex; align-items:center; justify-content:center;
+    font-weight:600;
+  }
+  .io-group .pos-btn:active{ transform:scale(0.95); }
+  .io-group .icon-btn{ width:40px; height:40px; padding:0; font-size:19px; box-sizing:border-box; }
+  #fileInput{ display:none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-row">
+    <h1><span class="dot">●</span> 生字簿 <span class="card-count-badge" id="cardCountBadge">0</span></h1>
+    <div class="mode-toggle-fixed">
+      <div class="mode-toggle-fixed-inner">
+        <button id="modeBrowse" class="active">學習</button>
+        <button id="modeQuiz">測驗</button>
+      </div>
+    </div>
+  </div>
+  <div class="io-group">
+    <button id="exportBtn">📤 匯出</button>
+    <button id="importBtn">📥 匯入</button>
+    <button id="statsBtn">📊</button>
+    <button id="hideToggle" class="gt-btn">隱</button>
+    <button id="insertToggle" class="pos-btn">▼ 插最後</button>
+    <button id="googleTranslateBtn" class="gt-btn" title="Google 翻譯">🌐</button>
+    <button id="jumpMarkBtn" class="gt-btn" title="跳到標記處">🔖→</button>
+    <button id="jumpFirstBtn" class="gt-btn" title="跳到第一張">⏫</button>
+    <button id="jumpLastBtn" class="gt-btn" title="跳到最後一張">⏬</button>
+    <button class="icon-btn" id="searchToggle" title="搜尋">🔍</button>
+    <button class="icon-btn" id="fontMinus" title="縮小字體">A-</button>
+    <button class="icon-btn" id="fontPlus" title="放大字體">A+</button>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+  <div class="header-controls">
+    <div class="filter-group">
+      <label for="datasetFilter">資料集</label>
+      <select id="datasetFilter"><option value="">全部</option></select>
+      <button class="manage-btn" id="deleteDatasetBtn" title="移除此資料集" style="display:none;">🗑</button>
+    </div>
+    <div class="filter-group">
+      <label for="categoryFilter">類別</label>
+      <select id="categoryFilter"><option value="">全部</option></select>
+      <button class="manage-btn" id="manageChaptersBtn" title="管理類別">⚙</button>
+    </div>
+  </div>
+  <div class="quiz-filters" id="quizFilters">
+    <select id="quizTypeSelect" title="出題類型">
+      <option value="all">全部類型</option>
+      <option value="word">單字</option>
+      <option value="phrase">片語</option>
+      <option value="sentence">例句</option>
+    </select>
+    <select id="quizQTypeSelect" title="出題方式">
+      <option value="all">隨機出題</option>
+      <option value="src2tgt">原文→翻譯</option>
+      <option value="tgt2src">翻譯→原文</option>
+      <option value="listen">聽力選字</option>
+      <option value="listen_multi">聽力多選</option>
+      <option value="cloze">填空選字</option>
+    </select>
+    <select id="quizSpeedSelect" title="限時速度">
+      <option value="unlimited">不限時</option>
+      <option value="slow">慢速倒數</option>
+      <option value="medium">中速倒數</option>
+      <option value="fast">快速倒數</option>
+    </select>
+    <button type="button" id="quizBetweenMarksBtn" class="quiz-mark-toggle" title="只從兩個標記字卡之間出題（需剛好標記兩張）">標記間</button>
+  </div>
+  <div class="search-bar" id="searchBar">
+    <input type="text" id="searchInput" placeholder="搜尋原文或翻譯...">
+  </div>
+</header>
+
+<main id="browseView">
+  <div id="cardList"></div>
+</main>
+
+<div class="quiz-wrap" id="quizView">
+  <div id="quizContent"></div>
+</div>
+
+<button class="fab" id="addFab" title="新增字卡">＋</button>
+
+<!-- 拖曳排序時顯示的側邊位置條 -->
+<div class="drag-position-bar" id="dragPositionBar">
+  <div class="drag-position-track">
+    <div class="drag-position-thumb" id="dragPositionThumb"></div>
+  </div>
+  <div class="drag-position-label" id="dragPositionLabel"></div>
+</div>
+
+<!-- Add/Edit sheet -->
+<div class="overlay" id="editOverlay">
+  <div class="sheet">
+    <h2 id="sheetTitle">新增字卡</h2>
+    <div class="field">
+      <label>類型</label>
+      <div class="type-select" id="typeSelect">
+        <button data-t="word" class="sel">單字</button>
+        <button data-t="phrase">片語</button>
+        <button data-t="sentence">例句</button>
+      </div>
+    </div>
+    <div class="lang-row">
+      <div class="field">
+        <label>原文語言</label>
+        <select id="sourceLangSelect">
+          <option value="zh">中文</option>
+          <option value="en">英文</option>
+          <option value="ja">日文</option>
+          <option value="fr" selected>法文</option>
+          <option value="ko">韓文</option>
+          <option value="es">西班牙文</option>
+          <option value="de">德文</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>翻譯語言</label>
+        <select id="targetLangSelect">
+          <option value="zh" selected>中文</option>
+          <option value="en">英文</option>
+          <option value="ja">日文</option>
+          <option value="fr">法文</option>
+          <option value="ko">韓文</option>
+          <option value="es">西班牙文</option>
+          <option value="de">德文</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>資料集（資料夾）</label>
+      <div class="chapter-row">
+        <select id="datasetSelect"></select>
+        <button type="button" id="addDatasetBtn">增資料集</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>類別（章節）</label>
+      <div class="chapter-row">
+        <select id="chapterSelect"></select>
+        <button type="button" id="addChapterBtn">增類別</button>
+      </div>
+    </div>
+    <div class="field">
+      <label id="sourceLabel">原文（法文）</label>
+      <textarea id="sourceInput" rows="2" placeholder="輸入原文內容..."></textarea>
+    </div>
+    <div class="field">
+      <label id="targetLabel">翻譯（中文）</label>
+      <textarea id="targetInput" rows="2" placeholder="輸入翻譯內容..."></textarea>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="cancelBtn">取消</button>
+      <button class="btn primary" id="saveBtn">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 匯出選項 sheet -->
+<div class="overlay" id="exportOverlay">
+  <div class="sheet">
+    <h2>選擇匯出的類別</h2>
+    <div class="field">
+      <label>勾選要匯出的類別（可複選）</label>
+      <div class="export-checkbox-group" id="exportCheckboxGroup">
+        <!-- 動態生成 -->
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="exportCancelBtn">取消</button>
+      <button class="btn primary" id="exportConfirmBtn">匯出</button>
+    </div>
+  </div>
+</div>
+
+<!-- 匯入選項 sheet -->
+<div class="overlay" id="importOverlay">
+  <div class="sheet">
+    <h2>此資料集已存在，如何處理？</h2>
+    <div class="field">
+      <label id="importSummary">偵測到 0 張字卡</label>
+    </div>
+    <div class="sheet-actions" style="flex-direction:column; gap:10px;">
+      <button class="btn primary" id="importSkipDupBtn">合併：略過重複，只新增新字卡</button>
+      <button class="btn danger" id="importReplaceBtn">完全刷新此資料集（清除舊的，改用新的）</button>
+      <button class="btn ghost" id="importCancelBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 匯入來源選擇 -->
+<div class="overlay" id="importSourceOverlay">
+  <div class="sheet">
+    <h2>從哪裡匯入？</h2>
+    <div class="sheet-actions" style="flex-direction:column; gap:10px;">
+      <button class="btn primary" id="importFromLocalBtn">📁 從本機檔案匯入</button>
+      <button class="btn primary" id="importFromGithubFolderBtn">📂 瀏覽 GitHub 資料夾</button>
+      <button class="btn primary" id="importFromUrlBtn">🔗 從單一 URL 匯入</button>
+      <button class="btn ghost" id="importSourceCancelBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 瀏覽 GitHub 資料夾 -->
+<div class="overlay" id="githubBrowseOverlay">
+  <div class="sheet">
+    <h2>瀏覽 GitHub 資料夾</h2>
+    <div class="field">
+      <label>擁有者 (owner)</label>
+      <div class="chapter-row">
+        <input type="text" id="ghOwnerInput" placeholder="例如 chi12357">
+        <button type="button" class="gh-clear-btn" data-target="ghOwnerInput">✕</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>倉庫 (repo)</label>
+      <div class="chapter-row">
+        <input type="text" id="ghRepoInput" placeholder="例如 Learning-App">
+        <button type="button" class="gh-clear-btn" data-target="ghRepoInput">✕</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>分支 (branch)</label>
+      <div class="chapter-row">
+        <input type="text" id="ghBranchInput" placeholder="main">
+        <button type="button" class="gh-clear-btn" data-target="ghBranchInput">✕</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>資料夾路徑 (path)</label>
+      <div class="chapter-row">
+        <input type="text" id="ghPathInput" placeholder="例如 Data/生字簿">
+        <button type="button" class="gh-clear-btn" data-target="ghPathInput">✕</button>
+      </div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="ghBrowseCancelBtn">取消</button>
+      <button class="btn primary" id="ghBrowseListBtn">瀏覽檔案</button>
+    </div>
+    <div class="field" id="ghFileListWrap" style="display:none;">
+      <label>選擇要匯入的 JSON 檔案</label>
+      <div id="ghFileList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 從 URL 匯入 -->
+<div class="overlay" id="urlImportOverlay">
+  <div class="sheet">
+    <h2>從 URL 匯入</h2>
+    <div class="field">
+      <label>貼上 JSON 檔案的公開網址（例如 GitHub raw URL）</label>
+      <input type="text" id="urlImportInput" placeholder="https://raw.githubusercontent.com/.../file.json">
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="urlImportCancelBtn">取消</button>
+      <button class="btn primary" id="urlImportConfirmBtn">匯入</button>
+    </div>
+  </div>
+</div>
+
+<!-- 管理類別 sheet -->
+<div class="overlay" id="manageChaptersOverlay">
+  <div class="sheet">
+    <h2>管理類別</h2>
+    <div class="field">
+      <div id="manageChaptersList"></div>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn ghost" id="manageChaptersCloseBtn">關閉</button>
+    </div>
+  </div>
+</div>
+
+<!-- 移除確認 sheet（類別／資料集共用） -->
+<div class="overlay" id="removeConfirmOverlay">
+  <div class="sheet">
+    <h2 id="removeConfirmTitle">移除確認</h2>
+    <div class="field">
+      <label id="removeConfirmSummary"></label>
+    </div>
+    <div class="sheet-actions" style="flex-direction:column; gap:10px;">
+      <button class="btn primary" id="removeExportThenDeleteBtn">先匯出，再移除</button>
+      <button class="btn danger" id="removeDirectBtn">直接移除（不匯出）</button>
+      <button class="btn ghost" id="removeCancelBtn">取消</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const STORAGE_KEY = "語言筆記_cards_v4";
+  const FONT_KEY = "語言筆記_fontscale_v1";
+  const MODE_KEY = "語言筆記_mode_v1";
+  const LAST_KEY = "語言筆記_last_v4";
+  const INSERT_KEY = "語言筆記_insert_pos";
+  const QUIZ_PREFS_KEY = "語言筆記_quiz_prefs_v1";
+
+  let cards = [];
+  let editingId = null;
+  let currentMode = "browse";
+  let searchQuery = "";
+  let selectedCategory = "";
+  let selectedDataset = "";
+
+  let insertPosition = localStorage.getItem(INSERT_KEY) || 'end';
+
+  let hideSource = false;
+  let revealedCards = new Set();
+
+  let quizRound = null;
+  let quizTimerHandle = null;
+  let quizPrefs = { type:"all", qtype:"all", speed:"unlimited", betweenMarks:false };
+  try{
+    const rawPrefs = localStorage.getItem(QUIZ_PREFS_KEY);
+    if(rawPrefs) quizPrefs = Object.assign(quizPrefs, JSON.parse(rawPrefs));
+  }catch(e){}
+
+  const $ = (sel) => document.querySelector(sel);
+  const cardList = $("#cardList");
+  const dragPositionBar = $("#dragPositionBar");
+  const dragPositionThumb = $("#dragPositionThumb");
+  const dragPositionLabel = $("#dragPositionLabel");
+  const browseView = $("#browseView");
+  const quizView = $("#quizView");
+  const quizContent = $("#quizContent");
+  const quizFilters = $("#quizFilters");
+  const categoryFilter = $("#categoryFilter");
+  const datasetFilter = $("#datasetFilter");
+  const chapterSelect = $("#chapterSelect");
+  const datasetSelect = $("#datasetSelect");
+
+  const langLabels = {
+    "zh":"中文", "en":"英文", "ja":"日文", "fr":"法文",
+    "ko":"韓文", "es":"西班牙文", "de":"德文"
+  };
+  const typeLabels = {word:"單字", phrase:"片語", sentence:"例句"};
+
+  // ---------- 持久化 ----------
+  function loadCards(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) {
+        cards = JSON.parse(raw);
+        let changed = false;
+        cards.forEach(c => {
+          if(!c.sourceLang || !c.targetLang) {
+            const langKeys = Object.keys(c).filter(k => k.length===2 && k!=='id' && k!=='type' && k!=='chapter' && k!=='createdAt' && k!=='sourceLang' && k!=='targetLang');
+            if(langKeys.length >= 2) {
+              c.sourceLang = langKeys[0];
+              c.targetLang = langKeys[1];
+            } else if(c.fr !== undefined && c.zh !== undefined) {
+              c.sourceLang = "fr";
+              c.targetLang = "zh";
+              c[c.sourceLang] = c.fr;
+              c[c.targetLang] = c.zh;
+              delete c.fr;
+              delete c.zh;
+            } else {
+              c.sourceLang = "fr";
+              c.targetLang = "zh";
+              if(c.fr !== undefined) c[c.sourceLang] = c.fr;
+              if(c.zh !== undefined) c[c.targetLang] = c.zh;
+              delete c.fr;
+              delete c.zh;
+            }
+            changed = true;
+          }
+          if(!c[c.sourceLang]) c[c.sourceLang] = "";
+          if(!c[c.targetLang]) c[c.targetLang] = "";
+          if(!c.chapter) { c.chapter = "一般"; changed = true; }
+          if(!c.type) { c.type = "sentence"; changed = true; }
+          if(!c.dataset) { c.dataset = "預設"; changed = true; }
+          if(typeof c.marked !== "boolean") { c.marked = false; changed = true; }
+        });
+        if(changed) saveCards();
+      } else {
+        cards = sampleCards();
+        saveCards();
+      }
+    }catch(e){ cards = sampleCards(); saveCards(); }
+  }
+  function saveCards(){
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(cards));
+  }
+  function sampleCards(){
+    return [
+      {id: uid(), type:"word", sourceLang:"fr", targetLang:"zh", fr:"serendipité", zh:"意外發現美好事物的能力", chapter:"範例", dataset:"預設", createdAt: Date.now()},
+      {id: uid(), type:"phrase", sourceLang:"fr", targetLang:"zh", fr:"ça va sans dire", zh:"這是不言而喻的", chapter:"範例", dataset:"預設", createdAt: Date.now()},
+      {id: uid(), type:"sentence", sourceLang:"ja", targetLang:"zh", ja:"雨が降っても、試合は続きます。", zh:"就算下雨，比賽仍會繼續。", chapter:"範例", dataset:"預設", createdAt: Date.now()}
+    ];
+  }
+  function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+  // ---------- 上次使用的設定 ----------
+  function getLast(){
+    try{
+      const data = JSON.parse(localStorage.getItem(LAST_KEY)) || {};
+      if(!data.type) data.type = "word";
+      return data;
+    }catch(e){ return { sourceLang:"fr", targetLang:"zh", chapter:"", type:"word" }; }
+  }
+  function setLast(sourceLang, targetLang, chapter, type){
+    localStorage.setItem(LAST_KEY, JSON.stringify({sourceLang, targetLang, chapter, type}));
+  }
+
+  // ---------- 字體大小 ----------
+  const scales = [0.85, 1, 1.15, 1.3, 1.45];
+  function loadFontScale(){
+    let idx = parseInt(localStorage.getItem(FONT_KEY));
+    if(isNaN(idx) || idx<0 || idx>=scales.length) idx = 1;
+    applyFontScale(idx);
+  }
+  function applyFontScale(idx){
+    document.documentElement.style.setProperty("--fs-scale", scales[idx]);
+    localStorage.setItem(FONT_KEY, idx);
+  }
+  function currentScaleIdx(){
+    let idx = parseInt(localStorage.getItem(FONT_KEY));
+    if(isNaN(idx)) idx = 1;
+    return idx;
+  }
+  $("#fontPlus").addEventListener("click", ()=>{
+    let idx = Math.min(scales.length-1, currentScaleIdx()+1);
+    applyFontScale(idx);
+  });
+  $("#fontMinus").addEventListener("click", ()=>{
+    let idx = Math.max(0, currentScaleIdx()-1);
+    applyFontScale(idx);
+  });
+
+  // ---------- 類別輔助 ----------
+  function getChapterList(){
+    const ch = new Set();
+    cards.forEach(c => { if(c.chapter) ch.add(c.chapter); });
+    return [...ch].sort();
+  }
+  function getChapterListForDataset(datasetName){
+    const ch = new Set();
+    cards.forEach(c => {
+      if(datasetName && c.dataset !== datasetName) return;
+      if(c.chapter) ch.add(c.chapter);
+    });
+    return [...ch].sort();
+  }
+  function getDatasetList(){
+    const ds = new Set();
+    cards.forEach(c => { if(c.dataset) ds.add(c.dataset); });
+    return [...ds].sort();
+  }
+
+  function updateAllChapterSelects(){
+    const datasets = getDatasetList();
+    const currentDatasetVal = datasetFilter.value;
+    let datasetHtml = `<option value="">全部</option>`;
+    datasets.forEach(ds => {
+      datasetHtml += `<option value="${escapeHtml(ds)}">${escapeHtml(ds)}</option>`;
+    });
+    datasetFilter.innerHTML = datasetHtml;
+    if(currentDatasetVal && datasets.includes(currentDatasetVal)) {
+      datasetFilter.value = currentDatasetVal;
+    } else {
+      datasetFilter.value = "";
+    }
+    selectedDataset = datasetFilter.value;
+    updateDeleteDatasetBtnVisibility();
+
+    const chaptersInDataset = getChapterListForDataset(selectedDataset);
+    const currentFilterVal = categoryFilter.value;
+    let filterHtml = `<option value="">全部</option>`;
+    chaptersInDataset.forEach(ch => {
+      filterHtml += `<option value="${escapeHtml(ch)}">${escapeHtml(ch)}</option>`;
+    });
+    categoryFilter.innerHTML = filterHtml;
+    if(currentFilterVal && chaptersInDataset.includes(currentFilterVal)) {
+      categoryFilter.value = currentFilterVal;
+    } else {
+      categoryFilter.value = "";
+    }
+    selectedCategory = categoryFilter.value;
+
+    const currentFormDatasetVal = datasetSelect.value;
+    let formDatasetHtml = "";
+    datasets.forEach(ds => {
+      formDatasetHtml += `<option value="${escapeHtml(ds)}">${escapeHtml(ds)}</option>`;
+    });
+    if(datasets.length === 0){
+      formDatasetHtml = `<option value="預設">預設</option>`;
+    }
+    datasetSelect.innerHTML = formDatasetHtml;
+    if(currentFormDatasetVal && datasets.includes(currentFormDatasetVal)) {
+      datasetSelect.value = currentFormDatasetVal;
+    } else if(datasets.includes(selectedDataset)) {
+      datasetSelect.value = selectedDataset;
+    } else if(datasets.includes("預設")) {
+      datasetSelect.value = "預設";
+    }
+
+    refreshFormChapterSelect();
+  }
+
+  function refreshFormChapterSelect(){
+    const chaptersForForm = getChapterListForDataset(datasetSelect.value);
+    const currentChapterVal = chapterSelect.value;
+    let selectHtml = `<option value="">請選擇</option>`;
+    chaptersForForm.forEach(ch => {
+      selectHtml += `<option value="${escapeHtml(ch)}">${escapeHtml(ch)}</option>`;
+    });
+    chapterSelect.innerHTML = selectHtml;
+    if(currentChapterVal && chaptersForForm.includes(currentChapterVal)) {
+      chapterSelect.value = currentChapterVal;
+    } else {
+      chapterSelect.value = "";
+    }
+  }
+  datasetSelect.addEventListener("change", refreshFormChapterSelect);
+
+  // ---------- 新增類別 ----------
+  function addNewChapter(){
+    const name = prompt("請輸入新類別名稱：");
+    if(!name || name.trim() === "") return;
+    const trimmed = name.trim();
+    const existing = getChapterList();
+    if(existing.includes(trimmed)){
+      alert("該類別已存在！");
+      return;
+    }
+    const chapters = getChapterList().concat(trimmed).sort();
+    let filterHtml = `<option value="">全部</option>`;
+    chapters.forEach(ch => {
+      filterHtml += `<option value="${escapeHtml(ch)}">${escapeHtml(ch)}</option>`;
+    });
+    categoryFilter.innerHTML = filterHtml;
+    let selectHtml = `<option value="">請選擇</option>`;
+    chapters.forEach(ch => {
+      selectHtml += `<option value="${escapeHtml(ch)}">${escapeHtml(ch)}</option>`;
+    });
+    chapterSelect.innerHTML = selectHtml;
+    chapterSelect.value = trimmed;
+    alert("類別已新增！");
+  }
+
+  // ---------- 新增資料集（表單內） ----------
+  function addNewDataset(){
+    const name = prompt("請輸入新資料集（資料夾）名稱：");
+    if(!name || name.trim() === "") return;
+    const trimmed = name.trim();
+    const existing = getDatasetList();
+    if(existing.includes(trimmed)){
+      alert("該資料集已存在！");
+      datasetSelect.value = trimmed;
+      refreshFormChapterSelect();
+      return;
+    }
+    const datasets = existing.concat(trimmed).sort();
+    let optHtml = "";
+    datasets.forEach(ds => {
+      optHtml += `<option value="${escapeHtml(ds)}">${escapeHtml(ds)}</option>`;
+    });
+    datasetSelect.innerHTML = optHtml;
+    datasetSelect.value = trimmed;
+    refreshFormChapterSelect();
+    alert("資料集已新增！新增的字卡會存到這個新資料集。");
+  }
+
+  // ---------- 管理類別（重新命名／刪除） ----------
+  const manageChaptersOverlay = $("#manageChaptersOverlay");
+  const manageChaptersList = $("#manageChaptersList");
+
+  function openManageChaptersSheet(){
+    renderManageChaptersList();
+    manageChaptersOverlay.classList.add("open");
+  }
+  function closeManageChaptersSheet(){
+    manageChaptersOverlay.classList.remove("open");
+  }
+  function renderManageChaptersList(){
+    const chapters = getChapterList();
+    if(chapters.length === 0){
+      manageChaptersList.innerHTML = `<div class="manage-row-label">目前沒有任何類別</div>`;
+      return;
+    }
+    manageChaptersList.innerHTML = chapters.map(ch => {
+      const count = cards.filter(c => c.chapter === ch).length;
+      return `<div class="manage-row">
+        <span class="manage-row-label">${escapeHtml(ch)}（${count} 張）</span>
+        <div class="manage-row-actions">
+          <button class="manage-rename-btn" data-chapter="${escapeHtml(ch)}">✏️ 重新命名</button>
+          <button class="manage-delete-btn" data-chapter="${escapeHtml(ch)}">🗑 刪除</button>
+        </div>
+      </div>`;
+    }).join("");
+    manageChaptersList.querySelectorAll(".manage-rename-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=> renameChapter(btn.dataset.chapter));
+    });
+    manageChaptersList.querySelectorAll(".manage-delete-btn").forEach(btn=>{
+      btn.addEventListener("click", ()=> deleteChapter(btn.dataset.chapter));
+    });
+  }
+
+  function renameChapter(oldName){
+    const input = prompt(`將類別「${oldName}」重新命名為：`, oldName);
+    if(input === null) return;
+    const trimmed = input.trim();
+    if(!trimmed || trimmed === oldName) return;
+    const chapters = getChapterList();
+    if(chapters.includes(trimmed)){
+      if(!confirm(`類別「${trimmed}」已存在，是否要將「${oldName}」的字卡合併進去？`)) return;
+    }
+    cards.forEach(c => { if(c.chapter === oldName) c.chapter = trimmed; });
+    saveCards();
+    if(selectedCategory === oldName) selectedCategory = trimmed;
+    render();
+    resetQuizRound();
+    if(currentMode === "quiz") renderQuiz();
+    renderManageChaptersList();
+  }
+
+  function deleteChapter(name){
+    const toRemove = cards.filter(c => c.chapter === name);
+    if(toRemove.length === 0) return;
+    openRemoveConfirm({
+      title: `移除類別「${name}」`,
+      summary: `此類別共有 ${toRemove.length} 張字卡，移除類別會一併刪除這些字卡，此操作無法復原。`,
+      cardsToRemove: toRemove,
+      suggestedName: `${name}_${new Date().toISOString().slice(0,10)}.json`,
+      onRemoved: ()=>{
+        cards = cards.filter(c => c.chapter !== name);
+        saveCards();
+        if(selectedCategory === name) selectedCategory = "";
+        render();
+        resetQuizRound();
+        if(currentMode === "quiz") renderQuiz();
+        renderManageChaptersList();
+      }
+    });
+  }
+
+  $("#manageChaptersBtn").addEventListener("click", openManageChaptersSheet);
+  $("#manageChaptersCloseBtn").addEventListener("click", closeManageChaptersSheet);
+  manageChaptersOverlay.addEventListener("click", (e)=>{ if(e.target===manageChaptersOverlay) closeManageChaptersSheet(); });
+
+  // ---------- 移除確認（類別／資料集共用，移除前可選擇先匯出） ----------
+  const removeConfirmOverlay = $("#removeConfirmOverlay");
+  let pendingRemoval = null;
+
+  function openRemoveConfirm(opts){
+    pendingRemoval = opts;
+    $("#removeConfirmTitle").textContent = opts.title;
+    $("#removeConfirmSummary").textContent = opts.summary;
+    removeConfirmOverlay.classList.add("open");
+  }
+  function closeRemoveConfirm(){
+    removeConfirmOverlay.classList.remove("open");
+    pendingRemoval = null;
+  }
+  $("#removeCancelBtn").addEventListener("click", closeRemoveConfirm);
+  removeConfirmOverlay.addEventListener("click", (e)=>{ if(e.target===removeConfirmOverlay) closeRemoveConfirm(); });
+
+  $("#removeExportThenDeleteBtn").addEventListener("click", async ()=>{
+    if(!pendingRemoval) return;
+    const { cardsToRemove, suggestedName, onRemoved } = pendingRemoval;
+    closeRemoveConfirm();
+    const jsonObj = buildExportJsonFromCards(cardsToRemove);
+    const saved = await downloadJsonFile(jsonObj, suggestedName);
+    if(!saved) return;
+    onRemoved();
+  });
+  $("#removeDirectBtn").addEventListener("click", ()=>{
+    if(!pendingRemoval) return;
+    const { onRemoved } = pendingRemoval;
+    closeRemoveConfirm();
+    onRemoved();
+  });
+
+  // ---------- 統計 ----------
+  function showStats(){
+    const datasetsToShow = selectedDataset ? [selectedDataset] : getDatasetList();
+    if(datasetsToShow.length === 0){
+      alert("目前沒有任何字卡");
+      return;
+    }
+    let msg = "📊 各類別字卡數量統計";
+    msg += selectedDataset ? `（資料集：${selectedDataset}）` : "（全部資料集）";
+    msg += "：\n\n";
+    let hasAny = false;
+    datasetsToShow.forEach(ds => {
+      const chaptersInDs = getChapterListForDataset(ds);
+      if(chaptersInDs.length === 0) return;
+      hasAny = true;
+      if(!selectedDataset) msg += `【${ds}】\n`;
+      chaptersInDs.forEach(ch => {
+        const count = cards.filter(c => c.dataset === ds && c.chapter === ch).length;
+        msg += `${ch}：${count} 張\n`;
+      });
+      msg += "\n";
+    });
+    if(!hasAny){
+      alert("目前沒有任何類別");
+      return;
+    }
+    alert(msg.trim());
+  }
+
+  // ---------- Google 翻譯 ----------
+  function openGoogleTranslate(){
+    window.open('https://translate.google.com', '_blank');
+  }
+
+  // ---------- 跳到標記處 ----------
+  let markJumpCursor = -1;
+  function jumpToNextMark(){
+    const markedCards = getFilteredCards().filter(c => c.marked);
+    if(markedCards.length === 0){
+      alert("目前沒有標記的字卡");
+      return;
+    }
+    markJumpCursor = (markJumpCursor + 1) % markedCards.length;
+    const target = markedCards[markJumpCursor];
+    const el = cardList.querySelector(`.card[data-id="${target.id}"]`);
+    if(el){
+      el.scrollIntoView({ behavior:"smooth", block:"center" });
+      el.classList.remove("jump-highlight");
+      void el.offsetWidth;
+      el.classList.add("jump-highlight");
+      setTimeout(()=> el.classList.remove("jump-highlight"), 1500);
+    }
+  }
+  $("#jumpMarkBtn").addEventListener("click", jumpToNextMark);
+
+  // ---------- 跳到第一張／最後一張 ----------
+  function jumpToCard(index) {
+    const filtered = getFilteredCards();
+    if (filtered.length === 0) {
+      alert("目前沒有符合條件的字卡");
+      return;
+    }
+    const target = filtered[index];
+    const el = cardList.querySelector(`.card[data-id="${target.id}"]`);
+    if (el) {
+      el.scrollIntoView({ behavior:"smooth", block:"center" });
+      el.classList.remove("jump-highlight");
+      void el.offsetWidth;
+      el.classList.add("jump-highlight");
+      setTimeout(()=> el.classList.remove("jump-highlight"), 1500);
+    }
+  }
+  $("#jumpFirstBtn").addEventListener("click", ()=> jumpToCard(0));
+  $("#jumpLastBtn").addEventListener("click", ()=> jumpToCard(getFilteredCards().length - 1));
+
+  // ---------- 隱藏原文 toggle ----------
+  function toggleHide(){
+    hideSource = !hideSource;
+    revealedCards.clear();
+    document.getElementById('hideToggle').textContent = hideSource ? '顯' : '隱';
+    render();
+  }
+
+  // ---------- 插入位置切換 ----------
+  function toggleInsertPosition(){
+    insertPosition = (insertPosition === 'start') ? 'end' : 'start';
+    localStorage.setItem(INSERT_KEY, insertPosition);
+    document.getElementById('insertToggle').textContent = (insertPosition === 'start') ? '▲ 插最前' : '▼ 插最後';
+  }
+
+  // ---------- 篩選 ----------
+  function getDatasetCategoryCards(){
+    return cards.filter(c => {
+      if(selectedDataset && c.dataset !== selectedDataset) return false;
+      if(selectedCategory && c.chapter !== selectedCategory) return false;
+      return true;
+    });
+  }
+
+  function getFilteredCards(){
+    const q = searchQuery.trim().toLowerCase();
+    return cards.filter(c => {
+      if(selectedDataset && c.dataset !== selectedDataset) return false;
+      if(selectedCategory && c.chapter !== selectedCategory) return false;
+      if(q){
+        const sourceText = c[c.sourceLang] || "";
+        const targetText = c[c.targetLang] || "";
+        const match = sourceText.toLowerCase().includes(q) ||
+                      targetText.toLowerCase().includes(q) ||
+                      (c.chapter && c.chapter.toLowerCase().includes(q));
+        if(!match) return false;
+      }
+      return true;
+    });
+  }
+
+  // ---------- 渲染 ----------
+  function render(){
+    updateAllChapterSelects();
+    const filtered = getFilteredCards();
+    const cardCountEl = document.getElementById("cardCountBadge");
+    if(cardCountEl) cardCountEl.textContent = getDatasetCategoryCards().length;
+    if(filtered.length===0){
+      cardList.innerHTML = `<div class="empty-state">${cards.length===0
+        ? "還沒有字卡<br>點右下角「＋」開始新增吧"
+        : "找不到符合的字卡"}</div>`;
+      return;
+    }
+    cardList.innerHTML = filtered.map((c, displayIdx)=>{
+      const realIdx = cards.indexOf(c);
+      const sourceText = c[c.sourceLang] || "";
+      const targetText = c[c.targetLang] || "";
+      const targetHtml = targetText ? `<div class="target-text">${escapeHtml(targetText)}</div>` : "";
+
+      let displaySource;
+      if (!hideSource) {
+        displaySource = escapeHtml(sourceText);
+      } else {
+        if (revealedCards.has(c.id)) {
+          displaySource = escapeHtml(sourceText);
+        } else {
+          displaySource = `<span class="hidden-placeholder">點擊顯示原文</span>`;
+        }
+      }
+
+      return `
+      <div class="card${c.marked ? ' marked' : ''}" data-id="${c.id}">
+        <span class="source-text type-${c.type}" data-lang="${c.sourceLang}">${displaySource}</span>
+        ${targetHtml}
+        <div class="meta-row">
+          <span class="drag-handle" title="按住拖曳排序">⠿</span>
+          <div style="flex:1;"></div>
+          <div class="card-actions">
+            <button data-action="mark" title="標記" class="mark-btn${c.marked ? ' active' : ''}">🔖</button>
+            <button data-action="up" title="上移" ${realIdx===0?"disabled style=opacity:0.25":""}>↑</button>
+            <button data-action="down" title="下移" ${realIdx===cards.length-1?"disabled style=opacity:0.25":""}>↓</button>
+            <button data-action="copy" title="複製">⧉</button>
+            <button data-action="edit" title="編輯">✎</button>
+            <button data-action="delete" title="刪除">🗑</button>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  }
+
+  // ---------- 卡片點擊事件 ----------
+  cardList.addEventListener("click", (e)=>{
+    const sourceEl = e.target.closest(".source-text");
+    if (sourceEl) {
+      const cardEl = sourceEl.closest(".card");
+      if (!cardEl) return;
+      const id = cardEl.dataset.id;
+      const c = cards.find(c => c.id === id);
+      if (!c) return;
+
+      if (hideSource) {
+        if (revealedCards.has(id)) {
+          revealedCards.delete(id);
+        } else {
+          revealedCards.add(id);
+          const text = c[c.sourceLang] || "";
+          speak(text, c.sourceLang);
+          copyToClipboard(text, false);
+        }
+        render();
+        return;
+      } else {
+        const text = c[c.sourceLang] || "";
+        speak(text, c.sourceLang);
+        copyToClipboard(text, false);
+        return;
+      }
+    }
+
+    const btn = e.target.closest("[data-action]");
+    if(!btn) return;
+    const cardEl = e.target.closest(".card");
+    if(!cardEl) return;
+    const id = cardEl.dataset.id;
+    const idx = cards.findIndex(c=>c.id===id);
+    if(idx===-1) return;
+    const action = btn.dataset.action;
+
+    if(action==="copy"){
+      copyToClipboard(cards[idx][cards[idx].sourceLang], true);
+    } else if(action==="mark"){
+      cards[idx].marked = !cards[idx].marked;
+      saveCards(); render();
+    } else if(action==="up"){
+      if(idx>0){ [cards[idx-1],cards[idx]]=[cards[idx],cards[idx-1]]; saveCards(); render(); }
+    } else if(action==="down"){
+      if(idx<cards.length-1){ [cards[idx+1],cards[idx]]=[cards[idx],cards[idx+1]]; saveCards(); render(); }
+    } else if(action==="edit"){
+      openEditSheet(cards[idx]);
+    } else if(action==="delete"){
+      if(confirm("確定要刪除這張字卡嗎？")){
+        cards.splice(idx,1); saveCards(); render();
+      }
+    }
+  });
+
+  // ---------- 拖曳排序（按住把手圖示） ----------
+  let dragState = null;
+
+  function updateDragPosition(idx, total){
+    const pct = total <= 1 ? 0 : Math.min(1, Math.max(0, idx/total));
+    dragPositionThumb.style.top = (pct*100) + "%";
+    dragPositionLabel.textContent = `${Math.min(idx+1, total)} / ${total}`;
+  }
+
+  function onDragMove(e){
+    if(!dragState) return;
+    e.preventDefault();
+    const x = e.clientX - dragState.offsetX;
+    const y = e.clientY - dragState.offsetY;
+    dragState.clone.style.left = x + "px";
+    dragState.clone.style.top = y + "px";
+
+    const cardEls = Array.from(cardList.querySelectorAll(".card")).filter(el => el !== dragState.originEl);
+    const pointerY = e.clientY;
+    let insertBeforeEl = null;
+    for(const el of cardEls){
+      const r = el.getBoundingClientRect();
+      if(pointerY < r.top + r.height/2){ insertBeforeEl = el; break; }
+    }
+    if(insertBeforeEl){
+      cardList.insertBefore(dragState.insertionLine, insertBeforeEl);
+    } else {
+      cardList.appendChild(dragState.insertionLine);
+    }
+
+    const filtered = getFilteredCards();
+    let targetRealIdx;
+    if(insertBeforeEl){
+      const beforeId = insertBeforeEl.dataset.id;
+      targetRealIdx = cards.findIndex(c => c.id === beforeId);
+    } else if(filtered.length > 0){
+      const lastId = filtered[filtered.length-1].id;
+      targetRealIdx = cards.findIndex(c => c.id === lastId) + 1;
+    } else {
+      targetRealIdx = cards.length;
+    }
+    dragState.targetRealIdx = targetRealIdx;
+
+    const countCards = getDatasetCategoryCards();
+    const displayIdx = countCards.filter(c => cards.indexOf(c) < targetRealIdx).length;
+    updateDragPosition(displayIdx, countCards.length);
+
+    const margin = 60;
+    if(e.clientY < margin) browseView.scrollTop -= 14;
+    else if(e.clientY > window.innerHeight - margin) browseView.scrollTop += 14;
+  }
+
+  function onDragEnd(){
+    document.removeEventListener("pointermove", onDragMove);
+    if(!dragState) return;
+    const { id, originEl, clone, insertionLine } = dragState;
+    insertionLine.remove();
+    clone.remove();
+    originEl.classList.remove("dragging-source");
+    dragPositionBar.classList.remove("active");
+
+    const fromIdx = cards.findIndex(c => c.id === id);
+    let toIdx = dragState.targetRealIdx;
+    dragState = null;
+    if(fromIdx === -1) return;
+
+    if(toIdx > fromIdx) toIdx--;
+    toIdx = Math.max(0, Math.min(cards.length - 1, toIdx));
+
+    if(toIdx !== fromIdx){
+      const [moved] = cards.splice(fromIdx, 1);
+      cards.splice(toIdx, 0, moved);
+      saveCards();
+    }
+    render();
+  }
+
+  function startDrag(cardEl, e){
+    const id = cardEl.dataset.id;
+    const realIdx = cards.findIndex(c => c.id === id);
+    if(realIdx === -1) return;
+    const rect = cardEl.getBoundingClientRect();
+
+    const clone = cardEl.cloneNode(true);
+    clone.classList.add("card-drag-clone");
+    clone.style.width = rect.width + "px";
+    clone.style.left = rect.left + "px";
+    clone.style.top = rect.top + "px";
+    clone.querySelectorAll("button").forEach(b => { b.style.pointerEvents = "none"; });
+    document.body.appendChild(clone);
+
+    cardEl.classList.add("dragging-source");
+
+    const insertionLine = document.createElement("div");
+    insertionLine.className = "drop-insertion-line";
+
+    dragState = {
+      id, originEl: cardEl, clone,
+      offsetX: e.clientX - rect.left, offsetY: e.clientY - rect.top,
+      insertionLine, targetRealIdx: realIdx
+    };
+
+    dragPositionBar.classList.add("active");
+    const countCardsAtStart = getDatasetCategoryCards();
+    const idxAtStart = countCardsAtStart.findIndex(c => c.id === id);
+    updateDragPosition(idxAtStart === -1 ? 0 : idxAtStart, countCardsAtStart.length);
+
+    try{ navigator.vibrate && navigator.vibrate(15); }catch(err){}
+
+    document.addEventListener("pointermove", onDragMove, { passive:false });
+    document.addEventListener("pointerup", onDragEnd, { once:true });
+    document.addEventListener("pointercancel", onDragEnd, { once:true });
+
+    onDragMove(e);
+  }
+
+  cardList.addEventListener("pointerdown", (e)=>{
+    const handle = e.target.closest(".drag-handle");
+    if(!handle) return;
+    const cardEl = handle.closest(".card");
+    if(!cardEl) return;
+    e.preventDefault();
+    startDrag(cardEl, e);
+  });
+
+  function speak(text, lang){
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = lang || "en";
+      window.speechSynthesis.speak(u);
+    }catch(e){ /* speech not supported */ }
+  }
+
+  function copyToClipboard(text, showToast){
+    function fallbackCopy(){
+      try{
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }catch(e){ /* copy not supported */ }
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(fallbackCopy);
+    } else {
+      fallbackCopy();
+    }
+  }
+
+  // ---------- 搜尋 ----------
+  const searchBar = $("#searchBar");
+  $("#searchToggle").addEventListener("click", ()=>{
+    searchBar.classList.toggle("open");
+    $("#searchToggle").classList.toggle("active");
+    if(searchBar.classList.contains("open")) $("#searchInput").focus();
+    else { searchQuery=""; $("#searchInput").value=""; render(); }
+  });
+  $("#searchInput").addEventListener("input", (e)=>{
+    searchQuery = e.target.value; render();
+  });
+
+  // ---------- 資料集篩選變更 ----------
+  function updateDeleteDatasetBtnVisibility(){
+    const btn = document.getElementById("deleteDatasetBtn");
+    if(btn) btn.style.display = selectedDataset ? "inline-flex" : "none";
+  }
+  datasetFilter.addEventListener("change", (e)=>{
+    selectedDataset = e.target.value;
+    updateDeleteDatasetBtnVisibility();
+    render();
+    if(currentMode === "quiz"){
+      resetQuizRound();
+      renderQuiz();
+    }
+  });
+  $("#deleteDatasetBtn").addEventListener("click", ()=>{
+    if(!selectedDataset) return;
+    const name = selectedDataset;
+    const toRemove = cards.filter(c => c.dataset === name);
+    if(toRemove.length === 0) return;
+    openRemoveConfirm({
+      title: `移除資料集「${name}」`,
+      summary: `此資料集共有 ${toRemove.length} 張字卡，移除後無法復原。`,
+      cardsToRemove: toRemove,
+      suggestedName: `${name}_${new Date().toISOString().slice(0,10)}.json`,
+      onRemoved: ()=>{
+        cards = cards.filter(c => c.dataset !== name);
+        saveCards();
+        selectedDataset = "";
+        render();
+        resetQuizRound();
+        if(currentMode === "quiz") renderQuiz();
+        updateDeleteDatasetBtnVisibility();
+      }
+    });
+  });
+
+  // ---------- 類別篩選變更 ----------
+  categoryFilter.addEventListener("change", (e)=>{
+    selectedCategory = e.target.value;
+    render();
+    if(currentMode === "quiz"){
+      resetQuizRound();
+      renderQuiz();
+    }
+  });
+
+  // ---------- 測驗篩選變更 ----------
+  function saveQuizPrefs(){
+    try{ localStorage.setItem(QUIZ_PREFS_KEY, JSON.stringify(quizPrefs)); }catch(e){}
+  }
+  $("#quizTypeSelect").value = quizPrefs.type;
+  $("#quizQTypeSelect").value = quizPrefs.qtype;
+  $("#quizSpeedSelect").value = quizPrefs.speed;
+  $("#quizBetweenMarksBtn").classList.toggle("active", quizPrefs.betweenMarks);
+  $("#quizTypeSelect").addEventListener("change", (e)=>{
+    quizPrefs.type = e.target.value; saveQuizPrefs();
+    resetQuizRound(); renderQuiz();
+  });
+  $("#quizQTypeSelect").addEventListener("change", (e)=>{
+    quizPrefs.qtype = e.target.value; saveQuizPrefs();
+    resetQuizRound(); renderQuiz();
+  });
+  $("#quizSpeedSelect").addEventListener("change", (e)=>{
+    quizPrefs.speed = e.target.value; saveQuizPrefs();
+    resetQuizRound(); renderQuiz();
+  });
+  $("#quizBetweenMarksBtn").addEventListener("click", ()=>{
+    quizPrefs.betweenMarks = !quizPrefs.betweenMarks;
+    saveQuizPrefs();
+    $("#quizBetweenMarksBtn").classList.toggle("active", quizPrefs.betweenMarks);
+    resetQuizRound(); renderQuiz();
+  });
+
+  // ---------- 統計按鈕 ----------
+  $("#statsBtn").addEventListener("click", showStats);
+
+  // ---------- 隱藏原文按鈕 ----------
+  $("#hideToggle").addEventListener("click", toggleHide);
+
+  // ---------- 插入位置切換按鈕 ----------
+  $("#insertToggle").addEventListener("click", toggleInsertPosition);
+
+  // ---------- Google 翻譯按鈕 ----------
+  $("#googleTranslateBtn").addEventListener("click", openGoogleTranslate);
+
+  // ---------- 新增/編輯表單 ----------
+  const editOverlay = $("#editOverlay");
+  const typeSelect = $("#typeSelect");
+  let selectedType = "word";
+
+  function openEditSheet(card){
+    editingId = card ? card.id : null;
+    $("#sheetTitle").textContent = card ? "編輯字卡" : "新增字卡";
+    const last = getLast();
+    let sourceLang, targetLang, chapter, type, dataset;
+    if (card) {
+      sourceLang = card.sourceLang;
+      targetLang = card.targetLang;
+      chapter = card.chapter;
+      type = card.type;
+      dataset = card.dataset || "預設";
+    } else {
+      sourceLang = last.sourceLang || "fr";
+      targetLang = last.targetLang || "zh";
+      chapter = last.chapter || "";
+      type = last.type || "word";
+      dataset = selectedDataset || "預設";
+    }
+    selectedType = type;
+    updateTypeButtons();
+    $("#sourceLangSelect").value = sourceLang;
+    $("#targetLangSelect").value = targetLang;
+    updateLabels(sourceLang, targetLang);
+    updateAllChapterSelects();
+    if(getDatasetList().includes(dataset)){
+      datasetSelect.value = dataset;
+    }
+    refreshFormChapterSelect();
+    if(chapter && getChapterListForDataset(datasetSelect.value).includes(chapter)){
+      chapterSelect.value = chapter;
+    } else {
+      chapterSelect.value = "";
+    }
+    const sourceText = card ? (card[sourceLang] || "") : "";
+    const targetText = card ? (card[targetLang] || "") : "";
+    $("#sourceInput").value = sourceText;
+    $("#targetInput").value = targetText;
+    editOverlay.classList.add("open");
+  }
+
+  function updateLabels(sourceLang, targetLang){
+    document.getElementById("sourceLabel").textContent = `原文（${langLabels[sourceLang]||sourceLang}）`;
+    document.getElementById("targetLabel").textContent = `翻譯（${langLabels[targetLang]||targetLang}）`;
+  }
+
+  function closeEditSheet(){
+    editOverlay.classList.remove("open");
+    editingId = null;
+  }
+  function updateTypeButtons(){
+    [...typeSelect.children].forEach(b=>{
+      b.classList.toggle("sel", b.dataset.t===selectedType);
+    });
+  }
+  typeSelect.addEventListener("click", (e)=>{
+    const b = e.target.closest("button");
+    if(!b) return;
+    selectedType = b.dataset.t;
+    updateTypeButtons();
+  });
+
+  $("#sourceLangSelect, #targetLangSelect").addEventListener("change", function(){
+    const sourceLang = $("#sourceLangSelect").value;
+    const targetLang = $("#targetLangSelect").value;
+    updateLabels(sourceLang, targetLang);
+  });
+
+  $("#addFab").addEventListener("click", ()=>openEditSheet(null));
+  $("#cancelBtn").addEventListener("click", closeEditSheet);
+  editOverlay.addEventListener("click", (e)=>{ if(e.target===editOverlay) closeEditSheet(); });
+
+  $("#addChapterBtn").addEventListener("click", addNewChapter);
+  $("#addDatasetBtn").addEventListener("click", addNewDataset);
+
+  function isDuplicate(sourceText, targetText, sourceLang, targetLang, excludeId) {
+    return cards.some(c => {
+      if(excludeId && c.id === excludeId) return false;
+      return c[c.sourceLang] === sourceText && c[c.targetLang] === targetText;
+    });
+  }
+
+  $("#saveBtn").addEventListener("click", ()=>{
+    const sourceLang = $("#sourceLangSelect").value;
+    const targetLang = $("#targetLangSelect").value;
+    const sourceText = $("#sourceInput").value.trim();
+    if(!sourceText){ $("#sourceInput").focus(); return; }
+    const targetText = $("#targetInput").value.trim();
+    let chapter = chapterSelect.value;
+    if(!chapter) {
+      alert("請選擇或新增一個類別");
+      chapterSelect.focus();
+      return;
+    }
+    const dataset = datasetSelect.value.trim() || "預設";
+
+    if(!editingId ||
+       cards.find(c=>c.id===editingId)[sourceLang] !== sourceText ||
+       cards.find(c=>c.id===editingId)[targetLang] !== targetText) {
+      if(isDuplicate(sourceText, targetText, sourceLang, targetLang, editingId)) {
+        if(!confirm("已存在相同原文與翻譯的字卡，是否仍要儲存？")) {
+          return;
+        }
+      }
+    }
+
+    if(editingId){
+      const c = cards.find(c=>c.id===editingId);
+      if(c){
+        if(c.sourceLang !== sourceLang) {
+          delete c[c.sourceLang];
+        }
+        if(c.targetLang !== targetLang) {
+          delete c[c.targetLang];
+        }
+        c.sourceLang = sourceLang;
+        c.targetLang = targetLang;
+        c[sourceLang] = sourceText;
+        c[targetLang] = targetText;
+        c.type = selectedType;
+        c.chapter = chapter;
+        c.dataset = dataset;
+      }
+    } else {
+      const newCard = {
+        id: uid(),
+        type: selectedType,
+        sourceLang: sourceLang,
+        targetLang: targetLang,
+        chapter: chapter,
+        dataset: dataset,
+        createdAt: Date.now()
+      };
+      newCard[sourceLang] = sourceText;
+      newCard[targetLang] = targetText;
+      if (insertPosition === 'start') {
+        cards.unshift(newCard);
+      } else {
+        cards.push(newCard);
+      }
+    }
+    setLast(sourceLang, targetLang, chapter, selectedType);
+    saveCards();
+    closeEditSheet();
+    render();
+  });
+
+  // ---------- 模式切換 ----------
+  const modeBrowseBtn = $("#modeBrowse");
+  const modeQuizBtn = $("#modeQuiz");
+  const addFab = $("#addFab");
+
+  function setMode(mode){
+    currentMode = mode;
+    localStorage.setItem(MODE_KEY, mode);
+    modeBrowseBtn.classList.toggle("active", mode==="browse");
+    modeQuizBtn.classList.toggle("active", mode==="quiz");
+    browseView.style.display = mode==="browse" ? "block" : "none";
+    quizView.classList.toggle("open", mode==="quiz");
+    quizFilters.classList.toggle("open", mode==="quiz");
+    addFab.style.display = mode==="browse" ? "flex" : "none";
+    if(mode==="quiz"){ resetQuizRound(); renderQuiz(); }
+    updateAllChapterSelects();
+  }
+  modeBrowseBtn.addEventListener("click", ()=>setMode("browse"));
+  modeQuizBtn.addEventListener("click", ()=>setMode("quiz"));
+
+  // ---------- 測驗模式（選擇題） ----------
+  const ROUND_SIZE = 10;
+  const SPEED_RATES_CPS = { slow: 100/60, medium: 150/60, fast: (150*1.5)/60 };
+  const QUIZ_TIME_MIN = 4, QUIZ_TIME_MAX = 60;
+  const LATIN_LANGS = ["en","fr","es","de"];
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+  }
+  function sample(arr, n){
+    if(arr.length <= n){
+      if(arr.length === 0) return [];
+      const out = [];
+      while(out.length < n){ out.push(arr[Math.floor(Math.random()*arr.length)]); }
+      return out;
+    }
+    return shuffle(arr).slice(0, n);
+  }
+  function langFontClass(lang){ return LATIN_LANGS.includes(lang) ? "en" : ""; }
+
+  function getQuizPool(){
+    let pool = cards.filter(c => {
+      if(selectedDataset && c.dataset !== selectedDataset) return false;
+      if(selectedCategory && c.chapter !== selectedCategory) return false;
+      if(quizPrefs.type !== "all" && c.type !== quizPrefs.type) return false;
+      if(!c[c.sourceLang]) return false;
+      return true;
+    });
+    if(quizPrefs.betweenMarks){
+      const markIdxs = [];
+      pool.forEach((c, i) => { if(c.marked) markIdxs.push(i); });
+      if(markIdxs.length !== 2) return [];
+      pool = pool.slice(markIdxs[0] + 1, markIdxs[1]);
+    }
+    return pool;
+  }
+
+  function poolForOptionLang(type, lang, excludeId, pool){
+    return pool.filter(c => c.id !== excludeId && c.type === type && c[lang] && String(c[lang]).trim() !== "");
+  }
+
+  function tokenizeWords(text){
+    return (text||"").split(/\s+/).filter(Boolean);
+  }
+  function uniqueMeaningfulTokens(tokens){
+    const seen = new Set();
+    const out = [];
+    tokens.forEach(t => {
+      const stripped = t.replace(/[^\p{L}\p{N}]/gu, "");
+      if(stripped.length < 2) return;
+      const key = t.toLowerCase();
+      if(seen.has(key)) return;
+      seen.add(key);
+      out.push(t);
+    });
+    return out;
+  }
+  function buildClozePool(card, pool){
+    const words = new Set();
+    pool.forEach(c => {
+      if(c.type !== card.type) return;
+      tokenizeWords(c[c.sourceLang]).forEach(w => words.add(w));
+    });
+    return Array.from(words);
+  }
+  function clozeEligible(card, pool){
+    const tokens = tokenizeWords(card[card.sourceLang]);
+    if(tokens.length < 2) return false;
+    return buildClozePool(card, pool).length >= 5;
+  }
+  function listenMultiEligible(card, pool){
+    const tokens = tokenizeWords(card[card.sourceLang]);
+    const meaningful = uniqueMeaningfulTokens(tokens);
+    if(meaningful.length < 2) return false;
+    const ownLower = new Set(tokens.map(t => t.toLowerCase()));
+    const distractorPool = buildClozePool(card, pool).filter(w => !ownLower.has(w.toLowerCase()));
+    return distractorPool.length >= 2;
+  }
+
+  function pickQType(card, pool){
+    let f = quizPrefs.qtype;
+    if(f === "all"){
+      const opts = card[card.targetLang] ? ["src2tgt","tgt2src","listen"] : ["src2tgt","listen"];
+      if(clozeEligible(card, pool)) opts.push("cloze");
+      if(listenMultiEligible(card, pool)) opts.push("listen_multi");
+      f = opts[Math.floor(Math.random()*opts.length)];
+    } else if(f === "tgt2src" && !card[card.targetLang]){
+      f = "src2tgt";
+    } else if(f === "cloze" && !clozeEligible(card, pool)){
+      f = "src2tgt";
+    } else if(f === "listen_multi" && !listenMultiEligible(card, pool)){
+      f = "listen";
+    }
+    return f;
+  }
+
+  function buildOptions(correctCard, optionLang, pool){
+    const candidatePool = poolForOptionLang(correctCard.type, optionLang, correctCard.id, pool);
+    const distractors = sample(candidatePool, Math.min(3, candidatePool.length));
+    const items = shuffle([correctCard].concat(distractors));
+    return items.map(it => ({ text: it[optionLang], cardId: it.id }));
+  }
+
+  function buildQuestion(card, pool){
+    const qtype = pickQType(card, pool);
+    const q = { card, qtype, userAnswerIndex:null, answered:false };
+    if(qtype === "src2tgt"){
+      q.promptType = "text";
+      q.promptLang = card.sourceLang;
+      q.promptText = card[card.sourceLang];
+      q.optionLang = card.targetLang;
+      q.options = buildOptions(card, card.targetLang, pool);
+    } else if(qtype === "tgt2src"){
+      q.promptType = "text";
+      q.promptLang = card.targetLang;
+      q.promptText = card[card.targetLang];
+      q.optionLang = card.sourceLang;
+      q.options = buildOptions(card, card.sourceLang, pool);
+    } else if(qtype === "cloze"){
+      const tokens = tokenizeWords(card[card.sourceLang]);
+      const candidateIdxs = tokens
+        .map((t,i)=>({t,i}))
+        .filter(o => o.t.replace(/[^\p{L}\p{N}]/gu,"").length >= 2);
+      const chosen = candidateIdxs.length > 0
+        ? candidateIdxs[Math.floor(Math.random()*candidateIdxs.length)]
+        : { t: tokens[0], i: 0 };
+      const blankWord = chosen.t;
+      const blankIndex = chosen.i;
+      q.promptType = "cloze";
+      q.promptLang = card.sourceLang;
+      q.clozeTokens = tokens;
+      q.blankIndex = blankIndex;
+      q.blankWord = blankWord;
+      const displayTokens = tokens.slice();
+      displayTokens[blankIndex] = "＿＿＿＿";
+      q.promptText = displayTokens.join(" ");
+      q.hintText = card[card.targetLang] || "";
+      q.optionLang = card.sourceLang;
+      const wordPool = buildClozePool(card, pool).filter(w => w.toLowerCase() !== blankWord.toLowerCase());
+      const distractorWords = sample(wordPool, Math.min(3, wordPool.length));
+      const optionTexts = shuffle([blankWord].concat(distractorWords));
+      q.options = optionTexts.map((w, i) => ({ text: w, cardId: card.id + "__cloze__" + i }));
+      q.correctIndex = optionTexts.indexOf(blankWord);
+      return q;
+    } else if(qtype === "listen_multi"){
+      const tokens = tokenizeWords(card[card.sourceLang]);
+      const meaningful = uniqueMeaningfulTokens(tokens);
+      const correctCount = Math.min(4, meaningful.length);
+      const correctWords = shuffle(meaningful).slice(0, correctCount);
+      const ownLower = new Set(tokens.map(t => t.toLowerCase()));
+      const distractorPoolAll = buildClozePool(card, pool).filter(w => !ownLower.has(w.toLowerCase()));
+      const totalOptions = 6;
+      const distractorCount = Math.min(Math.max(totalOptions - correctWords.length, 2), distractorPoolAll.length);
+      const distractorWords = shuffle(distractorPoolAll).slice(0, distractorCount);
+      const allOptions = shuffle(
+        correctWords.map(w => ({ text: w, isCorrect: true }))
+          .concat(distractorWords.map(w => ({ text: w, isCorrect: false })))
+      );
+      q.promptType = "listen_multi";
+      q.promptLang = card.sourceLang;
+      q.optionLang = card.sourceLang;
+      q.correctWords = correctWords;
+      q.options = allOptions;
+      q.promptText = card[card.sourceLang];
+      q._selectedIdx = new Set();
+      return q;
+    } else { // listen
+      q.promptType = "speaker";
+      const canUseTarget = !!card[card.targetLang];
+      q.optionLang = (canUseTarget && Math.random() < 0.5) ? card.targetLang : card.sourceLang;
+      q.options = buildOptions(card, q.optionLang, pool);
+    }
+    q.correctIndex = q.options.findIndex(o => o.cardId === card.id);
+    return q;
+  }
+
+  function startNewRound(specificCards, isRetest){
+    const pool = getQuizPool();
+    let items;
+    if(specificCards){
+      items = specificCards;
+    } else {
+      items = sample(pool, Math.min(ROUND_SIZE, pool.length));
+      if(pool.length > 0 && pool.length < ROUND_SIZE){
+        items = sample(pool, ROUND_SIZE);
+      }
+    }
+    const questions = items.map(c => buildQuestion(c, pool));
+    quizRound = {
+      questions, currentIndex:0, correctCount:0, answeredCount:0,
+      finished:false, isRetest: !!isRetest
+    };
+  }
+
+  function resetQuizRound(){ quizRound = null; clearQuizTimer(); }
+
+  function computeTimeLimit(text){
+    const cps = SPEED_RATES_CPS[quizPrefs.speed];
+    if(!cps) return null;
+    const seconds = (text||"").length / cps;
+    return Math.min(QUIZ_TIME_MAX, Math.max(QUIZ_TIME_MIN, Math.round(seconds)));
+  }
+  function clearQuizTimer(){
+    if(quizTimerHandle){ clearInterval(quizTimerHandle); quizTimerHandle = null; }
+  }
+
+  function renderQuiz(){
+    quizContent.innerHTML = "";
+    const pool = getQuizPool();
+    if(pool.length === 0){
+      let msg;
+      if(quizPrefs.betweenMarks){
+        const basePool = cards.filter(c => {
+          if(selectedDataset && c.dataset !== selectedDataset) return false;
+          if(selectedCategory && c.chapter !== selectedCategory) return false;
+          if(quizPrefs.type !== "all" && c.type !== quizPrefs.type) return false;
+          if(!c[c.sourceLang]) return false;
+          return true;
+        });
+        const markCount = basePool.filter(c => c.marked).length;
+        if(markCount !== 2){
+          msg = `「標記間」需要剛好標記兩張字卡作為起訖點<br>目前篩選範圍內標記了 ${markCount} 張，請調整為剛好 2 張`;
+        } else {
+          msg = "兩個標記字卡之間沒有其他字卡<br>請標記距離更遠的兩張字卡";
+        }
+      } else {
+        msg = "沒有符合篩選條件的字卡<br>請調整類別或新增字卡";
+      }
+      quizContent.innerHTML = `<div class="quiz-empty">${msg}</div>`;
+      return;
+    }
+    if(!quizRound){ startNewRound(); }
+    if(quizRound.finished){ renderQuizSummary(); }
+    else { renderQuizQuestion(); }
+  }
+
+  function renderQuizQuestion(){
+    clearQuizTimer();
+    const q = quizRound.questions[quizRound.currentIndex];
+    const c = q.card;
+    const langLabel = `${langLabels[c.sourceLang]||c.sourceLang} → ${langLabels[c.targetLang]||c.targetLang}`;
+
+    let topActionsHtml, timerHtml = "";
+    if(q.answered){
+      topActionsHtml = `
+        <div class="quiz-topbar-actions">
+          <button class="qa-translate" id="qaTranslate">🌐 翻譯</button>
+          <button class="qa-next" id="qaNext">下一題</button>
+        </div>`;
+    } else {
+      const timeLimit = computeTimeLimit((q.promptType === "speaker" || q.promptType === "listen_multi") ? c[c.sourceLang] : q.promptText);
+      if(timeLimit !== null){
+        if(q._timeRemaining === undefined) q._timeRemaining = timeLimit;
+        timerHtml = `<div class="quiz-timer${q._timeRemaining<=3?' low':''}" id="quizTimerDisplay">⏱ ${q._timeRemaining}s</div>`;
+      }
+      topActionsHtml = timerHtml;
+    }
+
+    const pct = quizRound.answeredCount > 0 ? Math.round((quizRound.correctCount/quizRound.answeredCount)*100) : 0;
+    const progressText = q.answered ? `${quizRound.answeredCount}　${pct}%` : `第 ${quizRound.currentIndex+1} / ${quizRound.questions.length} 題`;
+
+    let qInnerHtml;
+    let showBoth = false;
+    if(!q.answered){
+      if(q.promptType === "speaker" || q.promptType === "listen_multi"){
+        qInnerHtml = `<span class="speaker-icon-big">🔊</span>`;
+      } else {
+        qInnerHtml = `<span class="${langFontClass(q.promptLang)}">${escapeHtml(q.promptText||"")}</span>`;
+      }
+    } else {
+      showBoth = (q.promptType === "listen_multi") || (q.optionLang === c.sourceLang);
+      if(q.promptType === "cloze"){
+        const revealed = q.clozeTokens.map((t,i)=> i===q.blankIndex
+          ? `<span style="color:var(--gold); font-weight:700;">${escapeHtml(t)}</span>`
+          : escapeHtml(t)
+        ).join(" ");
+        qInnerHtml = `<span class="${langFontClass(c.sourceLang)}">${revealed}</span>`;
+      } else if(q.promptType === "listen_multi"){
+        const correctLower = new Set(q.correctWords.map(w => w.toLowerCase()));
+        const revealed = tokenizeWords(c[c.sourceLang]).map(t => correctLower.has(t.toLowerCase())
+          ? `<span style="color:var(--gold); font-weight:700;">${escapeHtml(t)}</span>`
+          : escapeHtml(t)
+        ).join(" ");
+        qInnerHtml = `<span class="${langFontClass(c.sourceLang)}">${revealed}</span>`;
+      } else if(q.promptType === "speaker" || showBoth){
+        qInnerHtml = `<span class="${langFontClass(c.sourceLang)}">${escapeHtml(c[c.sourceLang]||"")}</span>`;
+      } else {
+        qInnerHtml = `<span class="${langFontClass(q.promptLang)}">${escapeHtml(q.promptText||"")}</span>`;
+      }
+    }
+    const translationHtml = (q.answered && showBoth && c[c.targetLang])
+      ? `<div class="quiz-cloze-hint">${escapeHtml(c[c.targetLang])}</div>` : "";
+
+    const lineClass = (q.promptType !== "cloze" && q.promptType !== "listen_multi" && (c.type === "sentence" || c.type === "phrase")) ? "opt-line-2" : "opt-line-1";
+    const optionsHtml = q.options.map((opt, idx)=>{
+      let cls = "quiz-opt " + lineClass;
+      if(q.promptType === "listen_multi"){
+        if(q.answered){
+          if(opt.isCorrect && q._selectedIdx.has(idx)) cls += " correct-answer";
+          else if(opt.isCorrect && !q._selectedIdx.has(idx)) cls += " correct-missed";
+          else if(!opt.isCorrect && q._selectedIdx.has(idx)) cls += " wrong-answer";
+        } else if(q._selectedIdx.has(idx)){
+          cls += " selected";
+        }
+      } else if(q.answered){
+        if(idx === q.correctIndex) cls += " correct-answer";
+        else if(idx === q.userAnswerIndex) cls += " wrong-answer";
+      }
+      return `<button class="${cls}" data-idx="${idx}"><span class="quiz-opt-inner ${langFontClass(q.optionLang)}">${escapeHtml(opt.text||"")}</span></button>`;
+    }).join("");
+    const confirmBtnHtml = (q.promptType === "listen_multi" && !q.answered)
+      ? `<button class="qa-confirm" id="quizConfirmMulti">✅ 確認答案</button>` : "";
+
+    quizContent.innerHTML = `
+      <div class="quiz-inner">
+        <div class="quiz-card${q.answered ? (isQuestionCorrect(q)?' correct':' wrong') : ''}" id="quizCard">
+          <div class="quiz-topbar">
+            <div class="quiz-progress">${progressText}</div>
+            ${topActionsHtml}
+            <div class="quiz-correct-count">${quizRound.correctCount}</div>
+          </div>
+          <span class="lang-tag quiz-lang-tag">${langLabel} · ${typeLabels[c.type]}</span>
+          <div class="quiz-question" id="quizQuestion">
+            <span class="quiz-question-inner">${qInnerHtml}</span>
+          </div>
+          ${translationHtml}
+          <div class="quiz-options" id="quizOptions">${optionsHtml}</div>
+          ${confirmBtnHtml}
+        </div>
+      </div>`;
+
+    $("#quizQuestion").addEventListener("click", ()=>{
+      if(q.promptType === "cloze" && !q.answered) return;
+      speak(c[c.sourceLang], c.sourceLang);
+    });
+
+    if(!q.answered && !q._played && (q.promptType === "speaker" || q.promptType === "listen_multi" || q.qtype === "src2tgt")){
+      q._played = true;
+      setTimeout(()=> speak(c[c.sourceLang], c.sourceLang), 200);
+    }
+
+    $("#quizOptions").querySelectorAll(".quiz-opt").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const idx = parseInt(btn.dataset.idx, 10);
+        if(q.promptType === "listen_multi"){
+          if(q.answered){ speak(c[c.sourceLang], c.sourceLang); return; }
+          if(q._selectedIdx.has(idx)) q._selectedIdx.delete(idx); else q._selectedIdx.add(idx);
+          btn.classList.toggle("selected");
+          return;
+        }
+        if(q.answered){ speak(c[c.sourceLang], c.sourceLang); return; }
+        submitAnswer(idx);
+      });
+    });
+
+    const confirmBtn = document.getElementById("quizConfirmMulti");
+    if(confirmBtn){
+      confirmBtn.addEventListener("click", ()=> submitMultiAnswer());
+    }
+
+    if(q.answered){
+      $("#qaTranslate").addEventListener("click", ()=> translateAndOpen(q));
+      $("#qaNext").addEventListener("click", nextQuestion);
+    } else {
+      const timeLimit = computeTimeLimit((q.promptType === "speaker" || q.promptType === "listen_multi") ? c[c.sourceLang] : q.promptText);
+      if(timeLimit !== null){
+        quizTimerHandle = setInterval(()=>{
+          q._timeRemaining--;
+          const el = document.getElementById("quizTimerDisplay");
+          if(el){
+            el.textContent = "⏱ " + Math.max(0, q._timeRemaining) + "s";
+            el.classList.toggle("low", q._timeRemaining <= 3);
+          }
+          if(q._timeRemaining <= 0){
+            clearQuizTimer();
+            timeUpAnswer();
+          }
+        }, 1000);
+      }
+    }
+  }
+
+  function isQuestionCorrect(q){
+    if(q.promptType === "listen_multi") return !!q.isFullyCorrect;
+    return q.userAnswerIndex === q.correctIndex;
+  }
+
+  function submitAnswer(idx){
+    clearQuizTimer();
+    const q = quizRound.questions[quizRound.currentIndex];
+    q.userAnswerIndex = idx;
+    q.answered = true;
+    quizRound.answeredCount++;
+    if(idx === q.correctIndex) quizRound.correctCount++;
+    const c = q.card;
+    speak(c[c.sourceLang], c.sourceLang);
+    copyToClipboard(c[c.sourceLang]);
+    renderQuiz();
+  }
+
+  function submitMultiAnswer(){
+    clearQuizTimer();
+    const q = quizRound.questions[quizRound.currentIndex];
+    if(q.answered) return;
+    const selectedTexts = Array.from(q._selectedIdx).map(i => q.options[i].text);
+    const correctSet = new Set(q.correctWords.map(w => w.toLowerCase()));
+    const selSet = new Set(selectedTexts.map(w => w.toLowerCase()));
+    let fullyCorrect = correctSet.size === selSet.size;
+    if(fullyCorrect){
+      for(const w of correctSet){ if(!selSet.has(w)){ fullyCorrect = false; break; } }
+    }
+    q.isFullyCorrect = fullyCorrect;
+    q.answered = true;
+    quizRound.answeredCount++;
+    if(fullyCorrect) quizRound.correctCount++;
+    const c = q.card;
+    speak(c[c.sourceLang], c.sourceLang);
+    copyToClipboard(c[c.sourceLang]);
+    renderQuiz();
+  }
+
+  function timeUpAnswer(){
+    const q = quizRound.questions[quizRound.currentIndex];
+    if(q.answered) return;
+    if(q.promptType === "listen_multi"){
+      submitMultiAnswer();
+      return;
+    }
+    q.userAnswerIndex = -1;
+    q.answered = true;
+    quizRound.answeredCount++;
+    const c = q.card;
+    speak(c[c.sourceLang], c.sourceLang);
+    copyToClipboard(c[c.sourceLang]);
+    renderQuiz();
+  }
+
+  function nextQuestion(){
+    if(quizRound.currentIndex < quizRound.questions.length - 1){
+      quizRound.currentIndex++;
+    } else {
+      quizRound.finished = true;
+    }
+    renderQuiz();
+  }
+
+  function translateAndOpen(q){
+    const c = q.card;
+    const text = c[c.sourceLang];
+    if(!text) return;
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }catch(e){ /* copy not supported, fall through */ }
+    copyToClipboard(text);
+    const sl = c.sourceLang || "auto";
+    const tl = c.targetLang || "zh-TW";
+    const encoded = encodeURIComponent(text);
+    window.open(`https://translate.google.com/?sl=${sl}&tl=${tl}&text=${encoded}&op=translate`, "_blank");
+  }
+
+  function renderQuizSummary(){
+    const wrong = quizRound.questions.filter(q => !isQuestionCorrect(q));
+    const score = Math.round((quizRound.correctCount / quizRound.questions.length) * 100);
+
+    let wrongHtml;
+    if(wrong.length === 0){
+      wrongHtml = `<div class="all-clear">🎉 全數答對，太厲害了！</div>`;
+    } else {
+      wrongHtml = `<div class="wrong-list">${wrong.map(q=>{
+        const c = q.card;
+        return `<div class="wrong-list-item">
+          <div class="wsrc ${langFontClass(c.sourceLang)}" data-src="${c.id}">${escapeHtml(c[c.sourceLang]||"")}</div>
+          <div class="wtgt">${escapeHtml(c[c.targetLang]||"")}</div>
+        </div>`;
+      }).join("")}</div>`;
+    }
+
+    quizContent.innerHTML = `
+      <div class="quiz-inner">
+        <div class="quiz-summary">
+          <div class="quiz-score-label">${quizRound.isRetest ? "重測結果" : "本次測驗得分"}</div>
+          <div class="quiz-score">${score}</div>
+          ${wrongHtml}
+          <div class="summary-actions">
+            ${wrong.length>0 ? `<button class="btn-retest" id="btnRetest">重測錯題（${wrong.length}）</button>` : ""}
+            <button class="btn-next10" id="btnNext10">下 ${ROUND_SIZE} 題</button>
+          </div>
+        </div>
+      </div>`;
+
+    quizContent.querySelectorAll(".wsrc").forEach(el=>{
+      el.addEventListener("click", ()=>{
+        const cd = cards.find(c=>c.id===el.dataset.src);
+        if(cd) speak(cd[cd.sourceLang], cd.sourceLang);
+      });
+    });
+    const retestBtn = $("#btnRetest");
+    if(retestBtn){
+      retestBtn.addEventListener("click", ()=>{
+        const wrongCards = wrong.map(q=>q.card);
+        startNewRound(wrongCards, true);
+        renderQuiz();
+      });
+    }
+    $("#btnNext10").addEventListener("click", ()=>{
+      startNewRound();
+      renderQuiz();
+    });
+  }
+
+  // ---------- 匯出（保留卡片順序） ----------
+  const exportOverlay = $("#exportOverlay");
+  const exportCheckboxGroup = $("#exportCheckboxGroup");
+
+  async function saveFileWithPicker(data, suggestedName) {
+    if ('showSaveFilePicker' in window) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: suggestedName || '語言筆記.json',
+          types: [{
+            description: 'JSON 檔案',
+            accept: {'application/json': ['.json']},
+          }],
+        });
+        const writable = await handle.createWritable();
+        await writable.write(data);
+        await writable.close();
+        return true;
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          return null;
+        }
+        console.error('儲存失敗', err);
+        alert('無法儲存檔案：' + err.message);
+        return null;
+      }
+    } else {
+      return false;
+    }
+  }
+
+  function buildExportJsonFromCards(toExport){
+    const orderIndex = new Map();
+    toExport.forEach((c, i) => orderIndex.set(c.id, i));
+
+    const chapterOrder = [];
+    const seen = new Set();
+    toExport.forEach(c => {
+      if (!seen.has(c.chapter)) {
+        seen.add(c.chapter);
+        chapterOrder.push(c.chapter);
+      }
+    });
+
+    const groups = {};
+    toExport.forEach(c => {
+      if (!groups[c.chapter]) groups[c.chapter] = [];
+      groups[c.chapter].push(c);
+    });
+
+    const chaptersObj = chapterOrder.map(ch => {
+      const chapterCards = groups[ch];
+      const typeGroups = {};
+      chapterCards.forEach(c => {
+        if (!typeGroups[c.type]) typeGroups[c.type] = [];
+        typeGroups[c.type].push(c);
+      });
+      const sections = Object.keys(typeGroups).map(type => {
+        const cardsOfType = typeGroups[type];
+        const sentences = cardsOfType.map(c => {
+          const obj = { id: c.id };
+          obj[c.sourceLang] = c[c.sourceLang];
+          obj[c.targetLang] = c[c.targetLang];
+          obj.segments = [];
+          obj.syntax = "";
+          obj.grammar = "";
+          obj.culture = "";
+          obj.questions = [];
+          obj.vocab = [];
+          obj.order = orderIndex.get(c.id);
+          return obj;
+        });
+        return {
+          id: ch + "-" + type,
+          title: type,
+          sentences: sentences
+        };
+      });
+      return {
+        id: ch,
+        title: ch,
+        sections: sections
+      };
+    });
+
+    return { chapters: chaptersObj };
+  }
+
+  async function downloadJsonFile(jsonObj, suggestedName){
+    const data = JSON.stringify(jsonObj, null, 2);
+    const result = await saveFileWithPicker(data, suggestedName);
+    if(result === true) return true;
+    if(result === null) return false;
+    const blob = new Blob([data], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = suggestedName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=> URL.revokeObjectURL(url), 3000);
+    return true;
+  }
+
+  function openExportSheet(){
+    const chapters = getChapterList();
+    if(chapters.length === 0){
+      alert("沒有任何字卡可匯出");
+      return;
+    }
+    exportCheckboxGroup.innerHTML = chapters.map(ch => `
+      <label>
+        <input type="checkbox" value="${escapeHtml(ch)}" checked> ${escapeHtml(ch)}
+      </label>
+    `).join('');
+    exportOverlay.classList.add("open");
+  }
+
+  function closeExportSheet(){
+    exportOverlay.classList.remove("open");
+  }
+
+  $("#exportBtn").addEventListener("click", openExportSheet);
+  $("#exportCancelBtn").addEventListener("click", closeExportSheet);
+  exportOverlay.addEventListener("click", (e)=>{ if(e.target===exportOverlay) closeExportSheet(); });
+
+  $("#exportConfirmBtn").addEventListener("click", async ()=>{
+    const checkedBoxes = exportCheckboxGroup.querySelectorAll('input[type="checkbox"]:checked');
+    const selectedChapters = Array.from(checkedBoxes).map(cb => cb.value);
+    if(selectedChapters.length === 0){
+      alert("請至少選一個類別");
+      return;
+    }
+    const toExport = cards.filter(c => selectedChapters.includes(c.chapter));
+    if(toExport.length === 0){
+      alert("所選類別沒有卡片");
+      return;
+    }
+
+    const jsonObj = buildExportJsonFromCards(toExport);
+    const suggestedName = `語言筆記_${new Date().toISOString().slice(0,10)}.json`;
+    closeExportSheet();
+    await downloadJsonFile(jsonObj, suggestedName);
+  });
+
+  // ---------- 匯入 ----------
+  let pendingImportCards = null;
+  let pendingImportDatasetName = "";
+  let pendingImportExistingCount = 0;
+
+  function isDuplicateCard(c, existingArr){
+    return existingArr.some(ex => ex[ex.sourceLang] === c[c.sourceLang] && ex[ex.targetLang] === c[c.targetLang]);
+  }
+
+  function importCards(file){
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const datasetNameHint = (file.name || "匯入資料").replace(/\.json$/i, "").trim() || "匯入資料";
+      processImportedText(e.target.result, datasetNameHint);
+    };
+    reader.onerror = ()=>{
+      alert("匯入失敗：無法讀取檔案");
+    };
+    reader.readAsText(file);
+  }
+
+  function deriveDatasetNameFromUrl(url){
+    try{
+      const u = new URL(url);
+      const parts = u.pathname.split('/').filter(Boolean);
+      let last = parts[parts.length - 1] || "匯入資料";
+      last = decodeURIComponent(last).replace(/\.json$/i, "").trim();
+      return last || "匯入資料";
+    }catch(e){
+      return "匯入資料";
+    }
+  }
+
+  async function importFromUrl(url){
+    let text;
+    try{
+      const resp = await fetch(url);
+      if(!resp.ok){
+        alert(`匯入失敗：無法取得檔案（HTTP ${resp.status}）`);
+        return;
+      }
+      text = await resp.text();
+    }catch(err){
+      alert("匯入失敗：無法連線到此網址，請確認網址正確且為公開連結（例如 GitHub 的 raw 網址）。\n" + err.message);
+      return;
+    }
+    const datasetNameHint = deriveDatasetNameFromUrl(url);
+    processImportedText(text, datasetNameHint);
+  }
+
+  function processImportedText(text, datasetNameHint){
+    try{
+      const data = JSON.parse(text);
+      let importedCards = [];
+      if (data.chapters && Array.isArray(data.chapters)) {
+        data.chapters.forEach(ch => {
+          const chapterTitle = ch.title || "一般";
+          if (ch.sections) {
+            ch.sections.forEach(sec => {
+              if (sec.sentences) {
+                sec.sentences.forEach(s => {
+                  const langKeys = Object.keys(s).filter(k => k.length===2 && /^[a-z]{2}$/.test(k) && k!=='id');
+                  if(langKeys.length >= 2) {
+                    const sourceLang = langKeys[0];
+                    const targetLang = langKeys[1];
+                    const sourceText = s[sourceLang] || "";
+                    const targetText = s[targetLang] || "";
+                    if(sourceText) {
+                      importedCards.push({
+                        id: uid(),
+                        type: sec.title || "sentence",
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        [sourceLang]: sourceText,
+                        [targetLang]: targetText,
+                        chapter: chapterTitle,
+                        createdAt: s.createdAt || Date.now(),
+                        _order: (typeof s.order === "number") ? s.order : null
+                      });
+                    }
+                  } else {
+                    const possible = ['fr','en','zh','ja','ko','es','de'];
+                    let found = [];
+                    possible.forEach(lang => {
+                      if(s[lang]) found.push({lang, text: s[lang]});
+                    });
+                    if(found.length >= 2) {
+                      const sourceLang = found[0].lang;
+                      const targetLang = found[1].lang;
+                      importedCards.push({
+                        id: uid(),
+                        type: sec.title || "sentence",
+                        sourceLang: sourceLang,
+                        targetLang: targetLang,
+                        [sourceLang]: found[0].text,
+                        [targetLang]: found[1].text,
+                        chapter: chapterTitle,
+                        createdAt: s.createdAt || Date.now(),
+                        _order: (typeof s.order === "number") ? s.order : null
+                      });
+                    }
+                  }
+                });
+              }
+            });
+          }
+        });
+      } else if (Array.isArray(data)) {
+        data.forEach(s => {
+          const langKeys = Object.keys(s).filter(k => k.length===2 && /^[a-z]{2}$/.test(k) && k!=='id');
+          if(langKeys.length >= 2) {
+            const sourceLang = langKeys[0];
+            const targetLang = langKeys[1];
+            const sourceText = s[sourceLang] || "";
+            const targetText = s[targetLang] || "";
+            if(sourceText) {
+              importedCards.push({
+                id: uid(),
+                type: s.type || "sentence",
+                sourceLang: sourceLang,
+                targetLang: targetLang,
+                [sourceLang]: sourceText,
+                [targetLang]: targetText,
+                chapter: s.chapter || "一般",
+                createdAt: s.createdAt || Date.now(),
+                _order: (typeof s.order === "number") ? s.order : null
+              });
+            }
+          }
+        });
+      } else {
+        throw new Error("不支援的格式");
+      }
+
+      importedCards = importedCards.filter(c => !!c[c.sourceLang]);
+      if(importedCards.length === 0){
+        alert("匯入失敗：檔案中沒有可用的字卡");
+        return;
+      }
+
+      if(importedCards.some(c => c._order !== null)){
+        importedCards = importedCards
+          .map((c, i) => ({ c, i }))
+          .sort((a, b) => {
+            const oa = a.c._order === null ? a.i : a.c._order;
+            const ob = b.c._order === null ? b.i : b.c._order;
+            return oa - ob;
+          })
+          .map(x => x.c);
+      }
+      importedCards.forEach(c => { delete c._order; });
+
+      const datasetName = datasetNameHint || "匯入資料";
+      importedCards.forEach(c => { c.dataset = datasetName; });
+
+      const existingInDataset = cards.filter(c => c.dataset === datasetName);
+
+      if(existingInDataset.length === 0){
+        cards = cards.concat(importedCards);
+        saveCards();
+        render();
+        resetQuizRound();
+        if(currentMode === "quiz") renderQuiz();
+        alert(`已建立新資料集「${datasetName}」，共 ${importedCards.length} 張字卡。`);
+        return;
+      }
+
+      pendingImportCards = importedCards;
+      pendingImportDatasetName = datasetName;
+      pendingImportExistingCount = existingInDataset.length;
+      const dupCount = importedCards.filter(c => isDuplicateCard(c, existingInDataset)).length;
+      $("#importSummary").textContent = `資料集「${datasetName}」已存在（原有 ${existingInDataset.length} 張），這次匯入 ${importedCards.length} 張，其中 ${dupCount} 張內容重複。請選擇處理方式：`;
+      openImportOverlay();
+    }catch(err){
+      alert("匯入失敗：檔案格式錯誤\n" + err.message);
+    }
+  }
+
+  // ---------- 匯入方式選擇 sheet ----------
+  const importOverlay = $("#importOverlay");
+  function openImportOverlay(){ importOverlay.classList.add("open"); }
+  function closeImportOverlay(){
+    importOverlay.classList.remove("open");
+    pendingImportCards = null;
+    pendingImportDatasetName = "";
+    pendingImportExistingCount = 0;
+  }
+
+  $("#importCancelBtn").addEventListener("click", closeImportOverlay);
+  importOverlay.addEventListener("click", (e)=>{ if(e.target===importOverlay) closeImportOverlay(); });
+
+  $("#importSkipDupBtn").addEventListener("click", ()=>{
+    if(!pendingImportCards) return;
+    const datasetName = pendingImportDatasetName;
+    const existingInDataset = cards.filter(c => c.dataset === datasetName);
+    let added = 0, skipped = 0;
+    pendingImportCards.forEach(c => {
+      if(isDuplicateCard(c, existingInDataset)){
+        skipped++;
+      } else {
+        cards.push(c);
+        added++;
+      }
+    });
+    saveCards();
+    render();
+    resetQuizRound();
+    if(currentMode === "quiz") renderQuiz();
+    closeImportOverlay();
+    alert(`已合併到資料集「${datasetName}」！新增 ${added} 張，跳過 ${skipped} 張重複。`);
+  });
+
+  $("#importReplaceBtn").addEventListener("click", ()=>{
+    if(!pendingImportCards) return;
+    const datasetName = pendingImportDatasetName;
+    const existingCount = pendingImportExistingCount;
+    const importCount = pendingImportCards.length;
+    if(!confirm(`此操作只會清除資料集「${datasetName}」原有的 ${existingCount} 張字卡（其他資料集不受影響），改為這次匯入的 ${importCount} 張，確定要完全刷新嗎？`)) return;
+    cards = cards.filter(c => c.dataset !== datasetName).concat(pendingImportCards);
+    saveCards();
+    render();
+    resetQuizRound();
+    if(currentMode === "quiz") renderQuiz();
+    closeImportOverlay();
+    alert(`資料集「${datasetName}」已刷新，共 ${importCount} 張字卡。`);
+  });
+
+  // ---------- 匯入來源選擇 ----------
+  const importSourceOverlay = $("#importSourceOverlay");
+  const urlImportOverlay = $("#urlImportOverlay");
+
+  function openImportSourceSheet(){ importSourceOverlay.classList.add("open"); }
+  function closeImportSourceSheet(){ importSourceOverlay.classList.remove("open"); }
+
+  $("#importBtn").addEventListener("click", openImportSourceSheet);
+  $("#importSourceCancelBtn").addEventListener("click", closeImportSourceSheet);
+  importSourceOverlay.addEventListener("click", (e)=>{ if(e.target===importSourceOverlay) closeImportSourceSheet(); });
+
+  $("#importFromLocalBtn").addEventListener("click", ()=>{
+    closeImportSourceSheet();
+    document.getElementById("fileInput").click();
+  });
+  document.getElementById("fileInput").addEventListener("change", (e)=>{
+    if(e.target.files.length>0){
+      importCards(e.target.files[0]);
+      e.target.value = "";
+    }
+  });
+
+  $("#importFromUrlBtn").addEventListener("click", ()=>{
+    closeImportSourceSheet();
+    $("#urlImportInput").value = "";
+    urlImportOverlay.classList.add("open");
+    setTimeout(()=> $("#urlImportInput").focus(), 50);
+  });
+  function closeUrlImportSheet(){ urlImportOverlay.classList.remove("open"); }
+  $("#urlImportCancelBtn").addEventListener("click", closeUrlImportSheet);
+  urlImportOverlay.addEventListener("click", (e)=>{ if(e.target===urlImportOverlay) closeUrlImportSheet(); });
+  $("#urlImportConfirmBtn").addEventListener("click", async ()=>{
+    const url = $("#urlImportInput").value.trim();
+    if(!url){ alert("請輸入網址"); return; }
+    closeUrlImportSheet();
+    await importFromUrl(url);
+  });
+
+  // ---------- 瀏覽 GitHub 資料夾 ----------
+  const GH_BROWSE_KEY = "生字簿_gh_browse_v1";
+  const githubBrowseOverlay = $("#githubBrowseOverlay");
+
+  function loadGhBrowsePrefs(){
+    let prefs = { owner:"chi12357", repo:"Learning-App", branch:"main", path:"Data/生字簿" };
+    try{
+      const raw = localStorage.getItem(GH_BROWSE_KEY);
+      if(raw) prefs = Object.assign(prefs, JSON.parse(raw));
+    }catch(e){}
+    return prefs;
+  }
+  function saveGhBrowsePrefs(prefs){
+    try{ localStorage.setItem(GH_BROWSE_KEY, JSON.stringify(prefs)); }catch(e){}
+  }
+
+  function openGithubBrowseSheet(){
+    const prefs = loadGhBrowsePrefs();
+    $("#ghOwnerInput").value = prefs.owner;
+    $("#ghRepoInput").value = prefs.repo;
+    $("#ghBranchInput").value = prefs.branch || "main";
+    $("#ghPathInput").value = prefs.path;
+    $("#ghFileListWrap").style.display = "none";
+    $("#ghFileList").innerHTML = "";
+    githubBrowseOverlay.classList.add("open");
+  }
+  function closeGithubBrowseSheet(){ githubBrowseOverlay.classList.remove("open"); }
+
+  $("#importFromGithubFolderBtn").addEventListener("click", ()=>{
+    closeImportSourceSheet();
+    openGithubBrowseSheet();
+  });
+  $("#ghBrowseCancelBtn").addEventListener("click", closeGithubBrowseSheet);
+  githubBrowseOverlay.querySelectorAll(".gh-clear-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const target = document.getElementById(btn.dataset.target);
+      if(target){ target.value = ""; target.focus(); }
+    });
+  });
+  githubBrowseOverlay.addEventListener("click", (e)=>{ if(e.target===githubBrowseOverlay) closeGithubBrowseSheet(); });
+
+  $("#ghBrowseListBtn").addEventListener("click", async ()=>{
+    const owner = $("#ghOwnerInput").value.trim();
+    const repo = $("#ghRepoInput").value.trim();
+    const branch = $("#ghBranchInput").value.trim() || "main";
+    const path = $("#ghPathInput").value.trim();
+    if(!owner || !repo){
+      alert("請輸入擁有者 (owner) 與倉庫 (repo) 名稱");
+      return;
+    }
+    saveGhBrowsePrefs({ owner, repo, branch, path });
+
+    const encodedPath = path.split('/').filter(Boolean).map(encodeURIComponent).join('/');
+    const apiUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/contents/${encodedPath}?ref=${encodeURIComponent(branch)}`;
+
+    $("#ghFileListWrap").style.display = "block";
+    $("#ghFileList").innerHTML = `<div class="manage-row-label">載入中...</div>`;
+
+    let items;
+    try{
+      const resp = await fetch(apiUrl);
+      if(!resp.ok){
+        $("#ghFileList").innerHTML = `<div class="manage-row-label">無法取得清單（HTTP ${resp.status}），請確認 owner／repo／分支／路徑是否正確，以及倉庫是否為公開。</div>`;
+        return;
+      }
+      items = await resp.json();
+    }catch(err){
+      $("#ghFileList").innerHTML = `<div class="manage-row-label">連線失敗：${escapeHtml(err.message)}</div>`;
+      return;
+    }
+
+    if(!Array.isArray(items)){
+      $("#ghFileList").innerHTML = `<div class="manage-row-label">這個路徑不是資料夾，請確認路徑是否正確。</div>`;
+      return;
+    }
+    const jsonFiles = items.filter(it => it.type === "file" && /\.json$/i.test(it.name));
+    if(jsonFiles.length === 0){
+      $("#ghFileList").innerHTML = `<div class="manage-row-label">這個資料夾裡沒有找到 JSON 檔案。</div>`;
+      return;
+    }
+    $("#ghFileList").innerHTML = jsonFiles.map((f, i) => `
+      <div class="manage-row">
+        <span class="manage-row-label">${escapeHtml(f.name)}</span>
+        <div class="manage-row-actions">
+          <button class="gh-file-pick-btn" data-idx="${i}">匯入</button>
+        </div>
+      </div>
+    `).join("");
+    $("#ghFileList").querySelectorAll(".gh-file-pick-btn").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const f = jsonFiles[parseInt(btn.dataset.idx, 10)];
+        if(!f || !f.download_url) return;
+        closeGithubBrowseSheet();
+        await importFromUrl(f.download_url);
+      });
+    });
+  });
+
+  // ---------- PWA ----------
+  if("serviceWorker" in navigator){
+    window.addEventListener("load", ()=>{
+      navigator.serviceWorker.register("sw.js").catch(()=>{});
+    });
+  }
+
+  // ---------- 初始化 ----------
+  loadCards();
+  loadFontScale();
+  document.getElementById('insertToggle').textContent = (insertPosition === 'start') ? '▲ 插最前' : '▼ 插最後';
+  updateAllChapterSelects();
+  selectedCategory = categoryFilter.value;
+  render();
+  const savedMode = localStorage.getItem(MODE_KEY) || "browse";
+  setMode(savedMode);
+})();
+</script>
+</body>
+</html>
