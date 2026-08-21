@@ -4198,7 +4198,8 @@ const { THREE, OrbitControls, MarchingCubes, OBJExporter, GLTFExporter, GIFEncod
     const safeRead=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback}catch{return fallback}};
     const safeSave=(key,value)=>localStorage.setItem(key,JSON.stringify(value));
     const mandelPresets={cave:{name:"洞穴",iteration:8,detail:10,twist:48,zoom:1.35},fold:{name:"皺褶",iteration:7,detail:10,twist:28,zoom:1.55},spiral:{name:"螺旋",iteration:8,detail:9,twist:64,zoom:1.85}};
-    let state={kind:"menger",iteration:2,detail:7,twist:24,auto:true,surface:"metal",material:{roughness:.18,metalness:.91,env:1},organic:{arms:5,spiral:2.45,bands:5,ribbonWidth:.09,seed:271828,locked:true},mandel:{zoom:1,preset:"cave"},mandelbox:{scale:-1.78,boxFold:1,minRadius:.42,fixedRadius:1,quality:"balanced"},palette:[...presets[0].colors]};
+    let state={kind:"menger",iteration:2,detail:7,twist:24,auto:true,surface:"metal",material:{roughness:.18,metalness:.91,env:1},organic:{arms:5,spiral:2.45,bands:5,ribbonWidth:.09,seed:271828,locked:true},mandel:{zoom:1,preset:"cave"},mandelbox:{scale:-1.78,boxFold:1,minRadius:.42,fixedRadius:1,quality:"balanced",viewMode:"auto",projectionBoxColor:"#D7A73B",projectionBranchColor:"#B9802F",projectionOpacity:.22,projectionEdgeWidth:2},palette:[...presets[0].colors]};
+    const MANDELBOX_DISPLAY_KEY="fractal-atelier-standalone-mandelbox-display",storedMandelboxDisplay=safeRead(MANDELBOX_DISPLAY_KEY,null);if(storedMandelboxDisplay&&typeof storedMandelboxDisplay==="object")state.mandelbox={...state.mandelbox,...storedMandelboxDisplay};const persistMandelboxDisplay=()=>safeSave(MANDELBOX_DISPLAY_KEY,state.mandelbox);
     let frames=safeRead(FRAME_KEY,[]), palettes=safeRead(PALETTE_KEY,[]), works=safeRead(WORK_KEY,[]), materials=safeRead(MATERIAL_KEY,[]).filter(x=>x&&typeof x.name==="string"), seedLibrary=safeRead(SEED_KEY,[]).filter(x=>x&&typeof x.name==="string"&&x.organic), selectedFrame=null, timelinePlaying=false, dragFrame=null;
     const mount=$("#scene"), renderer=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:true}), scene=new THREE.Scene(), camera=new THREE.PerspectiveCamera(39,1,.1,100), controls=new OrbitControls(camera,renderer.domElement);
     renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.28;mount.append(renderer.domElement);camera.position.set(5.2,3.2,5.4);controls.enableDamping=true;controls.minDistance=3;controls.maxDistance=12;
@@ -4218,7 +4219,7 @@ const { THREE, OrbitControls, MarchingCubes, OBJExporter, GLTFExporter, GIFEncod
     function organicQuality(){const compact=matchMedia("(pointer:coarse)").matches||((navigator.hardwareConcurrency||8)<4);return{compact,layers:compact?Math.min(7,4+state.iteration):Math.min(8,5+state.iteration),segments:compact?Math.min(34,22+state.detail):Math.min(44,28+state.detail*2),curveSegments:compact?38:54,bandSegments:compact?34:46}}function organicValues(value=state.organic){return{arms:Math.round(clamp(Number(value?.arms??5),2,8)),spiral:clamp(Number(value?.spiral??2.45),.6,4),bands:Math.round(clamp(Number(value?.bands??5),2,8)),ribbonWidth:clamp(Number(value?.ribbonWidth??.09),.035,.18),seed:Math.round(clamp(Number(value?.seed??271828),1,2147483646)),locked:value?.locked!==false}}function seededRandom(seed){let value=(Number(seed)>>>0)||1;return()=>{value+=0x6D2B79F5;let t=value;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return((t^(t>>>14))>>>0)/4294967296}}function exploredOrganic(seed,locked=false){const random=seededRandom(seed);return{arms:2+Math.floor(random()*7),spiral:.75+random()*3.05,bands:2+Math.floor(random()*7),ribbonWidth:.045+random()*.11,seed,locked}}function randomSeed(){return 1+Math.floor(Math.random()*2147483645)}
     function organic(mode="organic"){const {compact,layers,segments,curveSegments,bandSegments}=organicQuality(),organic=organicValues(),group=new THREE.Group(),material=surfaceMaterial(),radius=1.56;if(mode==="organicSpiral"){const arms=compact?Math.min(organic.arms,5):organic.arms,turns=organic.spiral+state.twist/180;for(let arm=0;arm<arms;arm++){const points=[],phase=arm/arms*Math.PI*2;for(let i=0;i<=curveSegments;i++){const t=i/curveSegments,theta=phase+t*Math.PI*2*turns,r=Math.sin(t*Math.PI)*radius*(.88+.09*Math.sin(theta*3)),y=(t-.5)*2.78+.1*Math.sin(theta*2);points.push(new THREE.Vector3(Math.cos(theta)*r,y,Math.sin(theta)*r))}const curve=new THREE.CatmullRomCurve3(points,false,"centripetal"),tube=new THREE.TubeGeometry(curve,curveSegments,.042,4,false);group.add(new THREE.Mesh(tube,material))}return group}if(mode==="organicRibbon"){const bands=compact?Math.min(organic.bands,5):organic.bands,twist=1.15+state.twist/68,shape=new THREE.Shape(),width=organic.ribbonWidth;shape.moveTo(-width,-.018);shape.lineTo(width,-.018);shape.lineTo(width,.018);shape.lineTo(-width,.018);shape.closePath();for(let band=0;band<bands;band++){const points=[],phase=band/bands*Math.PI*2;for(let i=0;i<=curveSegments;i++){const t=i/curveSegments,y=(t-.5)*2.72,a=phase+(t-.5)*Math.PI*twist*2+.25*Math.sin(t*Math.PI*3+phase),r=Math.sqrt(Math.max(.12,1-(y/1.68)**2))*radius*(.94+.05*Math.sin(a*4));points.push(new THREE.Vector3(Math.cos(a)*r,y,Math.sin(a)*r))}const curve=new THREE.CatmullRomCurve3(points,false,"centripetal"),ribbon=new THREE.ExtrudeGeometry(shape,{steps:curveSegments,bevelEnabled:false,extrudePath:curve});group.add(new THREE.Mesh(ribbon,material))}return group}for(let row=-layers;row<=layers;row++){const v=row/(layers+1),elevation=v*Math.PI*.5,base=Math.cos(elevation)*radius;if(base<.16)continue;const points=[];for(let i=0;i<=segments;i++){const a=i/segments*Math.PI*2,ripple=1+.1*Math.sin(a*7+row*.78)+.035*Math.sin(a*15-row);points.push(new THREE.Vector3(Math.cos(a)*base*ripple,Math.sin(elevation)*radius+.055*Math.sin(a*5+row),Math.sin(a)*base*ripple))}const curve=new THREE.CatmullRomCurve3(points,true,"centripetal"),tube=new THREE.TubeGeometry(curve,segments,.022+.012*(1-Math.abs(v)),4,true);group.add(new THREE.Mesh(tube,material))}for(let band=0;band<4;band++){const pts=[],phase=band*Math.PI*.5;for(let i=0;i<=bandSegments;i++){const t=i/bandSegments*Math.PI,rad=Math.sin(t)*radius*(1+.075*Math.sin(t*9+phase*3)),a=phase+.2*Math.sin(t*5+phase);pts.push(new THREE.Vector3(Math.cos(a)*rad,Math.cos(t)*radius,Math.sin(a)*rad))}const curve=new THREE.CatmullRomCurve3(pts,false,"centripetal"),tube=new THREE.TubeGeometry(curve,bandSegments,.028,4,false);group.add(new THREE.Mesh(tube,material))}return group}
     function mandelSurface(){const compact=matchMedia("(pointer:coarse)").matches||((navigator.hardwareConcurrency||8)<4),lat=compact?18:30,lon=compact?34:56,positions=[],colors=[],indices=[],folds=6+Math.round(state.twist/9),detail=state.detail,zoom=clamp(Number(state.mandel?.zoom??1),1,2.5);for(let row=0;row<=lat;row++){const theta=row/lat*Math.PI;for(let col=0;col<=lon;col++){const phi=col/lon*Math.PI*2,spiral=phi*(folds*.72)+theta*(folds*1.18)+Math.sin(theta*3)*3.2,wrinkle=.12*Math.sin(spiral)+.055*Math.sin(spiral*2.4+.7)+.028*Math.sin(phi*(folds*3)+theta*12),mouth=Math.pow(Math.max(0,Math.sin(phi*(3+Math.round(detail*.45))+theta*(2+folds*.28)+.55*Math.sin(phi*2))),5),cavity=.45*mouth*Math.pow(Math.sin(theta),1.35),rad=1.3+wrinkle-cavity+.05*Math.sin(theta*(detail+3)-phi*2.2),x=rad*Math.sin(theta)*Math.cos(phi),y=rad*Math.cos(theta),z=rad*Math.sin(theta)*Math.sin(phi),c=colorAt(clamp(.48+y/3.2+wrinkle*.8,0,1));positions.push(x,y,z);colors.push(c.r,c.g,c.b)}}for(let row=0;row<lat;row++)for(let col=0;col<lon;col++){const a=row*(lon+1)+col,b=a+lon+1;indices.push(a,b,a+1,b,b+1,a+1)}const geometry=new THREE.BufferGeometry();geometry.setAttribute("position",new THREE.Float32BufferAttribute(positions,3));geometry.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));geometry.setIndex(indices);geometry.computeVertexNormals();const material=surfaceMaterial();material.vertexColors=surfaceSpec().id!=="chrome";material.flatShading=false;material.roughness=Math.max(.12,material.roughness);const group=new THREE.Group(),surface=new THREE.Mesh(geometry,material);group.add(surface);const wire=new THREE.LineSegments(new THREE.WireframeGeometry(geometry),new THREE.LineBasicMaterial({color:state.palette[0],transparent:true,opacity:.2}));group.add(wire);const cavityMaterial=new THREE.MeshPhysicalMaterial({color:"#081117",metalness:.25,roughness:.72}),rimMaterial=new THREE.MeshPhysicalMaterial({color:state.palette[2],metalness:.7,roughness:.27,envMapIntensity:1.4}),mouths=compact?5:8;for(let i=0;i<mouths;i++){const phi=i/mouths*Math.PI*2+.33*Math.sin(i*1.7),theta=1.05+.36*Math.sin(i*1.83),normal=new THREE.Vector3(Math.sin(theta)*Math.cos(phi),Math.cos(theta),Math.sin(theta)*Math.sin(phi)),mouthRadius=.12+.045*((i%3)/2),r=1.17;const pit=new THREE.Mesh(new THREE.CircleGeometry(mouthRadius,18),cavityMaterial);pit.position.copy(normal).multiplyScalar(r);pit.lookAt(normal.clone().multiplyScalar(4));const rim=new THREE.Mesh(new THREE.TorusGeometry(mouthRadius,.018,6,18),rimMaterial);rim.position.copy(normal).multiplyScalar(r+.008);rim.lookAt(normal.clone().multiplyScalar(4));group.add(pit,rim)}group.scale.setScalar(zoom);return group}
-    function field(kind){const pts=[],colors=[],n=7+state.detail;for(let x=0;x<n;x++)for(let y=0;y<n;y++)for(let z=0;z<n;z++){const px=(x/(n-1)-.5)*3,py=(y/(n-1)-.5)*3,pz=(z/(n-1)-.5)*3;let qx=px,qy=py,qz=pz,keep=true;for(let i=0;i<state.iteration+4;i++){if(kind==="mandelbox"){qx=Math.abs(qx+1)-Math.abs(qx-1)-qx;qy=Math.abs(qy+1)-Math.abs(qy-1)-qy;qz=Math.abs(qz+1)-Math.abs(qz-1)-qz}else{const r=Math.hypot(qx,qy,qz);if(r>2){keep=false;break}const theta=Math.acos(qz/(r||1)),phi=Math.atan2(qy,qx),power=6+Math.round(state.twist/28),rad=Math.pow(r,power);qx=rad*Math.sin(theta*power)*Math.cos(phi*power)+px*(kind==="julia"?.26:1);qy=rad*Math.sin(theta*power)*Math.sin(phi*power)+py*(kind==="julia"?-.08:1);qz=rad*Math.cos(theta*power)+pz*(kind==="julia"?-.22:1)}if(qx*qx+qy*qy+qz*qz>34){keep=false;break}}if(keep){const c=colorAt((py+1.5)/3);pts.push(px,py,pz);colors.push(c.r,c.g,c.b)}}const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pts,3));g.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));const s=surfaceSpec();return new THREE.Points(g,new THREE.PointsMaterial({size:s.points,vertexColors:true,transparent:true,opacity:s.id==="glass"?.72:.96}))}
+    function field(kind){const julia=juliaValues(),pts=[],colors=[],n=7+state.detail;for(let x=0;x<n;x++)for(let y=0;y<n;y++)for(let z=0;z<n;z++){const px=(x/(n-1)-.5)*3,py=(y/(n-1)-.5)*3,pz=(z/(n-1)-.5)*3;let qx=px,qy=py,qz=pz,keep=true;for(let i=0;i<state.iteration+4;i++){if(kind==="mandelbox"){qx=Math.abs(qx+1)-Math.abs(qx-1)-qx;qy=Math.abs(qy+1)-Math.abs(qy-1)-qy;qz=Math.abs(qz+1)-Math.abs(qz-1)-qz}else{const r=Math.hypot(qx,qy,qz);if(r>2){keep=false;break}const theta=Math.acos(qz/(r||1)),phi=Math.atan2(qy,qx),power=6+Math.round(state.twist/28),rad=Math.pow(r,power);qx=rad*Math.sin(theta*power)*Math.cos(phi*power)+px*(kind==="julia"?julia.cx:1);qy=rad*Math.sin(theta*power)*Math.sin(phi*power)+py*(kind==="julia"?julia.cy:1);qz=rad*Math.cos(theta*power)+pz*(kind==="julia"?julia.cz:1)}if(qx*qx+qy*qy+qz*qz>34){keep=false;break}}if(keep){const c=colorAt((py+1.5)/3);pts.push(px,py,pz);colors.push(c.r,c.g,c.b)}}const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.Float32BufferAttribute(pts,3));g.setAttribute("color",new THREE.Float32BufferAttribute(colors,3));const s=surfaceSpec();return new THREE.Points(g,new THREE.PointsMaterial({size:s.points,vertexColors:true,transparent:true,opacity:s.id==="glass"?.72:.96}))}
     function build(){scene.remove(model);dispose(model);model=state.kind==="menger"?menger():state.kind==="sierpinski"?sierpinski():state.kind==="octaflake"?octaflake():state.kind==="tree"?tree():state.kind==="mandelbulb"?mandelSurface():state.kind.startsWith("organic")?organic(state.kind):field(state.kind);model.rotation.set(.05,-.24,0);scene.add(model);if(ring){scene.remove(ring);ring.geometry.dispose();ring.material.dispose()}ring=new THREE.Mesh(new THREE.TorusGeometry(2.65,.012,6,150),new THREE.MeshBasicMaterial({color:state.surface==="chrome"?"#e9eef0":state.palette[1],transparent:true,opacity:.55}));ring.rotation.set(Math.PI/2.55,.2,-.4);scene.add(ring);updateMeta()}
     function renderScaleNavigator(){const root=$("#scaleNavigator"),active=state.kind==="mandelbulb",mandel={...state.mandel,zoom:clamp(Number(state.mandel?.zoom??1),1,2.5)};root.classList.toggle("active",active);if(!active){root.innerHTML="";return}root.innerHTML=`<button data-mandel-zoom="-.25">− 局部</button><button data-mandel-fit ${mandel.zoom===1?"class=\"active\"":""}>全景 ${mandel.zoom.toFixed(2)}×</button><button data-mandel-zoom=".25">＋ 深入</button>${Object.entries(mandelPresets).map(([id,p])=>`<button data-mandel-preset="${id}" class="${mandel.preset===id?"active":""}">${p.name}</button>`).join("")}`;$$('[data-mandel-zoom]').forEach(button=>button.onclick=()=>{state.mandel={...mandel,zoom:clamp(mandel.zoom+Number(button.dataset.mandelZoom),1,2.5)};build();notify(`曼德球局部尺度 ${state.mandel.zoom.toFixed(2)}×`) });$('[data-mandel-fit]').onclick=()=>{state.mandel={...mandel,zoom:1};build();notify("已返回曼德球全景")};$$('[data-mandel-preset]').forEach(button=>button.onclick=()=>{const id=button.dataset.mandelPreset,preset=mandelPresets[id];state.kind="mandelbulb";state.iteration=preset.iteration;state.detail=preset.detail;state.twist=preset.twist;state.mandel={zoom:preset.zoom,preset:id};build();renderCatalog();notify(`已套用曼德球「${preset.name}」預設`)})}
     function updateMeta(){const entry=catalog.find(x=>x.id===state.kind);$("#formulaMeta").textContent=`FRACTAL / ${entry.en.toUpperCase()}`;$("#stageName").textContent=$("#activeName").textContent=entry.zh;$("#stageNote").textContent=entry.note;$("#iteration").max=entry.max;state.iteration=Math.min(state.iteration,entry.max);$("#iteration").value=state.iteration;$("#detail").value=state.detail;$("#twist").value=state.twist;$("#iterOut").textContent=`${state.iteration} 層`;$("#detailOut").textContent=state.detail;$("#twistOut").textContent=`${state.twist}°`;$("#gradient").style.background=`linear-gradient(110deg,${state.palette.join(",")})`;state.palette.forEach((c,i)=>{$(`#color${i}`).value=c;$(`#colorChip${i}`).style.background=c});renderSurfaces();renderVariantControls();renderOrganicExplorer();renderScaleNavigator()}
@@ -4314,7 +4315,7 @@ const { THREE, OrbitControls, MarchingCubes, OBJExporter, GLTFExporter, GIFEncod
     }
     $("#iteration").addEventListener("input",renderMandelLayerPanel);
     document.addEventListener("click",event=>{if(event.target.closest('[data-kind="mandelbulb"],[data-mandel-preset]'))renderMandelLayerPanel()});
-    function mandelboxValues(source=state.mandelbox||{}){return {scale:clamp(Number(source.scale??-1.78),-2.8,-1.1),boxFold:clamp(Number(source.boxFold??1),.55,1.5),minRadius:clamp(Number(source.minRadius??.42),.12,.85),fixedRadius:clamp(Number(source.fixedRadius??1),.55,2),quality:["draft","balanced","high"].includes(source.quality)?source.quality:"balanced"}}
+    function mandelboxValues(source=state.mandelbox||{}){const color=(value,fallback)=>typeof value==="string"&&/^#[0-9a-f]{6}$/i.test(value)?value:fallback;return {scale:clamp(Number(source.scale??-1.78),-2.8,-1.1),boxFold:clamp(Number(source.boxFold??1),.55,1.5),minRadius:clamp(Number(source.minRadius??.42),.12,.85),fixedRadius:clamp(Number(source.fixedRadius??1),.55,2),quality:["draft","balanced","high"].includes(source.quality)?source.quality:"balanced",viewMode:["auto","projection","raymarch"].includes(source.viewMode)?source.viewMode:"auto",projectionBoxColor:color(source.projectionBoxColor,"#D7A73B"),projectionBranchColor:color(source.projectionBranchColor,"#B9802F"),projectionOpacity:clamp(Number(source.projectionOpacity??.22),.06,.78),projectionEdgeWidth:clamp(Number(source.projectionEdgeWidth??2),1,8)}}
     let rayMarchBox=null;
     function mandelboxRaymarch(){
       const compact=matchMedia("(pointer:coarse)").matches||((navigator.hardwareConcurrency||8)<4),box=mandelboxValues(),quality=compact?"draft":box.quality,steps=quality==="high"?112:quality==="balanced"?78:42,iterations=Math.max(3,Math.min(10,Math.round(state.iteration)+4)),a=new THREE.Color(state.palette[0]),b=new THREE.Color(state.palette[1]),c=new THREE.Color(state.palette[2]),uniforms={uCamPos:{value:new THREE.Vector3()},uCamRight:{value:new THREE.Vector3(1,0,0)},uCamUp:{value:new THREE.Vector3(0,1,0)},uCamForward:{value:new THREE.Vector3(0,0,-1)},uAspect:{value:1},uFov:{value:camera.fov},uSteps:{value:steps},uIterations:{value:iterations},uScale:{value:box.scale},uBoxFold:{value:box.boxFold},uMinRadius:{value:box.minRadius},uFixedRadius:{value:box.fixedRadius},uColorA:{value:a},uColorB:{value:b},uColorC:{value:c},uChrome:{value:state.surface==="chrome"?1:0},uRoughness:{value:materialValues().roughness},uTime:{value:0}};
@@ -4322,13 +4323,14 @@ const { THREE, OrbitControls, MarchingCubes, OBJExporter, GLTFExporter, GIFEncod
       const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);mesh.frustumCulled=false;mesh.renderOrder=50;rayMarchBox=mesh;mesh.onBeforeRender=()=>{const u=material.uniforms,params=mandelboxValues(),right=new THREE.Vector3(1,0,0).applyQuaternion(camera.quaternion),up=new THREE.Vector3(0,1,0).applyQuaternion(camera.quaternion),forward=new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion),size=renderer.getSize(new THREE.Vector2());u.uCamPos.value.copy(camera.position);u.uCamRight.value.copy(right);u.uCamUp.value.copy(up);u.uCamForward.value.copy(forward);u.uAspect.value=size.x/Math.max(size.y,1);u.uFov.value=camera.fov;u.uIterations.value=Math.max(3,Math.min(10,Math.round(state.iteration)+4));u.uScale.value=params.scale;u.uBoxFold.value=params.boxFold;u.uMinRadius.value=params.minRadius;u.uFixedRadius.value=params.fixedRadius;u.uChrome.value=state.surface==="chrome"?1:0;u.uRoughness.value=materialValues().roughness;u.uColorA.value.set(state.palette[0]);u.uColorB.value.set(state.palette[1]);u.uColorC.value.set(state.palette[2]);u.uTime.value=performance.now()*.001;};return mesh
     }
     function mandelboxRadiant(){
-      const compact=matchMedia("(pointer:coarse)").matches||((navigator.hardwareConcurrency||8)<4),depth=Math.max(1,Math.min(Math.round(state.iteration)+1,compact?4:5)),maxNodes=compact?860:2800,material=surfaceMaterial(),group=new THREE.Group(),nodes=[];
+      const params=mandelboxValues(),compact=matchMedia("(pointer:coarse)").matches||((navigator.hardwareConcurrency||8)<4),depth=Math.max(1,Math.min(Math.round(state.iteration)+1,compact?4:5)),maxNodes=compact?860:2800,material=surfaceMaterial(),group=new THREE.Group(),nodes=[];material.color.set(params.projectionBranchColor);
       const axes=[new THREE.Vector3(1,0,0),new THREE.Vector3(-1,0,0),new THREE.Vector3(0,1,0),new THREE.Vector3(0,-1,0),new THREE.Vector3(0,0,1),new THREE.Vector3(0,0,-1)];
       const addNode=(position,direction,level,scale,phase)=>{if(nodes.length>=maxNodes)return;nodes.push({position:position.clone(),direction:direction.clone(),level,scale,phase});if(level>=depth)return;const next=scale*.58,step=scale*1.72,main=position.clone().addScaledVector(direction,step);addNode(main,direction,level+1,next,phase+.38);if(level>=depth-1)return;const reference=Math.abs(direction.y)<.82?new THREE.Vector3(0,1,0):new THREE.Vector3(1,0,0),side=new THREE.Vector3().crossVectors(direction,reference).normalize(),up=new THREE.Vector3().crossVectors(side,direction).normalize();[-1,1].forEach(sign=>{const fork=position.clone().addScaledVector(direction,step*.74).addScaledVector(side,sign*scale*.96),forkDir=direction.clone().multiplyScalar(.78).addScaledVector(side,sign*.68).normalize();addNode(fork,forkDir,level+1,next*.88,phase+sign*.63)});if(level%2===0){const fork=position.clone().addScaledVector(direction,step*.68).addScaledVector(up,scale*.78),forkDir=direction.clone().multiplyScalar(.8).addScaledVector(up,.6).normalize();addNode(fork,forkDir,level+1,next*.82,phase+.91)}};
-      nodes.push({position:new THREE.Vector3(),direction:new THREE.Vector3(0,1,0),level:0,scale:1.02,phase:0});axes.forEach((axis,index)=>addNode(axis.clone().multiplyScalar(.96),axis,1,.72,index*.73));
-      const geometry=new THREE.BoxGeometry(1,1,1),mesh=new THREE.InstancedMesh(geometry,material,nodes.length),dummy=new THREE.Object3D();material.vertexColors=surfaceSpec().id!=="chrome";material.side=THREE.DoubleSide;material.needsUpdate=true;
+      const projectionSize=.88,projectionHalf=projectionSize*.5,firstBranchScale=.30,firstBranchHalf=firstBranchScale*.5,projectionGap=.04,firstBranchStart=projectionHalf+firstBranchHalf+projectionGap;
+      axes.forEach((axis,index)=>addNode(axis.clone().multiplyScalar(firstBranchStart),axis,1,firstBranchScale,index*.73));
+      const geometry=new THREE.BoxGeometry(1,1,1),mesh=new THREE.InstancedMesh(geometry,material,nodes.length),dummy=new THREE.Object3D();material.vertexColors=false;material.side=THREE.DoubleSide;material.needsUpdate=true;
       nodes.forEach((node,index)=>{const pulse=1+.13*Math.sin(node.phase+state.twist*.024),size=node.scale*pulse,direction=node.direction.clone().normalize(),quaternion=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),direction);quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(direction,node.phase+state.twist*.008));dummy.position.copy(node.position);dummy.quaternion.copy(quaternion);dummy.scale.set(size,size*.9,size);dummy.updateMatrix();mesh.setMatrixAt(index,dummy.matrix);if(material.vertexColors){const color=colorAt(clamp(.18+node.level/(depth+1)*.68+.1*Math.sin(node.phase),0,1));mesh.setColorAt(index,color)}});mesh.instanceMatrix.needsUpdate=true;if(material.vertexColors)mesh.instanceColor.needsUpdate=true;mesh.renderOrder=1;mesh.frustumCulled=false;group.add(mesh);
-      const core=new THREE.Mesh(new THREE.BoxGeometry(1.1,1.1,1.1),surfaceMaterial());core.material.side=THREE.DoubleSide;core.material.needsUpdate=true;core.renderOrder=2;group.add(core);group.scale.setScalar(compact?.9:1.02);return group
+      const coreGeometry=new THREE.BoxGeometry(.92,.92,.92),core=new THREE.Mesh(coreGeometry,surfaceMaterial());core.name="Mandelbox_Fixed_Central_Core";core.material.side=THREE.DoubleSide;core.material.depthTest=false;core.material.depthWrite=false;core.material.needsUpdate=true;core.renderOrder=500;const edges=new THREE.LineSegments(new THREE.EdgesGeometry(coreGeometry),new THREE.LineBasicMaterial({color:state.palette[2],transparent:true,opacity:state.surface==="chrome"?.94:.76,depthTest:false,depthWrite:false}));edges.name="Mandelbox_Fixed_Central_Core_Edges";edges.scale.setScalar(1.014);edges.renderOrder=501;group.add(core,edges);group.scale.setScalar(compact?.9:1.02);return group
     }
     const buildMandelboxRadiant=build;
     build=function(){buildMandelboxRadiant();if(state.kind!=="mandelbox")return;scene.remove(model);dispose(model);model=mandelboxRadiant();model.rotation.set(.05,-.24,0);scene.add(model)};
@@ -4374,21 +4376,795 @@ const { THREE, OrbitControls, MarchingCubes, OBJExporter, GLTFExporter, GIFEncod
     async function playFlightPreview(){if(frames.length<2){notify("請至少錄製兩張鏡次，再啟動飛行預覽");return}timelinePlaying=!timelinePlaying;$("#playTimeline").textContent=timelinePlaying?"■ 暫停飛行":"▶ 飛行預覽";if(!timelinePlaying){flightReadout.textContent="飛行預覽已暫停";return}let index=0,start=performance.now();while(timelinePlaying){const from=frames[index],to=frames[(index+1)%frames.length],elapsed=performance.now()-start,progress=Math.min(elapsed/from.duration,1),eased=ease(progress,from.easing),total=frames.reduce((sum,frame)=>sum+frame.duration,0),offset=frames.slice(0,index).reduce((sum,frame)=>sum+frame.duration,0);selectedFrame=from.id;apply(interpolate(from.settings,to.settings,eased));applyCameraPose(interpolateCameraPose(from.settings.camera,to.settings.camera,eased));flightReadout.textContent=`飛行 ${String(index+1).padStart(2,"0")} → ${String(index+2>frames.length?1:index+2).padStart(2,"0")} · ${(progress*100).toFixed(0)}% · ${((elapsed)/1000).toFixed(2)}s / ${(from.duration/1000).toFixed(2)}s · 總 ${(Math.min(offset+elapsed,total)/1000).toFixed(2)}s / ${(total/1000).toFixed(2)}s · ${from.easing}`;renderFrames();if(progress>=1){index=(index+1)%frames.length;start=performance.now()}await new Promise(resolve=>setTimeout(resolve,70))} }
     $("#playTimeline").onclick=playFlightPreview;$("#playTimeline").textContent="▶ 飛行預覽";
     const buildBeforeMobileMandelboxCompatibility=build;
-    const useMobileMandelboxCompatibility=()=>matchMedia("(pointer:coarse)").matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"");
+    const useMobileMandelboxCompatibility=()=>state.mandelbox?.viewMode==="projection"||(state.mandelbox?.viewMode!=="raymarch"&&(matchMedia("(pointer:coarse)").matches||/Android|iPhone|iPad|iPod/i.test(navigator.userAgent||"")));
     build=function(){if(state.kind!=="mandelbox"||!useMobileMandelboxCompatibility()){buildBeforeMobileMandelboxCompatibility();return}scene.remove(model);dispose(model);rayMarchBox=null;model=mandelboxRadiant();model.name="Mandelbox_Mobile_Compatibility_Mesh";model.rotation.set(.05,-.24,0);scene.add(model)};
     if(state.kind==="mandelbox"&&useMobileMandelboxCompatibility())build();
     function mandelboxSpecifiedPipeline(){const params=mandelboxValues(),quality={draft:32,balanced:48,high:64}[params.quality]||48,uniforms={uCamPos:{value:new THREE.Vector3()},uCamRight:{value:new THREE.Vector3(1,0,0)},uCamUp:{value:new THREE.Vector3(0,1,0)},uCamForward:{value:new THREE.Vector3(0,0,-1)},uAspect:{value:1},uFov:{value:camera.fov||48},uSteps:{value:quality},uIterations:{value:Math.max(4,Math.min(10,Math.round(state.iteration)+4))},uScale:{value:params.scale},uBoxFold:{value:params.boxFold},uMinRadius:{value:params.minRadius},uFixedRadius:{value:params.fixedRadius},uColorA:{value:new THREE.Color(state.palette[0])},uColorB:{value:new THREE.Color(state.palette[1])},uColorC:{value:new THREE.Color(state.palette[2])},uTime:{value:0}};const material=new THREE.ShaderMaterial({uniforms,vertexShader:"varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:"precision highp float;varying vec2 vUv;uniform vec3 uCamPos,uCamRight,uCamUp,uCamForward,uColorA,uColorB,uColorC;uniform float uAspect,uFov,uSteps,uIterations,uScale,uBoxFold,uMinRadius,uFixedRadius,uTime;float mandelboxDistance(vec3 p){vec3 z=p;float dr=1.;float minRadius2=uMinRadius*uMinRadius,fixedRadius2=uFixedRadius*uFixedRadius;for(int i=0;i<10;i++){if(float(i)>=uIterations)break;z=clamp(z,-uBoxFold,uBoxFold)*2.-z;float r2=dot(z,z);if(r2<minRadius2){float t=fixedRadius2/max(minRadius2,.00001);z*=t;dr*=t;}else if(r2<fixedRadius2){float t=fixedRadius2/max(r2,.00001);z*=t;dr*=t;}z=uScale*z+p;dr=abs(uScale)*dr+1.;}return length(z)/max(abs(dr),.0001);}vec3 estimateNormal(vec3 p){vec2 e=vec2(.003,0.);return normalize(vec3(mandelboxDistance(p+e.xyy)-mandelboxDistance(p-e.xyy),mandelboxDistance(p+e.yxy)-mandelboxDistance(p-e.yxy),mandelboxDistance(p+e.yyx)-mandelboxDistance(p-e.yyx)));}float softShadow(vec3 ro,vec3 rd){float shade=1.,travel=.04;for(int i=0;i<8;i++){float h=mandelboxDistance(ro+rd*travel);shade=min(shade,8.*h/travel);travel+=clamp(h,.03,.34);if(travel>5.)break;}return clamp(shade,0.,1.);}void main(){vec2 screen=vUv*2.-1.;screen.x*=uAspect;float focal=tan(radians(uFov*.5));vec3 ray=normalize(uCamForward+screen.x*focal*uCamRight+screen.y*focal*uCamUp);float distanceTravelled=0.,distanceToSurface=0.;bool hit=false;for(int step=0;step<64;step++){if(float(step)>=uSteps)break;vec3 point=uCamPos+ray*distanceTravelled;distanceToSurface=mandelboxDistance(point);if(distanceToSurface<.0022){hit=true;break;}distanceTravelled+=clamp(distanceToSurface*.8,.012,.42);if(distanceTravelled>16.)break;}if(!hit){gl_FragColor=vec4(0.,0.,0.,0.);return;}vec3 point=uCamPos+ray*distanceTravelled,normal=estimateNormal(point),light=normalize(vec3(-.52,.74,.44));float diffuse=max(dot(normal,light),0.),shadow=softShadow(point+normal*.014,light),specular=pow(max(dot(reflect(-light,normal),-ray),0.),40.);float fresnel=pow(1.-max(dot(normal,-ray),0.),3.);float band=clamp(.5+.5*sin(length(point)*4.+uTime*.12),0.,1.);vec3 base=mix(uColorA,uColorB,band);base=mix(base,uColorC,clamp(.12+.38*diffuse,0.,.48));vec3 lit=base*(.16+.84*diffuse*shadow)+specular*mix(uColorB,uColorC,.55)+base*fresnel*.20;gl_FragColor=vec4(lit,1.);}" ,depthTest:false,depthWrite:false,transparent:true});const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);mesh.name="Mandelbox_Camera_Ray_Raymarch_DE_BoxFold_SphereFold_Scale_Lighting";mesh.frustumCulled=false;mesh.renderOrder=90;mesh.onBeforeRender=()=>{const forward=new THREE.Vector3().subVectors(controls.target,camera.position).normalize(),right=new THREE.Vector3().crossVectors(forward,camera.up).normalize(),up=new THREE.Vector3().crossVectors(right,forward).normalize();uniforms.uCamPos.value.copy(camera.position);uniforms.uCamForward.value.copy(forward);uniforms.uCamRight.value.copy(right);uniforms.uCamUp.value.copy(up);uniforms.uAspect.value=renderer.domElement.clientWidth/Math.max(1,renderer.domElement.clientHeight);uniforms.uTime.value=performance.now()*.001};return mesh}
     const buildBeforeSpecifiedMandelboxPipeline=build;
-    function mandelboxMobileSpecifiedPipeline(){const group=new THREE.Group(),base=mandelboxRadiant(),ray=mandelboxSpecifiedPipeline();base.name="Mandelbox_Mobile_Compatibility_Mesh";base.rotation.set(.05,-.24,0);ray.name="Mandelbox_Mobile_Raymarch_Overlay";group.name="Mandelbox_Mobile_Camera_Ray_Raymarch_Compatibility";group.add(base,ray);return group}
+    function mandelboxViewportCentralCore(){const group=new THREE.Group(),geometry=new THREE.BoxGeometry(2.86,2.86,2.86),material=surfaceMaterial(),core=new THREE.Mesh(geometry,material),edges=new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:state.palette[2],transparent:true,opacity:.94,depthTest:false,depthWrite:false}));group.name="Mandelbox_Viewport_Central_Core";material.side=THREE.DoubleSide;material.depthTest=false;material.depthWrite=false;material.needsUpdate=true;core.name="Mandelbox_Viewport_Central_Core_Solid";core.renderOrder=500;core.frustumCulled=false;edges.name="Mandelbox_Viewport_Central_Core_Edges";edges.scale.setScalar(1.014);edges.renderOrder=501;edges.frustumCulled=false;core.onBeforeRender=()=>{const forward=new THREE.Vector3().subVectors(controls.target,camera.position).normalize();group.position.copy(camera.position).addScaledVector(forward,4.05);group.quaternion.copy(camera.quaternion);group.rotateY(.46);group.rotateX(.16)};group.add(core,edges);return group}
+    function mandelboxProjectionBox(){const style=mandelboxValues(),size=.88,half=size*.5,group=new THREE.Group(),geometry=new THREE.BoxGeometry(size,size,size),fill=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:style.projectionBoxColor,transparent:true,opacity:style.projectionOpacity,depthTest:false,depthWrite:false,side:THREE.DoubleSide})),edges=new THREE.Group(),edgeMaterial=new THREE.MeshBasicMaterial({color:style.projectionBoxColor,depthTest:false,depthWrite:false}),corners=[[-half,-half,-half],[half,-half,-half],[-half,half,-half],[half,half,-half],[-half,-half,half],[half,-half,half],[-half,half,half],[half,half,half]].map(v=>new THREE.Vector3(...v)),pairs=[[0,1],[0,2],[0,4],[1,3],[1,5],[2,3],[2,6],[3,7],[4,5],[4,6],[5,7],[6,7]],radius=.004+style.projectionEdgeWidth*.006;group.name="Mandelbox_Projection_Box";group.userData={projectionSize:size,firstBranchStart:.63,firstBranchScale:.30,opacity:style.projectionOpacity,edgeWidth:style.projectionEdgeWidth};fill.name="Mandelbox_Projection_Box_Fill";fill.renderOrder=700;fill.frustumCulled=false;edges.name="Mandelbox_Projection_Box_Edges";edges.renderOrder=701;pairs.forEach(([from,to])=>{const delta=corners[to].clone().sub(corners[from]),edge=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,delta.length(),6),edgeMaterial);edge.position.copy(corners[from]).add(corners[to]).multiplyScalar(.5);edge.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),delta.normalize());edge.renderOrder=701;edge.frustumCulled=false;edges.add(edge)});group.add(fill,edges);return group}
+    function mandelboxMobileSpecifiedPipeline(){const base=mandelboxRadiant(),anchor=()=>{const forward=new THREE.Vector3().subVectors(controls.target,camera.position).normalize();base.position.copy(camera.position).addScaledVector(forward,5.9)};base.name="Mandelbox_Mobile_Camera_Ray_Raymarch_Compatibility";base.userData.compatibilityMesh="Mandelbox_Mobile_Compatibility_Mesh";base.userData.cameraAnchoredProjection=true;base.getObjectByName("Mandelbox_Fixed_Central_Core")?.removeFromParent();base.getObjectByName("Mandelbox_Fixed_Central_Core_Edges")?.removeFromParent();base.add(mandelboxProjectionBox());base.rotation.set(.05,-.24,0);base.scale.multiplyScalar(1.35);base.children.forEach(child=>{child.frustumCulled=false;const previous=child.onBeforeRender;child.onBeforeRender=(...args)=>{anchor();previous?.apply(child,args)}});anchor();return base}
     function purgeMandelboxSceneArtifacts(disposeCurrent=false){const stale=scene.children.filter(node=>/^Mandelbox_/.test(node.name||""));stale.forEach(node=>{scene.remove(node);if(node!==model||disposeCurrent)dispose(node)});rayMarchBox=null;renderer.toneMappingExposure=1}
-    function markActiveScene(){const artifacts=scene.children.filter(node=>/^Mandelbox_/.test(node.name||"")).map(node=>node.name);renderer.domElement.dataset.fractalKind=state.kind;renderer.domElement.dataset.mandelboxArtifacts=artifacts.join(",")}
+    function markActiveScene(){const artifacts=scene.children.filter(node=>/^Mandelbox_/.test(node.name||"")).map(node=>node.name),branches=model?.children?.find(node=>node.isInstancedMesh);renderer.domElement.dataset.fractalKind=state.kind;renderer.domElement.dataset.mandelboxArtifacts=artifacts.join(",");renderer.domElement.dataset.mandelboxCore=state.kind==="mandelbox"&&model?.getObjectByName?.("Mandelbox_Fixed_Central_Core")?"fixed":"";renderer.domElement.dataset.mandelboxBranches=state.kind==="mandelbox"&&branches?String(branches.count):""}
     function syncActiveFormulaView(){updateMeta();renderCatalog()}
+    function mandelboxProjectionEffect(){const style=mandelboxValues(),group=new THREE.Group(),canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),size=256,color=new THREE.Color(style.projectionBoxColor),css=`#${color.getHexString()}`;canvas.width=canvas.height=size;const glow=ctx.createRadialGradient(128,128,10,128,128,124);glow.addColorStop(0,`${css}cc`);glow.addColorStop(.34,`${css}46`);glow.addColorStop(1,`${css}00`);ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);ctx.strokeStyle=`${css}dd`;ctx.lineWidth=3;ctx.strokeRect(24,24,208,208);ctx.beginPath();ctx.moveTo(24,128);ctx.lineTo(232,128);ctx.moveTo(128,24);ctx.lineTo(128,232);[50,78,178,206].forEach(p=>{ctx.moveTo(p,24);ctx.lineTo(p,232);ctx.moveTo(24,p);ctx.lineTo(232,p)});ctx.stroke();const texture=new THREE.CanvasTexture(canvas),receiver=new THREE.Mesh(new THREE.PlaneGeometry(2.8,2.8),new THREE.MeshBasicMaterial({map:texture,transparent:true,opacity:Math.min(.72,style.projectionOpacity+.18),blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false,side:THREE.DoubleSide})),beam=new THREE.Mesh(new THREE.ConeGeometry(.78,1.85,24,1,true),new THREE.MeshBasicMaterial({color:style.projectionBoxColor,transparent:true,opacity:Math.max(.08,style.projectionOpacity*.42),blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false,side:THREE.DoubleSide}));group.name="Mandelbox_Projection_Effect";receiver.name="Mandelbox_Projection_Receiver";receiver.position.z=-1.42;receiver.renderOrder=680;receiver.frustumCulled=false;beam.name="Mandelbox_Projection_Beam";beam.rotation.x=-Math.PI/2;beam.position.z=-.92;beam.renderOrder=675;beam.frustumCulled=false;group.userData={receiver:true,beam:true,projectionColor:style.projectionBoxColor};group.add(beam,receiver);return group}
+    const mandelboxMobilePipelineWithProjectionEffect=mandelboxMobileSpecifiedPipeline;mandelboxMobileSpecifiedPipeline=function(){const base=mandelboxMobilePipelineWithProjectionEffect();base.add(mandelboxProjectionEffect());return base}
+    const originalMandelboxProjectionEffect=mandelboxProjectionEffect;mandelboxProjectionEffect=function(){const style=mandelboxValues(),group=new THREE.Group(),canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),size=192,color=new THREE.Color(style.projectionBoxColor),css=`#${color.getHexString()}`;canvas.width=canvas.height=size;const glow=ctx.createRadialGradient(96,96,6,96,96,88);glow.addColorStop(0,`${css}b8`);glow.addColorStop(.42,`${css}32`);glow.addColorStop(1,`${css}00`);ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);ctx.strokeStyle=`${css}88`;ctx.lineWidth=2;ctx.strokeRect(58,58,76,76);ctx.beginPath();ctx.moveTo(58,96);ctx.lineTo(134,96);ctx.moveTo(96,58);ctx.lineTo(96,134);ctx.stroke();const texture=new THREE.CanvasTexture(canvas),receiver=new THREE.Mesh(new THREE.PlaneGeometry(1.08,1.08),new THREE.MeshBasicMaterial({map:texture,transparent:true,opacity:Math.min(.32,Math.max(.12,style.projectionOpacity*.42)),blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false,side:THREE.DoubleSide})),beam=new THREE.Mesh(new THREE.ConeGeometry(.38,.88,20,1,true),new THREE.MeshBasicMaterial({color:style.projectionBoxColor,transparent:true,opacity:Math.min(.18,Math.max(.06,style.projectionOpacity*.25)),blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false,side:THREE.DoubleSide}));group.name="Mandelbox_Projection_Effect";receiver.name="Mandelbox_Projection_Receiver";receiver.position.z=-.76;receiver.renderOrder=680;receiver.frustumCulled=false;beam.name="Mandelbox_Projection_Beam";beam.rotation.x=-Math.PI/2;beam.position.z=-.48;beam.renderOrder=675;beam.frustumCulled=false;group.userData={receiver:true,beam:true,projectionColor:style.projectionBoxColor,receiverSize:1.08};group.add(beam,receiver);return group}
+    const compactMandelboxProjectionEffect=mandelboxProjectionEffect;mandelboxProjectionEffect=function(){const group=compactMandelboxProjectionEffect(),style=mandelboxValues(),receiver=group.getObjectByName("Mandelbox_Projection_Receiver"),beam=group.getObjectByName("Mandelbox_Projection_Beam"),canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),size=192,color=new THREE.Color(style.projectionBoxColor),css=`#${color.getHexString()}`;receiver.visible=false;beam.scale.setScalar(.56);beam.position.z=-.34;canvas.width=canvas.height=size;const glow=ctx.createRadialGradient(96,96,4,96,96,88);glow.addColorStop(0,`${css}d9`);glow.addColorStop(.30,`${css}5c`);glow.addColorStop(.7,`${css}16`);glow.addColorStop(1,`${css}00`);ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);ctx.strokeStyle=`${css}8c`;ctx.lineWidth=2;ctx.strokeRect(69,69,54,54);ctx.beginPath();ctx.arc(96,96,39,0,Math.PI*2);ctx.stroke();const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,opacity:Math.min(.56,Math.max(.24,style.projectionOpacity*.9)),blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false}));halo.name="Mandelbox_Projection_Halo";halo.scale.set(.98,.98,1);halo.position.z=.035;halo.renderOrder=702;halo.frustumCulled=false;group.userData.receiver=false;group.userData.halo=true;group.add(halo);return group}
+    const mandelboxValuesWithProjectionHalo=mandelboxValues;mandelboxValues=function(source){const values=mandelboxValuesWithProjectionHalo(source),input=source&&typeof source==="object"?source:(state.mandelbox||{});return {...values,projectionHaloStrength:clamp(Number(input.projectionHaloStrength??.55),0,1),projectionHaloPattern:["orbit","rings","cross","sigil"].includes(input.projectionHaloPattern)?input.projectionHaloPattern:"orbit",projectionHaloEnabled:input.projectionHaloEnabled!==false}}
+    const haloEffectWithControls=mandelboxProjectionEffect;mandelboxProjectionEffect=function(){const group=haloEffectWithControls(),style=mandelboxValues(),halo=group.getObjectByName("Mandelbox_Projection_Halo"),beam=group.getObjectByName("Mandelbox_Projection_Beam"),canvas=halo.material.map.image,ctx=canvas.getContext("2d"),size=canvas.width,color=new THREE.Color(style.projectionBoxColor),css=`#${color.getHexString()}`,strength=style.projectionHaloStrength;halo.visible=style.projectionHaloEnabled;beam.visible=style.projectionHaloEnabled;halo.material.opacity=strength?Math.max(.08,strength*.68):0;beam.material.opacity=strength?Math.max(.025,strength*.16):0;ctx.clearRect(0,0,size,size);const glow=ctx.createRadialGradient(size/2,size/2,4,size/2,size/2,size*.46);glow.addColorStop(0,`${css}${Math.round(210*strength).toString(16).padStart(2,"0")}`);glow.addColorStop(.42,`${css}${Math.round(70*strength).toString(16).padStart(2,"0")}`);glow.addColorStop(1,`${css}00`);ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);ctx.strokeStyle=`${css}${Math.round(170*strength).toString(16).padStart(2,"0")}`;ctx.lineWidth=2;const c=size/2;if(style.projectionHaloPattern==="rings"){[.17,.29,.41].forEach(r=>{ctx.beginPath();ctx.arc(c,c,size*r,0,Math.PI*2);ctx.stroke()})}else if(style.projectionHaloPattern==="cross"){ctx.beginPath();ctx.moveTo(c*.35,c);ctx.lineTo(c*1.65,c);ctx.moveTo(c,c*.35);ctx.lineTo(c,c*1.65);ctx.moveTo(c*.52,c*.52);ctx.lineTo(c*1.48,c*1.48);ctx.moveTo(c*1.48,c*.52);ctx.lineTo(c*.52,c*1.48);ctx.stroke()}else if(style.projectionHaloPattern==="sigil"){ctx.beginPath();ctx.moveTo(c,c*.38);ctx.lineTo(c*1.62,c);ctx.lineTo(c,c*1.62);ctx.lineTo(c*.38,c);ctx.closePath();ctx.stroke();ctx.strokeRect(c*.66,c*.66,c*.68,c*.68)}else{ctx.strokeRect(c*.68,c*.68,c*.64,c*.64);ctx.beginPath();ctx.arc(c,c,size*.20,0,Math.PI*2);ctx.stroke()}halo.material.map.needsUpdate=true;group.userData.haloPattern=style.projectionHaloPattern;group.userData.haloStrength=strength;return group}
+    const renderVariantControlsWithHaloControls=renderVariantControls;renderVariantControls=function(){renderVariantControlsWithHaloControls();if(state.kind!=="mandelbox")return;const root=$("#variantControls"),style=mandelboxValues();root.insertAdjacentHTML("afterbegin",`<div class="mandel-layer-panel halo-controls"><p class="hint">HALO PROJECTOR</p><strong>中央投影光暈</strong><label class="row"><input type="checkbox" data-halo-enabled ${style.projectionHaloEnabled?"checked":""}> 啟用光暈</label><label>光暈強度 <b>${style.projectionHaloStrength.toFixed(2)}</b><input type="range" min="0" max="1" step="0.01" value="${style.projectionHaloStrength}" data-halo-strength></label><label>光暈圖樣 <select data-halo-pattern><option value="orbit" ${style.projectionHaloPattern==="orbit"?"selected":""}>軌道方環</option><option value="rings" ${style.projectionHaloPattern==="rings"?"selected":""}>同心圓環</option><option value="cross" ${style.projectionHaloPattern==="cross"?"selected":""}>星圖十字</option><option value="sigil" ${style.projectionHaloPattern==="sigil"?"selected":""}>菱形符印</option></select></label><small>關閉可保留投影方盒，僅隱藏光暈與中心光束。</small></div>`);const saveHalo=()=>{persistMandelboxDisplay();build()};root.querySelector("[data-halo-enabled]").onchange=e=>{state.mandelbox={...state.mandelbox,projectionHaloEnabled:e.target.checked};saveHalo()};root.querySelector("[data-halo-strength]").oninput=e=>{state.mandelbox={...state.mandelbox,projectionHaloStrength:Number(e.target.value)};saveHalo()};root.querySelector("[data-halo-pattern]").onchange=e=>{state.mandelbox={...state.mandelbox,projectionHaloPattern:e.target.value};saveHalo()}}
+    function mandelboxFullOverview(){camera.position.set(7.9,4.8,8.2);camera.fov=52;camera.updateProjectionMatrix();controls.target.set(0,0,0);controls.minDistance=3.6;controls.maxDistance=15;controls.update()}
+    const mobilePipelineWithFullOverview=mandelboxMobileSpecifiedPipeline;mandelboxMobileSpecifiedPipeline=function(){const base=mobilePipelineWithFullOverview();base.scale.multiplyScalar(.68);base.userData.fullOverviewScale=.68;return base}
+    const renderVariantControlsWithFullOverview=renderVariantControls;renderVariantControls=function(){renderVariantControlsWithFullOverview();if(state.kind!=="mandelbox")return;const root=$("#variantControls");root.insertAdjacentHTML("afterbegin",`<div class="mandel-layer-panel mandel-overview"><p class="hint">FULL BOX FRAMING</p><button type="button" class="small active" data-mandel-overview>完整方盒全覽</button><small>投影方盒與距離場皆使用安全視距，顯示完整中央盒與外展結構。</small></div>`);root.querySelector("[data-mandel-overview]").onclick=()=>{mandelboxFullOverview();build();notify("已回到完整方盒全覽")};root.querySelectorAll("[data-mandel-view]").forEach(button=>{const previous=button.onclick;button.onclick=event=>{mandelboxFullOverview();previous?.call(button,event)}})}
+    const markActiveSceneWithProjection=markActiveScene;markActiveScene=function(){markActiveSceneWithProjection();if(state.kind==="mandelbox"&&scene.getObjectByName("Mandelbox_Projection_Box"))renderer.domElement.dataset.mandelboxCore="projection"}
+    const renderVariantControlsWithMandelboxViewMode=renderVariantControls;renderVariantControls=function(){renderVariantControlsWithMandelboxViewMode();if(state.kind!=="mandelbox")return;const root=$("#variantControls"),style=mandelboxValues(),mode=style.viewMode,projection=mode==="projection";root.insertAdjacentHTML("afterbegin",`<div class="mandel-layer-panel mandel-view-mode"><p class="hint">ANDROID DISPLAY MODE</p><strong>${projection?"投影方盒模式 · 中央方盒＋六向分支":"距離場模式 · Ray Marching"}</strong><div class="row"><button type="button" class="small ${projection?"active":""}" data-mandel-view="projection">投影方盒</button><button type="button" class="small ${mode==="raymarch"?"active":""}" data-mandel-view="raymarch">距離場</button><button type="button" class="small" data-mandel-reset>重置構圖</button></div><small>投影方盒模式會固定顯示完整中央盒，適合 Android 全螢幕觀察。</small></div><div class="mandel-layer-panel projection-style"><p class="hint">PROJECTION APPEARANCE</p><strong>投影外觀 · 中央方盒與六向分支</strong><div class="row"><label>中央方盒 <input type="color" data-projection-style="projectionBoxColor" value="${style.projectionBoxColor}"></label><label>六向分支 <input type="color" data-projection-style="projectionBranchColor" value="${style.projectionBranchColor}"></label></div><label>方盒透明度 <b>${style.projectionOpacity.toFixed(2)}</b><input type="range" min="0.06" max="0.78" step="0.01" value="${style.projectionOpacity}" data-projection-style="projectionOpacity"></label><label>邊線粗細 <b>${style.projectionEdgeWidth.toFixed(0)}</b><input type="range" min="1" max="8" step="1" value="${style.projectionEdgeWidth}" data-projection-style="projectionEdgeWidth"></label><button type="button" class="small" data-projection-style-reset>重設投影外觀</button></div>`);const saveProjection=()=>{persistMandelboxDisplay();build()};root.querySelectorAll("[data-mandel-view]").forEach(button=>button.onclick=()=>{state.mandelbox={...state.mandelbox,viewMode:button.dataset.mandelView};persistMandelboxDisplay();build();notify(button.dataset.mandelView==="projection"?"已啟用投影方盒模式":"已切換距離場模式")});root.querySelector("[data-mandel-reset]").onclick=()=>{state.mandelbox={...state.mandelbox,viewMode:"projection"};persistMandelboxDisplay();camera.position.set(5.2,3.2,5.4);controls.target.set(0,0,0);controls.update();build();notify("已回到中央投影方盒構圖")};root.querySelectorAll("[data-projection-style]").forEach(input=>input.oninput=()=>{state.mandelbox={...state.mandelbox,[input.dataset.projectionStyle]:input.type==="color"?input.value:Number(input.value)};saveProjection()});root.querySelector("[data-projection-style-reset]").onclick=()=>{state.mandelbox={...state.mandelbox,projectionBoxColor:"#D7A73B",projectionBranchColor:"#B9802F",projectionOpacity:.22,projectionEdgeWidth:2};saveProjection();notify("已重設投影外觀")}}
     build=function(){if(state.kind!=="mandelbox"){purgeMandelboxSceneArtifacts(false);buildBeforeMobileMandelboxCompatibility();purgeMandelboxSceneArtifacts(false);markActiveScene();syncActiveFormulaView();return}purgeMandelboxSceneArtifacts(false);scene.remove(model);dispose(model);rayMarchBox=null;if(useMobileMandelboxCompatibility()){model=mandelboxMobileSpecifiedPipeline();scene.add(model);markActiveScene();syncActiveFormulaView();return}model=mandelboxSpecifiedPipeline();scene.add(model);markActiveScene();syncActiveFormulaView()};
+    function mandelboxRaymarchFullBoxGuide(){const style=mandelboxValues(),group=new THREE.Group(),geometry=new THREE.BoxGeometry(3.1,3.1,3.1),fill=new THREE.Mesh(geometry,new THREE.MeshBasicMaterial({color:style.projectionBoxColor,transparent:true,opacity:.035,depthTest:false,depthWrite:false,side:THREE.DoubleSide})),edges=new THREE.LineSegments(new THREE.EdgesGeometry(geometry),new THREE.LineBasicMaterial({color:style.projectionBoxColor,transparent:true,opacity:.56,depthTest:false,depthWrite:false}));group.name="Mandelbox_Raymarch_Full_Box_Guide";group.userData.fullOverviewGuide=true;fill.renderOrder=70;edges.renderOrder=71;edges.scale.setScalar(1.004);group.add(fill,edges);return group}
+    const buildWithRaymarchFullBoxGuide=build;build=function(){buildWithRaymarchFullBoxGuide();if(state.kind==="mandelbox"&&!useMobileMandelboxCompatibility()){scene.add(mandelboxRaymarchFullBoxGuide());markActiveScene()}}
+    const JULIA_PROJECTION_KEY="fractal-atelier-standalone-julia-projection",juliaProjectionDefaults={enabled:true,coreColor:"#84DCE8",branchColor:"#A572E4",opacity:.24,edgeWidth:2,haloEnabled:true,haloStrength:.52,haloPattern:"orbit",nodeCount:6,nodeRadius:.96},juliaDefaults={cx:.26,cy:-.08,cz:-.22},storedJuliaProjection=safeRead(JULIA_PROJECTION_KEY,null);state.juliaProjection={...juliaProjectionDefaults,...(storedJuliaProjection&&typeof storedJuliaProjection==="object"?storedJuliaProjection:{})};state.julia={...juliaDefaults,...(storedJuliaProjection?.julia&&typeof storedJuliaProjection.julia==="object"?storedJuliaProjection.julia:state.julia&&typeof state.julia==="object"?state.julia:{})};
+    function juliaValues(source=state.julia||{}){return {cx:clamp(Number(source.cx??.26),-.6,.6),cy:clamp(Number(source.cy??-.08),-.6,.6),cz:clamp(Number(source.cz??-.22),-.6,.6)}}
+    function juliaProjectionValues(source=state.juliaProjection||{}){const color=(value,fallback)=>typeof value==="string"&&/^#[0-9a-f]{6}$/i.test(value)?value:fallback;return {enabled:source.enabled!==false,coreColor:color(source.coreColor,"#84DCE8"),branchColor:color(source.branchColor,"#A572E4"),opacity:clamp(Number(source.opacity??.24),.06,.78),edgeWidth:clamp(Number(source.edgeWidth??2),1,8),haloEnabled:source.haloEnabled!==false,haloStrength:clamp(Number(source.haloStrength??.52),0,1),haloPattern:["orbit","rings","cross","sigil"].includes(source.haloPattern)?source.haloPattern:"orbit",nodeCount:Math.round(clamp(Number(source.nodeCount??6),4,16)),nodeRadius:clamp(Number(source.nodeRadius??.96),.72,1.7)}}
+    const persistJuliaProjection=()=>safeSave(JULIA_PROJECTION_KEY,{...juliaProjectionValues(),julia:{...juliaValues()}});
+    function juliaProjectionOverlay(){const style=juliaProjectionValues(),group=new THREE.Group(),coreGeometry=new THREE.SphereGeometry(.70,20,16),core=new THREE.Mesh(coreGeometry,new THREE.MeshBasicMaterial({color:style.coreColor,transparent:true,opacity:style.enabled?style.opacity:0,depthTest:false,depthWrite:false,side:THREE.DoubleSide})),edges=new THREE.LineSegments(new THREE.WireframeGeometry(coreGeometry),new THREE.LineBasicMaterial({color:style.coreColor,transparent:true,opacity:style.enabled?1:0,depthTest:false,depthWrite:false})),branchGeometry=new THREE.OctahedronGeometry(.15,1),branchMaterial=new THREE.MeshBasicMaterial({color:style.branchColor,transparent:true,opacity:style.enabled?.9:0,depthTest:false,depthWrite:false}),canvas=document.createElement("canvas"),ctx=canvas.getContext("2d"),size=160,color=new THREE.Color(style.coreColor),css=`#${color.getHexString()}`;group.name="Julia_Projection_Overlay";core.name="Julia_Projection_Core";core.renderOrder=600;edges.name="Julia_Projection_Edges";edges.renderOrder=601;edges.scale.setScalar(1.012+style.edgeWidth*.002);group.userData={core:true,branchCount:style.nodeCount,nodeRadius:style.nodeRadius,fullOverview:true};for(let index=0;index<style.nodeCount;index++){const y=1-2*(index+.5)/style.nodeCount,radius=Math.sqrt(Math.max(0,1-y*y)),theta=index*2.399963229728653,branch=new THREE.Mesh(branchGeometry,branchMaterial);branch.name=`Julia_Projection_Branch_${index}`;branch.position.set(Math.cos(theta)*radius,y,Math.sin(theta)*radius).multiplyScalar(style.nodeRadius);branch.renderOrder=602;group.add(branch)}canvas.width=canvas.height=size;const c=size/2,glow=ctx.createRadialGradient(c,c,4,c,c,c*.46);glow.addColorStop(0,`${css}${Math.round(220*style.haloStrength).toString(16).padStart(2,"0")}`);glow.addColorStop(.45,`${css}${Math.round(62*style.haloStrength).toString(16).padStart(2,"0")}`);glow.addColorStop(1,`${css}00`);ctx.fillStyle=glow;ctx.fillRect(0,0,size,size);ctx.strokeStyle=`${css}${Math.round(180*style.haloStrength).toString(16).padStart(2,"0")}`;ctx.lineWidth=2;if(style.haloPattern==="rings")[.18,.31,.43].forEach(r=>{ctx.beginPath();ctx.arc(c,c,size*r,0,Math.PI*2);ctx.stroke()});else if(style.haloPattern==="cross"){ctx.beginPath();ctx.moveTo(c*.32,c);ctx.lineTo(c*1.68,c);ctx.moveTo(c,c*.32);ctx.lineTo(c,c*1.68);ctx.stroke()}else if(style.haloPattern==="sigil"){ctx.beginPath();ctx.moveTo(c,c*.36);ctx.lineTo(c*1.64,c);ctx.lineTo(c,c*1.64);ctx.lineTo(c*.36,c);ctx.closePath();ctx.stroke()}else{ctx.strokeRect(c*.67,c*.67,c*.66,c*.66);ctx.beginPath();ctx.arc(c,c,size*.21,0,Math.PI*2);ctx.stroke()}const halo=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(canvas),transparent:true,opacity:style.haloEnabled&&style.enabled?Math.max(.08,style.haloStrength*.65):0,blending:THREE.AdditiveBlending,depthTest:false,depthWrite:false}));halo.name="Julia_Projection_Halo";halo.scale.set(1.28,1.28,1);halo.position.z=.03;halo.renderOrder=603;group.add(core,edges,halo);return group}
+    function juliaFullOverview(){camera.position.set(6.7,4.2,7.1);camera.fov=50;camera.updateProjectionMatrix();controls.target.set(0,0,0);controls.minDistance=3;controls.maxDistance=14;controls.update()}
+    const snapshotWithJuliaProjection=snapshot;snapshot=function(){return {...snapshotWithJuliaProjection(),julia:{...juliaValues()},juliaProjection:{...juliaProjectionValues()}}};
+    const applyWithJuliaProjection=apply;apply=function(settings){applyWithJuliaProjection(settings);if(settings?.julia)state.julia=juliaValues(settings.julia);if(settings?.juliaProjection)state.juliaProjection={...juliaProjectionDefaults,...juliaProjectionValues(settings.juliaProjection)};if(settings?.julia||settings?.juliaProjection){persistJuliaProjection();if(state.kind==="julia")build()}};
+    const interpolateWithJuliaProjection=interpolate;interpolate=function(a,b,t){const result=interpolateWithJuliaProjection(a,b,t),aj=juliaValues(a.julia),bj=juliaValues(b.julia);return {...result,julia:{cx:aj.cx+(bj.cx-aj.cx)*t,cy:aj.cy+(bj.cy-aj.cy)*t,cz:aj.cz+(bj.cz-aj.cz)*t},juliaProjection:{...(t<.5?juliaProjectionValues(a.juliaProjection):juliaProjectionValues(b.juliaProjection))}}};
+    const renderVariantControlsWithJuliaProjection=renderVariantControls;renderVariantControls=function(){renderVariantControlsWithJuliaProjection();if(state.kind!=="julia")return;const root=$("#variantControls"),style=juliaProjectionValues();root.insertAdjacentHTML("afterbegin",`<div class="mandel-layer-panel julia-overview"><p class="hint">JULIA PROJECTION MODE</p><button type="button" class="small active" data-julia-overview>完整茱莉亞全覽</button><div class="row"><label>中央球 <input type="color" data-julia-style="coreColor" value="${style.coreColor}"></label><label>六向節點 <input type="color" data-julia-style="branchColor" value="${style.branchColor}"></label></div><label>中央透明度 <b>${style.opacity.toFixed(2)}</b><input type="range" min="0.06" max="0.78" step="0.01" value="${style.opacity}" data-julia-style="opacity"></label><label>邊線粗細 <b>${style.edgeWidth.toFixed(0)}</b><input type="range" min="1" max="8" step="1" value="${style.edgeWidth}" data-julia-style="edgeWidth"></label><label class="row"><input type="checkbox" data-julia-halo-enabled ${style.haloEnabled?"checked":""}> 啟用光暈</label><label>光暈強度 <b>${style.haloStrength.toFixed(2)}</b><input type="range" min="0" max="1" step="0.01" value="${style.haloStrength}" data-julia-style="haloStrength"></label><label>光暈圖樣 <select data-julia-style="haloPattern"><option value="orbit" ${style.haloPattern==="orbit"?"selected":""}>軌道方環</option><option value="rings" ${style.haloPattern==="rings"?"selected":""}>同心圓環</option><option value="cross" ${style.haloPattern==="cross"?"selected":""}>星圖十字</option><option value="sigil" ${style.haloPattern==="sigil"?"selected":""}>菱形符印</option></select></label><button type="button" class="small" data-julia-style-reset>重設茱莉亞投影</button></div>`);const saveJulia=()=>{persistJuliaProjection();build()};root.querySelector("[data-julia-overview]").onclick=()=>{juliaFullOverview();build();notify("已回到完整茱莉亞全覽")};root.querySelectorAll("[data-julia-style]").forEach(input=>input.oninput=input.onchange=()=>{state.juliaProjection={...state.juliaProjection,[input.dataset.juliaStyle]:input.type==="color"?input.value:input.dataset.juliaStyle==="haloPattern"?input.value:Number(input.value)};saveJulia()});root.querySelector("[data-julia-halo-enabled]").onchange=e=>{state.juliaProjection={...state.juliaProjection,haloEnabled:e.target.checked};saveJulia()};root.querySelector("[data-julia-style-reset]").onclick=()=>{state.juliaProjection={...juliaProjectionDefaults};saveJulia();notify("已重設茱莉亞投影")}}
+    const renderVariantControlsWithJuliaParameters=renderVariantControls;renderVariantControls=function(){renderVariantControlsWithJuliaParameters();if(state.kind!=="julia")return;const root=$("#variantControls");root.classList.add("active");const julia=juliaValues(),style=juliaProjectionValues();root.insertAdjacentHTML("afterbegin",`<div class="mandel-layer-panel julia-parameters"><p class="hint">JULIA ADVANCED CONTROLS</p><strong>茱莉亞進階控制 · 複數常數與投影節點</strong><label>常數 Cₓ <b>${julia.cx.toFixed(2)}</b><input type="range" min="-0.60" max="0.60" step="0.01" value="${julia.cx}" data-julia-constant="cx"></label><label>常數 Cᵧ <b>${julia.cy.toFixed(2)}</b><input type="range" min="-0.60" max="0.60" step="0.01" value="${julia.cy}" data-julia-constant="cy"></label><label>常數 C𝓏 <b>${julia.cz.toFixed(2)}</b><input type="range" min="-0.60" max="0.60" step="0.01" value="${julia.cz}" data-julia-constant="cz"></label><label>節點數 <b>${style.nodeCount}</b><input type="range" min="4" max="16" step="1" value="${style.nodeCount}" data-julia-projection="nodeCount"></label><label>節點半徑 <b>${style.nodeRadius.toFixed(2)}</b><input type="range" min="0.72" max="1.70" step="0.01" value="${style.nodeRadius}" data-julia-projection="nodeRadius"></label></div>`);const saveJuliaParameters=()=>{persistJuliaProjection();build()};root.querySelectorAll("[data-julia-constant]").forEach(input=>input.oninput=()=>{state.julia={...state.julia,[input.dataset.juliaConstant]:Number(input.value)};saveJuliaParameters()});root.querySelectorAll("[data-julia-projection]").forEach(input=>input.oninput=()=>{state.juliaProjection={...state.juliaProjection,[input.dataset.juliaProjection]:Number(input.value)};saveJuliaParameters()})}
+    const buildWithJuliaProjection=build;build=function(){buildWithJuliaProjection();if(state.kind==="julia"&&model){model.add(juliaProjectionOverlay());markActiveScene()}}
+    function juliaBulbRaymarchPipeline(){const julia=juliaValues(),quality=useMobileMandelboxCompatibility()?40:64,uniforms={uCamPos:{value:new THREE.Vector3()},uCamRight:{value:new THREE.Vector3(1,0,0)},uCamUp:{value:new THREE.Vector3(0,1,0)},uCamForward:{value:new THREE.Vector3(0,0,-1)},uAspect:{value:1},uFov:{value:camera.fov||48},uSteps:{value:quality},uIterations:{value:Math.max(4,Math.min(10,Math.round(state.iteration)+4))},uPower:{value:6+Math.round(state.twist/28)},uJuliaC:{value:new THREE.Vector3(julia.cx,julia.cy,julia.cz)},uColorA:{value:new THREE.Color(state.palette[0])},uColorB:{value:new THREE.Color(state.palette[1])},uColorC:{value:new THREE.Color(state.palette[2])},uTime:{value:0}};const material=new THREE.ShaderMaterial({uniforms,vertexShader:"varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}",fragmentShader:"precision highp float;varying vec2 vUv;uniform vec3 uCamPos,uCamRight,uCamUp,uCamForward,uJuliaC,uColorA,uColorB,uColorC;uniform float uAspect,uFov,uSteps,uIterations,uPower,uTime;float juliaBulbDistance(vec3 p){vec3 z=p;float dr=1.;float r=0.;for(int i=0;i<10;i++){if(float(i)>=uIterations)break;r=length(z);if(r>4.)break;float theta=acos(clamp(z.z/max(r,.00001),-1.,1.));float phi=atan(z.y,z.x);float zr=pow(max(r,.00001),uPower);dr=uPower*pow(max(r,.00001),uPower-1.)*dr+1.;theta*=uPower;phi*=uPower;z=zr*vec3(sin(theta)*cos(phi),sin(theta)*sin(phi),cos(theta))+uJuliaC;}return .5*log(max(r,1.001))*r/max(abs(dr),.0001);}vec3 estimateNormal(vec3 p){vec2 e=vec2(.0028,0.);return normalize(vec3(juliaBulbDistance(p+e.xyy)-juliaBulbDistance(p-e.xyy),juliaBulbDistance(p+e.yxy)-juliaBulbDistance(p-e.yxy),juliaBulbDistance(p+e.yyx)-juliaBulbDistance(p-e.yyx)));}float softShadow(vec3 ro,vec3 rd){float shade=1.,travel=.035;for(int i=0;i<9;i++){float h=juliaBulbDistance(ro+rd*travel);shade=min(shade,10.*h/max(travel,.001));travel+=clamp(h,.02,.26);if(travel>6.)break;}return clamp(shade,0.,1.);}float ambientOcclusion(vec3 p,vec3 n){float occ=0.,weight=1.;for(int i=1;i<5;i++){float h=.035*float(i),d=juliaBulbDistance(p+n*h);occ+=(h-d)*weight;weight*=.58;}return clamp(1.-occ*2.8,0.,1.);}void main(){vec2 screen=vUv*2.-1.;screen.x*=uAspect;float focal=tan(radians(uFov*.5));vec3 ray=normalize(uCamForward+screen.x*focal*uCamRight+screen.y*focal*uCamUp);float travel=0.,surfaceDistance=0.;bool hit=false;for(int step=0;step<72;step++){if(float(step)>=uSteps)break;vec3 p=uCamPos+ray*travel;surfaceDistance=juliaBulbDistance(p);if(surfaceDistance<.0018){hit=true;break;}travel+=clamp(surfaceDistance*.78,.008,.34);if(travel>18.)break;}if(!hit){gl_FragColor=vec4(0.,0.,0.,0.);return;}vec3 p=uCamPos+ray*travel,n=estimateNormal(p),light=normalize(vec3(-.46,.78,.38));float diffuse=max(dot(n,light),0.),shadow=softShadow(p+n*.012,light),ao=ambientOcclusion(p,n),spec=pow(max(dot(reflect(-light,n),-ray),0.),46.),fresnel=pow(1.-max(dot(n,-ray),0.),3.);float bands=.5+.5*sin(length(p)*5.2+atan(p.y,p.x)*3.+uTime*.12);vec3 base=mix(uColorA,uColorB,clamp(bands,0.,1.));base=mix(base,uColorC,clamp(.12+.46*diffuse,0.,.58));vec3 lit=base*(.14+.86*diffuse*shadow)*ao+spec*mix(uColorB,uColorC,.7)+base*fresnel*.24;gl_FragColor=vec4(lit,1.);}",depthTest:false,depthWrite:false,transparent:true});const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);mesh.name="JuliaBulb_Camera_Ray_Raymarch_DE_Normal_Lighting_AO_Shadow";mesh.frustumCulled=false;mesh.renderOrder=89;mesh.onBeforeRender=()=>{const forward=new THREE.Vector3().subVectors(controls.target,camera.position).normalize(),right=new THREE.Vector3().crossVectors(forward,camera.up).normalize(),up=new THREE.Vector3().crossVectors(right,forward).normalize(),values=juliaValues();uniforms.uCamPos.value.copy(camera.position);uniforms.uCamForward.value.copy(forward);uniforms.uCamRight.value.copy(right);uniforms.uCamUp.value.copy(up);uniforms.uAspect.value=renderer.domElement.clientWidth/Math.max(1,renderer.domElement.clientHeight);uniforms.uFov.value=camera.fov;uniforms.uJuliaC.value.set(values.cx,values.cy,values.cz);uniforms.uPower.value=6+Math.round(state.twist/28);uniforms.uTime.value=performance.now()*.001};return mesh}
+    const buildWithJuliaBulbRaymarch=build;build=function(){buildWithJuliaBulbRaymarch();if(state.kind==="julia"&&model){const overlay=model.getObjectByName("Julia_Projection_Overlay");if(overlay){model.remove(overlay);scene.add(overlay)}model.visible=false;scene.add(juliaBulbRaymarchPipeline());renderer.domElement.dataset.juliaPipeline="raymarch";markActiveScene()}}
     if(state.kind==="mandelbox"&&!useMobileMandelboxCompatibility())build();
+    const launchParams=new URLSearchParams(location.search),launchFormula=launchParams.get("formula"),launchIteration=Number(launchParams.get("iteration"));if(Number.isFinite(launchIteration))state.iteration=Math.round(clamp(launchIteration,0,8));if(catalog.some(item=>item.id===launchFormula)){state.kind=launchFormula;build();renderCatalog()}
+    const launchFocus=new URLSearchParams(location.search).get("focus");if(launchFocus==="stage")requestAnimationFrame(()=>mount.scrollIntoView({block:"start"}));
     document.addEventListener("submit",event=>event.preventDefault());
     const renderCatalogWithMandelboxPipeline=renderCatalog;
     renderCatalog=function(){renderCatalogWithMandelboxPipeline();renderVariantControls()};
     renderCatalog();
-  </script>
+</script>
+<script>
+  // Julia Bulb 距離場表面優先：投影節點保留為導引，但不再以實心球遮住逐像素 Ray Marching 表面。
+  const juliaOverlayForDistanceField = juliaProjectionOverlay;
+  juliaProjectionOverlay = function () {
+    const group = juliaOverlayForDistanceField();
+    const core = group.getObjectByName("Julia_Projection_Core");
+    const halo = group.getObjectByName("Julia_Projection_Halo");
+    if (core?.material) core.material.opacity = Math.min(Number(core.material.opacity || 0), 0.065);
+    if (halo?.material) halo.material.opacity *= 0.28;
+    return group;
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // Julia Bulb 距離場模式以逐像素表面為主；投影僅保留外側節點與柔和光暈。
+  const juliaOverlaySurfacePriority = juliaProjectionOverlay;
+  juliaProjectionOverlay = function () {
+    const group = juliaOverlaySurfacePriority();
+    const core = group.getObjectByName("Julia_Projection_Core");
+    const edges = group.getObjectByName("Julia_Projection_Edges");
+    const halo = group.getObjectByName("Julia_Projection_Halo");
+    if (core) core.visible = false;
+    if (edges) edges.visible = false;
+    if (halo?.material) halo.material.opacity *= 0.42;
+    return group;
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // 即使舊投影群組在重建時被保留，也必須讓 Julia Bulb 距離場表面優先顯示。
+  const hideJuliaProjectionSurface = () => {
+    if (typeof scene === "undefined") return;
+    let hidden = 0;
+    scene.traverse((node) => {
+      if (node.name === "Julia_Projection_Core" || node.name === "Julia_Projection_Edges") {
+        node.visible = false;
+        hidden += 1;
+      }
+    });
+    if (typeof renderer !== "undefined") renderer.domElement.dataset.juliaSurfacePriority = String(hidden);
+  };
+  const buildWithJuliaSurfacePriority = build;
+  build = function () {
+    buildWithJuliaSurfacePriority();
+    if (typeof state !== "undefined" && state.kind === "julia") {
+      requestAnimationFrame(hideJuliaProjectionSurface);
+      setTimeout(hideJuliaProjectionSurface, 0);
+    }
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // Android 全覽安全步進：較寬容的 epsilon 能避免 Julia Bulb 過度估計而穿透薄表面。
+  const juliaBulbRaymarchSafeSurface = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    const mesh = juliaBulbRaymarchSafeSurface();
+    mesh.material.fragmentShader = mesh.material.fragmentShader
+      .replace("if(surfaceDistance<.0018)", "if(surfaceDistance<.0105)")
+      .replace("surfaceDistance*.78", "surfaceDistance*.46")
+      .replace("clamp(surfaceDistance*.46,.008,.34)", "clamp(surfaceDistance*.46,.006,.22)");
+    mesh.material.needsUpdate = true;
+    mesh.name = "JuliaBulb_Camera_Ray_Raymarch_DE_Normal_Lighting_AO_Shadow_Safe";
+    return mesh;
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // 對 Julia Bulb DE 採保守步進，優先穩定取得行動裝置全覽的可見表面。
+  const juliaBulbRaymarchGuaranteedHit = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    const mesh = juliaBulbRaymarchGuaranteedHit();
+    mesh.material.fragmentShader = mesh.material.fragmentShader
+      .replace("if(surfaceDistance<.0105)", "if(surfaceDistance<.040)")
+      .replace("surfaceDistance*.46", "surfaceDistance*.22")
+      .replace("clamp(surfaceDistance*.46,.006,.22)", "clamp(surfaceDistance*.22,.004,.12)");
+    mesh.material.needsUpdate = true;
+    mesh.name = "JuliaBulb_Camera_Ray_Raymarch_DE_Normal_Lighting_AO_Shadow_Conservative";
+    return mesh;
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // 僅作為透明距離場未命中時的低層保底；正常情況下由 renderOrder 89 的 Julia Bulb Ray Marching 表面覆蓋。
+  function juliaBulbRaymarchFallbackSurface() {
+    const group = new THREE.Group();
+    const material = new THREE.MeshPhysicalMaterial({
+      color: new THREE.Color(state.palette[1]),
+      emissive: new THREE.Color(state.palette[0]),
+      emissiveIntensity: 0.18,
+      roughness: 0.34,
+      metalness: 0.22,
+      transparent: true,
+      opacity: 0.86,
+      side: THREE.DoubleSide,
+    });
+    const core = new THREE.Mesh(new THREE.IcosahedronGeometry(1.06, 4), material);
+    core.name = "JuliaBulb_Raymarch_Compatibility_Core";
+    group.name = "JuliaBulb_Raymarch_Compatibility_Surface";
+    group.userData.fallback = true;
+    group.add(core);
+    const lobes = [
+      [0.42, 0.28, 0.36, 0.38], [-0.44, 0.18, 0.22, 0.31], [0.15, -0.46, 0.2, 0.34],
+      [-0.1, 0.14, -0.48, 0.29], [0.36, -0.12, -0.36, 0.27],
+    ];
+    lobes.forEach(([x, y, z, scale], index) => {
+      const lobe = new THREE.Mesh(new THREE.IcosahedronGeometry(scale, 3), material.clone());
+      lobe.position.set(x, y, z);
+      lobe.name = `JuliaBulb_Raymarch_Compatibility_Lobe_${index}`;
+      group.add(lobe);
+    });
+    group.renderOrder = 20;
+    return group;
+  }
+  const buildWithJuliaBulbFallback = build;
+  build = function () {
+    buildWithJuliaBulbFallback();
+    if (typeof state !== "undefined" && state.kind === "julia") {
+      scene.add(juliaBulbRaymarchFallbackSurface());
+      renderer.domElement.dataset.juliaFallback = "raymarch-compatibility";
+    }
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // 純 Julia Bulb 為預設；中央與六向節點僅作為使用者主動開啟的構圖導引。
+  const juliaProjectionValuesWithGuides = juliaProjectionValues;
+  juliaProjectionValues = function (source) {
+    const values = juliaProjectionValuesWithGuides(source);
+    const raw = source || state.juliaProjection || {};
+    return { ...values, guidesEnabled: raw.guidesEnabled === true };
+  };
+  const juliaProjectionOverlayPureDefault = juliaProjectionOverlay;
+  juliaProjectionOverlay = function () {
+    const group = juliaProjectionOverlayPureDefault();
+    const style = juliaProjectionValues();
+    if (!style.guidesEnabled) {
+      group.traverse((node) => {
+        if (node.name.startsWith("Julia_Projection_Branch_") || node.name === "Julia_Projection_Halo") node.visible = false;
+      });
+    }
+    return group;
+  };
+  const renderVariantControlsWithJuliaGuideToggle = renderVariantControls;
+  renderVariantControls = function () {
+    renderVariantControlsWithJuliaGuideToggle();
+    if (state.kind !== "julia") return;
+    const root = $("#variantControls");
+    const style = juliaProjectionValues();
+    root.insertAdjacentHTML("afterbegin", `<div class="mandel-layer-panel julia-pure-mode"><p class="hint">PURE JULIA BULB</p><strong>純 Julia Bulb 表面</strong><label class="row"><input type="checkbox" data-julia-guides ${style.guidesEnabled ? "checked" : ""}> 顯示投影導引（中央與六向節點）</label></div>`);
+    root.querySelector("[data-julia-guides]").onchange = (event) => {
+      state.juliaProjection = { ...state.juliaProjection, guidesEnabled: event.target.checked };
+      persistJuliaProjection();
+      build();
+    };
+  };
+  if (typeof state !== "undefined" && state.kind === "julia") build();
+</script>
+<script>
+  // Julia 常數探索、距離場雕刻與「Run 才重算」工作流。
+  const JULIA_EXPLORER_KEY = "fractal-atelier-standalone-julia-explorer";
+  const juliaBuiltinPresets = [
+    { name: "青金門扉", values: { cx: .26, cy: -.08, cz: -.22 } },
+    { name: "朱砂裂谷", values: { cx: -.34, cy: .17, cz: -.12 } },
+    { name: "曜金潮汐", values: { cx: .18, cy: .38, cz: -.29 } },
+    { name: "月白旋臂", values: { cx: -.12, cy: -.31, cz: .42 } },
+  ];
+  const juliaDefaultAB = { a: { cx: .26, cy: -.08, cz: -.22 }, b: { cx: -.34, cy: .17, cz: -.12 }, scanMs: 3600 };
+  const juliaSculptProfiles = {
+    balanced: { name: "均衡觀測", hitEpsilon: .032, iterations: 8, steps: 58, displacement: .18, curvature: .42 },
+    clear: { name: "清晰刻紋", hitEpsilon: .024, iterations: 9, steps: 72, displacement: .36, curvature: .78 },
+    roughCarve: { name: "粗糙雕刻", hitEpsilon: .018, iterations: 10, steps: 88, displacement: .64, curvature: 1.18 },
+  };
+  const storedJuliaExplorer = safeRead(JULIA_EXPLORER_KEY, {});
+  let juliaPresetLibrary = Array.isArray(storedJuliaExplorer.presets)
+    ? storedJuliaExplorer.presets.filter((preset) => preset && typeof preset.name === "string" && preset.values)
+    : [];
+  let juliaABLibrary = Array.isArray(storedJuliaExplorer.abSets)
+    ? storedJuliaExplorer.abSets.filter((preset) => preset && typeof preset.name === "string" && preset.a && preset.b)
+    : [];
+  function juliaDetailValues(source = state.juliaDetail || {}) {
+    return {
+      hitEpsilon: clamp(Number(source.hitEpsilon ?? .018), .006, .045),
+      iterations: Math.round(clamp(Number(source.iterations ?? 10), 4, 10)),
+      steps: Math.round(clamp(Number(source.steps ?? 88), 32, 96)),
+      displacement: clamp(Number(source.displacement ?? .64), 0, 1),
+      curvature: clamp(Number(source.curvature ?? 1.18), 0, 1.6),
+      profile: Object.keys(juliaSculptProfiles).includes(source.profile) || source.profile === "custom" ? source.profile : "roughCarve",
+    };
+  }
+  function juliaExplorerValues(source = state.juliaExplorer || {}) {
+    return {
+      a: juliaValues(source.a || juliaDefaultAB.a),
+      b: juliaValues(source.b || juliaDefaultAB.b),
+      scanMs: Math.round(clamp(Number(source.scanMs ?? juliaDefaultAB.scanMs), 1000, 12000)),
+    };
+  }
+  state.juliaDetail = juliaDetailValues(storedJuliaExplorer.detail);
+  state.juliaExplorer = juliaExplorerValues(storedJuliaExplorer.explorer);
+  const persistJuliaExplorer = () => safeSave(JULIA_EXPLORER_KEY, {
+    detail: juliaDetailValues(), explorer: juliaExplorerValues(), presets: juliaPresetLibrary, abSets: juliaABLibrary,
+  });
+
+  let appliedJuliaConstants = juliaValues();
+  let appliedJuliaDetail = juliaDetailValues();
+  let juliaScanFrame = 0;
+  let juliaScanActive = false;
+  let runPending = false;
+  let runGateOpen = false;
+  const buildBeforeRunGate = build;
+
+  function installRunDock() {
+    if ($("#runDock")) return;
+    const dock = document.createElement("div");
+    dock.id = "runDock";
+    dock.innerHTML = `<button type="button" class="btn" id="runFractal">▶ Run · 重算</button><button type="button" class="btn soft julia-run-quick" id="juliaABAnimate">AB動畫</button><button type="button" class="btn soft julia-run-quick" id="juliaABStore">收錄AB</button><span id="runHint">調整參數後按 Run 才套用</span>`;
+    $("#iteration").closest(".section").prepend(dock);
+    const style = document.createElement("style");
+    style.textContent = `#runDock{display:flex;align-items:center;gap:8px;padding:8px 9px;margin:0 0 12px;border:1px solid rgba(220,169,54,.46);background:linear-gradient(110deg,rgba(220,169,54,.14),rgba(157,52,48,.08));flex-wrap:wrap}#runDock .btn{min-height:32px;white-space:nowrap}#runHint{font:9px var(--mono);letter-spacing:.04em;color:var(--gold2)}#runDock.pending{border-color:rgba(157,52,48,.9);box-shadow:inset 3px 0 0 var(--red)}#runDock.pending #runHint{color:#ffb0aa}.julia-lab{display:grid;gap:8px}.julia-lab strong{font-size:12px;font-weight:500}.julia-ab{display:grid;grid-template-columns:1fr 1fr;gap:6px}.julia-ab div,.julia-preset{border:1px solid var(--line);padding:7px;background:rgba(255,255,255,.025)}.julia-ab b,.julia-preset b{display:block;font-size:10px}.julia-ab small,.julia-preset small{display:block;font:8px var(--mono);color:var(--muted);margin:4px 0 6px}.julia-preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}.julia-preset .row{grid-template-columns:1fr 30px 30px}.julia-preset button{min-height:26px;border:1px solid var(--line);background:transparent;color:var(--paper);font-size:9px}.julia-preset button:hover{border-color:var(--gold)}.julia-sculpt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.julia-sculpt-grid button{min-height:32px;border:1px solid var(--line);background:rgba(255,255,255,.02);color:var(--paper);font-size:9px}.julia-sculpt-grid button.active{border-color:var(--gold);background:rgba(220,169,54,.12)}@media(max-width:700px){.julia-preset-grid{grid-template-columns:1fr}.julia-sculpt-grid{grid-template-columns:1fr 1fr 1fr}#runDock{position:sticky;top:2px;z-index:4;gap:6px}#runDock .btn{padding:0 8px;font-size:10px}}`;
+    document.head.append(style);
+    $("#runFractal").onclick = runFractal;
+    $("#juliaABAnimate").onclick = startJuliaScan;
+    $("#juliaABStore").onclick = storeJuliaAB;
+  }
+  function renderRunDock() {
+    const dock = $("#runDock");
+    if (!dock) return;
+    dock.classList.toggle("pending", runPending);
+    dock.querySelectorAll(".julia-run-quick").forEach(button => { button.hidden = state.kind !== "julia"; });
+    $("#runHint").textContent = runPending ? "參數已暫存 · 按 Run 重新計算" : "目前畫面已套用";
+  }
+  function markRunPending(message = "參數已暫存 · 按 Run 重新計算") {
+    runPending = true;
+    renderRunDock();
+    notify(message);
+  }
+  build = function () {
+    if (!runGateOpen) {
+      markRunPending();
+      return model;
+    }
+    return buildBeforeRunGate();
+  };
+  function runFractal() {
+    if (juliaScanActive) stopJuliaScan();
+    appliedJuliaConstants = juliaValues();
+    appliedJuliaDetail = juliaDetailValues();
+    runGateOpen = true;
+    try { buildBeforeRunGate(); }
+    finally { runGateOpen = false; }
+    persistJuliaProjection();
+    persistJuliaExplorer();
+    runPending = false;
+    renderRunDock();
+    if (state.kind === "julia") renderVariantControls();
+    notify(`已重算「${catalog.find(item => item.id === state.kind)?.zh || "碎形"}」`);
+  }
+  installRunDock();
+  renderRunDock();
+
+  // 將 Julia 雕刻控制接到既有距離估計器、Ray Marching 與曲率光照。
+  const juliaBulbPipelineWithDetailControls = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    const mesh = juliaBulbPipelineWithDetailControls();
+    const detail = appliedJuliaDetail;
+    const uniforms = mesh.material.uniforms;
+    Object.assign(uniforms, {
+      uHitEpsilon: { value: detail.hitEpsilon },
+      uDisplacement: { value: detail.displacement },
+      uCurvature: { value: detail.curvature },
+    });
+    mesh.material.fragmentShader = mesh.material.fragmentShader
+      .replace("uniform float uAspect,uFov,uSteps,uIterations,uPower,uTime;", "uniform float uAspect,uFov,uSteps,uIterations,uPower,uTime,uHitEpsilon,uDisplacement,uCurvature;")
+      .replace("return .5*log(max(r,1.001))*r/max(abs(dr),.0001);", "float base=.5*log(max(r,1.001))*r/max(abs(dr),.0001);float grain=pow(abs(sin(p.x*7.4+sin(p.z*4.2))*sin(p.y*8.1+cos(p.x*3.1))),2.2);return base-uDisplacement*.042*grain;")
+      .replace("for(int step=0;step<72;step++)", "for(int step=0;step<96;step++)")
+      .replace("if(surfaceDistance<.040)", "if(surfaceDistance<uHitEpsilon)")
+      .replace("vec3 lit=base*", "float curvature=clamp(length(estimateNormal(p+n*.018)-n)*7.,0.,1.);base=mix(base,uColorC,clamp(curvature*uCurvature*.52,0.,.62));vec3 lit=base*");
+    const beforeRender = mesh.onBeforeRender;
+    mesh.onBeforeRender = function () {
+      beforeRender?.call(this);
+      const current = appliedJuliaConstants;
+      const settings = appliedJuliaDetail;
+      uniforms.uJuliaC.value.set(current.cx, current.cy, current.cz);
+      uniforms.uHitEpsilon.value = settings.hitEpsilon;
+      uniforms.uDisplacement.value = settings.displacement;
+      uniforms.uCurvature.value = settings.curvature;
+      uniforms.uIterations.value = settings.iterations;
+      uniforms.uSteps.value = matchMedia("(pointer:coarse)").matches ? Math.min(settings.steps, 64) : settings.steps;
+      renderer.domElement.dataset.juliaCarving = `${settings.hitEpsilon}|${settings.iterations}|${settings.steps}|${settings.displacement}|${settings.curvature}`;
+    };
+    mesh.material.needsUpdate = true;
+    mesh.name = "JuliaBulb_Raymarch_DE_RoughCarving_Curvature";
+    return mesh;
+  };
+
+  const snapshotWithJuliaExplorer = snapshot;
+  snapshot = function () {
+    return { ...snapshotWithJuliaExplorer(), juliaDetail: { ...juliaDetailValues() }, juliaExplorer: { ...juliaExplorerValues() }, juliaPresetLibrary: juliaPresetLibrary.map(preset => ({ name: preset.name, values: juliaValues(preset.values) })), juliaABLibrary: juliaABLibrary.map(preset => ({ name: preset.name, a: juliaValues(preset.a), b: juliaValues(preset.b), scanMs: preset.scanMs })) };
+  };
+  const applyWithJuliaExplorer = apply;
+  apply = function (settings) {
+    const wasOpen = runGateOpen;
+    runGateOpen = true;
+    try { applyWithJuliaExplorer(settings); }
+    finally { runGateOpen = wasOpen; }
+    if (settings?.juliaDetail) state.juliaDetail = juliaDetailValues(settings.juliaDetail);
+    if (settings?.juliaExplorer) state.juliaExplorer = juliaExplorerValues(settings.juliaExplorer);
+    if (Array.isArray(settings?.juliaPresetLibrary)) juliaPresetLibrary = settings.juliaPresetLibrary.filter(preset => preset && typeof preset.name === "string" && preset.values);
+    if (Array.isArray(settings?.juliaABLibrary)) juliaABLibrary = settings.juliaABLibrary.filter(preset => preset && typeof preset.name === "string" && preset.a && preset.b);
+    appliedJuliaConstants = juliaValues();
+    appliedJuliaDetail = juliaDetailValues();
+    persistJuliaExplorer();
+    runGateOpen = true;
+    try { buildBeforeRunGate(); }
+    finally { runGateOpen = wasOpen; }
+    runPending = false;
+    renderRunDock();
+  };
+  const interpolateWithJuliaExplorer = interpolate;
+  interpolate = function (a, b, t) {
+    const result = interpolateWithJuliaExplorer(a, b, t), ad = juliaDetailValues(a.juliaDetail), bd = juliaDetailValues(b.juliaDetail);
+    return { ...result, juliaDetail: { hitEpsilon: ad.hitEpsilon + (bd.hitEpsilon - ad.hitEpsilon) * t, iterations: Math.round(ad.iterations + (bd.iterations - ad.iterations) * t), steps: Math.round(ad.steps + (bd.steps - ad.steps) * t), displacement: ad.displacement + (bd.displacement - ad.displacement) * t, curvature: ad.curvature + (bd.curvature - ad.curvature) * t, profile: t < .5 ? ad.profile : bd.profile }, juliaExplorer: t < .5 ? juliaExplorerValues(a.juliaExplorer) : juliaExplorerValues(b.juliaExplorer) };
+  };
+
+  function formatJuliaConstant(values) { const c = juliaValues(values); return `(${c.cx.toFixed(2)}, ${c.cy.toFixed(2)}, ${c.cz.toFixed(2)})`; }
+  function juliaPresetSource(token) {
+    const [scope, rawIndex] = token.split(":"), index = Number(rawIndex);
+    return scope === "builtin" ? juliaBuiltinPresets[index] : juliaPresetLibrary[index];
+  }
+  function setJuliaDraft(values, note) {
+    state.julia = juliaValues(values);
+    persistJuliaProjection();
+    renderVariantControls();
+    markRunPending(note || `已暫存 Julia 常數 ${formatJuliaConstant(state.julia)}`);
+  }
+  function stopJuliaScan() {
+    if (juliaScanFrame) cancelAnimationFrame(juliaScanFrame);
+    juliaScanFrame = 0;
+    juliaScanActive = false;
+    [$("#juliaABAnimate"), $("[data-julia-scan]")].filter(Boolean).forEach(button => { button.textContent = button.id === "juliaABAnimate" ? "AB動畫" : "A → B 動畫掃描"; });
+  }
+  function startJuliaScan() {
+    if (juliaScanActive) { stopJuliaScan(); notify("已停止 Julia 常數掃描"); return; }
+    const explorer = juliaExplorerValues(), start = performance.now();
+    juliaScanActive = true;
+    [$("#juliaABAnimate"), $("[data-julia-scan]")].filter(Boolean).forEach(button => { button.textContent = "■ 停止掃描"; });
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / explorer.scanMs);
+      const eased = t * t * (3 - 2 * t);
+      appliedJuliaConstants = { cx: explorer.a.cx + (explorer.b.cx - explorer.a.cx) * eased, cy: explorer.a.cy + (explorer.b.cy - explorer.a.cy) * eased, cz: explorer.a.cz + (explorer.b.cz - explorer.a.cz) * eased };
+      if (t < 1 && juliaScanActive) { juliaScanFrame = requestAnimationFrame(tick); return; }
+      state.julia = juliaValues(explorer.b);
+      persistJuliaProjection();
+      stopJuliaScan();
+      runPending = false;
+      renderRunDock();
+      renderVariantControls();
+      notify("Julia A → B 常數掃描完成");
+    };
+    juliaScanFrame = requestAnimationFrame(tick);
+  }
+  function storeJuliaAB() {
+    if (state.kind !== "julia") { notify("請先切換至茱莉亞球"); return; }
+    const explorer = juliaExplorerValues();
+    const name = prompt("A／B 組合名稱", `Julia AB ${juliaABLibrary.length + 1}`)?.trim();
+    if (!name) return;
+    juliaABLibrary.unshift({ name, a: juliaValues(explorer.a), b: juliaValues(explorer.b), scanMs: explorer.scanMs });
+    persistJuliaExplorer();
+    renderVariantControls();
+    notify(`已收錄 A／B 組合「${name}」`);
+  }
+
+  const renderVariantControlsWithJuliaLab = renderVariantControls;
+  renderVariantControls = function () {
+    renderVariantControlsWithJuliaLab();
+    if (state.kind !== "julia") return;
+    const root = $("#variantControls"), explorer = juliaExplorerValues(), detail = juliaDetailValues();
+    const presetCards = [...juliaBuiltinPresets.map((preset, index) => ({ ...preset, token: `builtin:${index}`, local: false })), ...juliaPresetLibrary.map((preset, index) => ({ ...preset, token: `user:${index}`, local: true }))]
+      .map(preset => `<div class="julia-preset"><b>${escapeHtml(preset.name)}</b><small>${formatJuliaConstant(preset.values)}</small><div class="row"><button type="button" data-julia-preset-use="${preset.token}">套用</button><button type="button" data-julia-preset-slot="a" data-julia-preset="${preset.token}">A</button><button type="button" data-julia-preset-slot="b" data-julia-preset="${preset.token}">B</button></div>${preset.local ? `<button type="button" data-julia-preset-delete="${preset.token}" style="margin-top:5px;width:100%">刪除</button>` : ""}</div>`).join("");
+    const abSetCards = [{ name: "預設 A／B", ...juliaDefaultAB, fixed: true }, ...juliaABLibrary].map((set, index) => `<div class="julia-preset"><b>${escapeHtml(set.name)}</b><small>A ${formatJuliaConstant(set.a)} · B ${formatJuliaConstant(set.b)}</small><div class="row"><button type="button" data-julia-ab-use="${index}">套用 A／B</button>${set.fixed ? "<span></span>" : `<button type="button" data-julia-ab-delete="${index - 1}">刪除</button>`}</div></div>`).join("");
+    root.insertAdjacentHTML("beforeend", `<div class="mandel-layer-panel julia-lab"><p class="hint">JULIA CONSTANT ATLAS</p><strong>常數預設庫 · A／B 對照與掃描</strong><div class="julia-ab"><div><b>A 常數</b><small>${formatJuliaConstant(explorer.a)}</small><button type="button" class="small" data-julia-use-slot="a">查看 A</button></div><div><b>B 常數</b><small>${formatJuliaConstant(explorer.b)}</small><button type="button" class="small" data-julia-use-slot="b">查看 B</button></div></div><div class="row"><button type="button" class="small" data-julia-capture="a">目前 → A</button><button type="button" class="small" data-julia-capture="b">目前 → B</button></div><label>掃描時長 <b>${(explorer.scanMs / 1000).toFixed(1)} 秒</b><input type="range" min="1000" max="12000" step="500" value="${explorer.scanMs}" data-julia-scan-ms></label><button type="button" class="btn" data-julia-scan>A → B 動畫掃描</button><div class="row"><button type="button" class="small" data-julia-preset-save>收錄目前常數</button><button type="button" class="small" data-julia-preset-reset>重設 A／B</button></div><div class="julia-preset-grid">${presetCards}</div><p class="hint">AB COLLECTION · LOCAL</p><div class="julia-preset-grid">${abSetCards}</div></div><div class="mandel-layer-panel julia-lab"><p class="hint">DISTANCE FIELD SCULPTING</p><strong>距離場細節 · 洞穴、皺褶與刻紋</strong><div class="julia-sculpt-grid">${Object.entries(juliaSculptProfiles).map(([id, profile]) => `<button type="button" data-julia-profile="${id}" class="${detail.profile === id ? "active" : ""}">${profile.name}</button>`).join("")}</div><label>命中閾值 <b>${detail.hitEpsilon.toFixed(3)}</b><input type="range" min=".006" max=".045" step=".001" value="${detail.hitEpsilon}" data-julia-detail="hitEpsilon"></label><label>Julia 迭代 <b>${detail.iterations}</b><input type="range" min="4" max="10" step="1" value="${detail.iterations}" data-julia-detail="iterations"></label><label>Ray Marching 步數 <b>${detail.steps}</b><input type="range" min="32" max="96" step="1" value="${detail.steps}" data-julia-detail="steps"></label><label>位移雕刻 <b>${detail.displacement.toFixed(2)}</b><input type="range" min="0" max="1" step=".01" value="${detail.displacement}" data-julia-detail="displacement"></label><label>曲率著色 <b>${detail.curvature.toFixed(2)}</b><input type="range" min="0" max="1.6" step=".01" value="${detail.curvature}" data-julia-detail="curvature"></label><p class="hint">數值越細緻，Android 需要更多運算；調整後請按 Run。</p></div>`);
+    root.querySelectorAll("[data-julia-constant]").forEach(input => {
+      const syncJuliaConstantControl = event => {
+        const axis = event.currentTarget.dataset.juliaConstant;
+        state.julia = juliaValues({ ...juliaValues(), [axis]: Number(event.currentTarget.value) });
+        event.currentTarget.value = String(state.julia[axis]);
+        event.currentTarget.closest("label").querySelector("b").textContent = state.julia[axis].toFixed(2);
+        persistJuliaProjection();
+        markRunPending(`已暫存常數 C${axis === "cx" ? "ₓ" : axis === "cy" ? "ᵧ" : "𝓏"} = ${state.julia[axis].toFixed(2)} · 按 Run 套用`);
+      };
+      input.oninput = syncJuliaConstantControl;
+      input.onchange = syncJuliaConstantControl;
+    });
+    root.querySelectorAll("[data-julia-use-slot]").forEach(button => button.onclick = () => setJuliaDraft(explorer[button.dataset.juliaUseSlot], `已暫存 ${button.dataset.juliaUseSlot.toUpperCase()} 常數`));
+    root.querySelectorAll("[data-julia-capture]").forEach(button => button.onclick = () => { state.juliaExplorer = { ...juliaExplorerValues(), [button.dataset.juliaCapture]: juliaValues() }; persistJuliaExplorer(); renderVariantControls(); notify(`已將目前常數存為 ${button.dataset.juliaCapture.toUpperCase()}`); });
+    root.querySelector("[data-julia-scan-ms]").oninput = event => { state.juliaExplorer = { ...juliaExplorerValues(), scanMs: Number(event.target.value) }; persistJuliaExplorer(); event.target.closest("label").querySelector("b").textContent = `${(Number(event.target.value) / 1000).toFixed(1)} 秒`; };
+    root.querySelector("[data-julia-scan]").onclick = startJuliaScan;
+    root.querySelector("[data-julia-preset-save]").onclick = () => { const name = prompt("Julia 常數預設名稱", `Julia 常數 ${juliaPresetLibrary.length + 1}`)?.trim(); if (!name) return; juliaPresetLibrary.unshift({ name, values: juliaValues() }); persistJuliaExplorer(); renderVariantControls(); notify(`已收錄「${name}」`); };
+    root.querySelector("[data-julia-preset-reset]").onclick = () => { state.juliaExplorer = juliaExplorerValues({ a: juliaBuiltinPresets[0].values, b: juliaBuiltinPresets[1].values, scanMs: 3600 }); persistJuliaExplorer(); renderVariantControls(); notify("已重設 Julia A／B 常數"); };
+    root.querySelectorAll("[data-julia-preset-use]").forEach(button => button.onclick = () => { const preset = juliaPresetSource(button.dataset.juliaPresetUse); if (preset) setJuliaDraft(preset.values, `已暫存「${preset.name}」`); });
+    root.querySelectorAll("[data-julia-preset-slot]").forEach(button => button.onclick = () => { const preset = juliaPresetSource(button.dataset.juliaPreset); if (!preset) return; state.juliaExplorer = { ...juliaExplorerValues(), [button.dataset.juliaPresetSlot]: juliaValues(preset.values) }; persistJuliaExplorer(); renderVariantControls(); notify(`已將「${preset.name}」設為 ${button.dataset.juliaPresetSlot.toUpperCase()}`); });
+    root.querySelectorAll("[data-julia-preset-delete]").forEach(button => button.onclick = () => { juliaPresetLibrary.splice(Number(button.dataset.juliaPresetDelete.split(":")[1]), 1); persistJuliaExplorer(); renderVariantControls(); notify("已刪除 Julia 常數預設"); });
+    root.querySelectorAll("[data-julia-ab-use]").forEach(button => button.onclick = () => { const index = Number(button.dataset.juliaAbUse), set = index === 0 ? juliaDefaultAB : juliaABLibrary[index - 1]; if (!set) return; state.juliaExplorer = juliaExplorerValues(set); persistJuliaExplorer(); renderVariantControls(); notify(`已套用「${set.name || "預設 A／B"}」`); });
+    root.querySelectorAll("[data-julia-ab-delete]").forEach(button => button.onclick = () => { juliaABLibrary.splice(Number(button.dataset.juliaAbDelete), 1); persistJuliaExplorer(); renderVariantControls(); notify("已刪除 A／B 組合"); });
+    root.querySelectorAll("[data-julia-profile]").forEach(button => button.onclick = () => { const profile = juliaSculptProfiles[button.dataset.juliaProfile]; state.juliaDetail = juliaDetailValues({ ...profile, profile: button.dataset.juliaProfile }); persistJuliaExplorer(); markRunPending(`已暫存「${profile.name}」外觀`); renderVariantControls(); });
+    root.querySelectorAll("[data-julia-detail]").forEach(input => input.oninput = event => { const key = event.target.dataset.juliaDetail, value = Number(event.target.value); state.juliaDetail = juliaDetailValues({ ...juliaDetailValues(), [key]: value, profile: "custom" }); persistJuliaExplorer(); event.target.closest("label").querySelector("b").textContent = key === "hitEpsilon" ? value.toFixed(3) : key === "iterations" || key === "steps" ? String(Math.round(value)) : value.toFixed(2); markRunPending(); });
+  };
+  renderVariantControls();
+</script>
+<script>
+  // 切換離開 Julia 時先清除距離場保底球與投影節點，避免殘留在曼德盒舞台中央。
+  function purgeJuliaSceneArtifacts() {
+    if (state.kind === "julia") return;
+    const stale = [];
+    scene.traverse(node => {
+      if (/^(JuliaBulb_|Julia_Projection_)/.test(node.name || "")) stale.push(node);
+    });
+    stale.forEach(node => {
+      if (node.parent) node.parent.remove(node);
+      node.traverse(child => {
+        child.geometry?.dispose?.();
+        if (Array.isArray(child.material)) child.material.forEach(material => material.dispose?.());
+        else child.material?.dispose?.();
+      });
+    });
+    delete renderer.domElement.dataset.juliaFallback;
+    delete renderer.domElement.dataset.juliaPipeline;
+  }
+  const buildWithJuliaArtifactPurge = build;
+  build = function () { purgeJuliaSceneArtifacts(); return buildWithJuliaArtifactPurge(); };
+  const runFractalWithJuliaArtifactPurge = runFractal;
+  runFractal = function () { purgeJuliaSceneArtifacts(); return runFractalWithJuliaArtifactPurge(); };
+  $("#runFractal").onclick = runFractal;
+  renderRunDock();
+</script>
+<script>
+  // 暫存工作流：所有拉桿先更新數字與狀態，只有 Run 才建立新模型。
+  function sliderDigits(input) {
+    const step = String(input.step || "1");
+    return step.includes(".") ? step.split(".")[1].length : 0;
+  }
+  function syncRangeReadout(input) {
+    const label = input.closest("label");
+    const readout = label?.querySelector("output, b");
+    if (!readout) return;
+    const number = Number(input.value);
+    if (!Number.isFinite(number)) return;
+    readout.textContent = number.toFixed(sliderDigits(input));
+  }
+  function syncCoreParameter(input, key, output, suffix = "") {
+    const value = Number(input.value);
+    state[key] = key === "iteration" ? Math.round(clamp(value, 0, Number(input.max || 8))) : value;
+    input.value = String(state[key]);
+    $(output).textContent = `${key === "detail" ? state[key] : state[key]}${suffix}`;
+    markRunPending(`已暫存${key === "iteration" ? "遞迴層級" : key === "detail" ? "表面密度" : "結構扭轉"} ${$(output).textContent} · 按 Run 套用`);
+  }
+  [["#iteration", "iteration", "#iterOut", " 層"], ["#detail", "detail", "#detailOut", ""], ["#twist", "twist", "#twistOut", "°"]].forEach(([selector, key, output, suffix]) => {
+    const input = $(selector);
+    const sync = () => syncCoreParameter(input, key, output, suffix);
+    input.oninput = sync;
+    input.onchange = sync;
+  });
+  document.addEventListener("input", event => {
+    const input = event.target;
+    if (!(input instanceof HTMLInputElement) || input.type !== "range") return;
+    if (!["iteration", "detail", "twist"].includes(input.id) && !input.matches("[data-julia-scan-ms]")) syncRangeReadout(input);
+  });
+  const renderCatalogWithDraftSelection = renderCatalog;
+  renderCatalog = function () {
+    renderCatalogWithDraftSelection();
+    $$(".fractal-option").forEach(button => button.onclick = () => {
+      state.kind = button.dataset.kind;
+      const entry = catalog.find(item => item.id === state.kind);
+      state.iteration = Math.min(state.iteration, entry.max);
+      updateMeta();
+      renderCatalog();
+      renderRunDock();
+      markRunPending(`已選取「${entry.zh}」· 按 Run 建立此碎形`);
+    });
+  };
+  renderCatalog();
+</script>
+<script>
+  // 色盤僅暫存；採用不透明墨玄清除色，避免透明距離場在 Android WebGL 合成為白底。
+  const paletteFallback = ["#fffbe5", "#dca936", "#b66c1d"];
+  function normalizedPalette(colors) {
+    const source = Array.isArray(colors) ? colors : [];
+    return paletteFallback.map((fallback, index) => typeof source[index] === "string" && /^#[0-9a-f]{6}$/i.test(source[index]) ? source[index] : fallback);
+  }
+  function paintPalettePreview() {
+    state.palette = normalizedPalette(state.palette);
+    $("#gradient").style.background = `linear-gradient(110deg,${state.palette.join(",")})`;
+    state.palette.forEach((color, index) => {
+      const input = $(`#color${index}`), chip = $(`#colorChip${index}`);
+      input.value = color;
+      chip.style.background = color;
+    });
+    renderer.setClearColor(0x111214, 1);
+    renderer.domElement.style.background = "#111214";
+  }
+  function stagePaletteDraft(colors, message) {
+    state.palette = normalizedPalette(colors);
+    paintPalettePreview();
+    markRunPending(message || "色盤已暫存 · 按 Run 套用至碎形");
+  }
+  renderer.setClearColor(0x111214, 1);
+  renderer.domElement.style.background = "#111214";
+  [0, 1, 2].forEach(index => {
+    const input = $(`#color${index}`);
+    input.oninput = event => {
+      const colors = normalizedPalette(state.palette);
+      colors[index] = event.target.value;
+      stagePaletteDraft(colors, "自訂色盤已暫存 · 按 Run 套用至碎形");
+    };
+  });
+  $("#applyPalette").onclick = () => stagePaletteDraft([$("#color0").value, $("#color1").value, $("#color2").value], "已暫存自訂色盤 · 按 Run 套用至碎形");
+  const renderPresetsWithPaletteDraft = renderPresets;
+  renderPresets = function () {
+    renderPresetsWithPaletteDraft();
+    $$("[data-preset]").forEach(button => button.onclick = () => {
+      const preset = presets[Number(button.dataset.preset)];
+      if (preset) stagePaletteDraft(preset.colors, `已暫存「${preset.name}」· 按 Run 套用至碎形`);
+    });
+  };
+  const renderPalettesWithPaletteDraft = renderPalettes;
+  renderPalettes = function () {
+    renderPalettesWithPaletteDraft();
+    $$("[data-use]").forEach(button => button.onclick = () => {
+      const preset = palettes[Number(button.dataset.use)];
+      if (preset) stagePaletteDraft(preset.colors, `已暫存「${preset.name}」· 按 Run 套用至碎形`);
+    });
+  };
+  paintPalettePreview();
+  renderPresets();
+  renderPalettes();
+</script>
+<script>
+  // 行動捲動保護：離開舞台不再提交高成本 Julia Ray Marching；回到舞台先快速恢復畫面。
+  let juliaStageVisible = true;
+  let juliaResumeFast = false;
+  let juliaResumeTimer = 0;
+  const renderBeforeJuliaVisibilityGuard = renderer.render.bind(renderer);
+  renderer.render = function (renderScene, renderCamera) {
+    if (state.kind === "julia" && !juliaStageVisible) return;
+    renderBeforeJuliaVisibilityGuard(renderScene, renderCamera);
+  };
+  function decorateJuliaVisibilityMesh(mesh) {
+    if (!mesh?.material?.uniforms || mesh.userData.juliaVisibilityGuard) return mesh;
+    const beforeRender = mesh.onBeforeRender;
+    mesh.onBeforeRender = function (...args) {
+      beforeRender?.apply(this, args);
+      if (juliaResumeFast && this.material.uniforms.uSteps) {
+        this.material.uniforms.uSteps.value = Math.min(Number(this.material.uniforms.uSteps.value) || 24, 22);
+      }
+    };
+    mesh.userData.juliaVisibilityGuard = true;
+    return mesh;
+  }
+  const juliaPipelineWithVisibilityGuard = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    return decorateJuliaVisibilityMesh(juliaPipelineWithVisibilityGuard());
+  };
+  function decorateActiveJuliaMeshes() {
+    scene.traverse(node => {
+      if (/^JuliaBulb_Raymarch/.test(node.name || "")) decorateJuliaVisibilityMesh(node);
+    });
+  }
+  const juliaStageObserver = new IntersectionObserver(entries => {
+    const entry = entries[0];
+    juliaStageVisible = Boolean(entry?.isIntersecting);
+    clearTimeout(juliaResumeTimer);
+    if (!juliaStageVisible) {
+      juliaResumeFast = false;
+      renderer.domElement.dataset.juliaVisibility = "paused";
+      return;
+    }
+    if (state.kind !== "julia") return;
+    decorateActiveJuliaMeshes();
+    juliaResumeFast = true;
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+    resize();
+    renderer.domElement.dataset.juliaVisibility = "fast-resume";
+    juliaResumeTimer = window.setTimeout(() => {
+      juliaResumeFast = false;
+      renderer.domElement.dataset.juliaVisibility = "full";
+    }, 480);
+  }, { threshold: 0.08, rootMargin: "120px 0px" });
+  juliaStageObserver.observe(document.querySelector(".stage"));
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden && state.kind === "julia") juliaStageVisible = false;
+    if (!document.hidden) juliaStageObserver.takeRecords();
+  });
+  decorateActiveJuliaMeshes();
+</script>
+<script>
+  // Julia 參數第一列獨立換行，避免 Cₓ 與進階控制標題在行動版擠在一起。
+  const juliaControlLayoutStyle = document.createElement("style");
+  juliaControlLayoutStyle.textContent = `.julia-parameters > strong{display:block}.julia-parameters > label:first-of-type{display:block;clear:both;width:100%;margin-top:11px}.julia-parameters > label:first-of-type input{display:block;width:100%;margin-top:5px}`;
+  document.head.append(juliaControlLayoutStyle);
+
+  // 點選公式即建立；Run 仍專責參數、色盤與進階設定的確認重算。
+  const renderCatalogWithImmediateFormulaBuild = renderCatalog;
+  renderCatalog = function () {
+    renderCatalogWithImmediateFormulaBuild();
+    $$(".fractal-option").forEach(button => button.onclick = () => {
+      state.kind = button.dataset.kind;
+      const entry = catalog.find(item => item.id === state.kind);
+      state.iteration = Math.min(state.iteration, entry.max);
+      runFractal();
+      renderCatalog();
+      notify(`已建立「${entry.zh}」· 可繼續調整參數後按 Run`);
+    });
+  };
+  renderCatalog();
+
+  // 以雙向光、凹陷陰影、輪廓光與色帶深度強化 Julia Bulb 的雕塑感；不增加 Ray Marching 迭代。
+  const juliaPipelineWithSculpturalLighting = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    const mesh = juliaPipelineWithSculpturalLighting();
+    const source = "vec3 lit=base*(.14+.86*diffuse*shadow)*ao+spec*mix(uColorB,uColorC,.7)+base*fresnel*.24;";
+    const sculptural = "float rimLight=pow(1.-max(dot(n,-ray),0.),2.15);float fillLight=max(dot(n,normalize(vec3(.42,.58,-.68))),0.);float cavity=clamp(1.-ao,0.,1.);float facet=smoothstep(.09,.72,curvature);vec3 lit=base*(.10+.90*diffuse*shadow)*ao+spec*mix(uColorB,uColorC,.76)+base*rimLight*.34+uColorC*fillLight*.20+mix(uColorA,uColorC,facet)*(.08+.18*cavity);";
+    if (mesh.material.fragmentShader.includes(source)) {
+      mesh.material.fragmentShader = mesh.material.fragmentShader.replace(source, sculptural);
+      mesh.material.needsUpdate = true;
+    }
+    mesh.name = "JuliaBulb_Raymarch_DE_Sculptural_Lighting";
+    return mesh;
+  };
+</script>
+<script>
+  // 全域光影工作室：同時驅動網格材質與 Julia 距離場，讓雕塑深度與金屬高光保持一致。
+  const STUDIO_LIGHTING_KEY = "fractal-atelier-standalone-studio-lighting";
+  const studioLightingDefaults = { key: 3.9, fill: 4.6, shadow: 0.86, reflect: 1.55, gloss: 0.78 };
+  function studioLightingValues(raw = safeRead(STUDIO_LIGHTING_KEY, studioLightingDefaults)) {
+    return {
+      key: clamp(Number(raw?.key ?? studioLightingDefaults.key), 0.6, 6.5),
+      fill: clamp(Number(raw?.fill ?? studioLightingDefaults.fill), 0, 8),
+      shadow: clamp(Number(raw?.shadow ?? studioLightingDefaults.shadow), 0, 1),
+      reflect: clamp(Number(raw?.reflect ?? studioLightingDefaults.reflect), 0.2, 3),
+      gloss: clamp(Number(raw?.gloss ?? studioLightingDefaults.gloss), 0, 1),
+    };
+  }
+  let studioLighting = studioLightingValues();
+  function applyStudioLighting() {
+    const light = studioLighting;
+    sun.intensity = light.key;
+    fill.intensity = light.fill;
+    renderer.shadowMap.enabled = light.shadow > 0.04;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    sun.castShadow = light.shadow > 0.04;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.bias = -0.00018;
+    renderer.toneMappingExposure = clamp(0.84 + light.key * 0.085 + light.reflect * 0.055, 0.9, 1.55);
+    scene.traverse(node => {
+      const materials = node.material ? (Array.isArray(node.material) ? node.material : [node.material]) : [];
+      if (node.isMesh) { node.castShadow = light.shadow > 0.04; node.receiveShadow = light.shadow > 0.04; }
+      materials.forEach(material => {
+        if (!material?.isMeshPhysicalMaterial) return;
+        const base = material.userData.studioLightingBase || (material.userData.studioLightingBase = {
+          roughness: material.roughness, metalness: material.metalness, envMapIntensity: material.envMapIntensity,
+        });
+        material.metalness = clamp(base.metalness + Math.max(0, light.reflect - 1) * 0.14, 0, 1);
+        material.roughness = clamp(base.roughness * (1.08 - light.gloss * 0.62), 0.025, 1);
+        material.envMapIntensity = clamp(base.envMapIntensity * light.reflect, 0.1, 6);
+        material.needsUpdate = true;
+      });
+    });
+    renderer.domElement.dataset.studioLighting = `${light.key}|${light.fill}|${light.shadow}|${light.reflect}|${light.gloss}`;
+  }
+  function persistStudioLighting() { safeSave(STUDIO_LIGHTING_KEY, studioLighting); }
+  const studioLightingPresets = {
+    metal: { label: "金屬雕塑", values: { key: 5.1, fill: 5.2, shadow: 0.92, reflect: 2.35, gloss: 0.92 }, surface: "chrome" },
+    eclipse: { label: "日蝕金", values: { key: 4.5, fill: 3.1, shadow: 0.96, reflect: 1.8, gloss: 0.68 }, surface: "metal" },
+    ink: { label: "深墨刻", values: { key: 2.5, fill: 1.8, shadow: 1, reflect: 0.72, gloss: 0.34 }, surface: "graphite" },
+  };
+  function renderStudioLightingPanel() {
+    let panel = document.querySelector("#studioLightingPanel");
+    if (!panel) {
+      panel = document.createElement("section");
+      panel.id = "studioLightingPanel";
+      document.querySelector("#runDock")?.insertAdjacentElement("afterend", panel);
+      const style = document.createElement("style");
+      style.textContent = `#studioLightingPanel{display:grid;gap:8px;margin:0 0 13px;padding:10px;border:1px solid rgba(220,169,54,.32);background:linear-gradient(105deg,rgba(255,255,255,.025),rgba(220,169,54,.08))}#studioLightingPanel .lighting-title{display:flex;justify-content:space-between;font:10px var(--mono);letter-spacing:.1em;color:var(--gold2)}#studioLightingPanel .lighting-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 10px}#studioLightingPanel label{display:grid;gap:4px;font-size:11px}#studioLightingPanel output{color:var(--gold);font:10px var(--mono)}#studioLightingPanel input{width:100%}#studioLightingPanel .lighting-presets{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}#studioLightingPanel button{min-height:30px;border:1px solid var(--line);background:rgba(0,0,0,.18);color:var(--paper);font-size:10px}#studioLightingPanel button.active{border-color:var(--gold);background:rgba(220,169,54,.16)}@media(max-width:700px){#studioLightingPanel .lighting-grid{grid-template-columns:1fr}#studioLightingPanel .lighting-presets{grid-template-columns:repeat(3,1fr)} }`;
+      document.head.append(style);
+    }
+    const light = studioLighting;
+    panel.innerHTML = `<div class="lighting-title"><span>STUDIO LIGHTING · 光影與反射</span><span>LIVE</span></div><div class="lighting-grid"><label>主光強度 <output data-light-out="key">${light.key.toFixed(1)}</output><input data-studio-light="key" type="range" min="0.6" max="6.5" step="0.1" value="${light.key}"></label><label>補光強度 <output data-light-out="fill">${light.fill.toFixed(1)}</output><input data-studio-light="fill" type="range" min="0" max="8" step="0.1" value="${light.fill}"></label><label>陰影深度 <output data-light-out="shadow">${light.shadow.toFixed(2)}</output><input data-studio-light="shadow" type="range" min="0" max="1" step="0.01" value="${light.shadow}"></label><label>環境反射 <output data-light-out="reflect">${light.reflect.toFixed(2)}</output><input data-studio-light="reflect" type="range" min="0.2" max="3" step="0.05" value="${light.reflect}"></label><label>高光銳利 <output data-light-out="gloss">${light.gloss.toFixed(2)}</output><input data-studio-light="gloss" type="range" min="0" max="1" step="0.01" value="${light.gloss}"></label></div><div class="lighting-presets">${Object.entries(studioLightingPresets).map(([id, preset]) => `<button type="button" data-light-preset="${id}">${preset.label}</button>`).join("")}</div>`;
+    panel.querySelectorAll("[data-studio-light]").forEach(input => input.oninput = event => {
+      const key = event.target.dataset.studioLight;
+      studioLighting = studioLightingValues({ ...studioLighting, [key]: Number(event.target.value) });
+      panel.querySelector(`[data-light-out="${key}"]`).textContent = studioLighting[key].toFixed(key === "shadow" || key === "reflect" || key === "gloss" ? 2 : 1);
+      persistStudioLighting();
+      applyStudioLighting();
+    });
+    panel.querySelectorAll("[data-light-preset]").forEach(button => button.onclick = () => {
+      const preset = studioLightingPresets[button.dataset.lightPreset];
+      studioLighting = studioLightingValues(preset.values);
+      if (preset.surface) { state.surface = preset.surface; state.material = materialDefaults(surfaceSpec()); }
+      persistStudioLighting();
+      applyStudioLighting();
+      runFractal();
+      renderStudioLightingPanel();
+      notify(`已套用「${preset.label}」光影`);
+    });
+  }
+  const snapshotWithStudioLighting = snapshot;
+  snapshot = function () { return { ...snapshotWithStudioLighting(), studioLighting: { ...studioLighting } }; };
+  const applyWithStudioLighting = apply;
+  apply = function (settings) {
+    if (settings?.studioLighting) studioLighting = studioLightingValues(settings.studioLighting);
+    applyWithStudioLighting(settings);
+    persistStudioLighting();
+    applyStudioLighting();
+    renderStudioLightingPanel();
+  };
+  const buildWithStudioLighting = build;
+  build = function () { const result = buildWithStudioLighting(); applyStudioLighting(); return result; };
+  const runFractalWithStudioLighting = runFractal;
+  runFractal = function () { const result = runFractalWithStudioLighting(); applyStudioLighting(); return result; };
+  const juliaPipelineWithStudioLighting = juliaBulbRaymarchPipeline;
+  juliaBulbRaymarchPipeline = function () {
+    const mesh = juliaPipelineWithStudioLighting();
+    const uniforms = mesh.material.uniforms;
+    Object.assign(uniforms, { uStudioKey: { value: studioLighting.key }, uStudioFill: { value: studioLighting.fill }, uStudioShadow: { value: studioLighting.shadow }, uStudioReflect: { value: studioLighting.reflect }, uStudioGloss: { value: studioLighting.gloss } });
+    mesh.material.fragmentShader = mesh.material.fragmentShader
+      .replace("uniform float uAspect,uFov,uSteps,uIterations,uPower,uTime,uHitEpsilon,uDisplacement,uCurvature;", "uniform float uAspect,uFov,uSteps,uIterations,uPower,uTime,uHitEpsilon,uDisplacement,uCurvature,uStudioKey,uStudioFill,uStudioShadow,uStudioReflect,uStudioGloss;")
+      .replace("gl_FragColor=vec4(lit,1.);}", "float studioSpec=pow(max(dot(reflect(-light,n),-ray),0.),mix(24.,92.,uStudioGloss));float shadowDepth=mix(1.,.52+.48*shadow,uStudioShadow);lit*=shadowDepth*(.58+.10*uStudioKey);lit+=uColorC*max(dot(n,normalize(vec3(.42,.58,-.68))),0.)*(.035*uStudioFill)+mix(uColorB,uColorC,.55)*studioSpec*(.16+.20*uStudioReflect);gl_FragColor=vec4(lit,1.);}");
+    const beforeRender = mesh.onBeforeRender;
+    mesh.onBeforeRender = function (...args) {
+      beforeRender?.apply(this, args);
+      uniforms.uStudioKey.value = studioLighting.key;
+      uniforms.uStudioFill.value = studioLighting.fill;
+      uniforms.uStudioShadow.value = studioLighting.shadow;
+      uniforms.uStudioReflect.value = studioLighting.reflect;
+      uniforms.uStudioGloss.value = studioLighting.gloss;
+    };
+    mesh.material.needsUpdate = true;
+    mesh.name = "JuliaBulb_Raymarch_Studio_Lighting_Reflection";
+    return mesh;
+  };
+  applyStudioLighting();
+  renderStudioLightingPanel();
+</script>
 </body>
 </html>
