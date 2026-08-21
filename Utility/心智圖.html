@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>心智圖</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;
+    --ink-2:#1a1c1f;
+    --ink-3:#232629;
+    --vermilion:#942525;
+    --gold:#bd8b2a;
+    --jade:#fcfbfa;
+    --jade-dim:rgba(252,251,250,0.55);
+    --jade-faint:rgba(252,251,250,0.18);
+    --fs:19px;
+    --serif:'Noto Serif TC','Noto Serif',serif;
+    --sans:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+    --display:'Cormorant Garamond','Noto Serif TC',serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:var(--ink);color:var(--jade);font-family:var(--serif);overscroll-behavior:none;}
+  body{display:flex;flex-direction:column;}
+
+  header{
+    flex:0 0 auto;background:var(--ink-2);border-bottom:1px solid var(--jade-faint);
+    padding:8px 10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;row-gap:6px;
+  }
+  .brand{font-family:var(--display);font-weight:600;font-style:italic;font-size:1.35rem;color:var(--gold);letter-spacing:.02em;flex:0 0 auto;}
+  .brand b{font-family:var(--serif);font-style:normal;color:var(--jade);font-weight:600;margin-left:2px;}
+  .spacer{flex:1 1 auto;}
+  .ctl-group{display:flex;align-items:center;gap:2px;background:var(--ink-3);border-radius:10px;padding:3px;flex:0 0 auto;}
+  .ctl-btn{font-family:var(--sans);font-weight:700;width:34px;height:34px;border-radius:8px;border:none;background:transparent;color:var(--jade);font-size:.92rem;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .ctl-btn:active{background:var(--jade-faint);}
+  .ctl-label{font-family:var(--sans);font-size:.68rem;color:var(--jade-dim);min-width:30px;text-align:center;}
+  .menu-btn{flex:0 0 auto;width:38px;height:38px;border-radius:10px;border:1px solid var(--jade-faint);background:var(--ink-3);color:var(--jade);font-size:1.05rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .menu-btn:active{background:var(--jade-faint);}
+
+  .move-banner{
+    flex:0 0 auto;display:none;align-items:center;gap:10px;
+    background:rgba(189,139,42,0.16);border-bottom:1px solid var(--gold);
+    padding:9px 14px;font-family:var(--sans);font-size:.82rem;color:var(--jade);
+  }
+  .move-banner.show{display:flex;}
+  .move-banner .txt{flex:1 1 auto;}
+  .move-banner button{font-family:var(--sans);font-size:.78rem;font-weight:600;background:var(--ink-3);color:var(--jade);border:1px solid var(--jade-faint);border-radius:8px;padding:6px 12px;cursor:pointer;}
+
+  main{flex:1 1 auto;overflow:auto;position:relative;touch-action:pan-x pan-y;background:
+    radial-gradient(circle at 1px 1px, rgba(252,251,250,0.06) 1px, transparent 0) 0 0/22px 22px;
+  }
+  #canvas{position:relative;transform-origin:0 0;padding:40px 60px 80px 30px;}
+  svg#lines{position:absolute;top:0;left:0;overflow:visible;pointer-events:none;}
+
+  .gnode{
+    position:absolute;width:var(--node-w,168px);
+    font-size:var(--fs);
+    cursor:pointer;
+    touch-action:manipulation;
+    user-select:none;
+  }
+  .gnode-box{
+    position:relative;border-radius:14px;
+    background:color-mix(in srgb, var(--nc,var(--gold)) 16%, var(--ink-2));
+    border:1.5px solid var(--nc,var(--gold));
+    padding:9px 12px;min-height:44px;display:flex;align-items:center;
+    transition:box-shadow 0.1s;
+  }
+  .gnode[data-depth="0"] .gnode-box{
+    background:color-mix(in srgb, var(--nc,var(--gold)) 30%, var(--ink-2));
+    border-width:2px;padding:12px 16px;
+  }
+  .gnode.selected .gnode-box{box-shadow:0 0 0 3px var(--jade);}
+  .gnode-text{
+    flex:1 1 auto;min-width:0;font-family:var(--serif);font-weight:500;color:var(--jade);
+    outline:none;word-break:break-word;white-space:pre-wrap;line-height:1.4;
+    cursor:text;
+    user-select:text;
+  }
+  .gnode[data-depth="0"] .gnode-text{font-weight:700;font-size:1.1em;}
+  .gnode-text:empty::before{content:"輸入文字…";color:var(--jade-dim);}
+
+  .collapse-badge{
+    position:absolute;right:-11px;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;background:var(--ink-3);
+    border:1.5px solid var(--nc,var(--gold));color:var(--jade);
+    font-family:var(--sans);font-size:.68rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    touch-action:manipulation;
+    z-index:2;
+  }
+  .grip{
+    position:absolute;right:-38px;top:50%;transform:translateY(-50%);
+    width:34px;height:34px;border-radius:50%;background:var(--gold);color:var(--ink);
+    font-size:1.05rem;font-weight:700;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 1px 4px rgba(0,0,0,.4);touch-action:none;user-select:none;
+    cursor:grab;
+    z-index:2;
+  }
+  .gnode.has-collapse .grip{right:-70px;}
+  .gnode:active .grip, .grip:active{background:var(--vermilion);color:var(--jade);}
+
+  #dragLine{stroke:var(--gold);stroke-width:2.5;fill:none;stroke-dasharray:5 4;}
+  .branch-path{fill:none;stroke-width:2.2;opacity:.85;}
+
+  .actionbar{
+    position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--ink-2);
+    border-top:1px solid var(--jade-faint);padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+    display:flex;gap:4px;overflow-x:auto;-ms-overflow-style:none;scrollbar-width:none;
+  }
+  .actionbar::-webkit-scrollbar{display:none;}
+  .abtn{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--ink-3);border:none;border-radius:10px;padding:8px 12px;min-width:60px;color:var(--jade);cursor:pointer;touch-action:manipulation;}
+  .abtn:active{background:var(--jade-faint);}
+  .abtn .ic{font-size:1.15rem;line-height:1;}
+  .abtn .lb{font-family:var(--sans);font-size:.64rem;color:var(--jade-dim);white-space:nowrap;}
+  .abtn.danger .ic{color:var(--vermilion);}
+  .abtn.primary .ic{color:var(--gold);}
+  .abtn.active{background:var(--gold);}
+  .abtn.active .lb, .abtn.active .ic{color:var(--ink);}
+  .abtn[disabled], .abtn:disabled{opacity:0.35;pointer-events:none;}
+
+  .sheet-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;display:none;}
+  .sheet-backdrop.open{display:block;}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--ink-2);border-top:1px solid var(--jade-faint);border-radius:16px 16px 0 0;padding:10px 14px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .22s ease;}
+  .sheet.open{transform:translateY(0);}
+  .sheet h3{font-family:var(--sans);font-weight:600;font-size:.78rem;color:var(--jade-dim);text-transform:uppercase;letter-spacing:.08em;margin:14px 4px 8px;}
+  .sheet h3:first-child{margin-top:6px;}
+  .sheet-handle{width:36px;height:4px;background:var(--jade-faint);border-radius:2px;margin:2px auto 4px;}
+  .sheet-row{display:flex;align-items:center;gap:12px;width:100%;padding:13px 10px;border-radius:10px;border:none;background:transparent;color:var(--jade);font-family:var(--serif);font-size:1rem;text-align:left;cursor:pointer;touch-action:manipulation;}
+  .sheet-row:active{background:var(--jade-faint);}
+  .sheet-row .ic{width:26px;text-align:center;font-size:1.15rem;color:var(--gold);flex:0 0 auto;}
+  .sheet-row.danger .ic{color:var(--vermilion);}
+  .sheet-row .txt{flex:1 1 auto;}
+  .sheet-row .sub{font-family:var(--sans);font-size:.72rem;color:var(--jade-dim);display:block;margin-top:2px;}
+
+  .popover-backdrop{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.5);}
+  .popover-backdrop.open{display:block;}
+  .color-pop{
+    position:fixed;left:12px;right:12px;bottom:96px;z-index:51;
+    background:var(--ink-2);border:1px solid var(--jade-faint);border-radius:14px;
+    padding:14px;display:none;flex-wrap:wrap;gap:12px;justify-content:center;
+  }
+  .color-pop.open{display:flex;}
+
+  .swatch{width:44px;height:44px;border-radius:50%;border:2px solid rgba(252,251,250,0.15);cursor:pointer;touch-action:manipulation;flex:0 0 auto;}
+  .swatch.selected{border-color:var(--jade);box-shadow:0 0 0 2px var(--ink) inset;}
+
+  .toast{position:fixed;left:50%;bottom:98px;transform:translate(-50%,10px);background:var(--ink-3);border:1px solid var(--jade-faint);color:var(--jade);font-family:var(--sans);font-size:.82rem;padding:9px 16px;border-radius:20px;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;z-index:60;}
+  .toast.show{opacity:1;transform:translate(-50%,0);}
+
+  .confirm-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:70;display:none;align-items:center;justify-content:center;padding:24px;}
+  .confirm-backdrop.open{display:flex;}
+  .confirm-box{background:var(--ink-2);border:1px solid var(--jade-faint);border-radius:16px;padding:22px 20px 16px;width:100%;max-width:340px;}
+  .confirm-msg{font-family:var(--serif);font-size:1.02rem;line-height:1.6;color:var(--jade);margin-bottom:18px;white-space:pre-wrap;}
+  .confirm-actions{display:flex;gap:10px;}
+  .confirm-actions button{flex:1 1 0;font-family:var(--sans);font-weight:600;font-size:.9rem;padding:12px 10px;border-radius:10px;border:none;cursor:pointer;}
+  .confirm-cancel{background:var(--ink-3);color:var(--jade);}
+  .confirm-ok{background:var(--vermilion);color:var(--jade);}
+  .confirm-ok.neutral{background:var(--gold);color:var(--ink);}
+
+  input[type=file]{display:none;}
+</style>
+</head>
+<body>
+
+<header>
+  <!-- 設定按鈕移到最左邊 -->
+  <button class="menu-btn" id="menuBtn">☰</button>
+  <div class="brand">心智圖</div>
+  <div class="spacer"></div>
+  <div class="ctl-group">
+    <button class="ctl-btn" id="fsDown">A-</button>
+    <!-- 字型大小文字標籤已移除 -->
+    <button class="ctl-btn" id="fsUp">A+</button>
+  </div>
+  <div class="ctl-group">
+    <button class="ctl-btn" id="zoomDown">－</button>
+    <span class="ctl-label" id="zoomLabel">100%</span>
+    <button class="ctl-btn" id="zoomUp">＋</button>
+  </div>
+</header>
+
+<div class="move-banner" id="moveBanner">
+  <span class="txt">拖曳的分支：請點選新的父節點</span>
+  <button id="moveCancelBtn">取消</button>
+</div>
+
+<main id="main">
+  <div id="canvas">
+    <svg id="lines"></svg>
+  </div>
+</main>
+
+<div class="actionbar" id="actionbar">
+  <button class="abtn primary" data-act="addChild"><span class="ic">＋﹀</span><span class="lb">新增子節點</span></button>
+  <button class="abtn" data-act="addSibling"><span class="ic">＋—</span><span class="lb">新增同層</span></button>
+  <button class="abtn" data-act="moveUp"><span class="ic">↑</span><span class="lb">上移</span></button>
+  <button class="abtn" data-act="moveDown"><span class="ic">↓</span><span class="lb">下移</span></button>
+  <button class="abtn" data-act="copy"><span class="ic">⧉</span><span class="lb">拷貝分支</span></button>
+  <button class="abtn" data-act="move" id="moveBtn"><span class="ic">✥</span><span class="lb">移動分支</span></button>
+  <button class="abtn" data-act="color"><span class="ic">🎨</span><span class="lb">顏色</span></button>
+  <button class="abtn danger" data-act="delete"><span class="ic">✕</span><span class="lb">移除分支</span></button>
+</div>
+
+<div class="popover-backdrop" id="colorBackdrop"></div>
+<div class="color-pop" id="colorPop"></div>
+
+<div class="sheet-backdrop" id="sheetBackdrop"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <h3>檔案</h3>
+  <button class="sheet-row" data-act="export"><span class="ic">⇩</span><span class="txt">匯出 JSON<span class="sub">儲存目前心智圖為檔案</span></span></button>
+  <button class="sheet-row" data-act="exportTxt"><span class="ic">⇩</span><span class="txt">匯出 TXT 大綱<span class="sub">項目符號＋內縮的純文字檔</span></span></button>
+  <button class="sheet-row" data-act="import"><span class="ic">⇧</span><span class="txt">匯入 JSON<span class="sub">從檔案讀取心智圖（將覆蓋目前內容）</span></span></button>
+  <h3>其他</h3>
+  <button class="sheet-row" data-act="expandAll"><span class="ic">▾</span><span class="txt">展開全部</span></button>
+  <button class="sheet-row" data-act="collapseAll"><span class="ic">▸</span><span class="txt">摺疊全部</span></button>
+  <button class="sheet-row" data-act="howto"><span class="ic">?</span><span class="txt">如何新增分支<span class="sub">拖曳節點旁的金色圓點向右拉出</span></span></button>
+  <button class="sheet-row" data-act="cleanEmpty"><span class="ic">🧹</span><span class="txt">清除空白節點<span class="sub">移除所有沒有文字內容的節點</span></span></button>
+  <button class="sheet-row danger" data-act="newMap"><span class="ic">＋</span><span class="txt">新建心智圖<span class="sub">清空目前內容，重新開始</span></span></button>
+</div>
+
+<div class="confirm-backdrop" id="confirmBackdrop">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirmCancelBtn">取消</button>
+      <button class="confirm-ok" id="confirmOkBtn">確定</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="application/json,.json">
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PALETTE = ["#bd8b2a","#942525","#3f6b4f","#35507a","#6b4a7a","#5a6b6b","#fcfbfa"];
+  var STORAGE_KEY = "mindmap_v2_data";
+  var FS_KEY = "mindmap_v2_fontsize";
+  var FS_STEPS = [16,18,19,21,24];
+  var NODE_W_BASE = [148,158,168,182,200];
+  var ROW_GAP = 16;
+  var COL_GAP = 96;
+
+  var uidCounter = 1;
+  function uid(){ return "n" + (uidCounter++) + "_" + Date.now().toString(36); }
+
+  function seedTree(){
+    return {
+      id: uid(), text: "我的心智圖", color: PALETTE[0], collapsed:false,
+      children: [
+        { id: uid(), text: "分支一", color: PALETTE[1], collapsed:false, children:[
+          { id: uid(), text: "子項目 A", color: PALETTE[1], collapsed:false, children:[] },
+          { id: uid(), text: "子項目 B", color: PALETTE[1], collapsed:false, children:[] }
+        ]},
+        { id: uid(), text: "分支二", color: PALETTE[2], collapsed:false, children:[
+          { id: uid(), text: "子項目 C", color: PALETTE[2], collapsed:false, children:[] }
+        ]},
+        { id: uid(), text: "分支三", color: PALETTE[3], collapsed:false, children:[] }
+      ]
+    };
+  }
+
+  var root = null;
+  var selectedId = null;
+  var fsIndex = 1;
+  var zoom = 1;
+  var moveMode = false;
+  var activeOverlay = null;
+
+  function setOverlay(name){
+    activeOverlay = name;
+    moveMode = (name === "move");
+    var colorPop = document.getElementById("colorPop");
+    var colorBackdrop = document.getElementById("colorBackdrop");
+    var moveBanner = document.getElementById("moveBanner");
+    var moveBtn = document.getElementById("moveBtn");
+    var sheet = document.getElementById("sheet");
+    var sheetBackdrop = document.getElementById("sheetBackdrop");
+
+    if (name === "color") {
+      colorPop.classList.add("open");
+      colorBackdrop.classList.add("open");
+      moveBanner.classList.remove("show");
+      moveBtn.classList.remove("active");
+      sheet.classList.remove("open");
+      sheetBackdrop.classList.remove("open");
+    } else if (name === "move") {
+      colorPop.classList.remove("open");
+      colorBackdrop.classList.remove("open");
+      moveBanner.classList.add("show");
+      moveBtn.classList.add("active");
+      sheet.classList.remove("open");
+      sheetBackdrop.classList.remove("open");
+    } else if (name === "sheet") {
+      colorPop.classList.remove("open");
+      colorBackdrop.classList.remove("open");
+      moveBanner.classList.remove("show");
+      moveBtn.classList.remove("active");
+      sheet.classList.add("open");
+      sheetBackdrop.classList.add("open");
+    } else {
+      colorPop.classList.remove("open");
+      colorBackdrop.classList.remove("open");
+      moveBanner.classList.remove("show");
+      moveBtn.classList.remove("active");
+      sheet.classList.remove("open");
+      sheetBackdrop.classList.remove("open");
+    }
+  }
+
+  var nodeEls = {};
+
+  var $ = function(sel){ return document.querySelector(sel); };
+  var canvasEl = document.getElementById("canvas");
+  var svgEl = document.getElementById("lines");
+  var mainEl = document.getElementById("main");
+  var toastEl = document.getElementById("toast");
+
+  function save(){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(root)); }catch(e){}
+  }
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if(!raw) return null;
+      return sanitizeTree(JSON.parse(raw));
+    }catch(e){ return null; }
+  }
+  function sanitizeTree(node){
+    if(!node || typeof node !== "object") return null;
+    var clean = {
+      id: (typeof node.id === "string" && node.id) ? node.id : uid(),
+      text: typeof node.text === "string" ? node.text : "",
+      color: (typeof node.color === "string" && node.color) ? node.color : PALETTE[0],
+      collapsed: !!node.collapsed,
+      children: []
+    };
+    if(Array.isArray(node.children)){
+      for(var i=0;i<node.children.length;i++){
+        var c = sanitizeTree(node.children[i]);
+        if(c) clean.children.push(c);
+      }
+    }
+    return clean;
+  }
+
+  function findNode(id, node, parentArr, parentNode){
+    node = node || root;
+    if(node.id === id) return {node:node, parentArr:parentArr, parentNode:parentNode};
+    for(var i=0;i<node.children.length;i++){
+      var r = findNode(id, node.children[i], node.children, node);
+      if(r) return r;
+    }
+    return null;
+  }
+  function isDescendant(ancestorNode, targetId){
+    for(var i=0;i<ancestorNode.children.length;i++){
+      if(ancestorNode.children[i].id === targetId) return true;
+      if(isDescendant(ancestorNode.children[i], targetId)) return true;
+    }
+    return false;
+  }
+  function newNode(text, color){
+    return { id: uid(), text: text || "", color: color || PALETTE[0], collapsed:false, children:[] };
+  }
+  function cloneDeep(node){
+    return { id: uid(), text: node.text, color: node.color, collapsed: node.collapsed,
+      children: node.children.map(cloneDeep) };
+  }
+
+  function render(){
+    canvasEl.querySelectorAll(".gnode").forEach(function(el){ el.remove(); });
+    nodeEls = {};
+    var nodeW = NODE_W_BASE[fsIndex];
+    canvasEl.style.setProperty("--node-w", nodeW+"px");
+
+    var maxDepth = 0;
+    function createEl(node, depth, branchColor){
+      maxDepth = Math.max(maxDepth, depth);
+      var el = document.createElement("div");
+      el.className = "gnode";
+      el.setAttribute("data-depth", depth);
+      el.setAttribute("data-id", node.id);
+      el.style.setProperty("--nc", node.color);
+      if(node.id === selectedId) el.classList.add("selected");
+
+      var box = document.createElement("div");
+      box.className = "gnode-box";
+
+      var txt = document.createElement("div");
+      txt.className = "gnode-text";
+      txt.contentEditable = "true";
+      txt.textContent = node.text;
+
+      txt.addEventListener("pointerdown", function(e){
+        // 不阻止冒泡
+      });
+
+      txt.addEventListener("focus", function(){
+        selectedId = node.id;
+        refreshSelection();
+      });
+
+      txt.addEventListener("blur", function(){
+        var newText = txt.textContent.replace(/\n+$/,"");
+        if(newText !== node.text){ node.text = newText; save(); }
+      });
+
+      txt.addEventListener("keydown", function(e){
+        if(e.key === "Enter"){ e.preventDefault(); txt.blur(); addSibling(node.id); }
+      });
+
+      box.appendChild(txt);
+
+      var hasKids = node.children.length > 0;
+      if(hasKids){
+        var badge = document.createElement("button");
+        badge.className = "collapse-badge";
+        badge.textContent = node.collapsed ? ("+"+node.children.length) : "－";
+        badge.addEventListener("pointerdown", function(e){ e.stopPropagation(); });
+        badge.addEventListener("click", function(e){
+          e.stopPropagation();
+          node.collapsed = !node.collapsed;
+          save(); render();
+        });
+        box.appendChild(badge);
+        el.classList.add("has-collapse");
+      }
+
+      var grip = document.createElement("button");
+      grip.className = "grip";
+      grip.textContent = "＋";
+      grip.title = "向右拖曳以新增分支";
+      attachDragHandle(grip, node);
+      box.appendChild(grip);
+
+      el.addEventListener("pointerdown", function(e){
+        if (e.target.closest(".grip") || e.target.closest(".collapse-badge")) return;
+        if (moveMode) {
+          handleMoveTarget(node.id);
+          e.stopPropagation();
+          return;
+        }
+        closeColorPicker();
+        selectedId = node.id;
+        refreshSelection();
+      });
+
+      el.appendChild(box);
+      canvasEl.appendChild(el);
+      nodeEls[node.id] = el;
+
+      if(hasKids && !node.collapsed){
+        var childBranchColor = depth === 0 ? null : branchColor;
+        node.children.forEach(function(c){
+          var cbc = depth === 0 ? c.color : branchColor;
+          createEl(c, depth+1, cbc);
+        });
+      }
+    }
+    createEl(root, 0, null);
+
+    var cursor = 0;
+    var maxX = 0;
+    function layout(node, depth){
+      var el = nodeEls[node.id];
+      if (!el) return;
+      var h = el.offsetHeight || 44;
+      var x = depth * (NODE_W_BASE[fsIndex] + COL_GAP);
+      maxX = Math.max(maxX, x + NODE_W_BASE[fsIndex]);
+      var visibleKids = node.collapsed ? [] : node.children;
+      var centerY;
+      if(visibleKids.length === 0){
+        centerY = cursor + h/2;
+        cursor += h + ROW_GAP;
+      } else {
+        visibleKids.forEach(function(c){ layout(c, depth+1); });
+        var first = visibleKids[0], last = visibleKids[visibleKids.length-1];
+        centerY = (first._centerY + last._centerY) / 2;
+      }
+      node._centerY = centerY;
+      node._x = x;
+      node._h = h;
+      node._w = NODE_W_BASE[fsIndex];
+      el.style.left = x + "px";
+      el.style.top = (centerY - h/2) + "px";
+    }
+    layout(root, 0);
+    var totalH = Math.max(cursor, root._h || 44);
+
+    canvasEl.style.width = (maxX + 60) + "px";
+    canvasEl.style.height = (totalH + 40) + "px";
+    svgEl.setAttribute("width", maxX + 60);
+    svgEl.setAttribute("height", totalH + 40);
+    svgEl.innerHTML = '<line id="dragLine" style="display:none"/>';
+
+    function drawLines(node, depth, branchColor){
+      var visibleKids = node.collapsed ? [] : node.children;
+      visibleKids.forEach(function(c){
+        var cbc = depth === 0 ? c.color : branchColor;
+        var x1 = node._x + node._w, y1 = node._centerY;
+        var x2 = c._x, y2 = c._centerY;
+        var midX = (x1 + x2) / 2;
+        var path = document.createElementNS("http://www.w3.org/2000/svg","path");
+        path.setAttribute("d", "M"+x1+","+y1+" C"+midX+","+y1+" "+midX+","+y2+" "+x2+","+y2);
+        path.setAttribute("class","branch-path");
+        path.setAttribute("stroke", cbc || node.color);
+        svgEl.appendChild(path);
+        drawLines(c, depth+1, cbc);
+      });
+    }
+    drawLines(root, 0, null);
+
+    updateActionbarState();
+  }
+
+  function refreshSelection(){
+    document.querySelectorAll(".gnode.selected").forEach(function(el){ el.classList.remove("selected"); });
+    if(selectedId && nodeEls[selectedId]) nodeEls[selectedId].classList.add("selected");
+    updateActionbarState();
+  }
+
+  function updateActionbarState(){
+    var hit = selectedId ? findNode(selectedId) : null;
+    var isRoot = hit && hit.node.id === root.id;
+    ["copy","move","delete","moveUp","moveDown"].forEach(function(act){
+      var btn = document.querySelector('.abtn[data-act="'+act+'"]');
+      if(!btn) return;
+      if (isRoot) {
+        btn.setAttribute("disabled", "disabled");
+        btn.style.opacity = "0.35";
+      } else {
+        btn.removeAttribute("disabled");
+        btn.style.opacity = "1";
+      }
+    });
+  }
+
+  function focusNodeText(id, placeCursorEnd){
+    requestAnimationFrame(function(){
+      var el = nodeEls[id];
+      if(!el) return;
+      var txt = el.querySelector(".gnode-text");
+      if(!txt) return;
+      txt.focus();
+      if(placeCursorEnd){
+        var range = document.createRange();
+        range.selectNodeContents(txt);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      scrollNodeIntoView(id);
+    });
+  }
+  function scrollNodeIntoView(id){
+    var el = nodeEls[id];
+    if(!el) return;
+    el.scrollIntoView({block:"nearest", inline:"nearest", behavior:"smooth"});
+  }
+
+  function addChild(id){
+    var hit = findNode(id);
+    if(!hit) return;
+    hit.node.collapsed = false;
+    var color = hit.node === root ? PALETTE[hit.node.children.length % PALETTE.length] : hit.node.color;
+    var n = newNode("", color);
+    hit.node.children.push(n);
+    selectedId = n.id;
+    save(); render();
+    focusNodeText(n.id, true);
+  }
+  function addSibling(id){
+    var hit = findNode(id);
+    if(!hit || !hit.parentArr) return addChild(id);
+    var n = newNode("", hit.node.color);
+    var idx = hit.parentArr.indexOf(hit.node);
+    hit.parentArr.splice(idx+1, 0, n);
+    selectedId = n.id;
+    save(); render();
+    focusNodeText(n.id, true);
+  }
+  function moveSibling(id, dir){
+    var hit = findNode(id);
+    if(!hit || !hit.parentArr) return;
+    var idx = hit.parentArr.indexOf(hit.node);
+    var newIdx = idx + dir;
+    if(newIdx < 0 || newIdx >= hit.parentArr.length) return;
+    var tmp = hit.parentArr[newIdx];
+    hit.parentArr[newIdx] = hit.parentArr[idx];
+    hit.parentArr[idx] = tmp;
+    save(); render();
+    scrollNodeIntoView(id);
+  }
+  function duplicateBranch(id){
+    var hit = findNode(id);
+    if(!hit || !hit.parentArr){ toast("無法複製根節點"); return; }
+    var clone = cloneDeep(hit.node);
+    clone.text = hit.node.text ? (hit.node.text + " 副本") : "副本";
+    var idx = hit.parentArr.indexOf(hit.node);
+    hit.parentArr.splice(idx+1, 0, clone);
+    selectedId = clone.id;
+    save(); render();
+    scrollNodeIntoView(clone.id);
+    toast("已拷貝分支");
+  }
+  function deleteNode(id){
+    var hit = findNode(id);
+    if(!hit || !hit.parentArr){ toast("無法刪除根節點"); return; }
+    var label = hit.node.text || "（空白節點）";
+    var count = countNodes(hit.node) - 1;
+    var msg = count > 0 ? ('移除「'+label+'」及其 '+count+' 個子節點？') : ('移除「'+label+'」？');
+    showConfirm(msg, function(){
+      var idx = hit.parentArr.indexOf(hit.node);
+      hit.parentArr.splice(idx,1);
+      selectedId = hit.parentNode ? hit.parentNode.id : root.id;
+      save(); render();
+      toast("已移除");
+    });
+  }
+  function countNodes(node){
+    var c = 1;
+    for(var i=0;i<node.children.length;i++) c += countNodes(node.children[i]);
+    return c;
+  }
+  function pruneEmptyLeaves(){
+    var removed = 0;
+    function walk(node){
+      for(var i=node.children.length-1;i>=0;i--){
+        var c = node.children[i];
+        walk(c);
+        if(c.children.length === 0 && (!c.text || !c.text.trim())){
+          node.children.splice(i,1);
+          removed++;
+        }
+      }
+    }
+    walk(root);
+    return removed;
+  }
+  function setAllCollapsed(node, val){
+    if(node !== root) node.collapsed = val;
+    for(var i=0;i<node.children.length;i++) setAllCollapsed(node.children[i], val);
+  }
+
+  function toggleMoveMode(){
+    if(!selectedId) { toast("請先選取一個節點"); return; }
+    var hit = findNode(selectedId);
+    if(!hit || !hit.parentArr){ toast("無法移動根節點"); return; }
+    setOverlay(activeOverlay === "move" ? null : "move");
+  }
+  function exitMoveMode(){
+    if(activeOverlay === "move") setOverlay(null);
+  }
+  document.getElementById("moveCancelBtn").addEventListener("click", exitMoveMode);
+  function handleMoveTarget(targetId){
+    if(!selectedId){ exitMoveMode(); return; }
+    if(targetId === selectedId){ toast("無法移到自己底下"); return; }
+    var hit = findNode(selectedId);
+    if(!hit){ exitMoveMode(); return; }
+    if(isDescendant(hit.node, targetId)){ toast("無法移到自己的子節點底下"); return; }
+    var targetHit = findNode(targetId);
+    if(!targetHit){ exitMoveMode(); return; }
+    var idx = hit.parentArr.indexOf(hit.node);
+    hit.parentArr.splice(idx,1);
+    targetHit.node.children.push(hit.node);
+    targetHit.node.collapsed = false;
+    save(); render();
+    exitMoveMode();
+    scrollNodeIntoView(hit.node.id);
+    toast("已移動分支");
+  }
+
+  var dragLineEl;
+  function attachDragHandle(handle, originNode){
+    handle.addEventListener("pointerdown", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      closeColorPicker();
+      exitMoveMode();
+      try{ handle.setPointerCapture(e.pointerId); }catch(err){}
+      var startX = e.clientX, startY = e.clientY;
+      dragLineEl = document.getElementById("dragLine");
+      var originEl = nodeEls[originNode.id];
+      if (!originEl) return;
+      var ox = originNode._x + originNode._w;
+      var oy = originNode._centerY;
+
+      function toCanvas(clientX, clientY){
+        var rect = canvasEl.getBoundingClientRect();
+        return { x: (clientX - rect.left)/zoom, y: (clientY - rect.top)/zoom };
+      }
+      function onMove(ev){
+        var p = toCanvas(ev.clientX, ev.clientY);
+        dragLineEl.style.display = "";
+        dragLineEl.setAttribute("x1", ox);
+        dragLineEl.setAttribute("y1", oy);
+        dragLineEl.setAttribute("x2", p.x);
+        dragLineEl.setAttribute("y2", p.y);
+      }
+      function onUp(ev){
+        document.removeEventListener("pointermove", onMove);
+        document.removeEventListener("pointerup", onUp);
+        if(dragLineEl) dragLineEl.style.display = "none";
+        addChild(originNode.id);
+      }
+      document.addEventListener("pointermove", onMove);
+      document.addEventListener("pointerup", onUp);
+    });
+  }
+
+  mainEl.addEventListener("click", function(e){
+    if(e.target === mainEl || e.target === canvasEl || e.target === svgEl){
+      if(moveMode){ exitMoveMode(); return; }
+    }
+  });
+
+  document.getElementById("actionbar").addEventListener("click", function(e){
+    var btn = e.target.closest(".abtn");
+    if(!btn || btn.disabled) return;
+    var act = btn.getAttribute("data-act");
+    if(act !== "color") closeColorPicker();
+    var id = selectedId || root.id;
+    if(act === "addChild") addChild(id);
+    else if(act === "addSibling") addSibling(id);
+    else if(act === "moveUp") moveSibling(id, -1);
+    else if(act === "moveDown") moveSibling(id, 1);
+    else if(act === "copy") duplicateBranch(id);
+    else if(act === "move") toggleMoveMode();
+    else if(act === "color") openColorPicker();
+    else if(act === "delete") deleteNode(id);
+  });
+
+  var colorPop = document.getElementById("colorPop");
+  var colorBackdrop = document.getElementById("colorBackdrop");
+  function openColorPicker(){
+    if(!selectedId) { toast("請先點選一個節點"); return; }
+    var hit = findNode(selectedId);
+    if(!hit) return;
+    colorPop.innerHTML = "";
+    PALETTE.forEach(function(c){
+      var sw = document.createElement("button");
+      sw.className = "swatch" + (hit.node.color === c ? " selected" : "");
+      sw.style.background = c;
+      sw.addEventListener("click", function(){
+        closeColorPicker();
+        hit.node.color = c;
+        save(); render();
+      });
+      colorPop.appendChild(sw);
+    });
+    setOverlay("color");
+  }
+  function closeColorPicker(){
+    if(activeOverlay === "color") setOverlay(null);
+  }
+  colorBackdrop.addEventListener("click", closeColorPicker);
+  document.addEventListener("pointerdown", function(e){
+    if(activeOverlay === "color" && !colorPop.contains(e.target)){
+      closeColorPicker();
+    }
+  }, true);
+
+  function applyFontSize(){
+    document.documentElement.style.setProperty("--fs", FS_STEPS[fsIndex]+"px");
+    // 已移除文字標籤，不再更新
+    try{ localStorage.setItem(FS_KEY, String(fsIndex)); }catch(e){}
+    render();
+  }
+  document.getElementById("fsUp").addEventListener("click", function(){ if(fsIndex < FS_STEPS.length-1){ fsIndex++; applyFontSize(); } });
+  document.getElementById("fsDown").addEventListener("click", function(){ if(fsIndex > 0){ fsIndex--; applyFontSize(); } });
+
+  function applyZoom(){
+    canvasEl.style.transform = "scale("+zoom+")";
+    document.getElementById("zoomLabel").textContent = Math.round(zoom*100)+"%";
+  }
+  document.getElementById("zoomUp").addEventListener("click", function(){ zoom = Math.min(1.6, +(zoom+0.1).toFixed(2)); applyZoom(); });
+  document.getElementById("zoomDown").addEventListener("click", function(){ zoom = Math.max(0.6, +(zoom-0.1).toFixed(2)); applyZoom(); });
+
+  var sheet = document.getElementById("sheet");
+  var sheetBackdrop = document.getElementById("sheetBackdrop");
+  function openSheet(){ setOverlay("sheet"); }
+  function closeSheet(){ if(activeOverlay === "sheet") setOverlay(null); }
+  document.getElementById("menuBtn").addEventListener("click", openSheet);
+  sheetBackdrop.addEventListener("click", closeSheet);
+  sheet.addEventListener("click", function(e){
+    var row = e.target.closest(".sheet-row");
+    if(!row) return;
+    var act = row.getAttribute("data-act");
+    closeSheet();
+    if(act === "export") exportJson();
+    else if(act === "exportTxt") exportTxt();
+    else if(act === "import") document.getElementById("fileInput").click();
+    else if(act === "expandAll"){ setAllCollapsed(root, false); save(); render(); }
+    else if(act === "collapseAll"){ setAllCollapsed(root, true); save(); render(); }
+    else if(act === "howto"){ toast("拖曳節點右側的金色圓點，向右拉出即可新增子分支"); }
+    else if(act === "cleanEmpty"){
+      var n = pruneEmptyLeaves();
+      if(n === 0){ toast("沒有找到空白節點"); }
+      else { selectedId = root.id; save(); render(); toast("已移除 "+n+" 個空白節點"); }
+    }
+    else if(act === "newMap"){
+      showConfirm("清空目前心智圖並重新開始？此動作無法復原。", function(){
+        root = seedTree();
+        root.text = "新的心智圖";
+        selectedId = root.id;
+        save(); render();
+        toast("已建立新心智圖");
+      });
+    }
+  });
+
+  function exportJson(){
+    var data = JSON.stringify(root, null, 2);
+    var blob = new Blob([data], {type:"application/json"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var d = new Date();
+    var stamp = d.getFullYear() + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0");
+    a.href = url; a.download = "心智圖_" + stamp + ".json";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    toast("已匯出 JSON 檔案");
+  }
+  function exportTxt(){
+    var lines = [];
+    function walk(node, depth){
+      var indent = "  ".repeat(depth);
+      var bullet = depth === 0 ? "" : "• ";
+      lines.push(indent + bullet + (node.text || "（未命名）"));
+      node.children.forEach(function(c){ walk(c, depth+1); });
+    }
+    walk(root, 0);
+    var text = lines.join("\n");
+    var blob = new Blob([text], {type:"text/plain;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    var d = new Date();
+    var stamp = d.getFullYear() + String(d.getMonth()+1).padStart(2,"0") + String(d.getDate()).padStart(2,"0");
+    a.href = url; a.download = "心智圖_" + stamp + ".txt";
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+    toast("已匯出 TXT 大綱檔案");
+  }
+  document.getElementById("fileInput").addEventListener("change", function(e){
+    var file = e.target.files && e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      var parsed;
+      try{ parsed = JSON.parse(reader.result); }
+      catch(err){ toast("讀取失敗：檔案不是有效的 JSON"); e.target.value=""; return; }
+      var clean = sanitizeTree(parsed);
+      if(!clean){ toast("讀取失敗：JSON 格式不符"); e.target.value=""; return; }
+      showConfirm("匯入將覆蓋目前的心智圖內容，確定要繼續嗎？", function(){
+        root = clean; selectedId = root.id;
+        save(); render();
+        toast("匯入成功");
+      });
+      e.target.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  var toastTimer = null;
+  function toast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add("show");
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove("show"); }, 2400);
+  }
+
+  var confirmBackdrop = document.getElementById("confirmBackdrop");
+  var confirmMsg = document.getElementById("confirmMsg");
+  var confirmOkBtn = document.getElementById("confirmOkBtn");
+  var confirmCancelBtn = document.getElementById("confirmCancelBtn");
+  function showConfirm(msg, onConfirm){
+    confirmMsg.textContent = msg;
+    confirmBackdrop.classList.add("open");
+    confirmOkBtn.onclick = function(){
+      confirmBackdrop.classList.remove("open");
+      onConfirm();
+    };
+    confirmCancelBtn.onclick = function(){
+      confirmBackdrop.classList.remove("open");
+    };
+  }
+  confirmBackdrop.addEventListener("click", function(e){
+    if(e.target === confirmBackdrop) confirmBackdrop.classList.remove("open");
+  });
+
+  function init(){
+    var savedFs = null;
+    try{ savedFs = localStorage.getItem(FS_KEY); }catch(e){}
+    if(savedFs !== null && FS_STEPS[parseInt(savedFs,10)]){ fsIndex = parseInt(savedFs,10); }
+    var savedTree = loadSaved();
+    root = savedTree || seedTree();
+    selectedId = root.id;
+    applyZoom();
+    applyFontSize();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

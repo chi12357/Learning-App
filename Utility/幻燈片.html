@@ -262,50 +262,50 @@
     <div class="picker-row">
       <button class="big-btn" id="pick-photos">
         <span class="icon">🖼️</span>
-        <span>選擇相片資料夾</span>
+        <span>選相片</span>
         <span class="status" id="photo-status">尚未選擇</span>
       </button>
       <button class="big-btn" id="pick-photos-library" style="display:none;">
         <span class="icon">📷</span>
-        <span>選擇相片（從照片圖庫）</span>
+        <span>選相片</span>
         <span class="status" id="photo-library-status">尚未選擇</span>
       </button>
       <button class="big-btn" id="pick-music">
         <span class="icon">🎵</span>
-        <span>選擇音樂資料夾（可略過）</span>
+        <span>選音樂</span>
         <span class="status" id="music-status">尚未選擇</span>
       </button>
     </div>
 
-    <button id="start-action" disabled>開始播放</button>
+    <button id="start-action" disabled>播放</button>
 
     <div class="option-row">
       <div class="option-group">
-        <label>播放順序</label>
+        <label>順序</label>
         <div class="toggle-pair" id="order-toggle">
           <button data-mode="sequential" class="active">循序</button>
           <button data-mode="random">隨機</button>
         </div>
       </div>
       <div class="option-group">
-        <label>每張秒數</label>
+        <label>秒數</label>
         <input type="range" id="duration-range" min="3" max="100" value="8">
         <span id="duration-label">8 秒</span>
       </div>
       <div class="option-group">
-        <label>放大比例</label>
+        <label>放大</label>
         <input type="range" id="zoom-range" min="100" max="300" step="10" value="100">
         <span id="zoom-label">100%</span>
       </div>
       <div class="option-group">
-        <label>放大前先看原圖</label>
+        <label>先看原圖</label>
         <div class="toggle-pair" id="original-toggle">
           <button data-val="off" class="active">關閉</button>
           <button data-val="on">開啟</button>
         </div>
       </div>
       <div class="option-group">
-        <label>高畫質放大</label>
+        <label>高畫質</label>
         <div class="toggle-pair" id="hq-toggle">
           <button data-val="off" class="active">關閉</button>
           <button data-val="on">開啟</button>
@@ -337,9 +337,9 @@
         <button class="ctrl-btn" id="gear-btn"><span class="ic">⚙️</span><span class="lb">設定</span></button>
       </div>
       <div id="bottom-bar">
-        <button class="ctrl-btn" id="prev-btn"><span class="ic">⏮</span><span class="lb">上一張</span></button>
+        <button class="ctrl-btn" id="prev-btn"><span class="ic">⏮</span><span class="lb">上張</span></button>
         <button class="ctrl-btn primary" id="play-btn"><span class="ic"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path id="play-icon-path" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></span><span class="lb">暫停</span></button>
-        <button class="ctrl-btn" id="next-btn"><span class="ic">⏭</span><span class="lb">下一張</span></button>
+        <button class="ctrl-btn" id="next-btn"><span class="ic">⏭</span><span class="lb">下張</span></button>
         <button class="ctrl-btn" id="order-btn"><span class="ic">🔀</span><span class="lb" id="order-lb">隨機</span></button>
         <button class="ctrl-btn" id="mute-btn"><span class="ic" id="mute-icon">🔊</span><span class="lb">音樂</span></button>
         <button class="ctrl-btn" id="fullscreen-btn"><span class="ic">⛶</span><span class="lb">全螢幕</span></button>
@@ -352,43 +352,43 @@
       <div id="settings-card">
         <h2>設定</h2>
         <div class="settings-row">
-          <label>每張相片秒數</label>
+          <label>秒數</label>
           <input type="range" id="duration-range-2" min="3" max="100" value="8">
           <span class="val" id="duration-label-2">8 秒</span>
         </div>
         <div class="settings-row">
-          <label>播放順序</label>
+          <label>順序</label>
           <div class="toggle-pair" id="order-toggle-2">
             <button data-mode="sequential">循序</button>
             <button data-mode="random">隨機</button>
           </div>
         </div>
         <div class="settings-row">
-          <label>放大比例</label>
+          <label>放大</label>
           <input type="range" id="zoom-range-2" min="100" max="300" step="10" value="100">
           <span class="val" id="zoom-label-2">100%</span>
         </div>
         <div class="settings-row">
-          <label>放大前先看原圖</label>
+          <label>先看原圖</label>
           <div class="toggle-pair" id="original-toggle-2">
             <button data-val="off" class="active">關閉</button>
             <button data-val="on">開啟</button>
           </div>
         </div>
         <div class="settings-row">
-          <label>高畫質放大</label>
+          <label>高畫質</label>
           <div class="toggle-pair" id="hq-toggle-2">
             <button data-val="off" class="active">關閉</button>
             <button data-val="on">開啟</button>
           </div>
         </div>
         <div class="settings-row">
-          <label>音樂音量</label>
+          <label>音量</label>
           <input type="range" id="volume-range" min="0" max="100" value="70">
           <span class="val" id="volume-label">70%</span>
         </div>
         <div class="settings-row">
-          <label>螢幕自動關閉</label>
+          <label>自動關閉</label>
           <div class="toggle-pair" id="screen-off-toggle">
             <button data-val="0" class="active">從不</button>
             <button data-val="15">15分</button>
@@ -397,12 +397,12 @@
           </div>
         </div>
         <div class="settings-btn-row">
-          <button class="big-btn" id="reselect-photos"><span class="icon">🖼️</span><span>重新選相片資料夾</span></button>
-          <button class="big-btn" id="reselect-photos-library" style="display:none;"><span class="icon">📷</span><span>從照片圖庫重新選</span></button>
-          <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>重新選音樂資料夾</span></button>
+          <button class="big-btn" id="reselect-photos"><span class="icon">🖼️</span><span>換相片</span></button>
+          <button class="big-btn" id="reselect-photos-library" style="display:none;"><span class="icon">📷</span><span>換相片</span></button>
+          <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>換音樂</span></button>
           <button class="big-btn" id="open-playlists-btn-2" style="display:none;"><span class="icon">📚</span><span>播放清單</span></button>
         </div>
-        <button id="close-settings">關閉設定</button>
+        <button id="close-settings">關閉</button>
       </div>
     </div>
   </div>
@@ -414,8 +414,8 @@
       <p class="panel-hint">一個清單可以包含好幾個相片／音樂資料夾，播放時會把它們合併在一起輪流播放。（需要瀏覽器支援資料夾授權，例如電腦版 Chrome / Edge）</p>
       <div id="playlist-list"></div>
       <div class="settings-btn-row">
-        <button class="big-btn" id="new-playlist-btn"><span class="icon">➕</span><span>新增清單</span></button>
-        <button class="big-btn" id="import-playlist-btn"><span class="icon">📥</span><span>匯入清單</span></button>
+        <button class="big-btn" id="new-playlist-btn"><span class="icon">➕</span><span>新增</span></button>
+        <button class="big-btn" id="import-playlist-btn"><span class="icon">📥</span><span>匯入</span></button>
       </div>
       <button id="close-playlist-panel">關閉</button>
     </div>
@@ -426,20 +426,20 @@
     <div id="playlist-edit-card">
       <div class="settings-row">
         <h2 id="playlist-edit-title">清單內容</h2>
-        <button id="rename-playlist-btn" class="small-btn">重新命名</button>
+        <button id="rename-playlist-btn" class="small-btn">改名</button>
       </div>
       <h3>相片資料夾</h3>
       <div id="playlist-photo-dirs" class="dir-list"></div>
-      <button class="big-btn wide-btn" id="add-photo-dir-btn"><span class="icon">🖼️</span><span>新增相片資料夾</span></button>
+      <button class="big-btn wide-btn" id="add-photo-dir-btn"><span class="icon">🖼️</span><span>新增相片</span></button>
       <h3>音樂資料夾</h3>
       <div id="playlist-music-dirs" class="dir-list"></div>
-      <button class="big-btn wide-btn" id="add-music-dir-btn"><span class="icon">🎵</span><span>新增音樂資料夾</span></button>
+      <button class="big-btn wide-btn" id="add-music-dir-btn"><span class="icon">🎵</span><span>新增音樂</span></button>
       <div class="settings-btn-row">
-        <button class="big-btn" id="use-playlist-btn"><span class="icon">▶️</span><span>使用這個清單</span></button>
-        <button class="big-btn" id="export-playlist-btn"><span class="icon">📤</span><span>匯出清單</span></button>
-        <button class="big-btn" id="delete-playlist-btn"><span class="icon">🗑️</span><span>刪除清單</span></button>
+        <button class="big-btn" id="use-playlist-btn"><span class="icon">▶️</span><span>使用</span></button>
+        <button class="big-btn" id="export-playlist-btn"><span class="icon">📤</span><span>匯出</span></button>
+        <button class="big-btn" id="delete-playlist-btn"><span class="icon">🗑️</span><span>刪除</span></button>
       </div>
-      <button id="close-playlist-edit">返回清單</button>
+      <button id="close-playlist-edit">返回</button>
     </div>
   </div>
 
@@ -1534,7 +1534,7 @@
         '<div class="meta"><div class="name"></div><div class="count"></div></div>' +
         '<div class="actions">' +
           '<button class="small-btn" data-act="use">使用</button>' +
-          '<button class="small-btn" data-act="view">查看內容</button>' +
+          '<button class="small-btn" data-act="view">查看</button>' +
         '</div>';
       row.querySelector('.name').textContent = pl.name;
       row.querySelector('.count').textContent =
@@ -1543,8 +1543,8 @@
         if (pl.photoDirs.length === 0){
           const pending = pl.pendingPhotoNames || [];
           alert(pending.length > 0
-            ? '這個清單裡的相片資料夾還沒有連結，請先「查看內容」把它們連結起來。'
-            : '這個清單還沒有加入任何相片資料夾，請先「查看內容」新增。');
+            ? '這個清單裡的相片資料夾還沒有連結，請先「查看」把它們連結起來。'
+            : '這個清單還沒有加入任何相片資料夾，請先「查看」新增。');
           openPlaylistEdit(pl.id);
           return;
         }
@@ -1670,7 +1670,7 @@
       if (pending.length > 0){
         alert('相片資料夾「' + pending.join('、') + '」還沒有連結，請先按下方的「選擇資料夾」把它們連結起來，才能使用這個清單。');
       } else {
-        alert('這個清單還沒有加入任何相片資料夾，請先按「新增相片資料夾」。');
+        alert('這個清單還沒有加入任何相片資料夾，請先按「新增相片」。');
       }
       return;
     }

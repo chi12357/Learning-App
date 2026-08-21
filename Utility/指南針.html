@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#121315">
+<title>即時方向路徑錶</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body {
+    width:100%; height:100%; overflow:hidden;
+    background:#121315; color:#fcfbfa;
+    font-family:'Noto Serif TC','Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  #app {
+    width:100%; height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    position:relative;
+  }
+  #dial-container {
+    position:relative;
+    width:min(92vw, 92vh);
+    height:min(92vw, 92vh);
+    max-width:520px; max-height:520px;
+    touch-action:manipulation;
+  }
+  #compass-ring {
+    position:absolute; top:0; left:0;
+    width:100%; height:100%;
+    transform:rotate(0deg);
+    transition:transform 0.3s ease-out;
+    pointer-events:none;
+  }
+  #inner-circle {
+    position:absolute; top:10%; left:10%;
+    width:80%; height:80%; border-radius:50%;
+    background:rgba(18,19,21,0.95);
+    border:1px solid rgba(252,251,250,0.1);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center;
+    padding:8%;
+    overflow:hidden;
+  }
+  #mode-title {
+    font-size:clamp(18px, 5vw, 28px);
+    color:#bd8b2a;
+    margin-bottom:8px;
+    font-family:'Noto Serif TC',serif;
+    letter-spacing:2px;
+    font-weight:600;
+  }
+  .mode-content {
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    width:100%;
+  }
+  .mode-content.active { display:flex; }
+
+  /* 指南針 */
+  #compass-deg {
+    font-size:clamp(48px, 14vw, 80px);
+    font-weight:300; color:#fcfbfa;
+    font-family:'Cormorant Garamond','Inter',serif;
+    line-height:1;
+  }
+  #compass-dir {
+    font-size:clamp(20px, 6vw, 32px);
+    color:#942525;
+    font-family:'Noto Serif TC',serif;
+    font-weight:600;
+  }
+  .compass-hint {
+    font-size:clamp(12px, 3vw, 16px);
+    color:#fcfbfa; opacity:0.5;
+    margin-top:4px;
+  }
+
+  /* 記錄 */
+  .record-hint {
+    font-size:clamp(14px, 4vw, 20px);
+    color:#fcfbfa; opacity:0.7;
+  }
+  #record-btn {
+    width:clamp(80px, 22vw, 120px);
+    height:clamp(80px, 22vw, 120px);
+    border-radius:50%;
+    background:#942525;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    box-shadow:0 0 20px rgba(148,37,37,0.4);
+    transition:transform 0.15s, box-shadow 0.15s;
+    user-select:none;
+    touch-action:manipulation;
+    margin:8px 0;
+  }
+  #record-btn:active {
+    transform:scale(0.92);
+    box-shadow:0 0 10px rgba(148,37,37,0.3);
+  }
+  #record-btn span {
+    font-size:clamp(16px, 5vw, 24px);
+    color:#fcfbfa;
+    font-family:'Noto Serif TC',serif;
+    font-weight:600;
+  }
+  #record-count {
+    font-size:clamp(14px, 4vw, 18px);
+    color:#bd8b2a;
+    font-weight:500;
+  }
+  #record-name {
+    font-size:clamp(12px, 3.5vw, 16px);
+    color:#fcfbfa; opacity:0.5;
+  }
+
+  /* 顯示 */
+  #display-waypoint-list {
+    width:100%;
+    max-height:clamp(120px, 30vw, 200px);
+    overflow-y:auto;
+    font-size:clamp(13px, 3.5vw, 17px);
+    line-height:1.6;
+    text-align:left;
+    padding:0 4px;
+  }
+  #display-waypoint-list::-webkit-scrollbar { width:4px; }
+  #display-waypoint-list::-webkit-scrollbar-thumb {
+    background:rgba(189,139,42,0.5); border-radius:2px;
+  }
+  .wp-item {
+    border-bottom:1px solid rgba(252,251,250,0.08);
+    padding:6px 0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+  }
+  .wp-coord { color:#fcfbfa; opacity:0.9; }
+  .wp-meta { color:#942525; font-size:0.9em; white-space:nowrap; margin-left:6px; }
+  .wp-dist { color:#bd8b2a; font-size:0.85em; }
+  #display-total {
+    font-size:clamp(12px, 3.5vw, 16px);
+    color:#bd8b2a;
+    margin-top:4px;
+  }
+
+  /* 設定 */
+  .setting-row {
+    width:100%; display:flex;
+    flex-direction:column;
+    gap:10px; align-items:center;
+  }
+  .setting-input {
+    width:85%;
+    padding:10px 14px;
+    border-radius:8px;
+    border:1px solid rgba(252,251,250,0.2);
+    background:rgba(252,251,250,0.05);
+    color:#fcfbfa;
+    font-size:clamp(14px, 4vw, 18px);
+    font-family:'Noto Serif TC',serif;
+    text-align:center;
+    outline:none;
+    transition:border-color 0.2s;
+  }
+  .setting-input:focus { border-color:#bd8b2a; }
+  .setting-input::placeholder { color:rgba(252,251,250,0.3); }
+  .setting-row-inline {
+    display:flex; align-items:center;
+    gap:8px; width:85%;
+    justify-content:center;
+  }
+  .setting-label {
+    font-size:clamp(13px, 3.5vw, 16px);
+    color:#fcfbfa; opacity:0.7;
+    white-space:nowrap;
+  }
+  .setting-num {
+    width:60px; padding:8px;
+    border-radius:6px;
+    border:1px solid rgba(252,251,250,0.2);
+    background:rgba(252,251,250,0.05);
+    color:#fcfbfa;
+    font-size:clamp(14px, 4vw, 18px);
+    text-align:center;
+    outline:none;
+  }
+  .setting-num:focus { border-color:#bd8b2a; }
+  #setting-total {
+    font-size:clamp(12px, 3.5vw, 15px);
+    color:#bd8b2a;
+  }
+  .btn-group {
+    display:flex; gap:8px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-top:4px;
+  }
+  .btn-gold {
+    padding:8px 14px; border-radius:20px;
+    border:1px solid #bd8b2a;
+    background:transparent; color:#bd8b2a;
+    font-size:clamp(12px, 3.5vw, 15px);
+    font-family:'Noto Serif TC',serif;
+    cursor:pointer; touch-action:manipulation;
+    transition:background 0.2s, color 0.2s;
+  }
+  .btn-gold:active { background:#bd8b2a; color:#121315; }
+  .btn-red {
+    padding:8px 14px; border-radius:20px;
+    border:1px solid #942525;
+    background:transparent; color:#942525;
+    font-size:clamp(12px, 3.5vw, 15px);
+    font-family:'Noto Serif TC',serif;
+    cursor:pointer; touch-action:manipulation;
+    transition:background 0.2s, color 0.2s;
+  }
+  .btn-red:active { background:#942525; color:#fcfbfa; }
+  .btn-gray {
+    padding:8px 14px; border-radius:20px;
+    border:1px solid rgba(252,251,250,0.3);
+    background:transparent; color:#fcfbfa;
+    opacity:0.6;
+    font-size:clamp(12px, 3.5vw, 15px);
+    font-family:'Noto Serif TC',serif;
+    cursor:pointer; touch-action:manipulation;
+    transition:opacity 0.2s;
+  }
+  .btn-gray:active { opacity:1; }
+
+  /* 模式列 */
+  #mode-bar {
+    position:fixed;
+    bottom:max(16px, 2vh);
+    left:0; right:0;
+    display:flex;
+    justify-content:center;
+    gap:max(8px, 2vw);
+    padding:0 16px;
+    z-index:10;
+  }
+  .mode-btn {
+    padding:max(10px, 2.5vw) max(16px, 4vw);
+    border-radius:28px;
+    border:2px solid rgba(252,251,250,0.25);
+    background:transparent;
+    color:#fcfbfa;
+    font-size:clamp(16px, 4.5vw, 22px);
+    font-family:'Noto Serif TC',serif;
+    cursor:pointer;
+    transition:all 0.2s;
+    min-width:max(72px, 18vw);
+    touch-action:manipulation;
+    font-weight:500;
+  }
+  .mode-btn.active {
+    border-color:#942525;
+    background:#942525;
+    color:#fcfbfa;
+    box-shadow:0 4px 16px rgba(148,37,37,0.35);
+  }
+  .mode-btn:active { transform:scale(0.96); }
+
+  /* Toast */
+  #toast {
+    position:fixed;
+    top:max(16px, 2vh);
+    left:50%;
+    transform:translateX(-50%) translateY(-120%);
+    background:rgba(189,139,42,0.95);
+    color:#121315;
+    padding:max(10px, 2vh) max(20px, 5vw);
+    border-radius:12px;
+    font-size:clamp(15px, 4vw, 20px);
+    font-family:'Noto Serif TC',serif;
+    transition:transform 0.3s ease;
+    z-index:20;
+    white-space:nowrap;
+    font-weight:600;
+    box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  }
+  #toast.show { transform:translateX(-50%) translateY(0); }
+
+  /* 模擬轉環提示 */
+  .bezel-hint {
+    position:absolute;
+    bottom:max(80px, 10vh);
+    font-size:clamp(11px, 3vw, 14px);
+    color:#fcfbfa;
+    opacity:0.25;
+    letter-spacing:1px;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- 圓形面板 -->
+  <div id="dial-container">
+    <svg id="compass-ring" viewBox="0 0 400 400">
+      <circle cx="200" cy="200" r="190" fill="none" stroke="#fcfbfa" stroke-width="2" opacity="0.15"/>
+      <circle cx="200" cy="200" r="170" fill="none" stroke="#fcfbfa" stroke-width="1" opacity="0.08"/>
+      <g id="ticks"></g>
+      <text x="200" y="35" text-anchor="middle" fill="#942525" font-size="28" font-weight="bold" font-family="'Noto Serif TC',serif">北</text>
+      <text x="200" y="75" text-anchor="middle" fill="#fcfbfa" font-size="14" opacity="0.7">N</text>
+      <text x="365" y="208" text-anchor="middle" fill="#fcfbfa" font-size="20" font-family="'Noto Serif TC',serif">東</text>
+      <text x="200" y="385" text-anchor="middle" fill="#fcfbfa" font-size="20" font-family="'Noto Serif TC',serif">南</text>
+      <text x="35" y="208" text-anchor="middle" fill="#fcfbfa" font-size="20" font-family="'Noto Serif TC',serif">西</text>
+      <polygon points="200,30 190,60 200,55 210,60" fill="#942525"/>
+      <polygon points="200,370 190,340 200,345 210,340" fill="#fcfbfa" opacity="0.4"/>
+    </svg>
+
+    <div id="inner-circle">
+      <div id="mode-title">指南針</div>
+
+      <!-- 指南針 -->
+      <div id="content-compass" class="mode-content active">
+        <div id="compass-deg">0°</div>
+        <div id="compass-dir">北</div>
+        <div class="compass-hint">傾斜手機可校準方位</div>
+      </div>
+
+      <!-- 記錄 -->
+      <div id="content-record" class="mode-content">
+        <div class="record-hint">點擊面板記錄航點</div>
+        <div id="record-btn"><span>記錄</span></div>
+        <div id="record-count">已記錄 0 點</div>
+        <div id="record-name">軌跡：未命名</div>
+      </div>
+
+      <!-- 顯示 -->
+      <div id="content-display" class="mode-content">
+        <div id="display-waypoint-list">
+          <div style="color:#fcfbfa;opacity:0.4;text-align:center;">尚無航點</div>
+        </div>
+        <div id="display-total"></div>
+      </div>
+
+      <!-- 設定 -->
+      <div id="content-settings" class="mode-content">
+        <div class="setting-row">
+          <input id="track-name-input" class="setting-input" type="text" placeholder="輸入軌跡名稱">
+          <div class="setting-row-inline">
+            <span class="setting-label">自動記錄</span>
+            <input id="auto-interval" class="setting-num" type="number" value="0" min="0" max="60" placeholder="分">
+            <span class="setting-label">分鐘</span>
+          </div>
+          <div id="setting-total">總長度：0 公里</div>
+        </div>
+        <div class="btn-group">
+          <button id="btn-export" class="btn-gold">匯出JSON</button>
+          <button id="btn-import" class="btn-gold">匯入JSON</button>
+          <button id="btn-kml" class="btn-red">KML檔</button>
+          <button id="btn-clear" class="btn-gray">清空</button>
+        </div>
+        <input id="file-input" type="file" accept=".json" style="display:none;">
+      </div>
+    </div>
+  </div>
+
+  <div class="bezel-hint">繞圓盤滑動可切換模式</div>
+
+  <!-- 模式列 -->
+  <div id="mode-bar">
+    <button class="mode-btn active" data-mode="compass">指南針</button>
+    <button class="mode-btn" data-mode="record">記錄</button>
+    <button class="mode-btn" data-mode="display">顯示</button>
+    <button class="mode-btn" data-mode="settings">設定</button>
+  </div>
+
+  <div id="toast"></div>
+</div>
+
+<script>
+(function(){
+  // ===== 元素 =====
+  const compassRing = document.getElementById('compass-ring');
+  const compassDeg  = document.getElementById('compass-deg');
+  const compassDir  = document.getElementById('compass-dir');
+  const modeTitle   = document.getElementById('mode-title');
+  const recordBtn   = document.getElementById('record-btn');
+  const recordCount = document.getElementById('record-count');
+  const recordName  = document.getElementById('record-name');
+  const displayList = document.getElementById('display-waypoint-list');
+  const displayTotal= document.getElementById('display-total');
+  const trackNameIn = document.getElementById('track-name-input');
+  const autoInterval= document.getElementById('auto-interval');
+  const settingTotal= document.getElementById('setting-total');
+  const toast       = document.getElementById('toast');
+  const fileInput   = document.getElementById('file-input');
+  const ticksGroup  = document.getElementById('ticks');
+  const innerCircle = document.getElementById('inner-circle');
+  const dialContainer= document.getElementById('dial-container');
+
+  // ===== 狀態 =====
+  let currentMode = 'compass';
+  let heading = 0;
+  let waypoints = [];
+  let trackName = '未命名軌跡';
+  let autoMin = 0;
+  let autoTimer = null;
+  let currentPos = null;
+
+  // ===== 方位文字 =====
+  const dirs = ['北','東北','東','東南','南','西南','西','西北'];
+  function getDirText(deg){
+    const idx = Math.round(deg / 45) % 8;
+    return dirs[idx];
+  }
+
+  // ===== 繪製刻度 =====
+  for(let i=0; i<360; i+=5){
+    const isCardinal = i%90===0;
+    const isMajor = i%30===0;
+    const len = isCardinal ? 14 : (isMajor ? 10 : 6);
+    const r1 = 190, r2 = 190 - len;
+    const rad = (i - 90) * Math.PI / 180;
+    const x1 = 200 + r1 * Math.cos(rad);
+    const y1 = 200 + r1 * Math.sin(rad);
+    const x2 = 200 + r2 * Math.cos(rad);
+    const y2 = 200 + r2 * Math.sin(rad);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('stroke','#fcfbfa');
+    line.setAttribute('stroke-width', isCardinal ? 2 : 1);
+    line.setAttribute('opacity', isCardinal ? 0.9 : (isMajor ? 0.5 : 0.25));
+    ticksGroup.appendChild(line);
+  }
+
+  // ===== Toast =====
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(()=> toast.classList.remove('show'), 2500);
+  }
+
+  // ===== 模式切換 =====
+  function setMode(mode){
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn=>{
+      if(btn.dataset.mode === mode){
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+    document.querySelectorAll('.mode-content').forEach(el=> el.classList.remove('active'));
+    document.getElementById('content-'+mode).classList.add('active');
+    const titles = {compass:'指南針', record:'記錄航點', display:'航點列表', settings:'設定'};
+    modeTitle.textContent = titles[mode];
+    if(mode==='display') renderWaypointList();
+    if(mode==='settings'){
+      trackNameIn.value = trackName;
+      autoInterval.value = autoMin;
+      updateTotal();
+    }
+  }
+  document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=> setMode(btn.dataset.mode));
+  });
+
+  // ===== 指南針（真實裝置） =====
+  function handleOrientation(e){
+    let h = e.webkitCompassHeading || e.alpha || 0;
+    if(e.alpha && !e.webkitCompassHeading) h = 360 - e.alpha;
+    heading = (h + 360) % 360;
+    compassRing.style.transform = 'rotate('+(-heading)+'deg)';
+    compassDeg.textContent = Math.round(heading)+'°';
+    compassDir.textContent = getDirText(heading);
+  }
+  if(window.DeviceOrientationEvent){
+    window.addEventListener('deviceorientation', handleOrientation);
+  }
+
+  // ===== 模擬指南針（桌面） =====
+  let simHeading = 0;
+  if(!window.DeviceOrientationEvent){
+    setInterval(()=>{
+      simHeading = (simHeading + 1.5) % 360;
+      heading = simHeading;
+      compassRing.style.transform = 'rotate('+(-heading)+'deg)';
+      compassDeg.textContent = Math.round(heading)+'°';
+      compassDir.textContent = getDirText(heading);
+    }, 150);
+  }
+
+  // ===== 記錄航點 =====
+  function addWaypoint(){
+    const ts = new Date().toISOString();
+    function pushWp(lat,lng){
+      waypoints.push({lat, lng, time: ts});
+      recordCount.textContent = '已記錄 '+waypoints.length+' 點';
+      showToast('已記錄第 '+waypoints.length+' 個航點');
+      updateTotal();
+    }
+    if(!navigator.geolocation){
+      showToast('無法取得位置，使用模擬點');
+      pushWp(25.03 + (Math.random()-0.5)*0.02, 121.5 + (Math.random()-0.5)*0.02);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        const p = {lat:pos.coords.latitude, lng:pos.coords.longitude, time:ts};
+        waypoints.push(p);
+        currentPos = p;
+        recordCount.textContent = '已記錄 '+waypoints.length+' 點';
+        showToast('已記錄第 '+waypoints.length+' 個航點');
+        updateTotal();
+      },
+      (err)=>{
+        showToast('定位失敗，使用模擬點');
+        pushWp(25.03 + (Math.random()-0.5)*0.02, 121.5 + (Math.random()-0.5)*0.02);
+      },
+      {enableHighAccuracy:true, timeout:8000, maximumAge:0}
+    );
+  }
+  recordBtn.addEventListener('click', addWaypoint);
+  recordBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); addWaypoint(); });
+  innerCircle.addEventListener('click', (e)=>{
+    if(currentMode==='record' && !e.target.closest('#record-btn')) addWaypoint();
+  });
+
+  // ===== 距離與方位計算 =====
+  function haversine(lat1,lng1,lat2,lng2){
+    const R=6371;
+    const dLat=(lat2-lat1)*Math.PI/180;
+    const dLon=(lng2-lng1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+  }
+  function bearing(lat1,lng1,lat2,lng2){
+    const dLon=(lng2-lng1)*Math.PI/180;
+    const y=Math.sin(dLon)*Math.cos(lat2*Math.PI/180);
+    const x=Math.cos(lat1*Math.PI/180)*Math.sin(lat2*Math.PI/180)-Math.sin(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.cos(dLon);
+    let brng=Math.atan2(y,x)*180/Math.PI;
+    return (brng+360)%360;
+  }
+  function calcTotalDistance(){
+    let total=0;
+    for(let i=1;i<waypoints.length;i++){
+      total += haversine(waypoints[i-1].lat, waypoints[i-1].lng, waypoints[i].lat, waypoints[i].lng);
+    }
+    return total;
+  }
+  function updateTotal(){
+    const t = calcTotalDistance();
+    const txt = '總長度：'+t.toFixed(2)+' 公里 / '+waypoints.length+' 點';
+    settingTotal.textContent = txt;
+    if(currentMode==='display') displayTotal.textContent = txt;
+  }
+
+  // ===== 顯示航點列表 =====
+  function renderWaypointList(){
+    if(waypoints.length===0){
+      displayList.innerHTML = '<div style="color:#fcfbfa;opacity:0.4;text-align:center;">尚無航點</div>';
+      displayTotal.textContent = '';
+      return;
+    }
+    let html = '';
+    waypoints.forEach((wp,i)=>{
+      const prev = i>0 ? waypoints[i-1] : null;
+      let distStr = '', dirStr = '';
+      if(prev){
+        const d = haversine(prev.lat, prev.lng, wp.lat, wp.lng);
+        distStr = ' <span class="wp-dist">+'+d.toFixed(2)+'km</span>';
+        const dir = bearing(prev.lat, prev.lng, wp.lat, wp.lng);
+        dirStr = getDirText(dir);
+      } else {
+        dirStr = getDirText(heading);
+      }
+      html += '<div class="wp-item">'+
+        '<span class="wp-coord">'+(i+1)+'. '+wp.lat.toFixed(5)+', '+wp.lng.toFixed(5)+'</span>'+
+        '<span class="wp-meta">'+dirStr+distStr+'</span></div>';
+    });
+    displayList.innerHTML = html;
+    updateTotal();
+  }
+
+  // ===== 設定 =====
+  trackNameIn.addEventListener('change', ()=>{
+    trackName = trackNameIn.value.trim() || '未命名軌跡';
+    recordName.textContent = '軌跡：'+trackName;
+    showToast('軌跡名稱已更新');
+  });
+  autoInterval.addEventListener('change', ()=>{
+    autoMin = parseInt(autoInterval.value)||0;
+    if(autoTimer){ clearInterval(autoTimer); autoTimer=null; }
+    if(autoMin>0){
+      autoTimer = setInterval(()=>{
+        if(currentMode==='record') addWaypoint();
+      }, autoMin*60000);
+      showToast('已設定每 '+autoMin+' 分鐘自動記錄');
+    } else {
+      showToast('已關閉自動記錄');
+    }
+  });
+
+  // ===== 匯出 JSON =====
+  document.getElementById('btn-export').addEventListener('click', ()=>{
+    const data = {name:trackName, created:new Date().toISOString(), waypoints:waypoints};
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = trackName.replace(/\s+/g,'_')+'.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已匯出 '+trackName+'.json');
+  });
+
+  // ===== 匯入 JSON =====
+  document.getElementById('btn-import').addEventListener('click', ()=> fileInput.click());
+  fileInput.addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      try{
+        const data = JSON.parse(ev.target.result);
+        if(data.waypoints && Array.isArray(data.waypoints)){
+          waypoints = data.waypoints;
+          trackName = data.name || '匯入軌跡';
+          recordName.textContent = '軌跡：'+trackName;
+          recordCount.textContent = '已記錄 '+waypoints.length+' 點';
+          updateTotal();
+          showToast('成功匯入 '+waypoints.length+' 個航點');
+        } else { showToast('檔案格式錯誤'); }
+      } catch(err){ showToast('讀取失敗'); }
+    };
+    reader.readAsText(file);
+    fileInput.value = '';
+  });
+
+  // ===== 產生 KML (Google Earth) =====
+  document.getElementById('btn-kml').addEventListener('click', ()=>{
+    if(waypoints.length===0){ showToast('沒有航點可輸出'); return; }
+    const coords = waypoints.map(wp=>wp.lng+','+wp.lat+',0').join(' ');
+    const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>${escapeXml(trackName)}</name>
+    <Style id="lineStyle"><LineStyle><color>ffbd8b2a</color><width>4</width></LineStyle></Style>
+    <Placemark>
+      <name>${escapeXml(trackName)}</name>
+      <styleUrl>#lineStyle</styleUrl>
+      <LineString><coordinates>${coords}</coordinates></LineString>
+    </Placemark>
+    ${waypoints.map((wp,i)=>'<Placemark><name>航點 '+(i+1)+'</name><Point><coordinates>'+wp.lng+','+wp.lat+',0</coordinates></Point></Placemark>').join('\n')}
+  </Document>
+</kml>`;
+    const blob = new Blob([kml], {type:'application/vnd.google-earth.kml+xml'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = trackName.replace(/\s+/g,'_')+'.kml';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('已產生 KML 檔');
+  });
+  function escapeXml(str){
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+
+  // ===== 清空 =====
+  document.getElementById('btn-clear').addEventListener('click', ()=>{
+    if(confirm('確定要清空所有航點嗎？此動作無法復原。')){
+      waypoints = [];
+      recordCount.textContent = '已記錄 0 點';
+      updateTotal();
+      showToast('已清空所有航點');
+    }
+  });
+
+  // ===== 轉環模擬（圓盤滑動切換） =====
+  let lastAngle = null;
+  let bezelMode = false;
+  dialContainer.addEventListener('touchstart', (e)=>{
+    if(e.touches.length===1){
+      const rect = dialContainer.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      lastAngle = Math.atan2(e.touches[0].clientY - cy, e.touches[0].clientX - cx);
+      bezelMode = false;
+    }
+  }, {passive:true});
+  dialContainer.addEventListener('touchmove', (e)=>{
+    if(e.touches.length===1 && lastAngle!==null){
+      const rect = dialContainer.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+      const angle = Math.atan2(e.touches[0].clientY - cy, e.touches[0].clientX - cx);
+      let diff = (angle - lastAngle) * 180 / Math.PI;
+      if(diff > 180) diff -= 360; if(diff < -180) diff += 360;
+      if(Math.abs(diff) > 25){
+        lastAngle = angle;
+        bezelMode = true;
+        const modes = ['compass','record','display','settings'];
+        const idx = modes.indexOf(currentMode);
+        const newIdx = diff > 0 ? (idx+1)%4 : (idx+3)%4;
+        setMode(modes[newIdx]);
+      }
+    }
+  }, {passive:true});
+  dialContainer.addEventListener('touchend', ()=>{ lastAngle=null; });
+
+  // ===== 初始化 =====
+  recordName.textContent = '軌跡：'+trackName;
+  updateTotal();
+})();
+</script>
+
+</body>
+</html>

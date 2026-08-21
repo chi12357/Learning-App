@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>健康趨勢</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0; padding: 0;
+      font-family: 'Noto Serif TC', 'Inter', 'Cormorant Garamond', serif;
+      background: #121315; color: #fcfbfa;
+      -webkit-font-smoothing: antialiased;
+    }
+    #app { max-width: 800px; margin: 0 auto; padding: 16px; min-height: 100vh; }
+
+    .app-header {
+      text-align: center; padding: 24px 0 16px;
+      border-bottom: 1px solid #2a2b2e; margin-bottom: 20px;
+    }
+    .app-header h1 {
+      font-family: 'Noto Serif TC', serif; font-size: 32px; font-weight: 700;
+      color: #fcfbfa; margin: 0 0 4px 0; letter-spacing: 4px;
+    }
+    .app-header .subtitle {
+      font-family: 'Cormorant Garamond', serif; font-size: 16px;
+      color: #bd8b2a; margin: 0; letter-spacing: 2px;
+    }
+
+    .chart-section {
+      background: #1a1b1e; border-radius: 12px; padding: 16px;
+      margin-bottom: 20px; border: 1px solid #2a2b2e;
+    }
+    .chart-tabs {
+      display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .tab-btn {
+      font-family: 'Noto Serif TC', serif; font-size: 16px;
+      padding: 10px 16px; border: 1px solid #2a2b2e;
+      background: transparent; color: #a09e9a; border-radius: 8px;
+      cursor: pointer; transition: all 0.2s; min-height: 44px;
+      touch-action: manipulation;
+    }
+    .tab-btn.active {
+      background: #942525; color: #fcfbfa; border-color: #942525;
+    }
+    .tab-btn:hover:not(.active) {
+      border-color: #bd8b2a; color: #fcfbfa;
+    }
+    .chart-container {
+      position: relative; width: 100%; height: 280px;
+    }
+    #trendChart { width: 100%; height: 100%; display: block; }
+
+    .cursor-info {
+      position: absolute; background: #1a1b1e;
+      border: 1px solid #bd8b2a; border-radius: 8px;
+      padding: 12px 16px; pointer-events: none; z-index: 10;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+      min-width: 180px; max-width: 260px;
+    }
+    .cursor-info.hidden { display: none; }
+    #cursorDate {
+      display: block; font-family: 'Noto Serif TC', serif;
+      font-size: 15px; color: #bd8b2a; margin-bottom: 6px; font-weight: 600;
+    }
+    #cursorValue {
+      display: block; font-size: 14px; color: #fcfbfa; line-height: 1.6;
+    }
+    #cursorNote {
+      display: block; font-size: 13px; color: #a09e9a;
+      margin-top: 6px; padding-top: 6px;
+      border-top: 1px solid #2a2b2e; font-style: italic; word-break: break-word;
+    }
+
+    .data-section {
+      background: #1a1b1e; border-radius: 12px; padding: 16px;
+      border: 1px solid #2a2b2e;
+    }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px; margin-bottom: 16px;
+    }
+    .section-header h2 {
+      font-family: 'Noto Serif TC', serif; font-size: 22px;
+      margin: 0; color: #fcfbfa;
+    }
+    .actions {
+      display: flex; gap: 8px; flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn-primary, .btn-secondary, .btn-danger {
+      font-family: 'Noto Serif TC', serif; font-size: 16px;
+      padding: 12px 20px; border-radius: 8px; border: none;
+      cursor: pointer; transition: all 0.2s; min-height: 48px;
+      font-weight: 600; touch-action: manipulation;
+    }
+    .btn-primary { background: #942525; color: #fcfbfa; }
+    .btn-primary:hover { background: #b02e2e; }
+    .btn-secondary {
+      background: transparent; color: #fcfbfa; border: 1px solid #2a2b2e;
+    }
+    .btn-secondary:hover { border-color: #bd8b2a; color: #bd8b2a; }
+    .btn-danger {
+      background: transparent; color: #942525; border: 1px solid #942525;
+    }
+    .btn-danger:hover { background: #942525; color: #fcfbfa; }
+
+    .records-list { display: flex; flex-direction: column; gap: 10px; }
+    .empty-state {
+      text-align: center; padding: 40px 20px; color: #a09e9a;
+      font-size: 16px; font-family: 'Noto Serif TC', serif;
+    }
+    .record-card {
+      background: #121315; border-radius: 10px; padding: 14px 16px;
+      border: 1px solid #2a2b2e; position: relative; transition: border-color 0.2s;
+    }
+    .record-card:hover { border-color: #bd8b2a; }
+    .record-date {
+      font-family: 'Noto Serif TC', serif; font-size: 17px;
+      color: #bd8b2a; font-weight: 600; margin-bottom: 6px;
+    }
+    .record-fields {
+      font-size: 15px; color: #fcfbfa; line-height: 1.5;
+    }
+    .record-fields .inherited {
+      color: #6b8cae;
+    }
+    .record-fields .inherited::after {
+      content: ' (繼承)';
+      font-size: 12px;
+      color: #6b8cae;
+    }
+    .record-note {
+      font-size: 14px; color: #a09e9a; margin-top: 8px; padding-top: 8px;
+      border-top: 1px solid #2a2b2e; font-style: italic; word-break: break-word;
+    }
+    .record-actions {
+      display: flex; gap: 8px; margin-top: 10px;
+    }
+    .btn-edit, .btn-delete {
+      font-size: 14px; padding: 6px 14px; border-radius: 6px;
+      border: 1px solid #2a2b2e; background: transparent;
+      color: #a09e9a; cursor: pointer; min-height: 36px;
+      touch-action: manipulation;
+    }
+    .btn-edit:hover { border-color: #bd8b2a; color: #bd8b2a; }
+    .btn-delete:hover { border-color: #942525; color: #942525; }
+
+    .modal {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 100; display: flex; align-items: center; justify-content: center;
+    }
+    .modal.hidden { display: none; }
+    .modal-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+    }
+    .modal-content {
+      position: relative; background: #1a1b1e;
+      border: 1px solid #2a2b2e; border-radius: 16px;
+      padding: 24px; width: 92%; max-width: 560px;
+      max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .modal-content h3 {
+      font-family: 'Noto Serif TC', serif; font-size: 22px;
+      margin: 0 0 20px 0; color: #fcfbfa; text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 16px; padding: 12px;
+      background: #121315; border-radius: 10px; border: 1px solid #2a2b2e;
+    }
+    .form-group h4 {
+      font-family: 'Noto Serif TC', serif; font-size: 16px;
+      color: #bd8b2a; margin: 0 0 12px 0; font-weight: 600;
+    }
+    .form-row { margin-bottom: 12px; }
+    .form-row:last-child { margin-bottom: 0; }
+    .form-row label {
+      display: block; font-size: 15px; color: #a09e9a; margin-bottom: 6px;
+    }
+    .form-row input, .form-row textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid #2a2b2e; border-radius: 8px;
+      background: #1a1b1e; color: #fcfbfa;
+      font-size: 17px; font-family: 'Inter', sans-serif;
+      box-sizing: border-box; min-height: 48px;
+    }
+    .form-row input:focus, .form-row textarea:focus {
+      outline: none; border-color: #bd8b2a;
+    }
+    .form-row.two-col {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .form-row.three-col {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    }
+    .checkbox-wrap {
+      display: flex; align-items: center; gap: 8px; padding-top: 28px;
+    }
+    .checkbox-wrap input[type="checkbox"] {
+      width: 24px; height: 24px; accent-color: #bd8b2a; min-height: 24px;
+    }
+    .checkbox-wrap label { margin: 0; font-size: 15px; color: #fcfbfa; }
+    .form-actions {
+      display: flex; gap: 12px; justify-content: flex-end; margin-top: 20px;
+    }
+    .form-actions .btn-primary, .form-actions .btn-secondary { min-width: 100px; }
+
+    .confirm-dialog {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      z-index: 200; display: flex; align-items: center; justify-content: center;
+    }
+    .confirm-dialog.hidden { display: none; }
+    .confirm-overlay {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.8);
+    }
+    .confirm-box {
+      position: relative; background: #1a1b1e;
+      border: 1px solid #942525; border-radius: 16px;
+      padding: 32px 28px; width: 92%; max-width: 400px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+    }
+    .confirm-box h3 {
+      font-family: 'Noto Serif TC', serif;
+      color: #fcfbfa; font-size: 20px; margin: 0 0 8px 0;
+    }
+    .confirm-box p {
+      color: #a09e9a; font-size: 16px; margin: 0 0 24px 0;
+      line-height: 1.6;
+    }
+    .confirm-box .btn-group {
+      display: flex; gap: 12px; justify-content: center;
+    }
+    .confirm-box .btn-group button {
+      min-width: 100px; padding: 12px 24px; border-radius: 8px;
+      font-size: 16px; font-family: 'Noto Serif TC', serif;
+      font-weight: 600; cursor: pointer; border: none;
+      transition: all 0.2s; min-height: 48px;
+    }
+    .confirm-box .btn-cancel {
+      background: transparent; color: #fcfbfa; border: 1px solid #2a2b2e;
+    }
+    .confirm-box .btn-cancel:hover { border-color: #bd8b2a; color: #bd8b2a; }
+    .confirm-box .btn-confirm {
+      background: #942525; color: #fcfbfa;
+    }
+    .confirm-box .btn-confirm:hover { background: #b02e2e; }
+
+    @media (max-width: 480px) {
+      .form-row.three-col { grid-template-columns: 1fr 1fr; }
+      .app-header h1 { font-size: 26px; }
+      .chart-tabs { gap: 6px; }
+      .tab-btn { padding: 8px 10px; font-size: 14px; }
+      .actions .btn-primary,
+      .actions .btn-secondary,
+      .actions .btn-danger {
+        font-size: 14px; padding: 10px 14px; min-height: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+  <header class="app-header">
+    <h1>健康趨勢</h1>
+    <p class="subtitle">Health Trend Tracker</p>
+  </header>
+
+  <section class="chart-section">
+    <div class="chart-tabs">
+      <button class="tab-btn active" data-tab="weight">體重</button>
+      <button class="tab-btn" data-tab="bp">血壓</button>
+      <button class="tab-btn" data-tab="pulse">心跳</button>
+      <button class="tab-btn" data-tab="iop">眼壓</button>
+      <button class="tab-btn" data-tab="vision">視力</button>
+    </div>
+    <div class="chart-container">
+      <canvas id="trendChart"></canvas>
+      <div id="cursorInfo" class="cursor-info hidden">
+        <span id="cursorDate"></span>
+        <span id="cursorValue"></span>
+        <span id="cursorNote"></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="data-section">
+    <div class="section-header">
+      <h2>數據紀錄</h2>
+      <div class="actions">
+        <button id="btnAdd" class="btn-primary">＋ 新增</button>
+        <button id="btnImport" class="btn-secondary">匯入</button>
+        <button id="btnExport" class="btn-secondary">匯出</button>
+        <button id="btnClearAll" class="btn-danger">🗑 清除</button>
+      </div>
+    </div>
+    <div id="recordsList" class="records-list"></div>
+  </section>
+
+  <input type="file" id="fileInput" accept=".json" style="display:none">
+
+  <div id="confirmDialog" class="confirm-dialog hidden">
+    <div class="confirm-overlay"></div>
+    <div class="confirm-box">
+      <h3>⚠️ 清除所有記錄</h3>
+      <p>確定要刪除全部 <span id="confirmCount">0</span> 筆健康紀錄嗎？<br>此操作無法復原！</p>
+      <div class="btn-group">
+        <button class="btn-cancel" id="confirmCancel">取消</button>
+        <button class="btn-confirm" id="confirmOk">確定清除</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <h3 id="modalTitle">新增紀錄</h3>
+      <form id="recordForm">
+        <div class="form-row">
+          <label>日期</label>
+          <input type="date" id="inpDate" required>
+        </div>
+
+        <div class="form-group">
+          <h4>基本資料</h4>
+          <div class="form-row two-col">
+            <div>
+              <label>身高 (cm)</label>
+              <input type="number" id="inpHeight" step="0.1" placeholder="例如 170.5">
+            </div>
+            <div>
+              <label>體重 (kg)</label>
+              <input type="number" id="inpWeight" step="0.1" placeholder="例如 65.2">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <h4>血壓與心跳</h4>
+          <div class="form-row three-col">
+            <div>
+              <label>收縮壓（高壓）</label>
+              <input type="number" id="inpSys" placeholder="mmHg">
+            </div>
+            <div>
+              <label>舒張壓（低壓）</label>
+              <input type="number" id="inpDia" placeholder="mmHg">
+            </div>
+            <div>
+              <label>心跳（次/分）</label>
+              <input type="number" id="inpPulse" placeholder="例如 68">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <h4>左眼</h4>
+          <div class="form-row three-col">
+            <div>
+              <label>眼壓 (mmHg)</label>
+              <input type="number" id="inpLiop" step="0.1" placeholder="例如 15">
+            </div>
+            <div>
+              <label>視力</label>
+              <input type="text" id="inpLvision" placeholder="例如 0.8">
+            </div>
+            <div class="checkbox-wrap">
+              <input type="checkbox" id="inpLdilate">
+              <label for="inpLdilate">散瞳</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <h4>右眼</h4>
+          <div class="form-row three-col">
+            <div>
+              <label>眼壓 (mmHg)</label>
+              <input type="number" id="inpRiop" step="0.1" placeholder="例如 15">
+            </div>
+            <div>
+              <label>視力</label>
+              <input type="text" id="inpRvision" placeholder="例如 0.8">
+            </div>
+            <div class="checkbox-wrap">
+              <input type="checkbox" id="inpRdilate">
+              <label for="inpRdilate">散瞳</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>附註（可記錄用藥、身體狀況等）</label>
+          <textarea id="inpNote" rows="3" placeholder="例如：今天左眼點了 1 滴藥水，感覺輕微乾澀..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="btnCancel" class="btn-secondary">取消</button>
+          <button type="submit" class="btn-primary">儲存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const COLORS = {
+    bg: '#121315', card: '#1a1b1e', text: '#fcfbfa', muted: '#a09e9a',
+    red: '#942525', gold: '#bd8b2a', grid: '#2a2b2e',
+    line1: '#bd8b2a', line2: '#942525', line3: '#6b8cae', line4: '#8cae6b'
+  };
+
+  // 所有需要繼承的欄位（按順序）
+  const INHERIT_FIELDS = [
+    'height', 'weight', 'sys', 'dia', 'pulse',
+    'liop', 'lvision', 'ldilate', 'riop', 'rvision', 'rdilate'
+  ];
+
+  let records = [];
+  let currentTab = 'vision';
+  let editingId = null;
+  let canvas, ctx, chartRect;
+
+  // 填補 null 值：從前一筆記錄繼承
+  function fillNullValues() {
+    if (records.length === 0) return;
+    
+    // 按日期排序
+    records.sort((a,b) => a.date.localeCompare(b.date));
+    
+    // 從第二筆開始，繼承前一筆的值
+    for (let i = 1; i < records.length; i++) {
+      const prev = records[i - 1];
+      const curr = records[i];
+      
+      INHERIT_FIELDS.forEach(field => {
+        const val = curr[field];
+        // 如果是 null、undefined、空字串，則繼承前一筆
+        if (val === null || val === undefined || val === '') {
+          curr[field] = prev[field];
+          curr['_inherited_' + field] = true;
+        } else {
+          curr['_inherited_' + field] = false;
+        }
+      });
+    }
+    
+    // 第一筆記錄沒有前一筆，標記為非繼承
+    INHERIT_FIELDS.forEach(field => {
+      records[0]['_inherited_' + field] = false;
+    });
+  }
+
+  // 從 localStorage 載入，若無則使用範例數據
+  function loadRecords() {
+    const stored = localStorage.getItem('healthRecords');
+    if (stored) {
+      try {
+        records = JSON.parse(stored);
+        records.sort((a,b) => a.date.localeCompare(b.date));
+        fillNullValues();
+        return;
+      } catch(e) {}
+    }
+    // 範例數據 - 包含一些 null 值來展示繼承功能
+    const baseDate = new Date('2023-08-24');
+    records = [];
+    for (let i = 0; i < 20; i++) {
+      const d = new Date(baseDate);
+      d.setDate(d.getDate() + i * 3);
+      const dateStr = d.toISOString().split('T')[0];
+      const rec = {
+        id: Date.now() + i,
+        date: dateStr,
+        lvision: (0.4 + Math.random() * 0.6).toFixed(1),
+        rvision: (0.6 + Math.random() * 0.5).toFixed(1),
+        liop: (12 + Math.random() * 6).toFixed(1),
+        riop: (11 + Math.random() * 6).toFixed(1),
+        sys: 110 + Math.floor(Math.random() * 30),
+        dia: 65 + Math.floor(Math.random() * 20),
+        pulse: 60 + Math.floor(Math.random() * 20),
+        weight: (62 + Math.random() * 8).toFixed(1),
+        note: i % 3 === 0 ? '例行檢查' : ''
+      };
+      // 隨機將某些欄位設為 null，展示繼承效果
+      if (i % 2 === 0) {
+        rec.lvision = null;
+      }
+      if (i % 3 === 0) {
+        rec.rvision = null;
+      }
+      if (i % 5 === 0) {
+        rec.weight = null;
+      }
+      records.push(rec);
+    }
+    records.sort((a,b) => a.date.localeCompare(b.date));
+    fillNullValues();
+    saveStorage();
+  }
+
+  function init() {
+    loadRecords();
+    canvas = document.getElementById('trendChart');
+    ctx = canvas.getContext('2d');
+    bindEvents();
+    renderRecords();
+    setTimeout(() => { resizeCanvas(); drawChart(); }, 50);
+    window.addEventListener('resize', () => { resizeCanvas(); drawChart(); });
+  }
+
+  function bindEvents() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        drawChart();
+      });
+    });
+    document.getElementById('btnAdd').addEventListener('click', () => openModal());
+    document.getElementById('btnCancel').addEventListener('click', closeModal);
+    document.querySelector('.modal-overlay').addEventListener('click', closeModal);
+    document.getElementById('recordForm').addEventListener('submit', e => { e.preventDefault(); saveRecord(); });
+    document.getElementById('btnExport').addEventListener('click', exportJSON);
+    document.getElementById('btnImport').addEventListener('click', () => document.getElementById('fileInput').click());
+    document.getElementById('fileInput').addEventListener('change', importJSON);
+    document.getElementById('btnClearAll').addEventListener('click', showClearConfirm);
+    document.getElementById('confirmCancel').addEventListener('click', hideClearConfirm);
+    document.querySelector('.confirm-overlay').addEventListener('click', hideClearConfirm);
+    document.getElementById('confirmOk').addEventListener('click', clearAllRecords);
+
+    canvas.addEventListener('mousemove', handleChartHover);
+    canvas.addEventListener('mouseleave', () => { document.getElementById('cursorInfo').classList.add('hidden'); drawChart(); });
+    canvas.addEventListener('touchstart', handleChartTouch, {passive:false});
+    canvas.addEventListener('touchmove', handleChartTouch, {passive:false});
+  }
+
+  function showClearConfirm() {
+    if (records.length === 0) {
+      alert('目前沒有紀錄可以清除。');
+      return;
+    }
+    document.getElementById('confirmCount').textContent = records.length;
+    document.getElementById('confirmDialog').classList.remove('hidden');
+  }
+
+  function hideClearConfirm() {
+    document.getElementById('confirmDialog').classList.add('hidden');
+  }
+
+  function clearAllRecords() {
+    records = [];
+    saveStorage();
+    renderRecords();
+    drawChart();
+    hideClearConfirm();
+  }
+
+  function openModal(record) {
+    editingId = record ? record.id : null;
+    document.getElementById('modalTitle').textContent = record ? '編輯紀錄' : '新增紀錄';
+    document.getElementById('inpDate').value = record ? record.date : new Date().toISOString().split('T')[0];
+    document.getElementById('inpHeight').value = record?.height || '';
+    document.getElementById('inpWeight').value = record?.weight || '';
+    document.getElementById('inpSys').value = record?.sys || '';
+    document.getElementById('inpDia').value = record?.dia || '';
+    document.getElementById('inpPulse').value = record?.pulse || '';
+    document.getElementById('inpLiop').value = record?.liop || '';
+    document.getElementById('inpLvision').value = record?.lvision || '';
+    document.getElementById('inpLdilate').checked = record?.ldilate || false;
+    document.getElementById('inpRiop').value = record?.riop || '';
+    document.getElementById('inpRvision').value = record?.rvision || '';
+    document.getElementById('inpRdilate').checked = record?.rdilate || false;
+    document.getElementById('inpNote').value = record?.note || '';
+    document.getElementById('modal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.add('hidden');
+    editingId = null;
+  }
+
+  function saveRecord() {
+    const rec = {
+      id: editingId || Date.now().toString(),
+      date: document.getElementById('inpDate').value,
+      height: parseFloat(document.getElementById('inpHeight').value) || null,
+      weight: parseFloat(document.getElementById('inpWeight').value) || null,
+      sys: parseFloat(document.getElementById('inpSys').value) || null,
+      dia: parseFloat(document.getElementById('inpDia').value) || null,
+      pulse: parseFloat(document.getElementById('inpPulse').value) || null,
+      liop: parseFloat(document.getElementById('inpLiop').value) || null,
+      lvision: document.getElementById('inpLvision').value || null,
+      ldilate: document.getElementById('inpLdilate').checked,
+      riop: parseFloat(document.getElementById('inpRiop').value) || null,
+      rvision: document.getElementById('inpRvision').value || null,
+      rdilate: document.getElementById('inpRdilate').checked,
+      note: document.getElementById('inpNote').value || null
+    };
+    if (editingId) {
+      const idx = records.findIndex(r => r.id === editingId);
+      if (idx >= 0) records[idx] = rec;
+    } else {
+      records.push(rec);
+    }
+    records.sort((a,b) => a.date.localeCompare(b.date));
+    fillNullValues();
+    saveStorage();
+    closeModal();
+    renderRecords();
+    drawChart();
+  }
+
+  function deleteRecord(id) {
+    if (!confirm('確定要刪除這筆紀錄嗎？')) return;
+    records = records.filter(r => r.id !== id);
+    fillNullValues();
+    saveStorage();
+    renderRecords();
+    drawChart();
+  }
+
+  function saveStorage() {
+    // 儲存時移除 _inherited_ 標記（這些是運行時產生的，不需要儲存）
+    const toStore = records.map(r => {
+      const copy = { ...r };
+      INHERIT_FIELDS.forEach(f => delete copy['_inherited_' + f]);
+      return copy;
+    });
+    localStorage.setItem('healthRecords', JSON.stringify(toStore));
+  }
+
+  function renderRecords() {
+    const list = document.getElementById('recordsList');
+    if (records.length === 0) {
+      list.innerHTML = '<div class="empty-state">尚無紀錄，請點擊「新增紀錄」開始記錄健康數據。</div>';
+      return;
+    }
+    const items = [...records].reverse().map(r => {
+      const fields = [];
+      const fieldMap = [
+        { key: 'height', label: '身高', unit: 'cm' },
+        { key: 'weight', label: '體重', unit: 'kg' },
+        { key: 'sys', label: '收縮壓', unit: '' },
+        { key: 'dia', label: '舒張壓', unit: '' },
+        { key: 'pulse', label: '心跳', unit: '' },
+        { key: 'liop', label: '左眼壓', unit: '' },
+        { key: 'riop', label: '右眼壓', unit: '' },
+        { key: 'lvision', label: '左視力', unit: '' },
+        { key: 'rvision', label: '右視力', unit: '' }
+      ];
+      
+      // 處理血壓特殊顯示
+      if (r.sys || r.dia) {
+        const inherited = r['_inherited_sys'] || r['_inherited_dia'];
+        fields.push({
+          text: `血壓 ${r.sys||'-'}/${r.dia||'-'}`,
+          inherited: inherited
+        });
+      }
+      
+      fieldMap.forEach(f => {
+        if (r[f.key] !== null && r[f.key] !== undefined && r[f.key] !== '') {
+          const val = r[f.key];
+          // 跳過已經用血壓顯示的
+          if (f.key === 'sys' || f.key === 'dia') return;
+          const unit = f.unit ? f.unit : (f.key.includes('vision') ? '' : '');
+          const label = f.label;
+          const inherited = r['_inherited_' + f.key] || false;
+          fields.push({
+            text: `${label} ${val}${unit}`.trim(),
+            inherited: inherited
+          });
+        }
+      });
+      
+      // 散瞳狀態
+      if (r.ldilate) fields.push({ text: '左散瞳', inherited: r['_inherited_ldilate'] || false });
+      if (r.rdilate) fields.push({ text: '右散瞳', inherited: r['_inherited_rdilate'] || false });
+      
+      const fieldsHtml = fields.map(f => {
+        return `<span class="${f.inherited ? 'inherited' : ''}">${f.text}</span>`;
+      }).join(' · ');
+      
+      const noteHtml = r.note ? `<div class="record-note">附註：${escapeHtml(r.note)}</div>` : '';
+      return `
+        <div class="record-card" data-id="${r.id}">
+          <div class="record-date">${r.date}</div>
+          <div class="record-fields">${fieldsHtml}</div>
+          ${noteHtml}
+          <div class="record-actions">
+            <button class="btn-edit" data-id="${r.id}">編輯</button>
+            <button class="btn-delete" data-id="${r.id}">刪除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+    list.innerHTML = items;
+    list.querySelectorAll('.btn-edit').forEach(btn => {
+      btn.addEventListener('click', () => { const rec = records.find(r => r.id === btn.dataset.id); openModal(rec); });
+    });
+    list.querySelectorAll('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', () => deleteRecord(btn.dataset.id));
+    });
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function resizeCanvas() {
+    const container = canvas.parentElement;
+    const dpr = window.devicePixelRatio || 1;
+    const rect = container.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.scale(dpr, dpr);
+    chartRect = rect;
+  }
+
+  function getTabConfig() {
+    const configs = {
+      weight: { keys: [['weight','體重(kg)',COLORS.line1]], yLabel: 'kg' },
+      bp: { keys: [['sys','收縮壓',COLORS.line1],['dia','舒張壓',COLORS.line2]], yLabel: 'mmHg' },
+      pulse: { keys: [['pulse','心跳',COLORS.line1]], yLabel: '次/分' },
+      iop: { keys: [['liop','左眼壓',COLORS.line1],['riop','右眼壓',COLORS.line2]], yLabel: 'mmHg' },
+      vision: { keys: [['lvision','左眼視力',COLORS.line1],['rvision','右眼視力',COLORS.line2]], yLabel: '' }
+    };
+    return configs[currentTab] || configs.vision;
+  }
+
+  function drawChart(highlightIdx) {
+    if (!chartRect) resizeCanvas();
+    const w = chartRect.width;
+    const h = chartRect.height;
+    const pad = { top: 30, right: 20, bottom: 40, left: 50 };
+    const chartW = w - pad.left - pad.right;
+    const chartH = h - pad.top - pad.bottom;
+
+    ctx.clearRect(0, 0, w, h);
+
+    if (records.length === 0) {
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = '16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('尚無數據', w/2, h/2);
+      return;
+    }
+
+    const cfg = getTabConfig();
+    const count = records.length;
+    const lastIdx = count - 1;
+
+    const series = cfg.keys.map(([key, label, color]) => {
+      const vals = records.map(r => {
+        const v = r[key];
+        if (v === null || v === undefined || v === '') return null;
+        const n = parseFloat(v);
+        return isNaN(n) ? null : n;
+      });
+      return { key, label, color, vals };
+    });
+
+    let allVals = [];
+    series.forEach(s => allVals.push(...s.vals.filter(v => v !== null)));
+    if (allVals.length === 0) {
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = '16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('此分類尚無數據', w/2, h/2);
+      return;
+    }
+    let minY = Math.min(...allVals);
+    let maxY = Math.max(...allVals);
+    if (minY === maxY) { minY -= 0.5; maxY += 0.5; }
+    const range = maxY - minY;
+    const padding = Math.max(range * 0.1, 0.5);
+    minY -= padding;
+    maxY += padding;
+
+    // 網格
+    ctx.strokeStyle = COLORS.grid;
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+      const y = pad.top + (chartH * i / 5);
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y);
+      ctx.lineTo(pad.left + chartW, y);
+      ctx.stroke();
+      const val = maxY - (maxY - minY) * i / 5;
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = '11px Inter, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(val.toFixed(1), pad.left - 6, y + 4);
+    }
+
+    // X 軸日期
+    const labelCount = Math.min(count, Math.floor(chartW / 50));
+    const step = Math.max(1, Math.floor(count / labelCount));
+    for (let i = 0; i < count; i += step) {
+      const x = pad.left + (i / lastIdx) * chartW;
+      const label = records[i].date.slice(5);
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, h - 10);
+    }
+    if ((count - 1) % step !== 0) {
+      const x = pad.left + chartW;
+      const label = records[lastIdx].date.slice(5);
+      ctx.fillStyle = COLORS.muted;
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(label, x, h - 10);
+    }
+
+    // 線條
+    series.forEach(s => {
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 2.5;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      for (let i = 0; i < s.vals.length - 1; i++) {
+        const v1 = s.vals[i];
+        const v2 = s.vals[i + 1];
+        if (v1 !== null && v2 !== null) {
+          const x1 = pad.left + (i / lastIdx) * chartW;
+          const y1 = pad.top + ((maxY - v1) / (maxY - minY)) * chartH;
+          const x2 = pad.left + ((i + 1) / lastIdx) * chartW;
+          const y2 = pad.top + ((maxY - v2) / (maxY - minY)) * chartH;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.stroke();
+        }
+      }
+    });
+
+    // 點
+    series.forEach(s => {
+      s.vals.forEach((v, i) => {
+        if (v === null) return;
+        const x = pad.left + (i / lastIdx) * chartW;
+        const y = pad.top + ((maxY - v) / (maxY - minY)) * chartH;
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = s.color;
+        ctx.fill();
+        ctx.strokeStyle = '#121315';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+    });
+
+    // 高亮
+    if (highlightIdx !== undefined && highlightIdx >= 0 && highlightIdx < count) {
+      const x = pad.left + (highlightIdx / lastIdx) * chartW;
+      ctx.strokeStyle = 'rgba(189,139,42,0.3)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(x, pad.top);
+      ctx.lineTo(x, pad.top + chartH);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      series.forEach(s => {
+        const v = s.vals[highlightIdx];
+        if (v === null) return;
+        const y = pad.top + ((maxY - v) / (maxY - minY)) * chartH;
+        ctx.beginPath();
+        ctx.arc(x, y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = COLORS.bg;
+        ctx.fill();
+        ctx.strokeStyle = s.color;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+      });
+    }
+
+    // 圖例
+    let legendX = pad.left;
+    series.forEach(s => {
+      ctx.fillStyle = s.color;
+      ctx.fillRect(legendX, 10, 14, 3);
+      ctx.fillStyle = COLORS.text;
+      ctx.font = '12px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(s.label, legendX + 20, 16);
+      legendX += ctx.measureText(s.label).width + 40;
+    });
+  }
+
+  function getChartIndexFromX(cx) {
+    if (!chartRect || records.length === 0) return -1;
+    const pad = { top: 30, right: 20, bottom: 40, left: 50 };
+    const chartW = chartRect.width - pad.left - pad.right;
+    const relX = cx - pad.left;
+    if (relX < 0 || relX > chartW) return -1;
+    const idx = Math.round((relX / chartW) * (records.length - 1));
+    return Math.max(0, Math.min(records.length - 1, idx));
+  }
+
+  function handleChartHover(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const idx = getChartIndexFromX(x);
+    if (idx < 0) {
+      document.getElementById('cursorInfo').classList.add('hidden');
+      drawChart();
+      return;
+    }
+    drawChart(idx);
+    showCursorInfo(idx, e.clientX, e.clientY);
+  }
+
+  function handleChartTouch(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const idx = getChartIndexFromX(x);
+    if (idx < 0) {
+      document.getElementById('cursorInfo').classList.add('hidden');
+      drawChart();
+      return;
+    }
+    drawChart(idx);
+    showCursorInfo(idx, touch.clientX, touch.clientY);
+  }
+
+  function showCursorInfo(idx, clientX, clientY) {
+    const r = records[idx];
+    const cfg = getTabConfig();
+    const info = document.getElementById('cursorInfo');
+    const dateEl = document.getElementById('cursorDate');
+    const valEl = document.getElementById('cursorValue');
+    const noteEl = document.getElementById('cursorNote');
+
+    dateEl.textContent = r.date;
+    const vals = cfg.keys.map(([key, label]) => {
+      const v = r[key];
+      if (v === null || v === undefined || v === '') return null;
+      const inherited = r['_inherited_' + key];
+      const suffix = inherited ? ' (繼承)' : '';
+      return `${label}: ${v}${suffix}`;
+    }).filter(Boolean);
+    valEl.innerHTML = vals.join('<br>');
+    noteEl.textContent = r.note || '';
+    noteEl.style.display = r.note ? 'block' : 'none';
+
+    info.classList.remove('hidden');
+    const infoRect = info.getBoundingClientRect();
+    const appRect = document.getElementById('app').getBoundingClientRect();
+    let left = clientX - appRect.left + 15;
+    let top = clientY - appRect.top - infoRect.height - 10;
+    if (left + infoRect.width > appRect.width) left = clientX - appRect.left - infoRect.width - 15;
+    if (top < 0) top = clientY - appRect.top + 20;
+    info.style.left = left + 'px';
+    info.style.top = top + 'px';
+  }
+
+  function exportJSON() {
+    // 匯出時移除 _inherited_ 標記
+    const toExport = records.map(r => {
+      const copy = { ...r };
+      INHERIT_FIELDS.forEach(f => delete copy['_inherited_' + f]);
+      return copy;
+    });
+    const blob = new Blob([JSON.stringify(toExport, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'health_records_' + new Date().toISOString().split('T')[0] + '.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (!Array.isArray(data)) throw new Error('格式錯誤');
+        records = data;
+        records.sort((a,b) => a.date.localeCompare(b.date));
+        fillNullValues();
+        saveStorage();
+        renderRecords();
+        drawChart();
+        alert('匯入成功！共 ' + data.length + ' 筆紀錄');
+      } catch (err) {
+        alert('匯入失敗：' + err.message);
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

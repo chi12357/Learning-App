@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>通用 EPUB/TXT 目錄生成器</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        /* ====== 古典美學 · 墨玄底色 ====== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background-color: #121315;
+            font-family: "Noto Serif TC", "Inter", "Cormorant Garamond", serif;
+            padding: 1.5rem 1rem;
+            color: #fcfbfa;
+            line-height: 1.7;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #1a1c1e;
+            padding: 2rem 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid #2d2f31;
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 6px;
+            padding-bottom: 0.3rem;
+            border-bottom: 3px double #942525;
+            margin-bottom: 0.2rem;
+            color: #fcfbfa;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+        .subtitle {
+            text-align: center;
+            color: #bd8b2a;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+        hr {
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #942525, transparent);
+            margin: 1.8rem 0;
+        }
+
+        .upload-area {
+            border: 2px dashed #942525;
+            border-radius: 20px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            background: #1e2022;
+            transition: 0.25s;
+            cursor: pointer;
+            margin-bottom: 1.8rem;
+        }
+        .upload-area:hover {
+            border-color: #bd8b2a;
+            background: #26282b;
+        }
+        .upload-area input[type="file"] {
+            display: none;
+        }
+        .upload-area label {
+            display: inline-block;
+            padding: 0.7rem 2.4rem;
+            background: #942525;
+            color: #fcfbfa;
+            border-radius: 40px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            letter-spacing: 2px;
+            border: 1px solid #bd8b2a;
+        }
+        .upload-area label:hover {
+            background: #b02e2e;
+            transform: scale(1.02);
+        }
+        .file-info {
+            margin-top: 1rem;
+            font-size: 1rem;
+            color: #bd8b2a;
+        }
+        .file-info .name {
+            font-weight: 600;
+            color: #fcfbfa;
+        }
+
+        .config-area {
+            margin: 1.2rem 0 0.8rem;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem 1.5rem;
+            margin-bottom: 0.8rem;
+        }
+        .config-grid .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+        .config-grid label {
+            font-size: 0.9rem;
+            color: #bd8b2a;
+            letter-spacing: 1px;
+        }
+        .config-grid input {
+            padding: 0.5rem 0.8rem;
+            border: 1px solid #3d3f41;
+            border-radius: 12px;
+            background: #1e2022;
+            color: #fcfbfa;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.15s;
+        }
+        .config-grid input:focus {
+            border-color: #bd8b2a;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(189, 139, 42, 0.15);
+        }
+        .config-area label[for="regexInput"] {
+            display: block;
+            font-size: 0.9rem;
+            color: #bd8b2a;
+            margin-bottom: 0.2rem;
+            letter-spacing: 1px;
+        }
+        .config-area textarea {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid #3d3f41;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: #1e2022;
+            color: #fcfbfa;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 3.5rem;
+            transition: 0.15s;
+        }
+        .config-area textarea:focus {
+            border-color: #bd8b2a;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(189, 139, 42, 0.12);
+        }
+        .regex-history {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+            align-items: center;
+        }
+        .regex-history .label {
+            font-size: 0.8rem;
+            color: #bd8b2a;
+            margin-right: 0.3rem;
+        }
+        .regex-history-item {
+            display: inline-block;
+            background: #2d2f31;
+            padding: 0.2rem 0.9rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            color: #fcfbfa;
+            transition: 0.15s;
+            border: 1px solid #3d3f41;
+            white-space: nowrap;
+        }
+        .regex-history-item:hover {
+            background: #942525;
+            border-color: #bd8b2a;
+        }
+
+        .btn {
+            padding: 0.5rem 1.8rem;
+            border: 1px solid #3d3f41;
+            border-radius: 40px;
+            background: #1e2022;
+            color: #fcfbfa;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            letter-spacing: 1px;
+            touch-action: manipulation;
+        }
+        .btn:hover {
+            background: #2d2f31;
+            border-color: #bd8b2a;
+        }
+        .btn-primary {
+            background: #942525;
+            border-color: #bd8b2a;
+            color: #fcfbfa;
+        }
+        .btn-primary:hover {
+            background: #b02e2e;
+        }
+        .btn-success {
+            background: #1f5a3a;
+            border-color: #bd8b2a;
+            color: #fcfbfa;
+        }
+        .btn-success:hover {
+            background: #287a4e;
+        }
+        .btn-danger {
+            background: #942525;
+            border-color: #942525;
+        }
+        .btn-danger:hover {
+            background: #b02e2e;
+        }
+        .btn-sm {
+            padding: 0.2rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin: 1rem 0 0.2rem;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.2rem;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.2rem 0 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #2d2f31;
+        }
+        .toolbar .left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem 1rem;
+            align-items: center;
+        }
+        .toolbar .right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+        .stat {
+            font-size: 0.95rem;
+            color: #bd8b2a;
+        }
+
+        .toc-list {
+            margin: 0.5rem 0 0.5rem;
+            max-height: 440px;
+            overflow-y: auto;
+            border: 1px solid #2d2f31;
+            border-radius: 16px;
+            padding: 0.2rem 0.2rem;
+            background: #1a1c1e;
+        }
+        .toc-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.6rem 0.8rem;
+            border-bottom: 1px solid #2d2f31;
+            transition: background 0.1s;
+        }
+        .toc-item:hover {
+            background: #26282b;
+        }
+        .toc-item .idx {
+            flex: 0 0 3rem;
+            font-weight: 600;
+            color: #bd8b2a;
+            font-size: 0.85rem;
+            text-align: right;
+            padding-right: 0.3rem;
+        }
+        .toc-item .title-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 1rem;
+            color: #fcfbfa;
+            padding: 0.2rem 0.4rem;
+            border-bottom: 1px dashed transparent;
+            transition: 0.15s;
+            min-width: 60px;
+        }
+        .toc-item .title-input:focus {
+            border-bottom-color: #bd8b2a;
+            outline: none;
+            background: #1e2022;
+            border-radius: 4px;
+        }
+        .toc-item .btn-del {
+            flex: 0 0 2rem;
+            background: transparent;
+            border: none;
+            color: #5d5f61;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+        .toc-item .btn-del:hover {
+            color: #942525;
+        }
+
+        .empty-msg {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #5d5f61;
+            font-size: 1rem;
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            padding-top: 1.2rem;
+            border-top: 1px solid #2d2f31;
+            font-size: 0.85rem;
+            color: #5d5f61;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
+
+        @media (max-width: 700px) {
+            .container {
+                padding: 1.2rem 1rem;
+                border-radius: 16px;
+            }
+            h1 {
+                font-size: 1.8rem;
+                letter-spacing: 3px;
+            }
+            .config-grid {
+                grid-template-columns: 1fr;
+                gap: 0.8rem;
+            }
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .toolbar .left, .toolbar .right {
+                justify-content: center;
+            }
+            .toc-item .idx {
+                flex-basis: 2.2rem;
+                font-size: 0.75rem;
+            }
+            .toc-item .title-input {
+                font-size: 0.9rem;
+            }
+            .upload-area {
+                padding: 1.5rem 1rem;
+            }
+            .btn {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1c1e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3d3f41;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #bd8b2a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="app">
+    <h1>📖 目錄生成器</h1>
+    <div class="subtitle">EPUB / TXT · 自動偵測 · 輸出結構化 EPUB</div>
+
+    <div class="upload-area" id="uploadArea">
+        <label for="fileInput">📂 選擇 EPUB 或 TXT 檔案</label>
+        <input type="file" id="fileInput" accept=".epub,.txt">
+        <div class="file-info" id="fileInfo">尚未選擇檔案</div>
+    </div>
+
+    <div class="config-area">
+        <div class="config-grid">
+            <div class="field">
+                <label for="bookTitleInput">📕 書名</label>
+                <input type="text" id="bookTitleInput" placeholder="請輸入書名（可留空）">
+            </div>
+            <div class="field">
+                <label for="bookAuthorInput">✍️ 作者</label>
+                <input type="text" id="bookAuthorInput" placeholder="作者（可留空）">
+            </div>
+        </div>
+    </div>
+
+    <div class="config-area">
+        <label for="regexInput">章節正則 (預設: <code>第[零一二三四五六七八九十百千萬]+回</code>)</label>
+        <textarea id="regexInput" rows="2">第[零一二三四五六七八九十百千萬]+回</textarea>
+        <div class="regex-history" id="regexHistory">
+            <span class="label">📋 最近使用：</span>
+        </div>
+    </div>
+
+    <div class="action-bar">
+        <button class="btn btn-primary" id="autoDetectBtn">🔍 自動偵測目錄</button>
+        <button class="btn" id="addChapterBtn">➕ 新增章節</button>
+        <button class="btn btn-danger" id="clearChaptersBtn">🗑 清空目錄</button>
+    </div>
+
+    <div class="toolbar">
+        <div class="left">
+            <span class="stat" id="statInfo">尚未載入</span>
+        </div>
+        <div class="right">
+            <button class="btn btn-success" id="generateEpubBtn">📦 生成 EPUB</button>
+        </div>
+    </div>
+
+    <div class="toc-list" id="tocList">
+        <div class="empty-msg">請上傳檔案並點擊「自動偵測目錄」</div>
+    </div>
+
+    <div class="footer-note">
+        自動清除章節開頭的分隔線 · 基於索引分割 · 內容不遺失
+    </div>
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // ============================================================
+        //  狀態
+        // ============================================================
+        let fileContent = null;
+        let fileType = null;
+        let fileName = '';
+        let chapters = [];
+        let rawEpubFiles = null;
+        let rawEpubText = null;
+        let fullText = '';
+
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const tocList = document.getElementById('tocList');
+        const statInfo = document.getElementById('statInfo');
+        const regexInput = document.getElementById('regexInput');
+        const autoDetectBtn = document.getElementById('autoDetectBtn');
+        const addChapterBtn = document.getElementById('addChapterBtn');
+        const clearChaptersBtn = document.getElementById('clearChaptersBtn');
+        const generateEpubBtn = document.getElementById('generateEpubBtn');
+        const regexHistory = document.getElementById('regexHistory');
+        const bookTitleInput = document.getElementById('bookTitleInput');
+        const bookAuthorInput = document.getElementById('bookAuthorInput');
+
+        // ============================================================
+        //  正則歷史
+        // ============================================================
+        function loadRegexHistory() {
+            try { return JSON.parse(localStorage.getItem('regexHistory')) || []; } catch { return []; }
+        }
+        function saveRegexHistory(regex) {
+            if (!regex || regex.trim().length === 0) return;
+            let history = loadRegexHistory();
+            history = history.filter(r => r !== regex);
+            history.unshift(regex);
+            if (history.length > 10) history = history.slice(0, 10);
+            localStorage.setItem('regexHistory', JSON.stringify(history));
+            renderRegexHistory();
+        }
+        function renderRegexHistory() {
+            const history = loadRegexHistory();
+            if (history.length === 0) {
+                regexHistory.innerHTML = `<span class="label">📋 最近使用：</span><span style="color:#5d5f61;font-size:0.85rem;">尚無紀錄</span>`;
+                return;
+            }
+            let html = `<span class="label">📋 最近使用：</span>`;
+            history.forEach(r => {
+                html += `<span class="regex-history-item" data-regex="${escapeHtml(r)}">${escapeHtml(r)}</span>`;
+            });
+            regexHistory.innerHTML = html;
+            regexHistory.querySelectorAll('.regex-history-item').forEach(el => {
+                el.addEventListener('click', function() {
+                    regexInput.value = this.dataset.regex;
+                });
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ============================================================
+        //  渲染目錄
+        // ============================================================
+        function renderToc() {
+            if (!chapters || chapters.length === 0) {
+                tocList.innerHTML = `<div class="empty-msg">目錄為空，請偵測或手動新增</div>`;
+                statInfo.textContent = '0 章節';
+                return;
+            }
+            let html = '';
+            chapters.forEach((ch, idx) => {
+                html += `
+                        <div class="toc-item" data-index="${idx}">
+                            <span class="idx">${idx+1}</span>
+                            <input class="title-input" type="text" value="${escapeHtml(ch.title)}" data-idx="${idx}" placeholder="章節標題">
+                            <button class="btn-del" data-idx="${idx}" title="刪除">✕</button>
+                        </div>
+                    `;
+            });
+            tocList.innerHTML = html;
+            statInfo.textContent = `${chapters.length} 章節`;
+
+            document.querySelectorAll('.toc-item .title-input').forEach(inp => {
+                inp.addEventListener('input', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    if (!isNaN(idx) && chapters[idx]) {
+                        chapters[idx].title = this.value;
+                    }
+                });
+            });
+            document.querySelectorAll('.toc-item .btn-del').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const idx = parseInt(this.dataset.idx);
+                    if (!isNaN(idx) && chapters[idx]) {
+                        chapters.splice(idx, 1);
+                        renderToc();
+                    }
+                });
+            });
+        }
+
+        // ============================================================
+        //  檔案上傳
+        // ============================================================
+        fileInput.addEventListener('change', function(e) {
+            const file = this.files[0];
+            if (!file) return;
+            fileName = file.name;
+            const ext = fileName.split('.').pop().toLowerCase();
+            if (ext === 'txt') {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    fullText = ev.target.result;
+                    fileContent = fullText;
+                    fileType = 'txt';
+                    rawEpubFiles = null;
+                    rawEpubText = null;
+                    fileInfo.innerHTML = `✅ 已載入: <span class="name">${fileName}</span> (TXT)`;
+                    autoDetect();
+                };
+                reader.readAsText(file, 'UTF-8');
+            } else if (ext === 'epub') {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    fileContent = ev.target.result;
+                    fileType = 'epub';
+                    fileInfo.innerHTML = `✅ 已載入: <span class="name">${fileName}</span> (EPUB)`;
+                    processEpub(fileContent);
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                alert('不支援的檔案格式，請上傳 .txt 或 .epub');
+                fileInput.value = '';
+            }
+        });
+
+        function processEpub(arrayBuffer) {
+            JSZip.loadAsync(arrayBuffer).then(function(zip) {
+                rawEpubFiles = zip;
+                let htmlFiles = [];
+                zip.forEach((relativePath, file) => {
+                    if (file.name.match(/\.(xhtml|html|htm)$/i) && !file.dir) {
+                        htmlFiles.push(file);
+                    }
+                });
+                if (htmlFiles.length === 0) {
+                    alert('無法在 EPUB 中找到 HTML 內容');
+                    return;
+                }
+                let combined = '';
+                const promises = htmlFiles.map(file => file.async('text'));
+                Promise.all(promises).then(contents => {
+                    contents.forEach(html => {
+                        const text = html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                        combined += ' ' + text;
+                    });
+                    rawEpubText = combined;
+                    fullText = combined;
+                    autoDetect();
+                }).catch(err => {
+                    alert('解析 EPUB 內容失敗: ' + err.message);
+                });
+            }).catch(err => {
+                alert('無法解壓 EPUB: ' + err.message);
+            });
+        }
+
+        // ============================================================
+        //  自動偵測 (內容清理：去除開頭分隔線)
+        // ============================================================
+        function autoDetect() {
+            if (!fullText || fullText.trim().length === 0) {
+                alert('請先上傳檔案或文字為空');
+                return;
+            }
+            const text = fullText;
+            const regexStr = regexInput.value.trim() || '第[零一二三四五六七八九十百千萬]+回';
+            saveRegexHistory(regexStr);
+
+            let regex;
+            try {
+                regex = new RegExp(regexStr, 'g');
+            } catch (e) {
+                alert('正則表達式無效: ' + e.message);
+                return;
+            }
+
+            const matches = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                matches.push({
+                    index: match.index,
+                    end: regex.lastIndex,
+                    title: match[0].trim()
+                });
+            }
+
+            if (matches.length === 0) {
+                alert('未偵測到任何章節，請調整正則表達式');
+                return;
+            }
+
+            const newChapters = [];
+
+            for (let i = 0; i < matches.length; i++) {
+                const m = matches[i];
+                // 處理前言
+                if (i === 0 && m.index > 0) {
+                    const preface = text.slice(0, m.index).trim();
+                    if (preface.length > 0) {
+                        newChapters.push({
+                            title: '前言',
+                            content: preface,
+                            start: 0,
+                            end: m.index
+                        });
+                    }
+                }
+
+                const contentStart = m.end;
+                const contentEnd = (i < matches.length - 1) ? matches[i+1].index : text.length;
+                let content = text.slice(contentStart, contentEnd).trim();
+
+                // ----- 新增：清除開頭的分隔線 (例如 —————————————————————————————————) -----
+                // 移除開頭的連續橫線、底線、等號，可能前後有空白或換行
+                content = content.replace(/^[\s]*[—\-_=]{4,}[\s]*\n?/, '');
+                // 若清除後開頭還有空行，再去除
+                content = content.replace(/^\s+/, '');
+
+                newChapters.push({
+                    title: m.title,
+                    content: content,
+                    start: contentStart,
+                    end: contentEnd
+                });
+            }
+
+            chapters = newChapters;
+            renderToc();
+        }
+
+        // ============================================================
+        //  手動新增 / 清空
+        // ============================================================
+        addChapterBtn.addEventListener('click', function() {
+            chapters.push({ title: '新章節', content: '', start: -1, end: -1 });
+            renderToc();
+            const inputs = document.querySelectorAll('.toc-item .title-input');
+            if (inputs.length > 0) inputs[inputs.length - 1].focus();
+        });
+
+        clearChaptersBtn.addEventListener('click', function() {
+            if (chapters.length === 0) return;
+            if (confirm('確定要清空所有章節嗎？')) {
+                chapters = [];
+                renderToc();
+            }
+        });
+
+        // ============================================================
+        //  生成 EPUB
+        // ============================================================
+        generateEpubBtn.addEventListener('click', function() {
+            if (chapters.length === 0) {
+                alert('目錄為空，無法生成 EPUB');
+                return;
+            }
+            if (!fullText) {
+                alert('請先上傳原始檔案');
+                return;
+            }
+
+            const finalChapters = chapters.map(ch => {
+                if (ch.start !== undefined && ch.start >= 0 && ch.end !== undefined && ch.end >= 0) {
+                    let content = fullText.slice(ch.start, ch.end).trim();
+                    // 同樣清理分隔線 (確保生成時也乾淨)
+                    content = content.replace(/^[\s]*[—\-_=]{4,}[\s]*\n?/, '');
+                    content = content.replace(/^\s+/, '');
+                    return {
+                        title: ch.title,
+                        content: content
+                    };
+                } else {
+                    return {
+                        title: ch.title,
+                        content: ch.content || ''
+                    };
+                }
+            });
+
+            chapters = finalChapters;
+            renderToc();
+            buildEpub(finalChapters, fileName);
+        });
+
+        // ============================================================
+        //  構建 EPUB
+        // ============================================================
+        function buildEpub(chapterList, originalFileName) {
+            const zip = new JSZip();
+
+            zip.file('mimetype', 'application/epub+zip', { compression: 'STORE' });
+
+            const containerXml = `<?xml version="1.0" encoding="UTF-8"?>
+        <container xmlns="urn:oasis:names:tc:opendocument:xmlns:container" version="1.0">
+          <rootfiles>
+            <rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/>
+          </rootfiles>
+        </container>`;
+            zip.folder('META-INF').file('container.xml', containerXml);
+
+            const oebps = zip.folder('OEBPS');
+
+            const uid = 'uuid_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+            let bookTitle = bookTitleInput.value.trim() || originalFileName.replace(/\.[^.]+$/, '') || '新書';
+            let bookAuthor = bookAuthorInput.value.trim() || '未知作者';
+
+            let opf = `<?xml version="1.0" encoding="UTF-8"?>
+        <package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="BookId">
+          <metadata xmlns:dc="http://purl.org/dc/elements/1.1/">
+            <dc:identifier id="BookId">${uid}</dc:identifier>
+            <dc:title>${escapeHtml(bookTitle)}</dc:title>
+            <dc:language>zh-Hant</dc:language>
+            <dc:creator>${escapeHtml(bookAuthor)}</dc:creator>
+            <meta property="dcterms:modified">${new Date().toISOString().replace(/\.\d+Z$/, 'Z')}</meta>
+          </metadata>
+          <manifest>
+            <item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>
+            <item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>`;
+            chapterList.forEach((ch, idx) => {
+                const id = 'ch' + (idx+1).toString().padStart(3, '0');
+                opf += `\n            <item id="${id}" href="${id}.xhtml" media-type="application/xhtml+xml"/>`;
+            });
+            opf += `\n          </manifest>
+          <spine toc="ncx">`;
+            chapterList.forEach((ch, idx) => {
+                const id = 'ch' + (idx+1).toString().padStart(3, '0');
+                opf += `\n            <itemref idref="${id}"/>`;
+            });
+            opf += `\n          </spine>
+        </package>`;
+            oebps.file('content.opf', opf);
+
+            let ncx = `<?xml version="1.0" encoding="UTF-8"?>
+        <ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+          <head>
+            <meta name="dtb:uid" content="${uid}"/>
+            <meta name="dtb:depth" content="1"/>
+            <meta name="dtb:totalPageCount" content="0"/>
+            <meta name="dtb:maxPageNumber" content="0"/>
+          </head>
+          <docTitle><text>${escapeHtml(bookTitle)}</text></docTitle>
+          <navMap>`;
+            chapterList.forEach((ch, idx) => {
+                const id = 'ch' + (idx+1).toString().padStart(3, '0');
+                const playOrder = idx+1;
+                ncx += `\n            <navPoint id="navpoint-${playOrder}" playOrder="${playOrder}">
+                <navLabel><text>${escapeHtml(ch.title)}</text></navLabel>
+                <content src="${id}.xhtml"/>
+              </navPoint>`;
+            });
+            ncx += `\n          </navMap>
+        </ncx>`;
+            oebps.file('toc.ncx', ncx);
+
+            let navHtml = `<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops">
+        <head>
+          <meta charset="UTF-8"/>
+          <title>目錄</title>
+          <style type="text/css">
+            body { font-family: "Noto Serif TC", serif; padding: 1rem; max-width: 700px; margin: 0 auto; background: #fcfbfa; color: #121315; }
+            h1 { font-size: 1.8rem; text-align: center; border-bottom: 2px solid #942525; padding-bottom: 0.5rem; }
+            ul { list-style: none; padding: 0; }
+            li { padding: 0.5rem 0; border-bottom: 1px solid #ddd; }
+            a { text-decoration: none; color: #942525; }
+            a:hover { color: #bd8b2a; }
+          </style>
+        </head>
+        <body>
+          <h1>目錄</h1>
+          <ul>`;
+            chapterList.forEach((ch, idx) => {
+                const id = 'ch' + (idx+1).toString().padStart(3, '0');
+                navHtml += `\n            <li><a href="${id}.xhtml">${escapeHtml(ch.title)}</a></li>`;
+            });
+            navHtml += `\n          </ul>
+        </body>
+        </html>`;
+            oebps.file('nav.xhtml', navHtml);
+
+            const css = `body { font-family: "Noto Serif TC", serif; padding: 1.5rem; max-width: 750px; margin: 0 auto; line-height: 1.8; background: #fcfbfa; color: #121315; } h1 { font-size: 1.8rem; text-align: center; color: #942525; border-bottom: 2px solid #bd8b2a; padding-bottom: 0.3rem; } p { text-indent: 2em; margin: 0.8rem 0; }`;
+            oebps.file('style.css', css);
+
+            chapterList.forEach((ch, idx) => {
+                const id = 'ch' + (idx+1).toString().padStart(3, '0');
+                let content = ch.content || '';
+                const paragraphs = content.split(/\n\s*\n/).map(p => p.trim()).filter(p => p.length > 0);
+                let bodyContent = `<h1>${escapeHtml(ch.title)}</h1>`;
+                paragraphs.forEach(p => {
+                    bodyContent += `<p>${escapeHtml(p)}</p>`;
+                });
+                if (paragraphs.length === 0) {
+                    bodyContent += `<p>（此章節內容為空）</p>`;
+                }
+                const xhtml = `<?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE html>
+        <html xmlns="http://www.w3.org/1999/xhtml">
+        <head>
+          <meta charset="UTF-8"/>
+          <link rel="stylesheet" type="text/css" href="style.css"/>
+          <title>${escapeHtml(ch.title)}</title>
+        </head>
+        <body>
+          ${bodyContent}
+        </body>
+        </html>`;
+                oebps.file(id + '.xhtml', xhtml);
+            });
+
+            zip.generateAsync({ type: 'blob', compression: 'DEFLATE' })
+                .then(function(blob) {
+                    let baseName = bookTitleInput.value.trim() || originalFileName.replace(/\.[^.]+$/, '') || '新書';
+                    baseName = baseName.replace(/[\\/:*?"<>|]/g, '');
+                    const outputName = baseName + '.epub';
+                    saveAs(blob, outputName, { type: 'application/epub+zip' });
+                })
+                .catch(function(err) {
+                    alert('生成 EPUB 失敗: ' + err.message);
+                });
+        }
+
+        // ============================================================
+        //  事件綁定
+        // ============================================================
+        autoDetectBtn.addEventListener('click', autoDetect);
+
+        document.getElementById('uploadArea').addEventListener('click', function(e) {
+            if (e.target.tagName !== 'LABEL' && e.target.tagName !== 'INPUT') {
+                fileInput.click();
+            }
+        });
+
+        // ============================================================
+        //  初始化
+        // ============================================================
+        renderRegexHistory();
+        renderToc();
+
+        console.log('通用 EPUB/TXT 目錄生成器已載入 (含分隔線清除)');
+    })();
+</script>
+
+</body>
+</html>
