@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
+  <title>讀聖經 · 可匯入TXT</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:opsz@14..32&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --font-scale: 1;
+    }
+
+    body {
+      background-color: #121315;
+      color: #fcfbfa;
+      font-family: 'Noto Serif TC', 'Inter', 'Cormorant Garamond', serif;
+      font-weight: 400;
+      line-height: 1.6;
+      padding: 0 1rem 3rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      max-width: 720px;
+      width: 100%;
+      background: transparent;
+      padding: 0 0.25rem;
+    }
+
+    .title-section {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 720px;
+      z-index: 80;
+      background: #121315;
+      padding-top: 1.5rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 3px solid #942525;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem 1rem;
+    }
+    #titleSpacer {
+      height: 0;
+      margin-bottom: 2.2rem;
+    }
+
+    .book-title {
+      font-family: 'Cormorant Garamond', 'Noto Serif TC', serif;
+      font-weight: 600;
+      font-size: 2.2rem;
+      letter-spacing: 0.06em;
+      color: #fcfbfa;
+      line-height: 1.2;
+      flex: 1;
+    }
+    .book-title small {
+      font-weight: 400;
+      font-size: 0.7em;
+      color: #bd8b2a;
+      margin-left: 0.3rem;
+    }
+
+    .title-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .icon-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: #fcfbfa;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .icon-btn:hover {
+      background: rgba(189, 139, 42, 0.15);
+      border-color: #bd8b2a;
+      transform: scale(1.05);
+    }
+    .icon-btn.active {
+      background: rgba(189, 139, 42, 0.25);
+      border-color: #bd8b2a;
+      color: #bd8b2a;
+    }
+
+    .import-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1.5px solid rgba(255,255,255,0.15);
+      color: #fcfbfa;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: 0.25s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .import-btn:hover {
+      background: rgba(189, 139, 42, 0.15);
+      border-color: #bd8b2a;
+      transform: scale(1.05);
+    }
+    .import-btn input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .font-btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .quick-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.2rem;
+      margin-bottom: 1.5rem;
+      width: 100%;
+      padding: 0.5rem 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .quick-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #fcfbfa;
+      padding: 0.25rem 0.9rem;
+      border-radius: 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .quick-btn:hover {
+      background: rgba(189, 139, 42, 0.2);
+      border-color: #bd8b2a;
+    }
+    .quick-btn.active {
+      background: rgba(189, 139, 42, 0.25);
+      border-color: #bd8b2a;
+      color: #bd8b2a;
+    }
+    .quick-btn.delete-btn {
+      color: #942525;
+      border-color: rgba(148, 37, 37, 0.3);
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+    }
+    .quick-btn.delete-btn:hover {
+      background: rgba(148, 37, 37, 0.2);
+      border-color: #942525;
+    }
+
+    .verse-card {
+      margin-bottom: 1.8rem;
+      padding: 0.8rem 1rem 0.8rem 1.2rem;
+      border-left: 4px solid #942525;
+      border-radius: 0 6px 6px 0;
+      transition: border-width 0.15s ease;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .verse-card:hover {
+      border-left-width: 7px;
+    }
+
+    .verse-line {
+      font-size: calc(1.95rem * var(--font-scale));
+      font-weight: 400;
+      line-height: 1.7;
+      margin-bottom: 0.05rem;
+      color: #fcfbfa;
+      word-break: break-word;
+    }
+
+    .highlight-red {
+      text-decoration: underline;
+      text-decoration-color: #942525;
+      text-underline-offset: 0.2em;
+      text-decoration-thickness: 0.1em;
+    }
+    .highlight-gold {
+      text-decoration: underline;
+      text-decoration-color: #bd8b2a;
+      text-underline-offset: 0.2em;
+      text-decoration-thickness: 0.1em;
+    }
+
+    .verse-number {
+      font-family: 'Inter', 'Cormorant Garamond', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #bd8b2a;
+      background: rgba(189, 139, 42, 0.08);
+      padding: 0 0.2rem 0 0.1rem;
+      border-radius: 4px;
+      margin-left: 0.15rem;
+      vertical-align: super;
+      line-height: 1;
+      display: inline-block;
+      transition: background 0.1s;
+      text-decoration: none;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+    }
+    .verse-number:hover {
+      background: rgba(189, 139, 42, 0.25);
+    }
+    .verse-number a {
+      color: #bd8b2a;
+      text-decoration: none;
+    }
+    .verse-number a:visited {
+      color: #bd8b2a;
+    }
+
+    .fav-star {
+      cursor: pointer;
+      font-size: 1.15rem;
+      margin-left: 0.5rem;
+      color: rgba(255,255,255,0.3);
+      vertical-align: super;
+      transition: transform 0.15s, color 0.15s;
+      user-select: none;
+      display: inline-block;
+    }
+    .fav-star:hover {
+      color: #bd8b2a;
+      transform: scale(1.2);
+    }
+    .fav-star.active {
+      color: #bd8b2a;
+    }
+    .fav-empty-hint {
+      text-align: center;
+      padding: 3rem 0;
+      color: #888;
+      font-size: 1.2rem;
+    }
+
+    .edit-toolbar {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 2rem);
+      max-width: 720px;
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      gap: 1rem;
+      padding: 0.8rem 0.5rem;
+      background: rgba(18, 19, 21, 0.95);
+      backdrop-filter: blur(6px);
+      border-bottom: 2px solid #bd8b2a;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .edit-toolbar.visible {
+      display: flex;
+    }
+    #editToolbarSpacer {
+      height: 0;
+      transition: height 0.15s ease;
+    }
+
+    .btn {
+      background: transparent;
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      color: #fcfbfa;
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-family: 'Inter', 'Noto Serif TC', sans-serif;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(2px);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .btn:hover {
+      background: rgba(148, 37, 37, 0.2);
+      border-color: #942525;
+      color: #fcfbfa;
+      transform: scale(1.01);
+    }
+    .btn:active {
+      transform: scale(0.97);
+    }
+    .btn-icon {
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    .verse-card.editing,
+    .verse-card.fav-editing {
+      border-left-style: dashed;
+      border-left-color: #bd8b2a;
+      background: rgba(189, 139, 42, 0.06);
+    }
+    .edit-verse-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+    .edit-verse-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      color: #bd8b2a;
+      letter-spacing: 0.05em;
+    }
+    .edit-verse-label a {
+      cursor: pointer;
+    }
+    .edit-verse-label a:hover {
+      text-decoration: underline;
+    }
+    .fav-label {
+      font-size: 1.125rem;
+      border: 1.5px solid #bd8b2a;
+      border-radius: 8px;
+      padding: 0.25rem 0.7rem;
+      display: inline-block;
+    }
+    .edit-line-row {
+      display: flex;
+      align-items: stretch;
+      gap: 0.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .verse-line-edit {
+      flex: 1;
+      min-width: 0;
+      font-size: calc(1.95rem * var(--font-scale));
+      font-weight: 400;
+      line-height: 1.7;
+      color: #fcfbfa;
+      word-break: break-word;
+      padding: 0.15rem 0.4rem;
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 4px;
+      outline: none;
+      background: rgba(255,255,255,0.03);
+    }
+    .verse-line-edit:focus {
+      border-color: #bd8b2a;
+      background: rgba(189, 139, 42, 0.1);
+    }
+    .line-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex-shrink: 0;
+      justify-content: center;
+    }
+    .line-mini-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fcfbfa;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      line-height: 1;
+      cursor: pointer;
+      transition: 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .line-mini-btn:hover {
+      background: rgba(189, 139, 42, 0.2);
+      border-color: #bd8b2a;
+    }
+    .line-mini-btn.del-line-btn:hover {
+      background: rgba(148, 37, 37, 0.2);
+      border-color: #942525;
+    }
+    .disabled-while-editing {
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    @media (max-width: 480px) {
+      .verse-line-edit { font-size: calc(1.6rem * var(--font-scale)); }
+      body { padding: 1.2rem 0.8rem 2.5rem; }
+      .verse-line { font-size: calc(1.6rem * var(--font-scale)); line-height: 1.65; }
+      .book-title { font-size: 1.8rem; }
+      .verse-number { font-size: 0.75rem; padding: 0 0.15rem; }
+      .btn { padding: 0.5rem 1.2rem; font-size: 0.9rem; gap: 0.3rem; }
+      .verse-card { padding: 0.6rem 0.8rem 0.6rem 1rem; border-left-width: 4px; }
+      .import-btn, .icon-btn { width: 38px; height: 38px; font-size: 1.2rem; }
+    }
+    @media (min-width: 768px) {
+      .verse-line { font-size: calc(2.2rem * var(--font-scale)); }
+      .book-title { font-size: 2.8rem; }
+      .verse-number { font-size: 1.0rem; }
+      .verse-card { padding: 1rem 1.8rem 1rem 2rem; }
+    }
+
+    @media print {
+      body { background: white; color: black; padding: 0.5in; }
+      .container { max-width: 100%; }
+      .verse-line { color: #111; font-size: 1.8rem; }
+      .book-title { color: #111; }
+      .verse-card { border-left-color: #942525; background: none; break-inside: avoid; }
+      .verse-number { color: #942525; background: none; }
+      .verse-number a { color: #942525; }
+      .edit-toolbar { display: none; }
+      .title-section { position: static; border-bottom-color: #942525; }
+      #titleSpacer { display: none; }
+      .highlight-red { text-decoration-color: #942525; }
+      .highlight-gold { text-decoration-color: #bd8b2a; }
+      .quick-buttons { display: none; }
+      .import-btn { display: none; }
+      .line-controls, .edit-verse-label { display: none; }
+    }
+
+    a, a:visited { color: inherit; text-decoration: none; }
+    .verse-card:last-child { margin-bottom: 0.2rem; }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <div class="title-section">
+    <span class="book-title" id="bookTitleDisplay">讀聖經 <small>載入經文</small></span>
+    <div class="title-actions">
+      <button class="icon-btn font-btn" id="fontDecBtn" title="縮小字體">A－</button>
+      <button class="icon-btn font-btn" id="fontIncBtn" title="放大字體">A＋</button>
+      <button class="icon-btn" id="editBtn" title="編輯本文">✏️</button>
+      <button class="icon-btn" id="favBtn" title="我的最愛">⭐</button>
+      <label class="import-btn" title="匯入 .txt 經文檔案">
+        📂
+        <input type="file" id="txtFileInput" accept=".txt">
+      </label>
+    </div>
+  </div>
+  <div id="titleSpacer"></div>
+
+  <div class="quick-buttons" id="quickButtons"></div>
+
+  <div class="edit-toolbar" id="editToolbar">
+    <button class="btn" id="saveEditBtn"><span class="btn-icon">💾</span> 儲存編輯</button>
+    <button class="btn" id="cancelEditBtn"><span class="btn-icon">✕</span> 取消編輯</button>
+  </div>
+  <div id="editToolbarSpacer"></div>
+
+  <div class="edit-toolbar" id="favToolbar">
+    <button class="icon-btn" id="editFavBtn" title="編輯">✏️</button>
+    <label class="import-btn" id="importFavLabel" title="匯入">
+      📂
+      <input type="file" id="favFileInput" accept=".json">
+    </label>
+    <button class="icon-btn" id="closeFavBtn" title="返回">✕</button>
+  </div>
+  <div id="favToolbarSpacer"></div>
+
+  <div class="edit-toolbar" id="favEditToolbar">
+    <button class="icon-btn" id="saveFavEditBtn" title="儲存">💾</button>
+    <button class="icon-btn" id="cancelFavEditBtn" title="取消">✕</button>
+  </div>
+  <div id="favEditToolbarSpacer"></div>
+
+  <div id="verses-container"></div>
+</div>
+
+<script>
+  (function() {
+    // ----- 預設經文 (箴言19) -----
+    const DEFAULT_RAW = [
+      { verse: 1, lines: ["貧窮而正直，", "勝過愚昧又乖謬。"], url: "https://bible.com/bible/1/pro.19.1.KJV" },
+      { verse: 2, lines: ["熱心無知識，", "實非美事；", "腳步急促的，", "難免失足。"], url: "https://bible.com/bible/1/pro.19.2.KJV" },
+      { verse: 3, lines: ["人的愚昧使道路彎曲，", "他的心卻向主發怒。"], url: "https://bible.com/bible/1/pro.19.3.KJV" },
+      { verse: 4, lines: ["財富使朋友增多，", "貧窮則使朋友遠離。"], url: "https://bible.com/bible/1/pro.19.4.KJV" },
+      { verse: 5, lines: ["作假見證的，", "必不免受罰；", "吐出謊言的，", "終不能逃脫。"], url: "https://bible.com/bible/1/pro.19.5.KJV" },
+      { verse: 6, lines: ["慷慨的，", "許多人求他的恩情；", "好施捨的，", "人人樂於結交。"], url: "https://bible.com/bible/1/pro.19.6.KJV" },
+      { verse: 7, lines: ["窮乏人連親族也厭棄他，", "何況朋友，", "更是遠遠避開。", "雖用言語追隨，", "他們卻不在。"], url: "https://bible.com/bible/1/pro.19.7.KJV" },
+      { verse: 8, lines: ["得著智慧的，", "愛惜生命；", "持守聰明的，", "必得福樂。"], url: "https://bible.com/bible/1/pro.19.8.KJV" },
+      { verse: 9, lines: ["作假見證的，", "不免受罰；", "吐出謊言的，", "終必滅亡。"], url: "https://bible.com/bible/1/pro.19.9.KJV" },
+      { verse: 10, lines: ["愚昧人坐享高位，", "本不相稱；", "僕人管轄王子，", "更是不宜。"], url: "https://bible.com/bible/1/pro.19.10.KJV" },
+      { verse: 11, lines: ["人有見識，", "就不輕易發怒；", "寬恕過犯，", "是自己的榮耀。"], url: "https://bible.com/bible/1/pro.19.11.KJV" },
+      { verse: 12, lines: ["王的怒氣如獅子吼叫，", "他的恩典卻像草上甘露。"], url: "https://bible.com/bible/1/pro.19.12.KJV" },
+      { verse: 13, lines: ["愚昧的兒子，", "是父親的禍患；", "爭吵的妻子，", "如雨水不斷滴漏。"], url: "https://bible.com/bible/1/pro.19.13.KJV" },
+      { verse: 14, lines: ["房屋財富，", "是祖宗的遺產；", "賢慧的妻子，", "卻是主所賜。"], url: "https://bible.com/bible/1/pro.19.14.KJV" },
+      { verse: 15, lines: ["懶惰使人沉睡，", "懈怠的人必致飢餓。"], url: "https://bible.com/bible/1/pro.19.15.KJV" },
+      { verse: 16, lines: ["謹守誡命的，", "保全生命；", "輕忽己路的，", "必致死亡。"], url: "https://bible.com/bible/1/pro.19.16.KJV" },
+      { verse: 17, lines: ["憐憫貧寒的，", "就是借給主，", "主必償還他所行的善。"], url: "https://bible.com/bible/1/pro.19.17.KJV" },
+      { verse: 18, lines: ["趁有指望，", "管教你的兒子，", "不可任他走向死亡。"], url: "https://bible.com/bible/1/pro.19.18.KJV" },
+      { verse: 19, lines: ["暴怒的人，", "必受刑罰；", "你若救他，", "反要再施管教。"], url: "https://bible.com/bible/1/pro.19.19.KJV" },
+      { verse: 20, lines: ["要聽勸言，", "接受訓誨，", "使你終久有智慧。"], url: "https://bible.com/bible/1/pro.19.20.KJV" },
+      { verse: 21, lines: ["人心多有計謀，", "惟有主的旨意必立定。"], url: "https://bible.com/bible/1/pro.19.21.KJV" },
+      { verse: 22, lines: ["人的美德，", "是他的恩慈；", "貧窮人勝過說謊的人。"], url: "https://bible.com/bible/1/pro.19.22.KJV" },
+      { verse: 23, lines: ["敬畏主的，", "得著生命，", "必安然居住，", "不受禍患。"], url: "https://bible.com/bible/1/pro.19.23.KJV" },
+      { verse: 24, lines: ["懶惰人把手藏在盤中，", "連送到口邊也嫌費力。"], url: "https://bible.com/bible/1/pro.19.24.KJV" },
+      { verse: 25, lines: ["責打傲慢人，", "愚蒙人就學聰明；", "責備明理人，", "他就增長知識。"], url: "https://bible.com/bible/1/pro.19.25.KJV" },
+      { verse: 26, lines: ["虐待父親、趕走母親的，", "是貽羞致辱之子。"], url: "https://bible.com/bible/1/pro.19.26.KJV" },
+      { verse: 27, lines: ["我兒，", "不可偏離訓誨的話，", "遠離知識的言語。"], url: "https://bible.com/bible/1/pro.19.27.KJV" },
+      { verse: 28, lines: ["匪徒作見證戲笑公平，", "惡人的口吞下罪孽。"], url: "https://bible.com/bible/1/pro.19.28.KJV" },
+      { verse: 29, lines: ["刑罰原是為傲慢人預備，", "鞭打原是為愚昧人設下。"], url: "https://bible.com/bible/1/pro.19.29.KJV" }
+    ];
+
+    // ----- 狀態 -----
+    let currentData = [];
+    let currentBookName = '讀聖經';
+    let currentFileName = '';
+    let currentFileHandle = null;
+    const supportsFSAccess = typeof window.showOpenFilePicker === 'function';
+    const supportsFSASave = typeof window.showSaveFilePicker === 'function';
+    let savedFiles = [];
+    let isEditing = false;
+    let favorites = [];
+    let isFavoritesView = false;
+    let isEditingFavorites = false;
+    let fontScale = 1;
+    const FONT_SCALE_MIN = 0.7;
+    const FONT_SCALE_MAX = 1.6;
+    const FONT_SCALE_STEP = 0.1;
+
+    const container = document.getElementById('verses-container');
+    const fileInput = document.getElementById('txtFileInput');
+    const bookTitleDisplay = document.getElementById('bookTitleDisplay');
+    const quickButtons = document.getElementById('quickButtons');
+    const editBtn = document.getElementById('editBtn');
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const editToolbar = document.getElementById('editToolbar');
+    const editToolbarSpacer = document.getElementById('editToolbarSpacer');
+    const titleSection = document.querySelector('.title-section');
+    const titleSpacer = document.getElementById('titleSpacer');
+    const importLabel = document.querySelector('.import-btn');
+    const favBtn = document.getElementById('favBtn');
+    const favToolbar = document.getElementById('favToolbar');
+    const favToolbarSpacer = document.getElementById('favToolbarSpacer');
+    const closeFavBtn = document.getElementById('closeFavBtn');
+    const favFileInput = document.getElementById('favFileInput');
+    const editFavBtn = document.getElementById('editFavBtn');
+    const favEditToolbar = document.getElementById('favEditToolbar');
+    const favEditToolbarSpacer = document.getElementById('favEditToolbarSpacer');
+    const saveFavEditBtn = document.getElementById('saveFavEditBtn');
+    const cancelFavEditBtn = document.getElementById('cancelFavEditBtn');
+    const fontDecBtn = document.getElementById('fontDecBtn');
+    const fontIncBtn = document.getElementById('fontIncBtn');
+
+    // ----- localStorage -----
+    function loadSavedFiles() {
+      try {
+        const stored = localStorage.getItem('bible_saved_files');
+        if (stored) {
+          savedFiles = JSON.parse(stored);
+          savedFiles = savedFiles.filter(f => f.data && f.data.length > 0);
+        } else {
+          savedFiles = [];
+        }
+      } catch (e) { savedFiles = []; }
+    }
+
+    function saveSavedFiles() {
+      try {
+        const toSave = savedFiles.filter(f => f.data && f.data.length > 0);
+        localStorage.setItem('bible_saved_files', JSON.stringify(toSave));
+      } catch (e) {}
+    }
+
+    // ----- 字型大小 -----
+    function loadFontScale() {
+      try {
+        const stored = localStorage.getItem('bible_font_scale');
+        fontScale = stored ? parseFloat(stored) : 1;
+        if (isNaN(fontScale)) fontScale = 1;
+      } catch (e) { fontScale = 1; }
+      applyFontScale();
+    }
+
+    function saveFontScale() {
+      try {
+        localStorage.setItem('bible_font_scale', String(fontScale));
+      } catch (e) {}
+    }
+
+    function applyFontScale() {
+      document.documentElement.style.setProperty('--font-scale', fontScale);
+    }
+
+    function changeFontScale(delta) {
+      let next = Math.round((fontScale + delta) * 10) / 10;
+      next = Math.min(FONT_SCALE_MAX, Math.max(FONT_SCALE_MIN, next));
+      fontScale = next;
+      applyFontScale();
+      saveFontScale();
+    }
+
+    // ----- 最愛 -----
+    function loadFavorites() {
+      try {
+        const stored = localStorage.getItem('bible_favorites');
+        favorites = stored ? JSON.parse(stored) : [];
+        if (!Array.isArray(favorites)) favorites = [];
+      } catch (e) { favorites = []; }
+    }
+
+    function saveFavorites() {
+      try {
+        localStorage.setItem('bible_favorites', JSON.stringify(favorites));
+      } catch (e) {}
+    }
+
+    // 用「書卷名 + 節數」作為判斷是否重複的依據，避免同一節被重複加入或重複匯入
+    function favoriteKey(bookName, verse) {
+      return (bookName || '') + '__' + verse;
+    }
+
+    function findFavoriteIndex(bookName, verse) {
+      const key = favoriteKey(bookName, verse);
+      return favorites.findIndex(f => favoriteKey(f.bookName, f.verse) === key);
+    }
+
+    function isFavorited(bookName, verse) {
+      return findFavoriteIndex(bookName, verse) !== -1;
+    }
+
+    function toggleFavorite(bookName, verse, lines, url) {
+      const idx = findFavoriteIndex(bookName, verse);
+      if (idx !== -1) {
+        favorites.splice(idx, 1);
+      } else {
+        favorites.push({
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+          bookName: bookName,
+          verse: verse,
+          lines: lines.slice(),
+          url: url || ''
+        });
+      }
+      saveFavorites();
+    }
+
+    function removeFavoriteAt(index) {
+      favorites.splice(index, 1);
+      saveFavorites();
+    }
+
+    // 匯入最愛時，略過已存在（同書卷+同節）的項目，避免重複
+    function mergeFavorites(importedList) {
+      let addedCount = 0;
+      let skippedCount = 0;
+      importedList.forEach((item, i) => {
+        if (!item || typeof item.bookName !== 'string' || typeof item.verse === 'undefined' || !Array.isArray(item.lines)) {
+          return;
+        }
+        if (isFavorited(item.bookName, item.verse)) {
+          skippedCount++;
+          return;
+        }
+        favorites.push({
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4) + i,
+          bookName: item.bookName,
+          verse: item.verse,
+          lines: item.lines.slice(),
+          url: item.url || ''
+        });
+        addedCount++;
+      });
+      saveFavorites();
+      return { addedCount: addedCount, skippedCount: skippedCount };
+    }
+
+    function downloadFavoritesJson(filename) {
+      const json = JSON.stringify(favorites, null, 2);
+      const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename || '我的最愛.json';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    // 儲存最愛備份：若瀏覽器支援，讓使用者選擇儲存位置／檔名，
+    // 若選到同名的既有檔案，系統／瀏覽器會自動詢問是否覆蓋；
+    // 不支援時則退回一般下載到預設下載資料夾。
+    async function saveFavoritesToFile() {
+      const json = JSON.stringify(favorites, null, 2);
+      if (supportsFSASave) {
+        try {
+          const handle = await window.showSaveFilePicker({
+            suggestedName: '我的最愛.json',
+            types: [{ description: 'JSON 檔案', accept: { 'application/json': ['.json'] } }]
+          });
+          const writable = await handle.createWritable();
+          await writable.write(json);
+          await writable.close();
+          return 'picker';
+        } catch (err) {
+          if (err && err.name === 'AbortError') {
+            return 'cancelled';
+          }
+          // 其他錯誤則退回一般下載
+        }
+      }
+      downloadFavoritesJson('我的最愛.json');
+      return 'download';
+    }
+
+    function handleFavoritesFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (!Array.isArray(parsed)) {
+            alert('檔案格式錯誤，無法匯入最愛。');
+            return;
+          }
+          const { addedCount, skippedCount } = mergeFavorites(parsed);
+          renderFavoritesView();
+          alert('已匯入 ' + addedCount + ' 節新的最愛' + (skippedCount > 0 ? '，' + skippedCount + ' 節因已存在而略過。' : '。'));
+        } catch (err) {
+          alert('讀取最愛檔案失敗：' + err.message);
+        }
+      };
+      reader.onerror = function() {
+        alert('無法讀取檔案');
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // ----- 輔助 -----
+    function applyHighlights(text) {
+      let result = text;
+      const goldWords = ['主', '智慧', '生命', '恩典', '榮耀', '美德', '慈愛', '憐憫', '公平'];
+      goldWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'g');
+        result = result.replace(regex, `<span class="highlight-gold">$1</span>`);
+      });
+      const redWords = ['刑罰', '罪', '死亡', '滅亡', '愚昧', '驕傲', '謊言', '彎曲', '怒氣'];
+      redWords.forEach(word => {
+        const regex = new RegExp(`(${word})`, 'g');
+        result = result.replace(regex, `<span class="highlight-red">$1</span>`);
+      });
+      return result;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    // ===== 核心：正確處理引號，」不亂分 =====
+    function splitIntoPhrases(text) {
+      const result = [];
+      let buffer = '';
+      let i = 0;
+
+      while (i < text.length) {
+        const char = text[i];
+
+        if (char === '「') {
+          // 開引號：先把前面累積的內容斷開，開引號跟著下一段文字開始
+          if (buffer.trim()) {
+            result.push(buffer.trim());
+            buffer = '';
+          }
+          buffer += char;
+          i++;
+          continue;
+        }
+
+        buffer += char;
+
+        if (char === '，' || char === '；' || char === '。') {
+          // 一般標點：正常斷行；但如果緊接著就是閉引號 」，
+          // 則留到 」 一起斷開，讓閉引號跟著最後一段文字，不會自己單獨成行
+          const next = text[i + 1];
+          if (next !== '」' && buffer.trim()) {
+            result.push(buffer.trim());
+            buffer = '';
+          }
+        } else if (char === '」') {
+          // 閉引號：跟著目前這段文字一起斷行
+          if (buffer.trim()) {
+            result.push(buffer.trim());
+            buffer = '';
+          }
+        }
+
+        i++;
+      }
+
+      if (buffer.trim()) {
+        result.push(buffer.trim());
+      }
+
+      return result.filter(p => p.length > 0);
+    }
+
+    // 判斷文字中「」是否成對閉合；若開引號數多於閉引號數，代表引號尚未結束，
+    // 需要與下一行合併後再進行斷句，避免「」被拆到不同行（例如閉引號自己變成一行）。
+    function isQuoteUnclosed(text) {
+      const openCount = (text.match(/「/g) || []).length;
+      const closeCount = (text.match(/」/g) || []).length;
+      return openCount > closeCount;
+    }
+
+    function renderVerses() {
+      if (isFavoritesView) {
+        renderFavoritesView();
+        return;
+      }
+      if (isEditing) {
+        renderEditMode();
+        return;
+      }
+      if (!currentData || currentData.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:3rem 0; color:#888; font-size:1.2rem;">📖 請匯入 .txt 經文檔案</div>`;
+        return;
+      }
+      let html = '';
+      currentData.forEach((item, vindex) => {
+        const lines = item.lines;
+        const faved = isFavorited(currentBookName, item.verse);
+        let linesHtml = '';
+        lines.forEach((line, idx) => {
+          const highlighted = applyHighlights(line);
+          if (idx < lines.length - 1) {
+            linesHtml += `<div class="verse-line">${highlighted}</div>`;
+          } else {
+            const verseNum = item.verse;
+            const url = item.url || '#';
+            linesHtml += `<div class="verse-line">${highlighted}<span class="verse-number"><a href="${url}" target="_blank" rel="noopener">${verseNum}</a></span><span class="fav-star${faved ? ' active' : ''}" data-vindex="${vindex}" title="加入／移除最愛">${faved ? '★' : '☆'}</span></div>`;
+          }
+        });
+        html += `<div class="verse-card">${linesHtml}</div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // ----- 最愛列表畫面 -----
+    function renderFavoritesView() {
+      if (isEditingFavorites) {
+        renderFavoritesEditMode();
+        return;
+      }
+      if (!favorites || favorites.length === 0) {
+        container.innerHTML = `<div class="fav-empty-hint">⭐ 尚未加入任何最愛節<br><small style="font-size:0.6em; color:#666;">在經文旁點選 ☆ 即可加入最愛</small></div>`;
+        return;
+      }
+      let html = '';
+      favorites.forEach((fav, findex) => {
+        let linesHtml = '';
+        fav.lines.forEach((line, idx) => {
+          const highlighted = applyHighlights(line);
+          if (idx < fav.lines.length - 1) {
+            linesHtml += `<div class="verse-line">${highlighted}</div>`;
+          } else {
+            linesHtml += `<div class="verse-line">${highlighted}<span class="verse-number"><a href="${fav.url || '#'}" target="_blank" rel="noopener">${fav.verse}</a></span></div>`;
+          }
+        });
+        html += `<div class="verse-card">
+          <div class="edit-verse-header">
+            <div class="edit-verse-label fav-label">${escapeHtml(fav.bookName)}</div>
+            <button class="line-mini-btn del-fav-btn" data-findex="${findex}" title="移除最愛">🗑</button>
+          </div>
+          ${linesHtml}
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    // ----- 最愛編輯模式 -----
+    function renderFavoritesEditMode() {
+      if (!favorites || favorites.length === 0) {
+        container.innerHTML = `<div class="fav-empty-hint">⭐ 尚未加入任何最愛節，沒有內容可以編輯</div>`;
+        return;
+      }
+      let html = '';
+      favorites.forEach((fav, findex) => {
+        let rowsHtml = '';
+        fav.lines.forEach((line) => {
+          rowsHtml += lineRowHtml(findex, escapeHtml(line));
+        });
+        html += `<div class="verse-card fav-editing" data-findex="${findex}">
+          <div class="edit-verse-header">
+            <div class="edit-verse-label fav-label">${escapeHtml(fav.bookName)} · 第 ${fav.verse} 節</div>
+            <button class="line-mini-btn del-verse-btn" title="刪除整節最愛">🗑</button>
+          </div>
+          ${rowsHtml}
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function enterFavoritesEditMode() {
+      if (!favorites || favorites.length === 0) {
+        alert('目前沒有最愛可編輯，請先加入最愛。');
+        return;
+      }
+      isEditingFavorites = true;
+      renderFavoritesView();
+      favToolbar.classList.remove('visible');
+      favEditToolbar.classList.add('visible');
+      requestAnimationFrame(function() {
+        updateHeaderSpacing();
+        favEditToolbarSpacer.style.height = favEditToolbar.offsetHeight + 'px';
+      });
+    }
+
+    function exitFavoritesEditModeUI() {
+      isEditingFavorites = false;
+      favEditToolbar.classList.remove('visible');
+      favToolbar.classList.add('visible');
+      favEditToolbarSpacer.style.height = '0';
+    }
+
+    async function saveFavoritesEdits() {
+      const cards = container.querySelectorAll('.verse-card.fav-editing');
+      const newFavorites = [];
+      cards.forEach(card => {
+        const findex = parseInt(card.getAttribute('data-findex'), 10);
+        const original = favorites[findex];
+        if (!original) return;
+        const lineEls = card.querySelectorAll('.verse-line-edit');
+        const newLines = [];
+        lineEls.forEach(el => {
+          const text = el.textContent.trim();
+          if (text.length > 0) newLines.push(text);
+        });
+        if (newLines.length > 0) {
+          newFavorites.push(Object.assign({}, original, { lines: newLines }));
+        }
+      });
+      favorites = newFavorites;
+      saveFavorites();
+      exitFavoritesEditModeUI();
+      renderFavoritesView();
+      const result = await saveFavoritesToFile();
+      if (result === 'picker') {
+        alert('已儲存最愛編輯內容，並將備份存到你選擇的位置。');
+      } else if (result === 'download') {
+        alert('已儲存最愛編輯內容，並下載更新後的備份 JSON 檔。\n（此瀏覽器不支援選擇儲存位置，檔案已下載到預設下載資料夾。）');
+      } else {
+        alert('已儲存最愛編輯內容（尚未匯出備份檔）。');
+      }
+    }
+
+    function cancelFavoritesEdits() {
+      exitFavoritesEditModeUI();
+      renderFavoritesView();
+    }
+
+    function enterFavoritesView() {
+      if (isEditing) return;
+      isFavoritesView = true;
+      favBtn.classList.add('active');
+      favToolbar.classList.add('visible');
+      editBtn.classList.add('disabled-while-editing');
+      importLabel.classList.add('disabled-while-editing');
+      quickButtons.classList.add('disabled-while-editing');
+      bookTitleDisplay.innerHTML = '最愛';
+      renderFavoritesView();
+      requestAnimationFrame(function() {
+        updateHeaderSpacing();
+        favToolbarSpacer.style.height = favToolbar.offsetHeight + 'px';
+      });
+    }
+
+    function exitFavoritesView() {
+      if (isEditingFavorites) {
+        isEditingFavorites = false;
+        favEditToolbar.classList.remove('visible');
+        favEditToolbarSpacer.style.height = '0';
+      }
+      isFavoritesView = false;
+      favBtn.classList.remove('active');
+      favToolbar.classList.remove('visible');
+      editBtn.classList.remove('disabled-while-editing');
+      importLabel.classList.remove('disabled-while-editing');
+      quickButtons.classList.remove('disabled-while-editing');
+      favToolbarSpacer.style.height = '0';
+      bookTitleDisplay.innerHTML = currentBookName || '讀聖經';
+      renderVerses();
+    }
+
+    // ----- 編輯模式 -----
+    function renderEditMode() {
+      if (!currentData || currentData.length === 0) {
+        container.innerHTML = `<div style="text-align:center; padding:3rem 0; color:#888; font-size:1.2rem;">目前沒有經文可編輯</div>`;
+        return;
+      }
+      let html = '';
+      currentData.forEach((item, vindex) => {
+        let rowsHtml = '';
+        item.lines.forEach((line) => {
+          rowsHtml += lineRowHtml(vindex, escapeHtml(line));
+        });
+        const url = item.url || '#';
+        html += `<div class="verse-card editing" data-vindex="${vindex}">
+          <div class="edit-verse-header">
+            <div class="edit-verse-label"><a href="${url}" target="_blank" rel="noopener">第 ${item.verse} 節 ↗</a></div>
+            <button class="line-mini-btn del-verse-btn" title="刪除整節">🗑</button>
+          </div>
+          ${rowsHtml}
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function lineRowHtml(vindex, escapedText) {
+      return `<div class="edit-line-row" data-vindex="${vindex}">
+        <div class="verse-line-edit" contenteditable="true">${escapedText}</div>
+        <div class="line-controls">
+          <button class="line-mini-btn add-below-btn" title="在此行下新增一行">＋</button>
+          <button class="line-mini-btn del-line-btn" title="刪除此行">－</button>
+        </div>
+      </div>`;
+    }
+
+    container.addEventListener('click', function(e) {
+      const favStar = e.target.closest('.fav-star');
+      if (favStar) {
+        const vindex = parseInt(favStar.getAttribute('data-vindex'), 10);
+        const item = currentData[vindex];
+        if (item) {
+          toggleFavorite(currentBookName, item.verse, item.lines, item.url);
+          renderVerses();
+        }
+        return;
+      }
+      const delFavBtn = e.target.closest('.del-fav-btn');
+      if (delFavBtn) {
+        const findex = parseInt(delFavBtn.getAttribute('data-findex'), 10);
+        if (confirm('確定要移除這節最愛嗎？')) {
+          removeFavoriteAt(findex);
+          renderFavoritesView();
+        }
+        return;
+      }
+      const addBtn = e.target.closest('.add-below-btn');
+      if (addBtn) {
+        const row = addBtn.closest('.edit-line-row');
+        const vindex = row.getAttribute('data-vindex');
+        const temp = document.createElement('div');
+        temp.innerHTML = lineRowHtml(vindex, '');
+        const newRow = temp.firstElementChild;
+        row.parentNode.insertBefore(newRow, row.nextSibling);
+        newRow.querySelector('.verse-line-edit').focus();
+        return;
+      }
+      const delBtn = e.target.closest('.del-line-btn');
+      if (delBtn) {
+        const row = delBtn.closest('.edit-line-row');
+        const card = row.closest('.verse-card');
+        const rows = card.querySelectorAll('.edit-line-row');
+        if (rows.length > 1) {
+          row.remove();
+        } else {
+          alert('每節至少需保留一行文字。');
+        }
+        return;
+      }
+      const delVerseBtn = e.target.closest('.del-verse-btn');
+      if (delVerseBtn) {
+        const card = delVerseBtn.closest('.verse-card');
+        const label = card.querySelector('.edit-verse-label').textContent.trim();
+        if (confirm('確定要刪除「' + label + '」整節嗎？（需按「儲存編輯」才會真正生效）')) {
+          card.remove();
+        }
+        return;
+      }
+    });
+
+    function updateHeaderSpacing() {
+      const h = titleSection.offsetHeight;
+      titleSpacer.style.height = h + 'px';
+      editToolbar.style.top = h + 'px';
+      favToolbar.style.top = h + 'px';
+      favEditToolbar.style.top = h + 'px';
+    }
+
+    function enterEditMode() {
+      if (!currentData || currentData.length === 0) {
+        alert('目前沒有經文可編輯，請先匯入或載入經文。');
+        return;
+      }
+      if (isFavoritesView) return;
+      isEditing = true;
+      renderVerses();
+      editBtn.classList.add('disabled-while-editing');
+      editToolbar.classList.add('visible');
+      quickButtons.classList.add('disabled-while-editing');
+      importLabel.classList.add('disabled-while-editing');
+      favBtn.classList.add('disabled-while-editing');
+      requestAnimationFrame(function() {
+        updateHeaderSpacing();
+        editToolbarSpacer.style.height = editToolbar.offsetHeight + 'px';
+      });
+    }
+
+    function exitEditModeUI() {
+      isEditing = false;
+      editBtn.classList.remove('disabled-while-editing');
+      editToolbar.classList.remove('visible');
+      quickButtons.classList.remove('disabled-while-editing');
+      importLabel.classList.remove('disabled-while-editing');
+      favBtn.classList.remove('disabled-while-editing');
+      editToolbarSpacer.style.height = '0';
+    }
+
+    async function saveEdits() {
+      const cards = container.querySelectorAll('.verse-card.editing');
+      const newData = [];
+      cards.forEach(card => {
+        const vindex = parseInt(card.getAttribute('data-vindex'), 10);
+        const original = currentData[vindex];
+        if (!original) return;
+        const lineEls = card.querySelectorAll('.verse-line-edit');
+        const newLines = [];
+        lineEls.forEach(el => {
+          const text = el.textContent.trim();
+          if (text.length > 0) newLines.push(text);
+        });
+        if (newLines.length > 0) {
+          newData.push(Object.assign({}, original, { lines: newLines }));
+        }
+      });
+      currentData = newData;
+      exitEditModeUI();
+      renderVerses();
+      if (currentFileName) {
+        saveFileRecord(currentFileName, currentData, currentBookName);
+      }
+      const result = await updateBackupFile(currentFileName);
+      if (result === 'direct') {
+        alert('已儲存編輯內容，並直接覆寫原始檔案。');
+      } else {
+        alert('已儲存編輯內容，並下載更新後的備份 .txt。\n（此瀏覽器無法直接覆寫你原本選取的檔案，請用新下載的檔案取代舊檔；若使用電腦版 Chrome／Edge 開啟本頁，儲存時可以直接覆寫原始檔案。）');
+      }
+    }
+
+    function cancelEdits() {
+      exitEditModeUI();
+      renderVerses();
+    }
+
+    function updateBookTitle(name) {
+      currentBookName = name || '讀聖經';
+      bookTitleDisplay.innerHTML = name || '讀聖經';
+    }
+
+    function setDataAndRender(dataArray, bookName, fileName) {
+      currentFileHandle = null;
+      currentData = dataArray.slice();
+      currentFileName = fileName || ((bookName || '自訂經文') + '.txt');
+      updateBookTitle(bookName || '自訂經文');
+      renderVerses();
+      updateQuickButtons();
+      updateHeaderSpacing();
+    }
+
+    // ----- 解析 TXT -----
+    function parseTxtToData(text) {
+      const lines = text.split(/\r?\n/);
+      const result = [];
+      let bookName = '自訂經文';
+
+      if (lines.length > 0 && lines[0].trim().length > 0) {
+        bookName = lines[0].trim();
+      }
+
+      let currentLines = [];
+      let quoteCarry = '';
+      const verseAtEndRegex = /^(.*?)\s*\[(\d+)\]$/;
+      const urlRegex = /^https?:\/\//;
+
+      for (let i = 1; i < lines.length; i++) {
+        let line = lines[i].trim();
+        if (line === '') continue;
+
+        if (urlRegex.test(line)) {
+          continue;
+        }
+
+        if (quoteCarry) {
+          line = quoteCarry + line;
+          quoteCarry = '';
+        }
+
+        const match = line.match(verseAtEndRegex);
+        if (match) {
+          const content = match[1].trim();
+          const verseNum = parseInt(match[2], 10);
+
+          const phrases = splitIntoPhrases(content);
+          if (phrases.length > 0) {
+            currentLines.push(...phrases);
+          } else if (content) {
+            currentLines.push(content);
+          }
+
+          let j = i + 1;
+          while (j < lines.length && lines[j].trim() === '') j++;
+          let verseUrl = '';
+          if (j < lines.length && urlRegex.test(lines[j].trim())) {
+            verseUrl = lines[j].trim();
+            i = j;
+          }
+
+          if (currentLines.length > 0) {
+            result.push({
+              verse: verseNum,
+              lines: currentLines.slice(),
+              url: verseUrl || `https://bible.com/bible/1/pro.${verseNum}.KJV`
+            });
+          }
+          currentLines = [];
+        } else if (isQuoteUnclosed(line)) {
+          // 引號尚未閉合，先暫存，等下一行補上閉引號後再一起斷句
+          quoteCarry = line;
+        } else {
+          const phrases = splitIntoPhrases(line);
+          if (phrases.length > 0) {
+            currentLines.push(...phrases);
+          } else {
+            currentLines.push(line);
+          }
+        }
+      }
+
+      if (quoteCarry) {
+        // 檔案結尾仍有未閉合的引號，直接當作一般文字處理，避免資料遺失
+        const phrases = splitIntoPhrases(quoteCarry);
+        if (phrases.length > 0) {
+          currentLines.push(...phrases);
+        } else {
+          currentLines.push(quoteCarry);
+        }
+      }
+
+      if (currentLines.length > 0) {
+        const fallbackVerse = result.length > 0 ? result[result.length - 1].verse + 1 : 1;
+        result.push({
+          verse: fallbackVerse,
+          lines: currentLines.slice(),
+          url: `https://bible.com/bible/1/pro.${fallbackVerse}.KJV`
+        });
+      }
+
+      if (result.length === 0) {
+        let altResult = [];
+        let altVerse = null;
+        let altLines = [];
+        let altUrl = '';
+        let altQuoteCarry = '';
+
+        for (let i = 1; i < lines.length; i++) {
+          let line = lines[i].trim();
+          if (line === '') continue;
+
+          const verseMatch = line.match(/^\[(\d+)\]$/);
+          if (verseMatch) {
+            if (altQuoteCarry) {
+              const phrases = splitIntoPhrases(altQuoteCarry);
+              altLines.push(...(phrases.length > 0 ? phrases : [altQuoteCarry]));
+              altQuoteCarry = '';
+            }
+            if (altVerse !== null && altLines.length > 0) {
+              altResult.push({
+                verse: altVerse,
+                lines: altLines.slice(),
+                url: altUrl || `https://bible.com/bible/1/pro.${altVerse}.KJV`
+              });
+            }
+            altVerse = parseInt(verseMatch[1], 10);
+            altLines = [];
+            altUrl = '';
+            continue;
+          }
+
+          if (line.startsWith('http://') || line.startsWith('https://')) {
+            altUrl = line;
+            continue;
+          }
+
+          if (altQuoteCarry) {
+            line = altQuoteCarry + line;
+            altQuoteCarry = '';
+          }
+
+          if (altVerse !== null && line.length > 0) {
+            if (isQuoteUnclosed(line)) {
+              altQuoteCarry = line;
+            } else {
+              const phrases = splitIntoPhrases(line);
+              if (phrases.length > 0) {
+                altLines.push(...phrases);
+              } else {
+                altLines.push(line);
+              }
+            }
+          }
+        }
+
+        if (altQuoteCarry) {
+          const phrases = splitIntoPhrases(altQuoteCarry);
+          altLines.push(...(phrases.length > 0 ? phrases : [altQuoteCarry]));
+        }
+
+        if (altVerse !== null && altLines.length > 0) {
+          altResult.push({
+            verse: altVerse,
+            lines: altLines.slice(),
+            url: altUrl || `https://bible.com/bible/1/pro.${altVerse}.KJV`
+          });
+        }
+
+        if (altResult.length > 0) {
+          return { data: altResult, bookName: bookName };
+        }
+      }
+
+      return { data: result, bookName: bookName };
+    }
+
+    // ----- 儲存與更新 -----
+    function saveFileRecord(name, data, bookName) {
+      const existingIndex = savedFiles.findIndex(f => f.name === name);
+      if (existingIndex !== -1) {
+        savedFiles[existingIndex] = {
+          id: savedFiles[existingIndex].id,
+          name: name,
+          data: data,
+          bookName: bookName
+        };
+      } else {
+        savedFiles.push({
+          id: Date.now().toString(36) + Math.random().toString(36).substr(2, 4),
+          name: name,
+          data: data,
+          bookName: bookName
+        });
+      }
+      saveSavedFiles();
+      updateQuickButtons();
+    }
+
+    function deleteFileRecord(name) {
+      savedFiles = savedFiles.filter(f => f.name !== name);
+      saveSavedFiles();
+      updateQuickButtons();
+    }
+
+    function updateQuickButtons() {
+      quickButtons.innerHTML = '';
+
+      if (savedFiles.length === 0) {
+        const hint = document.createElement('span');
+        hint.style.cssText = 'color:#666; font-size:0.75rem; font-family:Inter,sans-serif;';
+        hint.textContent = '匯入檔案後會出現快速切換按鈕';
+        quickButtons.appendChild(hint);
+        return;
+      }
+
+      savedFiles.forEach((file, index) => {
+        const wrapper = document.createElement('span');
+        wrapper.style.display = 'inline-flex';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.gap = '0.15rem';
+
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        const displayName = file.name.replace(/\.txt$/i, '');
+        btn.textContent = displayName;
+        btn.title = '載入: ' + file.bookName;
+
+        if (currentBookName === file.bookName && currentData.length > 0) {
+          btn.classList.add('active');
+        }
+
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          setDataAndRender(file.data, file.bookName, file.name);
+        });
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'quick-btn delete-btn';
+        deleteBtn.textContent = '✕';
+        deleteBtn.title = '刪除 ' + file.name;
+        deleteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (confirm('確定要刪除「' + file.name + '」的儲存記錄嗎？')) {
+            deleteFileRecord(file.name);
+            
+            if (currentBookName === file.bookName) {
+              if (savedFiles.length > 0) {
+                const first = savedFiles[0];
+                setDataAndRender(first.data, first.bookName, first.name);
+              } else {
+                setDataAndRender(DEFAULT_RAW, '箴言 · 十九', '箴言19.txt');
+              }
+            } else {
+              updateQuickButtons();
+            }
+          }
+        });
+
+        wrapper.appendChild(btn);
+        wrapper.appendChild(deleteBtn);
+        quickButtons.appendChild(wrapper);
+      });
+    }
+
+    // ----- 載入預設 -----
+    function loadDefault() {
+      setDataAndRender(DEFAULT_RAW, '箴言 · 十九', '箴言19.txt');
+      fileInput.value = '';
+    }
+
+    // ----- 處理檔案上傳 -----
+    function handleFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const text = e.target.result;
+          const { data, bookName } = parseTxtToData(text);
+          if (data.length === 0) {
+            alert('無法解析檔案，請確認格式正確。');
+            return;
+          }
+          setDataAndRender(data, bookName, file.name);
+          saveFileRecord(file.name, data, bookName);
+        } catch (err) {
+          alert('讀取檔案失敗：' + err.message);
+        }
+      };
+      reader.onerror = function() {
+        alert('無法讀取檔案');
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // ----- 下載／覆寫備份 -----
+    function buildTxtContent() {
+      if (!currentData || currentData.length === 0) return '';
+      let txt = currentBookName + '\n\n';
+      currentData.forEach(item => {
+        item.lines.forEach((line, idx) => {
+          if (idx === item.lines.length - 1) {
+            txt += line + ` [${item.verse}]\n`;
+          } else {
+            txt += line + '\n';
+          }
+        });
+        txt += (item.url || `https://bible.com/bible/1/pro.${item.verse}.KJV`) + '\n\n';
+      });
+      return txt;
+    }
+
+    function downloadTxt(filename) {
+      const txt = buildTxtContent();
+      if (!txt) return;
+      const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename || currentFileName || '經文_匯出.txt';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href);
+    }
+
+    async function writeToHandle(handle, text) {
+      try {
+        const writable = await handle.createWritable();
+        await writable.write(text);
+        await writable.close();
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+
+    async function updateBackupFile(filename) {
+      const txt = buildTxtContent();
+      if (!txt) return 'empty';
+      if (currentFileHandle && currentFileHandle.name === filename) {
+        const ok = await writeToHandle(currentFileHandle, txt);
+        if (ok) return 'direct';
+      }
+      downloadTxt(filename);
+      return 'download';
+    }
+
+    async function openViaFSA() {
+      try {
+        const [handle] = await window.showOpenFilePicker({
+          types: [{ description: '文字檔', accept: { 'text/plain': ['.txt'] } }],
+          excludeAcceptAllOption: false,
+          multiple: false
+        });
+        const file = await handle.getFile();
+        const text = await file.text();
+        const { data, bookName } = parseTxtToData(text);
+        if (data.length === 0) {
+          alert('無法解析檔案，請確認格式正確。');
+          return;
+        }
+        setDataAndRender(data, bookName, file.name);
+        currentFileHandle = handle;
+        saveFileRecord(file.name, data, bookName);
+      } catch (err) {
+        if (err && err.name !== 'AbortError') {
+          alert('讀取檔案失敗：' + (err.message || err));
+        }
+      }
+    }
+
+    // ----- 事件 -----
+    fileInput.addEventListener('change', function(e) {
+      if (this.files && this.files.length > 0) {
+        handleFile(this.files[0]);
+      }
+      this.value = '';
+    });
+
+    // ----- 初始化 -----
+    loadSavedFiles();
+    loadFavorites();
+    loadFontScale();
+    if (savedFiles.length > 0) {
+      const first = savedFiles[0];
+      setDataAndRender(first.data, first.bookName, first.name);
+    } else {
+      loadDefault();
+    }
+    updateQuickButtons();
+    updateHeaderSpacing();
+
+    editBtn.addEventListener('click', enterEditMode);
+    fontDecBtn.addEventListener('click', function() { changeFontScale(-FONT_SCALE_STEP); });
+    fontIncBtn.addEventListener('click', function() { changeFontScale(FONT_SCALE_STEP); });
+    favBtn.addEventListener('click', function() {
+      if (isFavoritesView) {
+        exitFavoritesView();
+      } else {
+        enterFavoritesView();
+      }
+    });
+    closeFavBtn.addEventListener('click', exitFavoritesView);
+    editFavBtn.addEventListener('click', enterFavoritesEditMode);
+    saveFavEditBtn.addEventListener('click', saveFavoritesEdits);
+    cancelFavEditBtn.addEventListener('click', cancelFavoritesEdits);
+    favFileInput.addEventListener('change', function(e) {
+      if (this.files && this.files.length > 0) {
+        handleFavoritesFile(this.files[0]);
+      }
+      this.value = '';
+    });
+    if (supportsFSAccess) {
+      importLabel.addEventListener('click', function(e) {
+        e.preventDefault();
+        openViaFSA();
+      });
+    }
+    saveEditBtn.addEventListener('click', saveEdits);
+    cancelEditBtn.addEventListener('click', cancelEdits);
+    window.addEventListener('resize', function() {
+      updateHeaderSpacing();
+      if (isEditing) {
+        editToolbarSpacer.style.height = editToolbar.offsetHeight + 'px';
+      }
+      if (isFavoritesView) {
+        favToolbarSpacer.style.height = favToolbar.offsetHeight + 'px';
+      }
+      if (isEditingFavorites) {
+        favEditToolbarSpacer.style.height = favEditToolbar.offsetHeight + 'px';
+      }
+    });
+  })();
+</script>
+</body>
+</html>

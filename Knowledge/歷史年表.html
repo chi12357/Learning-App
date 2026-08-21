@@ -80,7 +80,7 @@
         .col-china .cross-tag { font-size: 0.6rem; color: #942525; background: rgba(148, 37, 37, 0.15); padding: 0 8px; border-radius: 12px; margin-right: 4px; font-weight: 600; letter-spacing: 0.5px; display: inline-block; vertical-align: middle; }
         .col-world .bullet { display: inline-block; margin-right: 6px; color: #bd8b2a; font-weight: 700; font-size: 1.2em; }
         .search-match { background: rgba(189, 139, 42, 0.25); border-radius: 2px; padding: 0 2px; color: #fcfbfa; }
-        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: rgba(18, 19, 21, 0.92); backdrop-filter: blur(8px); color: #fcfbfa; padding: 10px 24px; border-radius: 40px; font-size: 0.85rem; font-family: 'Inter', sans-serif; border: 1px solid rgba(189, 139, 42, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 999; pointer-events: none; white-space: nowrap; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: rgba(18, 19, 21, 0.92); backdrop-filter: blur(8px); color: #fcfbfa; padding: 10px 24px; border-radius: 20px; font-size: 0.85rem; font-family: 'Inter', sans-serif; border: 1px solid rgba(189, 139, 42, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); opacity: 0; transition: opacity 0.3s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 999; pointer-events: none; max-width: 88vw; text-align: center; white-space: normal; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast .icon { margin-right: 8px; }
         .empty-state { text-align: center; padding: 40px 20px; color: rgba(252, 251, 250, 0.3); font-size: 1rem; letter-spacing: 1px; }
@@ -110,8 +110,50 @@
         .row-edit-actions .btn-secondary { background: rgba(252, 251, 250, 0.05); border: 1px solid rgba(252, 251, 250, 0.15); color: rgba(252, 251, 250, 0.6); padding: 2px 14px; border-radius: 16px; font-size: 0.7rem; cursor: pointer; transition: background 0.2s; font-family: 'Inter', sans-serif; }
         .row-edit-actions .btn-secondary:hover { background: rgba(252, 251, 250, 0.1); }
 
-        @media (max-width: 767px) { html { font-size: 25.6px; } body { padding: 8px 6px 24px; } .app-header h1 { font-size: 1.4rem; letter-spacing: 2px; } .app-header h1 small { font-size: 0.5rem; letter-spacing: 3px; } .sticky-toolbar { padding: 6px 0 4px; margin-bottom: 10px; } .toolbar { gap: 6px; } .search-wrap { min-width: 100px; flex: 1 1 100%; order: 1; } .search-wrap input { font-size: 0.85rem; padding: 8px 12px 8px 36px; } .search-wrap .search-icon { font-size: 0.9rem; left: 10px; } .search-wrap .clear-btn { font-size: 0.9rem; right: 8px; } .controls-group { order: 2; width: 100%; justify-content: flex-end; gap: 4px; } .controls-group .toggle-all-btn { width: 34px; height: 34px; font-size: 1.2rem; } .controls-group .divider { height: 22px; } .font-controls button { width: 34px; height: 34px; font-size: 1rem; } .font-controls .font-size-label { font-size: 0.55rem; min-width: 24px; } .stats { font-size: 0.65rem; padding: 0 2px 8px; margin-bottom: 10px; } .stats .hint { font-size: 0.6rem; } .dynasty-header { padding: 10px 12px; min-height: 48px; } .dynasty-name { font-size: 2.0rem; } .dynasty-name .years { font-size: 1.2rem; } .dynasty-name .badge { font-size: 0.9rem; } .dynasty-toggle { width: 32px; height: 32px; font-size: 1.3rem; } .emperor-row { grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 8px 10px; border-radius: 6px; min-height: 56px; grid-template-rows: auto auto auto; align-items: start; } .col-emperor { font-size: 1.2rem; grid-column: 1 / 3; grid-row: 1 / 2; padding-top: 2px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; } .col-emperor .emp-era { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; width: auto; } .col-emperor .year-range { font-size: 0.75rem; display: inline; } .col-emperor .edit-row-btn { font-size: 0.5rem; } .col-china { font-size: 0.78rem; grid-column: 1 / 3; grid-row: 2 / 3; padding-top: 4px; border-top: 1px solid rgba(252, 251, 250, 0.05); } .col-world { font-size: 0.72rem; grid-column: 1 / 3; grid-row: 3 / 4; color: rgba(252, 251, 250, 0.5); padding-top: 4px; border-top: none; display: block; } .col-china .cross-tag { font-size: 0.5rem; padding: 0 4px; } .toast { font-size: 0.7rem; padding: 8px 16px; bottom: 20px; } .event-edit input[type="text"] { font-size: 0.75rem; min-width: 60px; } .event-edit .btn-sm { font-size: 0.45rem; padding: 0 4px; } }
-        @media (max-width: 419px) { html { font-size: 22.4px; } body { padding: 4px 4px 16px; } .dynasty-name { font-size: 1.6rem; } .dynasty-name .years { font-size: 1.0rem; } .dynasty-name .badge { font-size: 0.75rem; } .emperor-row { padding: 6px 8px; gap: 2px 4px; } .col-emperor { font-size: 1.0rem; } .col-emperor .year-range { font-size: 0.6rem; } .col-china { font-size: 0.7rem; } .col-world { font-size: 0.65rem; } .dynasty-header { padding: 8px 10px; min-height: 40px; } .controls-group .toggle-all-btn { width: 30px; height: 30px; font-size: 1.0rem; } .font-controls button { width: 30px; height: 30px; font-size: 0.85rem; } .search-wrap input { font-size: 0.75rem; padding: 6px 10px 6px 30px; } .search-wrap .search-icon { font-size: 0.75rem; left: 8px; } .toast { font-size: 0.6rem; padding: 6px 12px; bottom: 16px; } }
+        /* 工具列圖示按鈕（排序 / 匯出 / 匯入） */
+        .controls-group .icon-btn { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid rgba(252, 251, 250, 0.15); background: rgba(252, 251, 250, 0.04); color: rgba(252, 251, 250, 0.4); font-size: 1.3rem; cursor: pointer; transition: background 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center; line-height: 1; user-select: none; -webkit-tap-highlight-color: transparent; padding: 0; }
+        .controls-group .icon-btn:hover { background: rgba(252, 251, 250, 0.08); }
+        .controls-group .icon-btn:active { background: rgba(189, 139, 42, 0.15); border-color: rgba(189, 139, 42, 0.3); }
+        .controls-group .icon-btn.active { background: #bd8b2a; color: #121315; border-color: #bd8b2a; }
+
+        /* 拖曳排序模式 */
+        .dynasty-drag-handle, .row-drag-handle { display: none; align-items: center; justify-content: center; cursor: grab; color: rgba(252, 251, 250, 0.35); font-size: 1.2rem; touch-action: none; flex-shrink: 0; user-select: none; -webkit-tap-highlight-color: transparent; }
+        .dynasty-drag-handle:active, .row-drag-handle:active { cursor: grabbing; color: #bd8b2a; }
+        .app.reorder-mode .dynasty-drag-handle { display: flex; width: 30px; }
+        .app.reorder-mode .emperor-row { position: relative; padding-left: 38px; }
+        .app.reorder-mode .row-drag-handle { display: flex; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; }
+        .app.reorder-mode .dynasty-header { cursor: default; }
+        .app.reorder-mode .search-wrap { opacity: 0.4; pointer-events: none; }
+        .dynasty.dragging, .emperor-row.dragging { opacity: 0.5; box-shadow: 0 8px 24px rgba(0,0,0,0.4); background: rgba(189, 139, 42, 0.1) !important; z-index: 50; }
+        .reorder-hint { display: none; font-size: 0.7rem; color: #bd8b2a; text-align: center; padding: 4px 0 10px; letter-spacing: 0.5px; }
+        .app.reorder-mode .reorder-hint { display: block; }
+
+        /* 朝代標題編輯 */
+        .dynasty-edit-fields { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .dynasty-edit-fields input[type="text"] { background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.2); border-radius: 6px; color: #fcfbfa; padding: 4px 8px; font-size: 1.4rem; font-family: 'Noto Serif TC', serif; outline: none; width: 120px; }
+        .dynasty-edit-fields input[type="number"] { background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.2); border-radius: 6px; color: #fcfbfa; padding: 4px 6px; font-size: 1rem; font-family: 'Inter', sans-serif; outline: none; width: 72px; }
+        .dynasty-header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+
+        /* 新增/刪除按鈕 */
+        .add-dynasty-btn { display: block; width: 100%; margin: 14px 0 30px; padding: 12px; border-radius: 12px; border: 1px dashed rgba(252, 251, 250, 0.2); background: transparent; color: rgba(252, 251, 250, 0.4); font-size: 0.9rem; cursor: pointer; transition: background 0.2s, color 0.2s; font-family: 'Inter', sans-serif; }
+        .add-dynasty-btn:hover { background: rgba(189, 139, 42, 0.1); color: #fcfbfa; border-color: rgba(189, 139, 42, 0.3); }
+        .add-emperor-btn { margin: 6px 0 2px; padding: 4px 12px; border-radius: 20px; border: 1px dashed rgba(252, 251, 250, 0.2); background: transparent; color: rgba(252, 251, 250, 0.4); font-size: 0.7rem; cursor: pointer; transition: background 0.2s, color 0.2s; font-family: 'Inter', sans-serif; display: inline-block; }
+        .add-emperor-btn:hover { background: rgba(189, 139, 42, 0.1); color: #fcfbfa; border-color: rgba(189, 139, 42, 0.3); }
+        .delete-row-btn { background: none; border: 1px solid rgba(148, 37, 37, 0.4); color: #d97070; border-radius: 12px; padding: 0 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.6rem; line-height: 1.6; }
+        .delete-row-btn:hover { background: rgba(148, 37, 37, 0.25); }
+        .delete-dynasty-btn { background: none; border: 1px solid rgba(148, 37, 37, 0.4); color: #d97070; border-radius: 12px; padding: 2px 10px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.65rem; }
+        .delete-dynasty-btn:hover { background: rgba(148, 37, 37, 0.25); }
+
+        /* 自動還原提示橫幅 */
+        .autosave-banner { display: flex; flex-direction: column; gap: 8px; background: rgba(189, 139, 42, 0.12); border: 1px solid rgba(189, 139, 42, 0.35); border-radius: 12px; padding: 10px 14px; margin: -6px 0 16px; font-size: 0.8rem; color: rgba(252, 251, 250, 0.85); }
+        .autosave-banner .autosave-ts { opacity: 0.6; font-size: 0.7rem; }
+        .autosave-banner-actions { display: flex; gap: 8px; }
+        .autosave-banner-actions button { flex: 1; padding: 6px 10px; border-radius: 8px; border: 1px solid rgba(252, 251, 250, 0.2); background: rgba(252, 251, 250, 0.06); color: #fcfbfa; font-size: 0.75rem; cursor: pointer; font-family: 'Inter', sans-serif; }
+        .autosave-banner-actions button:last-child { border-color: rgba(148, 37, 37, 0.4); color: #d97070; }
+        .autosave-banner-actions button:hover { background: rgba(252, 251, 250, 0.12); }
+
+        @media (max-width: 767px) { html { font-size: 25.6px; } body { padding: 8px 6px 24px; } .app-header h1 { font-size: 1.4rem; letter-spacing: 2px; } .app-header h1 small { font-size: 0.5rem; letter-spacing: 3px; } .sticky-toolbar { padding: 6px 0 4px; margin-bottom: 10px; } .toolbar { gap: 6px; } .search-wrap { min-width: 100px; flex: 1 1 100%; order: 1; } .search-wrap input { font-size: 0.85rem; padding: 8px 12px 8px 36px; } .search-wrap .search-icon { font-size: 0.9rem; left: 10px; } .search-wrap .clear-btn { font-size: 0.9rem; right: 8px; } .controls-group { order: 2; width: 100%; justify-content: flex-end; gap: 4px; flex-wrap: wrap; } .controls-group .toggle-all-btn { width: 34px; height: 34px; font-size: 1.2rem; } .controls-group .icon-btn { width: 34px; height: 34px; font-size: 1.1rem; } .controls-group .divider { height: 22px; } .app.reorder-mode .emperor-row { padding-left: 32px; } .app.reorder-mode .row-drag-handle { left: 4px; } .font-controls button { width: 34px; height: 34px; font-size: 1rem; } .font-controls .font-size-label { font-size: 0.55rem; min-width: 24px; } .stats { font-size: 0.65rem; padding: 0 2px 8px; margin-bottom: 10px; } .stats .hint { font-size: 0.6rem; } .dynasty-header { padding: 10px 12px; min-height: 48px; } .dynasty-name { font-size: 2.0rem; } .dynasty-name .years { font-size: 1.2rem; } .dynasty-name .badge { font-size: 0.9rem; } .dynasty-toggle { width: 32px; height: 32px; font-size: 1.3rem; } .emperor-row { grid-template-columns: 1fr 1fr; gap: 4px 8px; padding: 8px 10px; border-radius: 6px; min-height: 56px; grid-template-rows: auto auto auto; align-items: start; } .col-emperor { font-size: 1.2rem; grid-column: 1 / 3; grid-row: 1 / 2; padding-top: 2px; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 6px; } .col-emperor .emp-era { display: inline-flex; flex-wrap: wrap; gap: 2px 4px; width: auto; } .col-emperor .year-range { font-size: 0.75rem; display: inline; } .col-emperor .edit-row-btn { font-size: 0.5rem; } .col-china { font-size: 0.78rem; grid-column: 1 / 3; grid-row: 2 / 3; padding-top: 4px; border-top: 1px solid rgba(252, 251, 250, 0.05); } .col-world { font-size: 0.72rem; grid-column: 1 / 3; grid-row: 3 / 4; color: rgba(252, 251, 250, 0.5); padding-top: 4px; border-top: none; display: block; } .col-china .cross-tag { font-size: 0.5rem; padding: 0 4px; } .toast { font-size: 0.7rem; padding: 8px 16px; bottom: 20px; } .event-edit input[type="text"] { font-size: 0.75rem; min-width: 60px; } .event-edit .btn-sm { font-size: 0.45rem; padding: 0 4px; } }
+        @media (max-width: 419px) { html { font-size: 22.4px; } body { padding: 4px 4px 16px; } .dynasty-name { font-size: 1.6rem; } .dynasty-name .years { font-size: 1.0rem; } .dynasty-name .badge { font-size: 0.75rem; } .emperor-row { padding: 6px 8px; gap: 2px 4px; } .col-emperor { font-size: 1.0rem; } .col-emperor .year-range { font-size: 0.6rem; } .col-china { font-size: 0.7rem; } .col-world { font-size: 0.65rem; } .dynasty-header { padding: 8px 10px; min-height: 40px; } .controls-group .toggle-all-btn { width: 30px; height: 30px; font-size: 1.0rem; } .controls-group .icon-btn { width: 30px; height: 30px; font-size: 0.95rem; } .font-controls button { width: 30px; height: 30px; font-size: 0.85rem; } .search-wrap input { font-size: 0.75rem; padding: 6px 10px 6px 30px; } .search-wrap .search-icon { font-size: 0.75rem; left: 8px; } .toast { font-size: 0.6rem; padding: 6px 12px; bottom: 16px; } }
         @media (min-width: 768px) { .emperor-row { grid-template-columns: 1.2fr 1.2fr 1.2fr 1.2fr; gap: 10px 14px; padding: 10px 18px; } .col-emperor { font-size: 1.5rem; } .col-emperor .year-range { font-size: 0.9rem; } .col-china { font-size: 0.95rem; } .col-world { font-size: 0.9rem; } .dynasty-header { padding: 16px 22px; } .dynasty-body.open { padding: 0 8px 12px; } .emperor-row .col-world { display: block; } }
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: rgba(252, 251, 250, 0.04); }
@@ -142,13 +184,31 @@
                         <span class="font-size-label" id="fontSizeLabel">160%</span>
                         <button id="fontIncBtn" aria-label="放大字級">A+</button>
                     </div>
+                    <span class="divider"></span>
+                    <button class="icon-btn" id="reorderBtn" aria-label="拖曳排序模式" title="拖曳排序">⇅</button>
+                    <button class="icon-btn" id="exportBtn" aria-label="匯出JSON" title="匯出 JSON">
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h4l1.5 2h5L16 14h4"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/><path d="M12 11V3"/><path d="M8.5 6.5 12 3l3.5 3.5"/></svg>
+                    </button>
+                    <button class="icon-btn" id="importBtn" aria-label="匯入JSON" title="匯入 JSON">
+                        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h4l1.5 2h5L16 14h4"/><path d="M4 14v5a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-5"/><path d="M12 3v8"/><path d="M8.5 8.5 12 12l3.5-3.5"/></svg>
+                    </button>
+                    <input type="file" id="importFileInput" accept="application/json,.json" style="display:none" />
                 </div>
             </div>
+            <div class="reorder-hint">↕️ 拖曳左側 ⠿ 把手，調整順序後放開即自動儲存</div>
         </div>
 
         <div class="stats">
             <span class="count" id="statsCount">載入中…</span>
             <span class="hint" id="modeHint">點擊事件自動複製並 Google 搜尋</span>
+        </div>
+
+        <div class="autosave-banner" id="autosaveBanner" style="display:none;">
+            <span>💾 已自動還原您上次未存檔的編輯 <span class="autosave-ts"></span></span>
+            <div class="autosave-banner-actions">
+                <button onclick="hideAutosaveBanner()">知道了</button>
+                <button onclick="discardAutoSave()">捨棄，改用原始資料</button>
+            </div>
         </div>
 
         <div id="timelineContainer">
@@ -157,6 +217,8 @@
                 <div>載入歷史資料中…</div>
             </div>
         </div>
+
+        <button class="add-dynasty-btn" id="addDynastyBtn">➕ 新增時代分期</button>
     </div>
 
     <div class="toast" id="toast"><span class="icon">📋</span><span id="toastMsg">已複製，開啟搜尋…</span></div>
@@ -168,6 +230,91 @@
         let DATA = [];
         let editStates = {}; // key: 'dynastyIdx-emperorIdx' => true/false
         let backupData = null; // 用於取消編輯時還原
+        let dynastyEditStates = {}; // key: dynastyIdx => true/false（朝代標題編輯）
+        let reorderMode = false; // 拖曳排序模式
+
+        // ============================================================
+        //  自動儲存（localStorage）— 防止手機返回手勢跳出時遺失編輯
+        // ============================================================
+        const AUTOSAVE_KEY = 'historyTimelineAutosave_v1';
+        const AUTOSAVE_TS_KEY = 'historyTimelineAutosave_v1_ts';
+        let autoSaveTimer = null;
+        let suppressAutoSave = false; // 剛從自動儲存還原時，避免立刻又覆蓋一次
+
+        function persistNow() {
+            if (suppressAutoSave || !DATA || DATA.length === 0) return;
+            try {
+                localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(DATA));
+                localStorage.setItem(AUTOSAVE_TS_KEY, Date.now().toString());
+            } catch (e) {
+                console.warn('自動儲存失敗（可能是儲存空間已滿）', e);
+            }
+        }
+
+        function scheduleAutoSave() {
+            clearTimeout(autoSaveTimer);
+            autoSaveTimer = setTimeout(persistNow, 300);
+        }
+
+        function clearAutoSave() {
+            try {
+                localStorage.removeItem(AUTOSAVE_KEY);
+                localStorage.removeItem(AUTOSAVE_TS_KEY);
+            } catch (e) {}
+        }
+
+        function hasAutoSave() {
+            try {
+                return !!localStorage.getItem(AUTOSAVE_KEY);
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function showAutosaveBanner() {
+            const banner = document.getElementById('autosaveBanner');
+            if (!banner) return;
+            let ts = '';
+            try {
+                const raw = localStorage.getItem(AUTOSAVE_TS_KEY);
+                if (raw) ts = new Date(parseInt(raw)).toLocaleString('zh-TW', { hour12: false });
+            } catch (e) {}
+            banner.querySelector('.autosave-ts').textContent = ts ? `（${ts}）` : '';
+            banner.style.display = 'flex';
+        }
+
+        function hideAutosaveBanner() {
+            const banner = document.getElementById('autosaveBanner');
+            if (banner) banner.style.display = 'none';
+        }
+
+        function restoreAutoSave() {
+            try {
+                const raw = localStorage.getItem(AUTOSAVE_KEY);
+                if (!raw) return false;
+                suppressAutoSave = true;
+                DATA = JSON.parse(raw);
+                editStates = {};
+                dynastyEditStates = {};
+                backupData = null;
+                render('');
+                const total = DATA.reduce((sum, d) => sum + d.emperors.length, 0);
+                statsCount.textContent = `共 ${total} 位皇帝 · ${DATA.length} 個朝代（已還原未存檔的編輯）`;
+                hideAutosaveBanner();
+                suppressAutoSave = false;
+                showToast('↩️ 已還原上次未存檔的編輯');
+                return true;
+            } catch (e) {
+                console.warn('還原自動儲存失敗', e);
+                return false;
+            }
+        }
+
+        function discardAutoSave() {
+            clearAutoSave();
+            hideAutosaveBanner();
+            loadData(true);
+        }
 
         // ============================================================
         //  工具函數
@@ -186,12 +333,14 @@
 
         function isEditing(dIdx, eIdx) { return editStates[getKey(dIdx, eIdx)] === true; }
 
+        function isDynastyEditing(dIdx) { return dynastyEditStates[dIdx] === true; }
+
         // ============================================================
         //  Toast 訊息
         // ============================================================
         let toastTimer = null;
 
-        function showToast(msg) {
+        function showToast(msg, duration) {
             const toast = document.getElementById('toast');
             const msgEl = document.getElementById('toastMsg');
             msgEl.textContent = msg;
@@ -199,7 +348,7 @@
             clearTimeout(toastTimer);
             toastTimer = setTimeout(() => {
                 toast.classList.remove('show');
-            }, 2000);
+            }, duration || 2000);
         }
 
         // ============================================================
@@ -340,6 +489,345 @@
         }
 
         // ============================================================
+        //  朝代標題編輯（名稱 / 起訖年）
+        // ============================================================
+        function toggleDynastyEdit(dIdx) {
+            if (isDynastyEditing(dIdx)) {
+                cancelDynastyEdit(dIdx);
+            } else {
+                backupData = JSON.parse(JSON.stringify(DATA));
+                dynastyEditStates[dIdx] = true;
+                render(searchInput.value);
+            }
+        }
+
+        function cancelDynastyEdit(dIdx) {
+            if (backupData) {
+                DATA = backupData;
+                backupData = null;
+            }
+            dynastyEditStates[dIdx] = false;
+            render(searchInput.value);
+            showToast('↩️ 已取消編輯');
+        }
+
+        function saveDynastyEdit(dIdx) {
+            backupData = null;
+            dynastyEditStates[dIdx] = false;
+            render(searchInput.value);
+            downloadJSON();
+            showToast('✅ 已儲存並下載 JSON');
+        }
+
+        function updateDynastyField(dIdx, field, value) {
+            if (!DATA[dIdx]) return;
+            if (field === 'start' || field === 'end') {
+                const num = parseInt(value);
+                DATA[dIdx][field] = isNaN(num) ? value : num;
+            } else {
+                DATA[dIdx][field] = value;
+            }
+        }
+
+        function deleteDynasty(dIdx) {
+            const dynasty = DATA[dIdx];
+            if (!dynasty) return;
+            if (!confirm(`確定要刪除整個時代「${dynasty.name}」嗎？此動作無法復原。`)) return;
+            DATA.splice(dIdx, 1);
+            render(searchInput.value);
+            downloadJSON();
+            showToast('🗑 已刪除時代並下載 JSON');
+        }
+
+        function addNewDynasty() {
+            const newDynasty = {
+                id: 'new-period-' + Date.now(),
+                name: '新時代分期',
+                start: 2027,
+                end: 2027,
+                emperors: [{
+                    name: '新條目',
+                    era: '請編輯',
+                    yearStart: 2027,
+                    yearEnd: 2027,
+                    chinaEvents: [],
+                    worldEvents: []
+                }]
+            };
+            DATA.push(newDynasty);
+            const newIdx = DATA.length - 1;
+            dynastyEditStates[newIdx] = true;
+            backupData = null;
+            render(searchInput.value);
+            setTimeout(() => {
+                const header = document.querySelectorAll('.dynasty')[newIdx];
+                if (header) header.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 50);
+            showToast('➕ 已新增時代，請編輯內容');
+        }
+
+        function addNewEmperorRow(dIdx) {
+            if (!DATA[dIdx]) return;
+            DATA[dIdx].emperors.push({
+                name: '新條目',
+                era: '請編輯',
+                yearStart: DATA[dIdx].start,
+                yearEnd: DATA[dIdx].end,
+                chinaEvents: [],
+                worldEvents: []
+            });
+            const newEmpIdx = DATA[dIdx].emperors.length - 1;
+            editStates[getKey(dIdx, newEmpIdx)] = true;
+            render(searchInput.value);
+            showToast('➕ 已新增一列，請編輯內容');
+        }
+
+        function deleteEmperorRow(dIdx, eIdx) {
+            if (!DATA[dIdx] || !DATA[dIdx].emperors[eIdx]) return;
+            if (!confirm('確定要刪除這一列嗎？')) return;
+            DATA[dIdx].emperors.splice(eIdx, 1);
+            render(searchInput.value);
+            downloadJSON();
+            showToast('🗑 已刪除並下載 JSON');
+        }
+
+        // ============================================================
+        //  匯出 / 匯入（File System Access API：情境A開檔覆寫、情境B另存新檔）
+        // ============================================================
+        let openedFileHandle = null;  // 情境A：透過「開啟檔案」匯入時取得的 handle，匯出時可直接無聲覆寫
+        let exportFileHandle = null;  // 情境B：透過「另存新檔」選過的位置，之後匯出可直接覆寫同一份
+        let hasExportedOnce = false;  // 純下載備援路徑用：是否已經下載過一次
+
+        async function exportData() {
+            const jsonStr = JSON.stringify(DATA, null, 2);
+
+            // 情境 A：資料是從「開啟檔案」匯入的，直接無聲覆寫回原檔（像 Ctrl+S）
+            if (openedFileHandle) {
+                try {
+                    const writable = await openedFileHandle.createWritable();
+                    await writable.write(jsonStr);
+                    await writable.close();
+                    showToast(`✅ 已直接覆寫原始檔案「${openedFileHandle.name}」`);
+                    return;
+                } catch (err) {
+                    console.warn('直接覆寫原檔失敗，改走另存新檔', err);
+                    openedFileHandle = null;
+                }
+            }
+
+            // 情境 B：讓使用者選擇儲存位置；已經選過的話直接覆寫同一份（覆蓋前先確認）
+            if (window.showSaveFilePicker) {
+                try {
+                    if (exportFileHandle) {
+                        const proceed = confirm('您先前已經匯出過一次，要再匯出一次並覆蓋原本的檔案嗎？');
+                        if (!proceed) return;
+                    } else {
+                        exportFileHandle = await window.showSaveFilePicker({
+                            suggestedName: 'timeline_data.json',
+                            types: [{ description: 'JSON 檔案', accept: { 'application/json': ['.json'] } }]
+                        });
+                    }
+                    const writable = await exportFileHandle.createWritable();
+                    await writable.write(jsonStr);
+                    await writable.close();
+                    showToast(`⬇ 已匯出至「${exportFileHandle.name}」`);
+                    return;
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return; // 使用者取消了選擇視窗
+                    console.warn('無法使用選擇資料夾儲存，改用一般下載', err);
+                    exportFileHandle = null;
+                }
+            }
+
+            // 情境 C（通用備援）：一般瀏覽器下載，無法得知或指定確切資料夾
+            if (hasExportedOnce) {
+                const proceed = confirm('您先前已經匯出過一次，要再匯出一次並覆蓋原本的檔案嗎？');
+                if (!proceed) return;
+            }
+            downloadJSON();
+            hasExportedOnce = true;
+            showToast('⬇ 已下載 timeline_data.json（存放於瀏覽器預設的「下載」資料夾，實際位置依裝置與瀏覽器設定而異）', 4500);
+        }
+
+        async function triggerImport() {
+            if (window.showOpenFilePicker) {
+                try {
+                    const [handle] = await window.showOpenFilePicker({
+                        types: [{ description: 'JSON 檔案', accept: { 'application/json': ['.json'] } }],
+                        excludeAcceptAllOption: false,
+                        multiple: false
+                    });
+                    const file = await handle.getFile();
+                    const text = await file.text();
+                    applyImportedText(text, file.name, handle);
+                } catch (err) {
+                    if (err && err.name === 'AbortError') return; // 使用者取消選擇，不做任何事
+                    console.warn('開啟檔案失敗，改用一般檔案選擇', err);
+                    document.getElementById('importFileInput').click();
+                }
+                return;
+            }
+            document.getElementById('importFileInput').click();
+        }
+
+        function applyImportedText(text, filename, handle) {
+            let parsed;
+            try {
+                parsed = JSON.parse(text);
+            } catch (err) {
+                showToast('⚠️ JSON 格式錯誤，匯入失敗');
+                return;
+            }
+            if (!Array.isArray(parsed)) {
+                showToast('⚠️ 格式不符（需為陣列），匯入失敗');
+                return;
+            }
+            if (!confirm(`確定要匯入「${filename}」嗎？這將取代目前畫面上的所有資料（共 ${parsed.length} 個時期）。`)) {
+                return;
+            }
+            DATA = parsed;
+            editStates = {};
+            dynastyEditStates = {};
+            backupData = null;
+            openedFileHandle = handle || null; // 有 handle 的話，之後按「匯出」會直接覆寫回這個檔案
+            exportFileHandle = null; // 重置另一條匯出路徑的記憶，避免兩邊搞混
+            hasExportedOnce = false;
+            render('');
+            if (handle) {
+                showToast(`✅ 已匯入「${filename}」（之後按匯出會直接覆寫回這個檔案）`);
+            } else {
+                showToast('✅ 已匯入 JSON 資料');
+            }
+        }
+
+        function handleImportFile(fileInput) {
+            const file = fileInput.files && fileInput.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                applyImportedText(e.target.result, file.name, null);
+                fileInput.value = '';
+            };
+            reader.onerror = () => {
+                showToast('⚠️ 讀取檔案失敗');
+                fileInput.value = '';
+            };
+            reader.readAsText(file, 'utf-8');
+        }
+
+        // ============================================================
+        //  拖曳排序（時代 / 皇帝列）— Pointer Events，支援觸控與滑鼠
+        // ============================================================
+        function toggleReorderMode() {
+            reorderMode = !reorderMode;
+            const app = document.getElementById('app');
+            const btn = document.getElementById('reorderBtn');
+            if (reorderMode) {
+                // 排序時清除搜尋，避免索引錯亂
+                searchInput.value = '';
+                clearBtn.classList.remove('visible');
+                render('');
+                app.classList.add('reorder-mode');
+                btn.classList.add('active');
+                if (!allExpanded) toggleAll();
+            } else {
+                app.classList.remove('reorder-mode');
+                btn.classList.remove('active');
+            }
+        }
+
+        function initDragAndDrop() {
+            container.addEventListener('pointerdown', onDragPointerDown);
+        }
+
+        let dragCtx = null;
+
+        function onDragPointerDown(e) {
+            if (!reorderMode) return;
+            const dynHandle = e.target.closest('.dynasty-drag-handle');
+            const rowHandle = e.target.closest('.row-drag-handle');
+            if (!dynHandle && !rowHandle) return;
+            e.preventDefault();
+
+            let item, listEl, mode, dynIdx = null;
+            if (dynHandle) {
+                item = dynHandle.closest('.dynasty');
+                listEl = container;
+                mode = 'dynasty';
+            } else {
+                item = rowHandle.closest('.emperor-row');
+                listEl = item.closest('.emperor-grid');
+                mode = 'row';
+                dynIdx = parseInt(item.dataset.dynastyIdx);
+            }
+            if (!item || !listEl) return;
+
+            dragCtx = { item, listEl, mode, dynIdx, startY: e.clientY, pointerId: e.pointerId };
+            item.classList.add('dragging');
+            try { item.setPointerCapture(e.pointerId); } catch (err) {}
+
+            const move = (ev) => onDragPointerMove(ev);
+            const up = (ev) => {
+                onDragPointerUp(ev);
+                listEl.removeEventListener('pointermove', move);
+                window.removeEventListener('pointerup', up);
+            };
+            listEl.addEventListener('pointermove', move);
+            window.addEventListener('pointerup', up);
+        }
+
+        function onDragPointerMove(e) {
+            if (!dragCtx) return;
+            const { item, listEl, mode } = dragCtx;
+            const itemSelector = mode === 'dynasty' ? ':scope > .dynasty' : '.emperor-row';
+            const siblings = Array.from(listEl.querySelectorAll(itemSelector)).filter(el => el !== item);
+            const itemRect = item.getBoundingClientRect();
+            const itemCenter = e.clientY;
+
+            for (const sib of siblings) {
+                const sibRect = sib.getBoundingClientRect();
+                const sibCenter = sibRect.top + sibRect.height / 2;
+                const pos = item.compareDocumentPosition(sib);
+                const itemIsBeforeSib = !!(pos & Node.DOCUMENT_POSITION_FOLLOWING);
+                if (itemIsBeforeSib && itemCenter > sibCenter) {
+                    listEl.insertBefore(item, sib.nextSibling);
+                    break;
+                } else if (!itemIsBeforeSib && itemCenter < sibCenter) {
+                    listEl.insertBefore(item, sib);
+                    break;
+                }
+            }
+        }
+
+        function onDragPointerUp(e) {
+            if (!dragCtx) return;
+            const { item, mode, dynIdx } = dragCtx;
+            item.classList.remove('dragging');
+            try { item.releasePointerCapture(e.pointerId); } catch (err) {}
+
+            if (mode === 'dynasty') {
+                const ids = Array.from(container.querySelectorAll(':scope > .dynasty')).map(el => el.dataset.dynastyId);
+                const newData = ids.map(id => DATA.find(d => d.id === id)).filter(Boolean);
+                if (newData.length === DATA.length) {
+                    DATA = newData;
+                    downloadJSON();
+                    showToast('↕️ 已調整時代順序並下載 JSON');
+                }
+            } else {
+                const rows = Array.from(document.querySelectorAll(`.emperor-row[data-dynasty-idx="${dynIdx}"]`));
+                const order = rows.map(r => parseInt(r.dataset.emperorIdx)).filter(n => !isNaN(n));
+                const emp = DATA[dynIdx].emperors;
+                if (order.length === emp.length) {
+                    DATA[dynIdx].emperors = order.map(i => emp[i]);
+                    downloadJSON();
+                    showToast('↕️ 已調整順序並下載 JSON');
+                }
+            }
+            dragCtx = null;
+            render('');
+        }
+
+        // ============================================================
         //  事件增刪改（編輯模式專用）
         // ============================================================
         function getIndices(el) {
@@ -393,6 +881,17 @@
             const events = (type === 'china') ? emp.chinaEvents : emp.worldEvents;
             if (eventIdx < events.length) {
                 events[eventIdx] = input.value;
+            }
+        }
+
+        function updateEmperorField(dIdx, eIdx, field, value) {
+            const emp = DATA[dIdx] && DATA[dIdx].emperors[eIdx];
+            if (!emp) return;
+            if (field === 'yearStart' || field === 'yearEnd') {
+                const num = parseInt(value);
+                emp[field] = isNaN(num) ? value : num;
+            } else {
+                emp[field] = value;
             }
         }
 
@@ -470,14 +969,37 @@
                 const toggleOpenClass = shouldOpen ? 'open' : '';
                 const highlightClass = dynasty.hasMatch && search ? 'highlight' : '';
 
+                const isDynEditing = isDynastyEditing(di);
+                const dynEditBtnText = isDynEditing ? '儲存' : '改';
+                const dynEditBtnAction = isDynEditing ? `saveDynastyEdit(${di})` : `toggleDynastyEdit(${di})`;
+
+                let dynNameHtml;
+                if (isDynEditing) {
+                    dynNameHtml = `<span class="dynasty-edit-fields">
+                            <input type="text" value="${escapeAttr(dynasty.name)}" oninput="updateDynastyField(${di}, 'name', this.value)" />
+                            <input type="number" value="${dynasty.start}" oninput="updateDynastyField(${di}, 'start', this.value)" />〜<input type="number" value="${dynasty.end}" oninput="updateDynastyField(${di}, 'end', this.value)" />
+                        </span>`;
+                } else {
+                    dynNameHtml = `${dynasty.name}
+                            <span class="years">${dynasty.start} ~ ${dynasty.end}</span>
+                            <span class="badge">${dynasty.emperors.length} 帝</span>`;
+                }
+
+                const dynActionsHtml = `<div class="dynasty-header-actions" onclick="event.stopPropagation()">
+                        <button class="edit-row-btn ${isDynEditing ? 'active' : ''}" onclick="${dynEditBtnAction}">${dynEditBtnText}</button>
+                        ${isDynEditing ? `<button class="edit-row-btn" onclick="cancelDynastyEdit(${di})" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);">取消</button><button class="delete-dynasty-btn" onclick="deleteDynasty(${di})">刪除時代</button>` : ''}
+                    </div>`;
+
                 html += `<div class="dynasty ${highlightClass}" data-dynasty-id="${dynasty.id}">
                     <div class="dynasty-header" data-toggle>
-                        <span class="dynasty-name">
-                            ${dynasty.name}
-                            <span class="years">${dynasty.start} ~ ${dynasty.end}</span>
-                            <span class="badge">${dynasty.emperors.length} 帝</span>
+                        <span style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+                            <span class="dynasty-drag-handle" title="拖曳調整順序" onclick="event.stopPropagation()">⠿</span>
+                            <span class="dynasty-name">${dynNameHtml}</span>
                         </span>
-                        <span class="dynasty-toggle ${toggleOpenClass}" aria-hidden="true">▾</span>
+                        <span style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                            ${dynActionsHtml}
+                            <span class="dynasty-toggle ${toggleOpenClass}" aria-hidden="true">▾</span>
+                        </span>
                     </div>
                     <div class="dynasty-body ${dynastyOpenClass}">
                         <div class="emperor-grid">`;
@@ -590,23 +1112,40 @@
                             `<button class="edit-row-btn" onclick="cancelRowEdit(${realDynIdx}, ${realEmpIdx})" style="border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.5);">取消</button>`;
                     }
 
-                    const emperorDisplay = `
-                        <span class="emp-era">
-                            <span class="emp-name">${emp.name}</span>·
-                            <span class="era-name">${emp.era}</span>
-                        </span>
-                        <span class="year-range">（${emp.yearStart}~${emp.yearEnd}）</span>
-                        <button class="${editBtnClass}" onclick="${editBtnAction}">${editBtnText}</button>
-                        ${cancelBtnHtml}
-                    `;
+                    const fieldInputStyle = "background: rgba(252, 251, 250, 0.08); border: 1px solid rgba(252, 251, 250, 0.2); border-radius: 6px; color: #fcfbfa; font-family: 'Noto Serif TC', serif; outline: none;";
+                    let emperorDisplay;
+                    if (isEditingRow) {
+                        emperorDisplay = `
+                            <span class="emp-era">
+                                <input type="text" value="${escapeAttr(emp.name)}" oninput="updateEmperorField(${realDynIdx}, ${realEmpIdx}, 'name', this.value)" style="${fieldInputStyle} width:88px; padding:2px 6px; font-size:0.85rem;" />・
+                                <input type="text" value="${escapeAttr(emp.era)}" oninput="updateEmperorField(${realDynIdx}, ${realEmpIdx}, 'era', this.value)" style="${fieldInputStyle} width:88px; padding:2px 6px; font-size:0.85rem;" />
+                            </span>
+                            <span class="year-range">（<input type="number" value="${emp.yearStart}" oninput="updateEmperorField(${realDynIdx}, ${realEmpIdx}, 'yearStart', this.value)" style="${fieldInputStyle} width:54px; padding:2px 4px; font-size:0.75rem; font-family:'Inter',sans-serif;" />~<input type="number" value="${emp.yearEnd}" oninput="updateEmperorField(${realDynIdx}, ${realEmpIdx}, 'yearEnd', this.value)" style="${fieldInputStyle} width:54px; padding:2px 4px; font-size:0.75rem; font-family:'Inter',sans-serif;" />）</span>
+                            <button class="${editBtnClass}" onclick="${editBtnAction}">${editBtnText}</button>
+                            ${cancelBtnHtml}
+                            <button class="delete-row-btn" onclick="deleteEmperorRow(${realDynIdx}, ${realEmpIdx})">刪除此列</button>
+                        `;
+                    } else {
+                        emperorDisplay = `
+                            <span class="emp-era">
+                                <span class="emp-name">${emp.name}</span>·
+                                <span class="era-name">${emp.era}</span>
+                            </span>
+                            <span class="year-range">（${emp.yearStart}~${emp.yearEnd}）</span>
+                            <button class="${editBtnClass}" onclick="${editBtnAction}">${editBtnText}</button>
+                            ${cancelBtnHtml}
+                        `;
+                    }
 
                     html += `<div class="emperor-row ${matchClass} ${crossClass} ${editingClass}" data-dynasty-idx="${realDynIdx}" data-emperor-idx="${realEmpIdx}">
+                        <span class="row-drag-handle" title="拖曳調整順序">⠿</span>
                         <div class="col-emperor">${emperorDisplay}</div>
                         <div class="col-china">${chinaHtml}</div>
                         <div class="col-world">${worldHtml}</div>
                     </div>`;
                 });
 
+                html += `<button class="add-emperor-btn" onclick="addNewEmperorRow(${di})">＋ 新增一列</button>`;
                 html += `</div></div></div>`;
             });
 
@@ -629,6 +1168,8 @@
                 header.removeEventListener('click', toggleDynasty);
                 header.addEventListener('click', toggleDynasty);
             });
+
+            scheduleAutoSave();
         }
 
         // ============================================================
@@ -659,7 +1200,13 @@
         // ============================================================
         //  載入 JSON 資料
         // ============================================================
-        function loadData() {
+        function loadData(force) {
+    if (!force && hasAutoSave()) {
+        if (restoreAutoSave()) {
+            showAutosaveBanner();
+            return;
+        }
+    }
     // 加入時間戳，強制跳過瀏覽器快取
     const timestamp = new Date().getTime();
     const jsonPath = '../Data/timeline_data.json?t=' + timestamp;
@@ -673,6 +1220,7 @@
         })
         .then(data => {
             DATA = data;
+            clearAutoSave();
             render('');
             const total = DATA.reduce((sum, d) => sum + d.emperors.length, 0);
             statsCount.textContent = `共 ${total} 位皇帝 · ${DATA.length} 個朝代`;
@@ -685,7 +1233,7 @@
                     <p>無法載入歷史資料</p>
                     <p style="font-size:0.7rem;opacity:0.6;margin-top:4px;">${error.message}</p>
                     <p style="font-size:0.7rem;opacity:0.5;margin-top:2px;">請確認 Data/timeline_data.json 存在且格式正確</p>
-                    <button class="retry-btn" onclick="loadData()">重新載入</button>
+                    <button class="retry-btn" onclick="loadData(true)">重新載入</button>
                 </div>
             `;
         });
@@ -716,6 +1264,12 @@
         document.getElementById('fontIncBtn').addEventListener('click', () => changeFontSize(STEP));
         document.getElementById('fontDecBtn').addEventListener('click', () => changeFontSize(-STEP));
         document.getElementById('toggleAllBtn').addEventListener('click', toggleAll);
+        document.getElementById('reorderBtn').addEventListener('click', toggleReorderMode);
+        document.getElementById('exportBtn').addEventListener('click', exportData);
+        document.getElementById('importBtn').addEventListener('click', triggerImport);
+        document.getElementById('importFileInput').addEventListener('change', function() { handleImportFile(this); });
+        document.getElementById('addDynastyBtn').addEventListener('click', addNewDynasty);
+        initDragAndDrop();
 
         document.addEventListener('touchstart', (e) => {
             if (e.target.tagName !== 'INPUT' && e.target.closest('.search-wrap') === null) {
@@ -726,6 +1280,13 @@
             if (e.key === 'Escape' && document.activeElement === searchInput) {
                 clearBtn.click();
             }
+        });
+
+        // 手機返回手勢 / 切換分頁 / 關閉App 前，立即（非延遲）寫入自動儲存
+        window.addEventListener('pagehide', persistNow);
+        window.addEventListener('beforeunload', persistNow);
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') persistNow();
         });
 
         // 開始載入資料
