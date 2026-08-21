@@ -1,0 +1,2547 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>三度空間</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#121315">
+<link rel="icon" href="./icon-192.png">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="三度空間">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;
+    --vermilion:#942525;
+    --gold:#bd8b2a;
+    --white:#fcfbfa;
+    --panel:#1b1c1f;
+    --panel-2:#232427;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;height:100%;background:var(--ink);color:var(--white);
+    font-family:"Noto Serif TC","Inter",sans-serif;overflow:hidden;}
+  #app{position:fixed;inset:0;display:flex;flex-direction:column;}
+
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:10px 16px;background:var(--ink);
+    border-bottom:1px solid #2a2b2e;flex:0 0 auto;z-index:5;
+  }
+  header h1{
+    margin:0;font-size:20px;font-weight:700;letter-spacing:.12em;
+    color:var(--white);
+  }
+  header h1 span{color:var(--gold);}
+  #btnMenu{
+    background:var(--vermilion);color:var(--white);border:none;
+    border-radius:10px;padding:10px 18px;font-size:16px;font-family:inherit;
+    font-weight:700;
+  }
+
+  #viewportWrap{position:relative;flex:1 1 auto;min-height:0;}
+  #c{width:100%;height:100%;display:block;touch-action:none;}
+  #hint{
+    position:absolute;left:12px;bottom:10px;font-family:"Inter",sans-serif;
+    font-size:13px;color:#cfcac0;background:rgba(18,19,21,.55);
+    padding:6px 10px;border-radius:8px;pointer-events:none;
+  }
+  #selInfo{
+    position:absolute;right:12px;top:12px;background:rgba(18,19,21,.7);
+    border:1px solid var(--gold);border-radius:10px;padding:8px 14px;
+    font-size:15px;display:none;max-width:60vw;
+  }
+  #selInfo.show{display:block;}
+  #selInfo b{color:var(--gold);}
+
+  #panel{
+    flex:0 0 auto;background:var(--panel);border-top:2px solid var(--gold);
+    max-height:54vh;display:flex;flex-direction:column;
+    transition:max-height .25s ease;
+  }
+  #panel.collapsed{max-height:52px;}
+  #panel.collapsed #tabContent{display:none;}
+
+  #dragHandle{
+    text-align:center;padding:6px 0 2px;color:#9a9691;font-size:13px;
+  }
+  .tabs{
+    display:flex;overflow-x:auto;gap:6px;padding:0 8px 6px;flex:0 0 auto;
+  }
+  .tab{
+    flex:0 0 auto;background:transparent;color:#cfcac0;border:none;
+    padding:10px 14px;font-size:16px;font-family:"Noto Serif TC",sans-serif;
+    font-weight:700;border-bottom:3px solid transparent;white-space:nowrap;
+  }
+  .tab.active{color:var(--white);border-bottom-color:var(--vermilion);}
+
+  #tabContent{flex:1 1 auto;overflow-y:auto;padding:12px 14px 22px;}
+  .tab-page{display:none;}
+  .tab-page.active{display:block;}
+
+  .grid-btns{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:10px;
+  }
+  .grid-btns.two{grid-template-columns:repeat(2,1fr);}
+  .grid-btns.three{grid-template-columns:repeat(3,1fr);}
+
+  button.big{
+    background:var(--panel-2);color:var(--white);border:1px solid #34353a;
+    border-radius:12px;padding:14px 6px;font-size:16px;font-family:"Noto Serif TC",sans-serif;
+    font-weight:700;text-align:center;min-height:58px;
+  }
+  button.big:active{background:var(--vermilion);border-color:var(--vermilion);}
+  button.big.gold:active{background:var(--gold);border-color:var(--gold);}
+  button.big[disabled]{opacity:.35;}
+  button.big.selected{background:var(--vermilion);border-color:var(--vermilion);}
+
+  .section-title{
+    font-size:15px;color:var(--gold);margin:16px 0 8px;font-weight:700;
+  }
+  .section-title:first-child{margin-top:0;}
+
+  .row{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 4px;border-bottom:1px solid #2a2b2e;font-size:16px;}
+  .row:last-child{border-bottom:none;}
+
+  .switch{
+    width:52px;height:30px;border-radius:16px;background:#3a3b3f;position:relative;
+    border:none;flex:0 0 auto;
+  }
+  .switch.on{background:var(--vermilion);}
+  .switch::after{
+    content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;
+    border-radius:50%;background:var(--white);transition:left .15s;
+  }
+  .switch.on::after{left:25px;}
+
+  label.small{font-size:13px;color:#b8b3ab;display:block;margin:8px 0 4px;}
+  input[type=text], input[type=number], select, input[type=color]{
+    width:100%;background:var(--panel-2);border:1px solid #34353a;color:var(--white);
+    border-radius:8px;padding:10px 10px;font-size:16px;font-family:"Inter",monospace;
+  }
+  select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23cfcac0' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  input[type=color]{padding:4px;height:42px;cursor:pointer;}
+  .formula-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;}
+  .formula-grid.three{grid-template-columns:1fr 1fr 1fr;}
+
+  .obj-item{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 8px;border-bottom:1px solid #2a2b2e;font-size:16px;
+  }
+  .obj-item.selected{background:rgba(148,37,37,.25);border-radius:8px;}
+  .obj-item .name{flex:1;}
+  .obj-item button{
+    background:none;border:1px solid var(--gold);color:var(--gold);
+    border-radius:8px;padding:6px 12px;font-size:14px;font-family:inherit;
+  }
+  .empty-hint{color:#8a8580;font-size:15px;padding:12px 4px;}
+
+  .apply-btn{
+    width:100%;margin-top:12px;background:var(--vermilion);color:var(--white);
+    border:none;border-radius:10px;padding:14px;font-size:17px;font-weight:700;
+    font-family:"Noto Serif TC",sans-serif;
+  }
+  .apply-btn.secondary{
+    background:var(--panel-2);border:1px solid var(--gold);color:var(--gold);
+  }
+  .apply-btn.small{padding:10px;font-size:15px;margin-top:8px;}
+
+  .preset-row{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  .preset-row select{flex:1;}
+  .preset-row button{
+    flex:0 0 auto;background:var(--panel-2);border:1px solid #34353a;color:var(--white);
+    border-radius:8px;padding:10px 12px;font-size:14px;font-family:inherit;
+  }
+
+  .style-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px;}
+  .style-row > div{display:flex;flex-direction:column;}
+
+  .path-status{
+    font-size:13px;color:#b8b3ab;padding:8px;background:var(--panel-2);
+    border-radius:8px;margin-top:8px;
+  }
+  .path-status.active{color:var(--gold);}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>三度<span>空間</span></h1>
+    <button id="btnMenu">選單</button>
+  </header>
+
+  <div id="viewportWrap">
+    <canvas id="c"></canvas>
+    <div id="hint">拖曳旋轉視角 · 點擊選取物件</div>
+    <div id="selInfo"></div>
+  </div>
+
+  <div id="panel">
+    <div id="dragHandle">︿</div>
+    <div class="tabs">
+      <button class="tab active" data-tab="create">建立</button>
+      <button class="tab" data-tab="formula">公式</button>
+      <button class="tab" data-tab="edit">編輯</button>
+      <button class="tab" data-tab="props">屬性</button>
+      <button class="tab" data-tab="view">視角</button>
+      <button class="tab" data-tab="space">空間</button>
+      <button class="tab" data-tab="list">物件</button>
+    </div>
+
+    <div id="tabContent">
+      <!-- 建立物件 -->
+      <div class="tab-page active" data-page="create">
+        <div class="section-title">一維 / 點與線</div>
+        <div class="grid-btns">
+          <button class="big" data-create="point">點</button>
+          <button class="big" data-create="line">線</button>
+        </div>
+        <div class="section-title">二維物件</div>
+        <div class="grid-btns">
+          <button class="big" data-create="triangle">三角形</button>
+          <button class="big" data-create="rect">長方形</button>
+          <button class="big" data-create="ellipse">橢圓</button>
+        </div>
+        <div class="section-title">三維物件</div>
+        <div class="grid-btns">
+          <button class="big" data-create="tetra">三角錐體</button>
+          <button class="big" data-create="box">長立方體</button>
+          <button class="big" data-create="sphere">球體</button>
+        </div>
+
+        <div class="section-title">碎形（20 種）</div>
+        <label class="small">選擇碎形類型</label>
+        <select id="fractalSelect"></select>
+        <button class="apply-btn" id="btnMakeFractal" style="margin-top:10px;">產生碎形</button>
+
+        <div class="section-title">封閉碎形（10 種，可調參數）</div>
+        <label class="small">選擇封閉碎形</label>
+        <select id="closedFractalSelect"></select>
+        <div id="closedFractalParams" style="margin-top:8px;"></div>
+        <button class="apply-btn" id="btnMakeClosedFractal" style="margin-top:10px;">產生封閉碎形</button>
+
+
+      </div>
+
+      <!-- 公式產生 -->
+      <div class="tab-page" data-page="formula">
+        <div class="section-title">內建 / 自訂曲線公式（25+ 種）</div>
+        <div class="preset-row">
+          <select id="presetSelect">
+            <option value="">— 選擇預設公式 —</option>
+          </select>
+          <button id="btnLoadPreset" title="載入選中的公式">載入</button>
+        </div>
+        <div class="grid-btns two" style="margin-bottom:10px;">
+          <button class="big" id="btnSaveCustom" style="min-height:48px;font-size:15px;">儲存為自訂</button>
+          <button class="big" id="btnDeleteCustom" style="min-height:48px;font-size:15px;">刪除自訂</button>
+        </div>
+
+        <div class="section-title">參數曲線 x(t), y(t), z(t)</div>
+        <div class="formula-grid three">
+          <div><label class="small">x(t)</label><input id="fx" type="text" value="cos(t)*2"></div>
+          <div><label class="small">y(t)</label><input id="fy" type="text" value="t*0.3"></div>
+          <div><label class="small">z(t)</label><input id="fz" type="text" value="sin(t)*2"></div>
+        </div>
+        <div class="formula-grid" style="margin-top:8px;">
+          <div><label class="small">t 最小值</label><input id="tMin" type="number" value="0"></div>
+          <div><label class="small">t 最大值</label><input id="tMax" type="number" value="12.56"></div>
+        </div>
+        <label class="small">分段數</label>
+        <input id="tSteps" type="number" value="120">
+
+        <div class="section-title">曲線外觀</div>
+        <div class="style-row">
+          <div>
+            <label class="small">顏色</label>
+            <input id="curveColor" type="color" value="#942525">
+          </div>
+          <div>
+            <label class="small">線型</label>
+            <select id="lineStyle">
+              <option value="solid">實線</option>
+              <option value="dashed">虛線</option>
+              <option value="dotted">點線</option>
+            </select>
+          </div>
+          <div>
+            <label class="small">動畫顯現</label>
+            <select id="curveAnimate">
+              <option value="0">關閉</option>
+              <option value="1">開啟</option>
+            </select>
+          </div>
+        </div>
+        <button class="apply-btn" id="btnMakeCurve">產生曲線</button>
+
+        <div class="section-title">曲面 z = f(x, y)</div>
+        <label class="small">f(x, y)</label>
+        <input id="fz2" type="text" value="sin(sqrt(x*x+y*y))">
+        <div class="formula-grid" style="margin-top:8px;">
+          <div><label class="small">x 最小值</label><input id="xMin" type="number" value="-4"></div>
+          <div><label class="small">x 最大值</label><input id="xMax" type="number" value="4"></div>
+          <div><label class="small">y 最小值</label><input id="yMin" type="number" value="-4"></div>
+          <div><label class="small">y 最大值</label><input id="yMax" type="number" value="4"></div>
+        </div>
+        <label class="small">網格密度（每軸段數）</label>
+        <input id="surfN" type="number" value="30">
+        <button class="apply-btn" id="btnMakeSurface">產生曲面</button>
+
+        <div class="section-title">物件移動路徑（需先選取物件）</div>
+        <div class="empty-hint">使用上方曲線公式作為路徑，讓選取的物件沿路徑移動。</div>
+        <div class="formula-grid" style="margin-top:8px;">
+          <div>
+            <label class="small">速度倍率</label>
+            <input id="pathSpeed" type="number" value="1" step="0.1" min="0.1">
+          </div>
+          <div>
+            <label class="small">顯示軌跡</label>
+            <select id="pathShowTraj">
+              <option value="1">顯示</option>
+              <option value="0">隱藏</option>
+            </select>
+          </div>
+        </div>
+        <div class="row" style="margin-top:8px;">
+          <span>循環播放</span>
+          <button class="switch on" id="pathLoop"></button>
+        </div>
+        <div class="grid-btns two" style="margin-top:10px;">
+          <button class="big" id="btnAssignPath">套用路徑並播放</button>
+          <button class="big" id="btnStopPath">停止移動</button>
+        </div>
+        <div class="grid-btns two" style="margin-top:8px;">
+          <button class="big" id="btnToggleTraj">顯示/隱藏軌跡</button>
+          <button class="big" id="btnRemovePath">移除路徑</button>
+        </div>
+        <div id="pathStatus" class="path-status">尚未選取物件或未設定路徑</div>
+        <div id="pathCoord" class="path-status" style="margin-top:6px;font-family:Inter,monospace;font-size:13px;">路徑座標：—</div>
+      </div>
+
+      <!-- 編輯 -->
+      <div class="tab-page" data-page="edit">
+        <div class="section-title">操作模式（需先選取物件）</div>
+        <div class="grid-btns three">
+          <button class="big" id="modeTranslate" data-mode="translate">移動</button>
+          <button class="big" id="modeRotate" data-mode="rotate">旋轉</button>
+          <button class="big" id="modeScale" data-mode="scale">縮放</button>
+        </div>
+        <div class="section-title">對齊格點</div>
+        <div class="row">
+          <span>啟用 Snap 對齊</span>
+          <button class="switch" id="snapToggle"></button>
+        </div>
+        <label class="small">對齊間距</label>
+        <input id="snapSize" type="number" value="0.5" step="0.1">
+        <div class="section-title">物件操作</div>
+        <div class="grid-btns two">
+          <button class="big" id="btnUndo" disabled>復原</button>
+          <button class="big" id="btnRedo" disabled>重做</button>
+        </div>
+        <div class="grid-btns two" style="margin-top:10px;">
+          <button class="big" id="btnDeleteSel" disabled>刪除選取</button>
+          <button class="big" id="btnClearAll">清除空間</button>
+        </div>
+      </div>
+
+      <!-- 視角 -->
+      <div class="tab-page" data-page="view">
+        <div class="section-title">預設視角</div>
+        <div class="grid-btns three">
+          <button class="big" data-view="front">前</button>
+          <button class="big" data-view="back">後</button>
+          <button class="big" data-view="left">左</button>
+          <button class="big" data-view="right">右</button>
+          <button class="big" data-view="top">上</button>
+          <button class="big" data-view="bottom">下</button>
+        </div>
+        <div class="grid-btns" style="margin-top:10px;">
+          <button class="big gold" data-view="iso">等角視圖 / 重設</button>
+        </div>
+        <div class="section-title">說明</div>
+        <div class="empty-hint">在畫面上拖曳可旋轉視角；雙指（或滾輪）可縮放；雙指平移可移動空間位置。</div>
+      </div>
+
+      <!-- 空間 -->
+      <div class="tab-page" data-page="space">
+        <div class="row">
+          <span>顯示格線</span>
+          <button class="switch on" id="toggleGrid"></button>
+        </div>
+        <div class="row">
+          <span>顯示空間格點</span>
+          <button class="switch" id="toggleGridPoints"></button>
+        </div>
+        <div class="row">
+          <span>顯示物件中心點</span>
+          <button class="switch on" id="toggleCenters"></button>
+        </div>
+        <div class="empty-hint" style="margin-top:12px;">空間中的物件會自動儲存在此裝置上，下次開啟時會自動恢復。若要安裝為手機 App，可用瀏覽器選單的「加到主畫面」。</div>
+      </div>
+
+
+      <!-- 屬性 -->
+      <div class="tab-page" data-page="props">
+        <div class="section-title">選取物件屬性（數值控制）</div>
+        <div id="propsEmpty" class="empty-hint">請先選取一個物件</div>
+        <div id="propsForm" style="display:none;">
+          <label class="small">名稱</label>
+          <input id="propName" type="text" readonly>
+          <div class="section-title">位置</div>
+          <div class="formula-grid three">
+            <div><label class="small">X</label><input id="propPx" type="number" step="0.1"></div>
+            <div><label class="small">Y</label><input id="propPy" type="number" step="0.1"></div>
+            <div><label class="small">Z</label><input id="propPz" type="number" step="0.1"></div>
+          </div>
+          <div class="section-title">旋轉（度）</div>
+          <div class="formula-grid three">
+            <div><label class="small">RX</label><input id="propRx" type="number" step="1"></div>
+            <div><label class="small">RY</label><input id="propRy" type="number" step="1"></div>
+            <div><label class="small">RZ</label><input id="propRz" type="number" step="1"></div>
+          </div>
+          <div class="section-title">縮放</div>
+          <div class="formula-grid three">
+            <div><label class="small">SX</label><input id="propSx" type="number" step="0.05" min="0.01"></div>
+            <div><label class="small">SY</label><input id="propSy" type="number" step="0.05" min="0.01"></div>
+            <div><label class="small">SZ</label><input id="propSz" type="number" step="0.05" min="0.01"></div>
+          </div>
+          <div class="section-title">顏色</div>
+          <input id="propColor" type="color" value="#942525">
+          <button class="apply-btn" id="btnApplyProps">套用數值</button>
+          <div id="propMeta" class="empty-hint" style="margin-top:10px;"></div>
+        </div>
+      </div>
+      <!-- 物件列表 -->
+      <div class="tab-page" data-page="list">
+        <div id="objList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { TransformControls } from "three/addons/controls/TransformControls.js";
+
+/* ---------- 基本場景 ---------- */
+const canvas = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setClearColor(0x121315, 1);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 1000);
+
+const hemi = new THREE.HemisphereLight(0xfcfbfa, 0x201515, 1.1);
+scene.add(hemi);
+const dir = new THREE.DirectionalLight(0xfcfbfa, 0.9);
+dir.position.set(5, 8, 6);
+scene.add(dir);
+
+const objectsGroup = new THREE.Group();
+scene.add(objectsGroup);
+const markersGroup = new THREE.Group();
+scene.add(markersGroup);
+
+const gridHelper = new THREE.GridHelper(20, 20, 0xbd8b2a, 0x3a3a3d);
+gridHelper.visible = true;
+scene.add(gridHelper);
+
+const axesHelper = new THREE.AxesHelper(6);
+scene.add(axesHelper);
+
+let gridPointsObj = null;
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.08;
+
+const tcontrol = new TransformControls(camera, renderer.domElement);
+tcontrol.addEventListener("dragging-changed", (e) => {
+  orbit.enabled = !e.value;
+  if (!e.value) {
+    scheduleAutosave();
+    refreshPropsUI();
+  }
+});
+tcontrol.addEventListener("objectChange", () => {
+  updateSelectedMarker();
+  refreshPropsUI();
+});
+scene.add(tcontrol);
+
+function setView(name) {
+  const d = 9;
+  const map = {
+    front: [0, 0, d], back: [0, 0, -d],
+    left: [-d, 0, 0], right: [d, 0, 0],
+    top: [0, d, 0.001], bottom: [0, -d, 0.001],
+    iso: [d * 0.7, d * 0.7, d * 0.7],
+  };
+  const p = map[name] || map.iso;
+  camera.position.set(p[0], p[1], p[2]);
+  orbit.target.set(0, 0, 0);
+  camera.up.set(0, 1, 0);
+  camera.lookAt(0, 0, 0);
+  orbit.update();
+}
+setView("iso");
+
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / Math.max(h, 1);
+  camera.updateProjectionMatrix();
+}
+window.addEventListener("resize", resize);
+
+/* ---------- 物件管理 ---------- */
+let objId = 0;
+const sceneObjects = [];
+let selected = null;
+let history = [];
+let redoStack = [];
+let showCenters = true;
+
+const PALETTE = [0x942525, 0xbd8b2a, 0xc9a24a, 0xa84a4a, 0xd9b46a, 0x5a8a6a, 0x4a6a9a, 0x8a5a9a];
+function nextColor(i) { return PALETTE[i % PALETTE.length]; }
+
+function pushHistory(action) {
+  history.push(action);
+  redoStack = [];
+  refreshUndoRedoButtons();
+}
+
+function addObjectToScene(mesh, type, name, kind, formula, record = true, extra = {}) {
+  objectsGroup.add(mesh);
+  const entry = {
+    id: ++objId,
+    name: name || type,
+    type,
+    kind,
+    formula: formula || null,
+    mesh,
+    color: extra.color,
+    lineStyle: extra.lineStyle || "solid",
+    path: extra.path || null,
+    pathAnim: extra.pathAnim || null,
+    trajectoryVisible: extra.trajectoryVisible !== false,
+    meta: extra.meta || {},
+  };
+  sceneObjects.push(entry);
+  const marker = makeCenterMarker();
+  markersGroup.add(marker);
+  entry.marker = marker;
+  refreshObjectList();
+  if (record) pushHistory({ type: "add", entry });
+  scheduleAutosave();
+  return entry;
+}
+
+function removeEntry(entry, record = true) {
+  if (entry.pathAnim) stopPathAnimation(entry);
+  objectsGroup.remove(entry.mesh);
+  markersGroup.remove(entry.marker);
+  if (entry.trajectoryMesh) {
+    objectsGroup.remove(entry.trajectoryMesh);
+    entry.trajectoryMesh = null;
+  }
+  const idx = sceneObjects.indexOf(entry);
+  if (idx >= 0) sceneObjects.splice(idx, 1);
+  if (selected === entry) selectEntry(null);
+  refreshObjectList();
+  if (record) pushHistory({ type: "remove", entry, index: idx });
+  scheduleAutosave();
+}
+
+function makeCenterMarker() {
+  const geo = new THREE.SphereGeometry(0.045, 10, 8);
+  const mat = new THREE.MeshBasicMaterial({ color: 0xfcfbfa });
+  const m = new THREE.Mesh(geo, mat);
+  m.visible = showCenters;
+  return m;
+}
+
+function updateSelectedMarker() {
+  if (!selected) return;
+  const box = new THREE.Box3().setFromObject(selected.mesh);
+  const c = box.getCenter(new THREE.Vector3());
+  selected.marker.position.copy(c);
+}
+
+function updateAllMarkers() {
+  const box = new THREE.Box3();
+  for (const e of sceneObjects) {
+    box.setFromObject(e.mesh);
+    const c = box.getCenter(new THREE.Vector3());
+    e.marker.position.copy(c);
+    e.marker.visible = showCenters;
+  }
+}
+
+/* ---------- 建立基本物件 ---------- */
+function offsetPosition() {
+  const n = sceneObjects.length;
+  const col = n % 5, row = Math.floor(n / 5) % 5;
+  return new THREE.Vector3((col - 2) * 2.2, 0, (row - 2) * 2.2);
+}
+
+function createPoint(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.SphereGeometry(0.09, 16, 12);
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.4 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.09, 0));
+  return addObjectToScene(mesh, "點", `點 ${sceneObjects.length + 1}`, "point", null, record, { meta: { radius: 0.09 } });
+}
+
+function createLine(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const pts = [new THREE.Vector3(-0.8, 0, 0), new THREE.Vector3(0.8, 0, 0)];
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({ color, linewidth: 2 });
+  const mesh = new THREE.Line(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.4, 0));
+  return addObjectToScene(mesh, "線", `線 ${sceneObjects.length + 1}`, "line", null, record, { meta: { length: 1.6 } });
+}
+
+function createTriangle(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.BufferGeometry();
+  const verts = new Float32Array([-0.8, 0, -0.6, 0.8, 0, -0.6, 0.0, 0, 0.7]);
+  geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+  geo.setIndex([0, 1, 2]);
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.5, transparent: true, opacity: 0.92 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.35, 0));
+  return addObjectToScene(mesh, "三角形", `三角形 ${sceneObjects.length + 1}`, "triangle", null, record);
+}
+
+function createRectangle(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.PlaneGeometry(1.6, 1.0);
+  geo.rotateX(-Math.PI / 2);
+  const mat = new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.5, transparent: true, opacity: 0.92 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.5, 0));
+  return addObjectToScene(mesh, "長方形", `長方形 ${sceneObjects.length + 1}`, "rect", null, record, { meta: { width: 1.6, height: 1.0 } });
+}
+
+function createEllipse(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const curve = new THREE.EllipseCurve(0, 0, 0.8, 0.5, 0, Math.PI * 2, false, 0);
+  const points = curve.getPoints(48).map((p) => new THREE.Vector2(p.x, p.y));
+  const shape = new THREE.Shape(points);
+  const geo = new THREE.ShapeGeometry(shape);
+  geo.rotateX(-Math.PI / 2);
+  const mat = new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.5, transparent: true, opacity: 0.92 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.5, 0));
+  return addObjectToScene(mesh, "橢圓", `橢圓 ${sceneObjects.length + 1}`, "ellipse", null, record, { meta: { rx: 0.8, ry: 0.5 } });
+}
+
+function createTetra(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.TetrahedronGeometry(0.7);
+  geo.computeVertexNormals();
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.45 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.55, 0));
+  return addObjectToScene(mesh, "三角錐體", `三角錐體 ${sceneObjects.length + 1}`, "tetra", null, record, { meta: { radius: 0.7 } });
+}
+
+function createBox(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.BoxGeometry(1.4, 0.8, 0.8);
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.45 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.4, 0));
+  return addObjectToScene(mesh, "長立方體", `長立方體 ${sceneObjects.length + 1}`, "box", null, record, { meta: { w: 1.4, h: 0.8, d: 0.8 } });
+}
+
+function createSphere(record = true) {
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.SphereGeometry(0.65, 28, 20);
+  const mat = new THREE.MeshStandardMaterial({ color, roughness: 0.4 });
+  const mesh = new THREE.Mesh(geo, mat);
+  mesh.position.copy(offsetPosition()).add(new THREE.Vector3(0, 0.65, 0));
+  return addObjectToScene(mesh, "球體", `球體 ${sceneObjects.length + 1}`, "sphere", null, record, { meta: { radius: 0.65 } });
+}
+
+const CREATORS = {
+  point: createPoint, line: createLine, triangle: createTriangle,
+  rect: createRectangle, ellipse: createEllipse, tetra: createTetra,
+  box: createBox, sphere: createSphere,
+};
+
+/* ---------- 內建曲線公式（擴充至約 25 種） ---------- */
+const BUILTIN_CURVES = [
+  { name: "螺旋線 (Helix)", x: "cos(t)*2", y: "t*0.25", z: "sin(t)*2", tMin: 0, tMax: 18.84, steps: 180 },
+  { name: "圓形", x: "cos(t)*2.5", y: "0", z: "sin(t)*2.5", tMin: 0, tMax: 6.2832, steps: 100 },
+  { name: "Lissajous 3:2", x: "sin(3*t)*2", y: "cos(2*t)*1.5", z: "sin(t)*0.8", tMin: 0, tMax: 6.2832, steps: 200 },
+  { name: "8字形", x: "sin(t)*2", y: "sin(t)*cos(t)*1.5", z: "cos(t)*0.5", tMin: 0, tMax: 6.2832, steps: 120 },
+  { name: "三葉結 (Trefoil)", x: "sin(t)+2*sin(2*t)", y: "cos(t)-2*cos(2*t)", z: "-sin(3*t)", tMin: 0, tMax: 6.2832, steps: 200 },
+  { name: "Viviani 曲線", x: "1+cos(t)", y: "sin(t)", z: "2*sin(t/2)", tMin: 0, tMax: 12.566, steps: 160 },
+  { name: "球螺旋", x: "sin(t)*cos(t*5)*2", y: "cos(t)*2", z: "sin(t)*sin(t*5)*2", tMin: 0, tMax: 6.2832, steps: 300 },
+  { name: "玫瑰曲線 (3瓣)", x: "cos(3*t)*cos(t)*2", y: "0.3", z: "cos(3*t)*sin(t)*2", tMin: 0, tMax: 6.2832, steps: 200 },
+  { name: "心形線", x: "16*sin(t)**3 *0.12", y: "(13*cos(t)-5*cos(2*t)-2*cos(3*t)-cos(4*t))*0.12", z: "sin(t)*0.4", tMin: 0, tMax: 6.2832, steps: 160 },
+  { name: "蝴蝶曲線", x: "sin(t)*(exp(cos(t))-2*cos(4*t)-sin(t/12)**5)", y: "cos(t)*(exp(cos(t))-2*cos(4*t)-sin(t/12)**5)", z: "sin(t*3)*0.5", tMin: 0, tMax: 12.566, steps: 400 },
+  { name: "雙螺旋", x: "cos(t)*2", y: "t*0.2", z: "sin(t)*2", tMin: 0, tMax: 25.13, steps: 250 },
+  { name: "正弦波", x: "t", y: "sin(t)*1.5", z: "0", tMin: -8, tMax: 8, steps: 160 },
+  { name: "餘弦波 3D", x: "t", y: "cos(t)*1.2", z: "sin(t*0.5)*0.8", tMin: -10, tMax: 10, steps: 200 },
+  { name: "環面結", x: "(2+cos(3*t))*cos(2*t)", y: "(2+cos(3*t))*sin(2*t)", z: "sin(3*t)", tMin: 0, tMax: 6.2832, steps: 300 },
+  { name: "橢圓螺旋", x: "cos(t)*3", y: "t*0.15", z: "sin(t)*1.5", tMin: 0, tMax: 25.13, steps: 220 },
+  { name: "星形線 (Astroid)", x: "cos(t)**3 *2.5", y: "0", z: "sin(t)**3 *2.5", tMin: 0, tMax: 6.2832, steps: 120 },
+  { name: "擺線 (Cycloid)", x: "t-sin(t)", y: "1-cos(t)", z: "sin(t*0.5)*0.5", tMin: 0, tMax: 18.84, steps: 200 },
+  { name: "雙紐線", x: "sin(t)/(1+cos(t)**2)*2", y: "sin(t)*cos(t)/(1+cos(t)**2)*2", z: "cos(t)*0.6", tMin: 0, tMax: 6.2832, steps: 160 },
+  { name: "空間正弦", x: "sin(t)*2", y: "sin(2*t)*1.5", z: "sin(3*t)*1", tMin: 0, tMax: 12.566, steps: 240 },
+  { name: "隨機漫步近似", x: "sin(t)+0.5*sin(2.3*t)+0.3*cos(1.7*t)", y: "cos(t)+0.4*sin(3.1*t)", z: "sin(0.7*t)*1.5", tMin: 0, tMax: 18.84, steps: 280 },
+  { name: "雙曲線螺旋", x: "cosh(t*0.3)*cos(t)", y: "t*0.2", z: "cosh(t*0.3)*sin(t)", tMin: -4, tMax: 4, steps: 200 },
+  { name: "克羅索伊德", x: "cos(t*t)*2", y: "sin(t*t)*2", z: "t*0.3", tMin: -3, tMax: 3, steps: 250 },
+  { name: "球面玫瑰", x: "sin(5*t)*cos(t)*2", y: "sin(5*t)*sin(t)*2", z: "cos(5*t)*1.5", tMin: 0, tMax: 6.2832, steps: 300 },
+  { name: "扭轉橢圓", x: "cos(t)*2", y: "sin(t)*1.2", z: "sin(2*t)*0.8", tMin: 0, tMax: 6.2832, steps: 160 },
+  { name: "螺旋八字", x: "sin(t)*2", y: "sin(2*t)*1.5", z: "t*0.15", tMin: 0, tMax: 25.13, steps: 280 },
+];
+
+const FORMULA_STORAGE_KEY = "3dspace-formulas-v1";
+let customFormulas = [];
+
+function loadCustomFormulas() {
+  try {
+    const raw = localStorage.getItem(FORMULA_STORAGE_KEY);
+    if (raw) customFormulas = JSON.parse(raw) || [];
+  } catch (e) { customFormulas = []; }
+}
+function saveCustomFormulas() {
+  try { localStorage.setItem(FORMULA_STORAGE_KEY, JSON.stringify(customFormulas)); } catch (e) {}
+}
+loadCustomFormulas();
+
+function getAllPresets() {
+  return [
+    ...BUILTIN_CURVES.map((c, i) => ({ ...c, id: `builtin-${i}`, isBuiltin: true })),
+    ...customFormulas.map((c, i) => ({ ...c, id: `custom-${i}`, isBuiltin: false })),
+  ];
+}
+
+/* ---------- 20 種碎形 ---------- */
+const FRACTAL_TYPES = [
+  { id: "koch", name: "Koch 雪花曲線" },
+  { id: "hilbert", name: "Hilbert 曲線" },
+  { id: "dragon", name: "龍曲線 (Dragon)" },
+  { id: "levy", name: "Lévy C 曲線" },
+  { id: "sierpinski", name: "Sierpiński 箭頭" },
+  { id: "tree", name: "碎形樹" },
+  { id: "cantor", name: "Cantor 塵 (3D)" },
+  { id: "peano", name: "Peano 近似" },
+  { id: "gosper", name: "Gosper 曲線" },
+  { id: "minkowski", name: "Minkowski 香腸" },
+  { id: "vicsek", name: "Vicsek 碎形" },
+  { id: "carpet", name: "Sierpiński 地毯" },
+  { id: "tetra_sier", name: "Sierpiński 四面體" },
+  { id: "menger", name: "Menger 海綿點" },
+  { id: "barnsley", name: "Barnsley 蕨" },
+  { id: "julia", name: "Julia 集投影" },
+  { id: "mandelbulb", name: "Mandelbulb 切片" },
+  { id: "ifs_tree", name: "IFS 樹木" },
+  { id: "spiral_frac", name: "碎形螺旋" },
+  { id: "pyramid", name: "碎形金字塔" },
+];
+
+function genKoch(order = 4, size = 3) {
+  let segs = [{ a: new THREE.Vector3(-size, 0, 0), b: new THREE.Vector3(size, 0, 0) }];
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (const s of segs) {
+      const dir = s.b.clone().sub(s.a);
+      const p1 = s.a.clone().add(dir.clone().multiplyScalar(1 / 3));
+      const p2 = s.a.clone().add(dir.clone().multiplyScalar(2 / 3));
+      const mid = p1.clone().add(p2).multiplyScalar(0.5);
+      const perp = new THREE.Vector3(-dir.z, dir.y * 0.3, dir.x).normalize().multiplyScalar(dir.length() / 3 * Math.sqrt(3) / 2);
+      const peak = mid.clone().add(perp);
+      next.push({ a: s.a, b: p1 }, { a: p1, b: peak }, { a: peak, b: p2 }, { a: p2, b: s.b });
+    }
+    segs = next;
+  }
+  const pts = [];
+  segs.forEach((s, i) => { if (i === 0) pts.push(s.a); pts.push(s.b); });
+  return pts;
+}
+
+function genHilbert(order = 3, size = 4) {
+  const pts = [];
+  const n = 1 << order;
+  function d2xy(d) {
+    let x = 0, y = 0, t = d;
+    for (let s = 1; s < n; s *= 2) {
+      const rx = 1 & (t / 2), ry = 1 & (t ^ rx);
+      if (ry === 0) {
+        if (rx === 1) { x = s - 1 - x; y = s - 1 - y; }
+        const tmp = x; x = y; y = tmp;
+      }
+      x += s * rx; y += s * ry; t = Math.floor(t / 4);
+    }
+    return [x, y];
+  }
+  const total = n * n;
+  for (let i = 0; i < total; i++) {
+    const [x, y] = d2xy(i);
+    pts.push(new THREE.Vector3((x / n - 0.5) * size, 0, (y / n - 0.5) * size));
+  }
+  return pts;
+}
+
+function genDragon(order = 10, size = 0.08) {
+  let seq = [1];
+  for (let o = 0; o < order; o++) {
+    const next = seq.slice();
+    next.push(1);
+    for (let i = seq.length - 1; i >= 0; i--) next.push(-seq[i]);
+    seq = next;
+  }
+  const pts = [new THREE.Vector3(0, 0, 0)];
+  let ang = 0, x = 0, z = 0;
+  for (const turn of seq) {
+    ang += turn * Math.PI / 2;
+    x += Math.cos(ang) * size;
+    z += Math.sin(ang) * size;
+    pts.push(new THREE.Vector3(x, (pts.length % 5) * 0.02, z));
+  }
+  return pts;
+}
+
+function genLevy(order = 10, size = 4) {
+  function recurse(x0, y0, x1, y1, depth, out) {
+    if (depth === 0) { out.push(new THREE.Vector3(x1, 0, y1)); return; }
+    const mx = (x0 + x1) / 2 + (y1 - y0) / 2;
+    const my = (y0 + y1) / 2 - (x1 - x0) / 2;
+    recurse(x0, y0, mx, my, depth - 1, out);
+    recurse(mx, my, x1, y1, depth - 1, out);
+  }
+  const pts = [new THREE.Vector3(-size / 2, 0, 0)];
+  recurse(-size / 2, 0, size / 2, 0, order, pts);
+  return pts;
+}
+
+function genSierpinski(order = 6, size = 3) {
+  let pts = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(size, 0, 0), new THREE.Vector3(size / 2, 0, size * Math.sqrt(3) / 2)];
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i], b = pts[i + 1];
+      const m = a.clone().add(b).multiplyScalar(0.5);
+      next.push(a, m);
+    }
+    next.push(pts[pts.length - 1]);
+    // simplified arrowhead-like refinement
+    pts = next;
+  }
+  // better: use triangle iteration points
+  const result = [];
+  const corners = [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(size, 0, 0),
+    new THREE.Vector3(size / 2, 0, size * 0.866),
+  ];
+  let p = corners[0].clone();
+  for (let i = 0; i < 4000; i++) {
+    const c = corners[Math.floor(Math.random() * 3)];
+    p.lerp(c, 0.5);
+    result.push(p.clone());
+  }
+  return result;
+}
+
+function genTree(depth = 6, len = 1.2) {
+  const pts = [];
+  function branch(pos, dir, d, length) {
+    if (d === 0) return;
+    const end = pos.clone().add(dir.clone().multiplyScalar(length));
+    pts.push(pos.clone(), end.clone());
+    const right = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
+    if (right.length() < 0.1) right.set(1, 0, 0);
+    const up = new THREE.Vector3().crossVectors(right, dir).normalize();
+    const d1 = dir.clone().applyAxisAngle(up, 0.45).applyAxisAngle(right, 0.15).normalize();
+    const d2 = dir.clone().applyAxisAngle(up, -0.45).applyAxisAngle(right, -0.1).normalize();
+    branch(end, d1, d - 1, length * 0.72);
+    branch(end, d2, d - 1, length * 0.68);
+  }
+  branch(new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 1, 0), depth, len);
+  return pts;
+}
+
+function genCantor(order = 4, size = 4) {
+  const pts = [];
+  function cantor3d(x, y, z, s, depth) {
+    if (depth === 0) {
+      pts.push(new THREE.Vector3(x, y, z));
+      return;
+    }
+    const h = s / 3;
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) for (let k = 0; k < 3; k++) {
+      if (i === 1 && j === 1 && k === 1) continue;
+      if ((i === 1) + (j === 1) + (k === 1) >= 2) continue;
+      cantor3d(x + (i - 1) * h, y + (j - 1) * h, z + (k - 1) * h, h, depth - 1);
+    }
+  }
+  cantor3d(0, 1, 0, size, order);
+  return pts;
+}
+
+function genPeano(order = 3, size = 4) {
+  // simplified grid-filling curve
+  const pts = [];
+  const n = Math.pow(3, order);
+  for (let i = 0; i < n * n; i++) {
+    const x = (i % n) / n;
+    const z = Math.floor(i / n) / n;
+    pts.push(new THREE.Vector3((x - 0.5) * size, Math.sin(i * 0.1) * 0.2, (z - 0.5) * size));
+  }
+  return pts;
+}
+
+function genGosper(order = 3, size = 0.15) {
+  // approximate with hex-like turns
+  let seq = "A";
+  const rules = { A: "A-B--B+A++AA+B-", B: "+A-BB--B-A++A+B" };
+  for (let o = 0; o < order; o++) {
+    let next = "";
+    for (const c of seq) next += rules[c] || c;
+    seq = next;
+  }
+  const pts = [new THREE.Vector3(0, 0, 0)];
+  let ang = 0, x = 0, z = 0;
+  for (const c of seq) {
+    if (c === "A" || c === "B") {
+      x += Math.cos(ang) * size;
+      z += Math.sin(ang) * size;
+      pts.push(new THREE.Vector3(x, 0, z));
+    } else if (c === "+") ang += Math.PI / 3;
+    else if (c === "-") ang -= Math.PI / 3;
+  }
+  return pts;
+}
+
+function genMinkowski(order = 3, size = 4) {
+  let segs = [{ a: new THREE.Vector3(-size / 2, 0, 0), b: new THREE.Vector3(size / 2, 0, 0) }];
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (const s of segs) {
+      const d = s.b.clone().sub(s.a).multiplyScalar(0.25);
+      const p = [s.a.clone()];
+      for (let i = 1; i <= 4; i++) p.push(s.a.clone().add(d.clone().multiplyScalar(i)));
+      const perp = new THREE.Vector3(-d.z, 0, d.x);
+      next.push(
+        { a: p[0], b: p[1] },
+        { a: p[1], b: p[1].clone().add(perp) },
+        { a: p[1].clone().add(perp), b: p[2].clone().add(perp) },
+        { a: p[2].clone().add(perp), b: p[2] },
+        { a: p[2], b: p[3] },
+        { a: p[3], b: p[3].clone().sub(perp) },
+        { a: p[3].clone().sub(perp), b: p[4].clone().sub(perp) },
+        { a: p[4].clone().sub(perp), b: p[4] }
+      );
+    }
+    segs = next;
+  }
+  const pts = [];
+  segs.forEach((s, i) => { if (i === 0) pts.push(s.a); pts.push(s.b); });
+  return pts;
+}
+
+function genVicsek(order = 4, size = 3) {
+  const pts = [];
+  function vicsek(x, y, z, s, d) {
+    if (d === 0) { pts.push(new THREE.Vector3(x, y, z)); return; }
+    const h = s / 3;
+    vicsek(x, y, z, h, d - 1);
+    vicsek(x + h, y, z, h, d - 1);
+    vicsek(x - h, y, z, h, d - 1);
+    vicsek(x, y + h, z, h, d - 1);
+    vicsek(x, y - h, z, h, d - 1);
+  }
+  vicsek(0, 1, 0, size, order);
+  return pts;
+}
+
+function genCarpet(order = 3, size = 4) {
+  const pts = [];
+  function carpet(x, z, s, d) {
+    if (d === 0) {
+      pts.push(new THREE.Vector3(x, 0, z));
+      return;
+    }
+    const h = s / 3;
+    for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
+      if (i === 0 && j === 0) continue;
+      carpet(x + i * h, z + j * h, h, d - 1);
+    }
+  }
+  carpet(0, 0, size, order);
+  return pts;
+}
+
+function genTetraSier(order = 4, size = 3) {
+  const pts = [];
+  const v0 = new THREE.Vector3(0, size, 0);
+  const v1 = new THREE.Vector3(-size * 0.866, -size * 0.5, size * 0.5);
+  const v2 = new THREE.Vector3(size * 0.866, -size * 0.5, size * 0.5);
+  const v3 = new THREE.Vector3(0, -size * 0.5, -size);
+  function mid(a, b) { return a.clone().add(b).multiplyScalar(0.5); }
+  function recurse(a, b, c, d, depth) {
+    if (depth === 0) {
+      pts.push(a.clone(), b.clone(), c.clone(), d.clone());
+      return;
+    }
+    const ab = mid(a, b), ac = mid(a, c), ad = mid(a, d), bc = mid(b, c), bd = mid(b, d), cd = mid(c, d);
+    recurse(a, ab, ac, ad, depth - 1);
+    recurse(ab, b, bc, bd, depth - 1);
+    recurse(ac, bc, c, cd, depth - 1);
+    recurse(ad, bd, cd, d, depth - 1);
+  }
+  recurse(v0, v1, v2, v3, order);
+  return pts;
+}
+
+function genMenger(order = 2, size = 3) {
+  const pts = [];
+  function menger(x, y, z, s, d) {
+    if (d === 0) { pts.push(new THREE.Vector3(x, y, z)); return; }
+    const h = s / 3;
+    for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) for (let k = -1; k <= 1; k++) {
+      const sum = Math.abs(i) + Math.abs(j) + Math.abs(k);
+      if (sum <= 1) continue; // remove center cross
+      menger(x + i * h, y + j * h, z + k * h, h, d - 1);
+    }
+  }
+  menger(0, 1, 0, size, order);
+  return pts;
+}
+
+function genBarnsley(n = 8000) {
+  const pts = [];
+  let x = 0, y = 0;
+  for (let i = 0; i < n; i++) {
+    const r = Math.random();
+    let nx, ny;
+    if (r < 0.01) { nx = 0; ny = 0.16 * y; }
+    else if (r < 0.86) { nx = 0.85 * x + 0.04 * y; ny = -0.04 * x + 0.85 * y + 1.6; }
+    else if (r < 0.93) { nx = 0.2 * x - 0.26 * y; ny = 0.23 * x + 0.22 * y + 1.6; }
+    else { nx = -0.15 * x + 0.28 * y; ny = 0.26 * x + 0.24 * y + 0.44; }
+    x = nx; y = ny;
+    pts.push(new THREE.Vector3(x * 0.4, y * 0.4, (Math.sin(i * 0.01)) * 0.3));
+  }
+  return pts;
+}
+
+function genJulia(n = 6000) {
+  const pts = [];
+  const cx = -0.7, cy = 0.27015;
+  for (let i = 0; i < n; i++) {
+    let x = (Math.random() - 0.5) * 3;
+    let y = (Math.random() - 0.5) * 3;
+    let zx = x, zy = y, iter = 0;
+    while (zx * zx + zy * zy < 4 && iter < 40) {
+      const tmp = zx * zx - zy * zy + cx;
+      zy = 2 * zx * zy + cy;
+      zx = tmp;
+      iter++;
+    }
+    if (iter < 40) {
+      pts.push(new THREE.Vector3(x, iter * 0.03, y));
+    }
+  }
+  return pts;
+}
+
+function genMandelbulb(n = 5000) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const x = (Math.random() - 0.5) * 2.5;
+    const y = (Math.random() - 0.5) * 2.5;
+    const z = (Math.random() - 0.5) * 2.5;
+    let zx = x, zy = y, zz = z, iter = 0;
+    const power = 8;
+    while (zx * zx + zy * zy + zz * zz < 4 && iter < 12) {
+      const r = Math.sqrt(zx * zx + zy * zy + zz * zz);
+      const theta = Math.atan2(Math.sqrt(zx * zx + zy * zy), zz);
+      const phi = Math.atan2(zy, zx);
+      const rp = Math.pow(r, power);
+      zx = rp * Math.sin(theta * power) * Math.cos(phi * power) + x;
+      zy = rp * Math.sin(theta * power) * Math.sin(phi * power) + y;
+      zz = rp * Math.cos(theta * power) + z;
+      iter++;
+    }
+    if (iter >= 8) pts.push(new THREE.Vector3(x * 1.5, y * 1.5, z * 1.5));
+  }
+  return pts;
+}
+
+function genIFSTree(n = 5000) {
+  const pts = [];
+  let x = 0, y = 0;
+  for (let i = 0; i < n; i++) {
+    const r = Math.random();
+    let nx, ny;
+    if (r < 0.1) { nx = 0.05 * x; ny = 0.6 * y; }
+    else if (r < 0.2) { nx = 0.05 * x; ny = -0.5 * y + 1; }
+    else if (r < 0.4) { nx = 0.46 * x - 0.15 * y; ny = 0.39 * x + 0.38 * y + 0.6; }
+    else if (r < 0.6) { nx = 0.47 * x - 0.15 * y; ny = 0.17 * x + 0.42 * y + 1.1; }
+    else if (r < 0.8) { nx = 0.43 * x + 0.28 * y; ny = -0.25 * x + 0.45 * y + 1; }
+    else { nx = 0.42 * x + 0.26 * y; ny = -0.35 * x + 0.31 * y + 0.7; }
+    x = nx; y = ny;
+    pts.push(new THREE.Vector3(x * 1.2, y * 1.2, Math.sin(i * 0.02) * 0.4));
+  }
+  return pts;
+}
+
+function genSpiralFrac(order = 8, size = 0.3) {
+  const pts = [];
+  let ang = 0, r = 0.01;
+  for (let i = 0; i < 2000; i++) {
+    pts.push(new THREE.Vector3(Math.cos(ang) * r, Math.sin(i * 0.02) * 0.5, Math.sin(ang) * r));
+    ang += 0.2 + r * 0.1;
+    r += size * 0.002 * (1 + Math.sin(i * 0.05));
+    if (i % 50 === 0) r *= 0.92;
+  }
+  return pts;
+}
+
+function genPyramid(order = 4, size = 3) {
+  const pts = [];
+  function pyr(x, y, z, s, d) {
+    if (d === 0) {
+      pts.push(new THREE.Vector3(x, y, z));
+      return;
+    }
+    const h = s / 2;
+    pyr(x, y + h * 0.5, z, h, d - 1);
+    pyr(x - h * 0.5, y - h * 0.3, z - h * 0.5, h, d - 1);
+    pyr(x + h * 0.5, y - h * 0.3, z - h * 0.5, h, d - 1);
+    pyr(x, y - h * 0.3, z + h * 0.5, h, d - 1);
+  }
+  pyr(0, 1, 0, size, order);
+  return pts;
+}
+
+const FRACTAL_GENS = {
+  koch: () => genKoch(4, 3),
+  hilbert: () => genHilbert(4, 4),
+  dragon: () => genDragon(11, 0.06),
+  levy: () => genLevy(11, 4),
+  sierpinski: () => genSierpinski(6, 4),
+  tree: () => genTree(7, 1.4),
+  cantor: () => genCantor(3, 3),
+  peano: () => genPeano(3, 4),
+  gosper: () => genGosper(3, 0.12),
+  minkowski: () => genMinkowski(3, 4),
+  vicsek: () => genVicsek(4, 3),
+  carpet: () => genCarpet(3, 4),
+  tetra_sier: () => genTetraSier(4, 3),
+  menger: () => genMenger(2, 3),
+  barnsley: () => genBarnsley(8000),
+  julia: () => genJulia(6000),
+  mandelbulb: () => genMandelbulb(4000),
+  ifs_tree: () => genIFSTree(6000),
+  spiral_frac: () => genSpiralFrac(8, 0.3),
+  pyramid: () => genPyramid(4, 3),
+};
+
+
+/* ---------- 10 個可調參數封閉碎形 ---------- */
+const CLOSED_FRACTALS = [
+  { id: "koch_snowflake", name: "Koch 雪花", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 5, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 6, step: 0.1, value: 2.5 },
+  ]},
+  { id: "quad_koch", name: "二次 Koch 島", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 4, step: 1, value: 2 },
+    { key: "size", label: "大小", min: 0.5, max: 6, step: 0.1, value: 2.5 },
+  ]},
+  { id: "cesaro", name: "Cesàro 碎形", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 5, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 6, step: 0.1, value: 2.5 },
+    { key: "angle", label: "角度°", min: 10, max: 90, step: 1, value: 60 },
+  ]},
+  { id: "sierpinski_closed", name: "封閉 Sierpiński", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 6, step: 1, value: 4 },
+    { key: "size", label: "大小", min: 0.5, max: 6, step: 0.1, value: 3 },
+  ]},
+  { id: "vicsek_closed", name: "封閉 Vicsek", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 5, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 6, step: 0.1, value: 3 },
+  ]},
+  { id: "pentagon_frac", name: "五邊形碎形", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 4, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 5, step: 0.1, value: 2.2 },
+  ]},
+  { id: "hexagon_frac", name: "六邊形碎形", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 4, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 5, step: 0.1, value: 2.2 },
+  ]},
+  { id: "star_frac", name: "星形碎形", params: [
+    { key: "order", label: "迭代次數", min: 0, max: 4, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 5, step: 0.1, value: 2.5 },
+    { key: "points", label: "尖角數", min: 5, max: 12, step: 1, value: 5 },
+  ]},
+  { id: "apollonian", name: "Apollonian 近似", params: [
+    { key: "order", label: "層級", min: 1, max: 5, step: 1, value: 3 },
+    { key: "size", label: "大小", min: 0.5, max: 5, step: 0.1, value: 2.5 },
+  ]},
+  { id: "closed_gosper", name: "封閉 Gosper 島", params: [
+    { key: "order", label: "迭代次數", min: 1, max: 3, step: 1, value: 2 },
+    { key: "size", label: "大小", min: 0.05, max: 0.4, step: 0.01, value: 0.15 },
+  ]},
+];
+
+function polygonPoints(n, radius, y = 0) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+    pts.push(new THREE.Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius));
+  }
+  pts.push(pts[0].clone()); // close
+  return pts;
+}
+
+function kochRefineClosed(pts, order, angleRad) {
+  // pts is closed (last == first)
+  let segs = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    segs.push({ a: pts[i].clone(), b: pts[i + 1].clone() });
+  }
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (const s of segs) {
+      const dir = s.b.clone().sub(s.a);
+      const p1 = s.a.clone().add(dir.clone().multiplyScalar(1 / 3));
+      const p2 = s.a.clone().add(dir.clone().multiplyScalar(2 / 3));
+      const mid = p1.clone().add(p2).multiplyScalar(0.5);
+      const len = dir.length() / 3;
+      // rotate dir by angle for peak
+      const ang = Math.atan2(dir.z, dir.x) + angleRad;
+      const peak = mid.clone().add(new THREE.Vector3(Math.cos(ang) * len * Math.sin(Math.PI / 3) * 2 / Math.sqrt(3) * 0.866, 0, Math.sin(ang) * len * 0.866));
+      // standard 60 deg outward
+      const perp = new THREE.Vector3(-dir.z, 0, dir.x).normalize().multiplyScalar(len * Math.sqrt(3) / 2);
+      const peak2 = mid.clone().add(perp);
+      next.push({ a: s.a, b: p1 }, { a: p1, b: peak2 }, { a: peak2, b: p2 }, { a: p2, b: s.b });
+    }
+    segs = next;
+  }
+  const out = [];
+  segs.forEach((s, i) => { if (i === 0) out.push(s.a); out.push(s.b); });
+  return out;
+}
+
+function genClosedKochSnowflake(p) {
+  const order = Math.min(5, Math.max(0, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 2.5;
+  const base = polygonPoints(3, size);
+  return kochRefineClosed(base, order, Math.PI / 3);
+}
+
+function genQuadKoch(p) {
+  const order = Math.min(4, Math.max(0, Math.floor(p.order ?? 2)));
+  const size = p.size ?? 2.5;
+  // start with square
+  let segs = [
+    { a: new THREE.Vector3(-size, 0, -size), b: new THREE.Vector3(size, 0, -size) },
+    { a: new THREE.Vector3(size, 0, -size), b: new THREE.Vector3(size, 0, size) },
+    { a: new THREE.Vector3(size, 0, size), b: new THREE.Vector3(-size, 0, size) },
+    { a: new THREE.Vector3(-size, 0, size), b: new THREE.Vector3(-size, 0, -size) },
+  ];
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (const s of segs) {
+      const d = s.b.clone().sub(s.a).multiplyScalar(0.25);
+      const p0 = s.a.clone();
+      const p1 = s.a.clone().add(d);
+      const p2 = s.a.clone().add(d.clone().multiplyScalar(2));
+      const p3 = s.a.clone().add(d.clone().multiplyScalar(3));
+      const p4 = s.b.clone();
+      const perp = new THREE.Vector3(-d.z, 0, d.x);
+      next.push(
+        { a: p0, b: p1 },
+        { a: p1, b: p1.clone().add(perp) },
+        { a: p1.clone().add(perp), b: p2.clone().add(perp) },
+        { a: p2.clone().add(perp), b: p2 },
+        { a: p2, b: p3 },
+        { a: p3, b: p3.clone().sub(perp) },
+        { a: p3.clone().sub(perp), b: p4.clone().sub(perp) },
+        { a: p4.clone().sub(perp), b: p4 }
+      );
+    }
+    segs = next;
+  }
+  const pts = [];
+  segs.forEach((s, i) => { if (i === 0) pts.push(s.a); pts.push(s.b); });
+  return pts;
+}
+
+function genCesaro(p) {
+  const order = Math.min(5, Math.max(0, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 2.5;
+  const angDeg = p.angle ?? 60;
+  const angleRad = (angDeg * Math.PI) / 180;
+  const base = polygonPoints(4, size); // square
+  // cesaro-like: similar to koch but with variable angle
+  let segs = [];
+  for (let i = 0; i < base.length - 1; i++) segs.push({ a: base[i].clone(), b: base[i + 1].clone() });
+  for (let o = 0; o < order; o++) {
+    const next = [];
+    for (const s of segs) {
+      const dir = s.b.clone().sub(s.a);
+      const p1 = s.a.clone().add(dir.clone().multiplyScalar(1 / 3));
+      const p2 = s.a.clone().add(dir.clone().multiplyScalar(2 / 3));
+      const len = dir.length() / 3;
+      const baseAng = Math.atan2(dir.z, dir.x);
+      const peak = p1.clone().add(new THREE.Vector3(
+        Math.cos(baseAng + angleRad) * len,
+        0,
+        Math.sin(baseAng + angleRad) * len
+      ));
+      next.push({ a: s.a, b: p1 }, { a: p1, b: peak }, { a: peak, b: p2 }, { a: p2, b: s.b });
+    }
+    segs = next;
+  }
+  const pts = [];
+  segs.forEach((s, i) => { if (i === 0) pts.push(s.a); pts.push(s.b); });
+  return pts;
+}
+
+function genSierpinskiClosed(p) {
+  const order = Math.min(6, Math.max(0, Math.floor(p.order ?? 4)));
+  const size = p.size ?? 3;
+  // outline of sierpinski at given depth using recursive edge removal -> approximate with koch on triangle + inner
+  const outer = kochRefineClosed(polygonPoints(3, size), Math.min(order, 3), Math.PI / 3);
+  // add inverted smaller triangles as closed loops (store as continuous path with lifts via same y)
+  return outer;
+}
+
+function genVicsekClosed(p) {
+  const order = Math.min(5, Math.max(0, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 3;
+  // Vicsek as cross outline closed
+  const pts = [];
+  function addRect(cx, cy, cz, s) {
+    const h = s / 2;
+    const r = [
+      new THREE.Vector3(cx - h, cy, cz - h),
+      new THREE.Vector3(cx + h, cy, cz - h),
+      new THREE.Vector3(cx + h, cy, cz + h),
+      new THREE.Vector3(cx - h, cy, cz + h),
+      new THREE.Vector3(cx - h, cy, cz - h),
+    ];
+    pts.push(...r);
+  }
+  function vicsek(x, y, z, s, d) {
+    if (d === 0) { addRect(x, y, z, s * 0.9); return; }
+    const h = s / 3;
+    vicsek(x, y, z, h, d - 1);
+    vicsek(x + h, y, z, h, d - 1);
+    vicsek(x - h, y, z, h, d - 1);
+    vicsek(x, y, z + h, h, d - 1);
+    vicsek(x, y, z - h, h, d - 1);
+  }
+  vicsek(0, 0, 0, size, order);
+  return pts;
+}
+
+function genPolygonFrac(nSides, p) {
+  const order = Math.min(4, Math.max(0, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 2.2;
+  return kochRefineClosed(polygonPoints(nSides, size), order, Math.PI / 3);
+}
+
+function genStarFrac(p) {
+  const order = Math.min(4, Math.max(0, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 2.5;
+  const n = Math.min(12, Math.max(5, Math.floor(p.points ?? 5)));
+  // star polygon
+  const pts = [];
+  for (let i = 0; i <= n * 2; i++) {
+    const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
+    const r = (i % 2 === 0) ? size : size * 0.4;
+    pts.push(new THREE.Vector3(Math.cos(a) * r, 0, Math.sin(a) * r));
+  }
+  return kochRefineClosed(pts, Math.min(order, 3), Math.PI / 3);
+}
+
+function genApollonian(p) {
+  const order = Math.min(5, Math.max(1, Math.floor(p.order ?? 3)));
+  const size = p.size ?? 2.5;
+  const pts = [];
+  // approximate with nested circles as closed polylines
+  function circle(cx, cz, r, segments = 48) {
+    const c = [];
+    for (let i = 0; i <= segments; i++) {
+      const a = (i / segments) * Math.PI * 2;
+      c.push(new THREE.Vector3(cx + Math.cos(a) * r, 0, cz + Math.sin(a) * r));
+    }
+    return c;
+  }
+  pts.push(...circle(0, 0, size));
+  function recurse(cx, cz, r, depth) {
+    if (depth <= 0 || r < 0.08) return;
+    const positions = [
+      [cx + r * 0.5, cz], [cx - r * 0.5, cz], [cx, cz + r * 0.5], [cx, cz - r * 0.5],
+    ];
+    for (const [nx, nz] of positions) {
+      const nr = r * 0.42;
+      pts.push(...circle(nx, nz, nr, 32));
+      recurse(nx, nz, nr, depth - 1);
+    }
+  }
+  recurse(0, 0, size * 0.55, order - 1);
+  return pts;
+}
+
+function genClosedGosper(p) {
+  const order = Math.min(3, Math.max(1, Math.floor(p.order ?? 2)));
+  const size = p.size ?? 0.15;
+  // Gosper + close by connecting end to start with a path along boundary-ish
+  let seq = "A";
+  const rules = { A: "A-B--B+A++AA+B-", B: "+A-BB--B-A++A+B" };
+  for (let o = 0; o < order; o++) {
+    let next = "";
+    for (const c of seq) next += rules[c] || c;
+    seq = next;
+  }
+  const pts = [new THREE.Vector3(0, 0, 0)];
+  let ang = 0, x = 0, z = 0;
+  for (const c of seq) {
+    if (c === "A" || c === "B") {
+      x += Math.cos(ang) * size;
+      z += Math.sin(ang) * size;
+      pts.push(new THREE.Vector3(x, 0, z));
+    } else if (c === "+") ang += Math.PI / 3;
+    else if (c === "-") ang -= Math.PI / 3;
+  }
+  // close
+  if (pts.length > 1) pts.push(pts[0].clone());
+  return pts;
+}
+
+const CLOSED_GENS = {
+  koch_snowflake: genClosedKochSnowflake,
+  quad_koch: genQuadKoch,
+  cesaro: genCesaro,
+  sierpinski_closed: genSierpinskiClosed,
+  vicsek_closed: genVicsekClosed,
+  pentagon_frac: (p) => genPolygonFrac(5, p),
+  hexagon_frac: (p) => genPolygonFrac(6, p),
+  star_frac: genStarFrac,
+  apollonian: genApollonian,
+  closed_gosper: genClosedGosper,
+};
+
+function createClosedFractal(typeId, params = {}, record = true) {
+  const info = CLOSED_FRACTALS.find((f) => f.id === typeId) || CLOSED_FRACTALS[0];
+  const gen = CLOSED_GENS[typeId] || CLOSED_GENS.koch_snowflake;
+  // merge default params
+  const p = {};
+  for (const def of info.params) p[def.key] = params[def.key] !== undefined ? params[def.key] : def.value;
+  const pts = gen(p);
+  if (!pts || pts.length < 2) return null;
+
+  const color = nextColor(sceneObjects.length);
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = new THREE.LineBasicMaterial({ color });
+  const mesh = new THREE.Line(geo, mat);
+  // also add a subtle fill using Shape if planar and simple — skip for complexity, keep line closed
+  mesh.position.copy(offsetPosition());
+  return addObjectToScene(
+    mesh,
+    "封閉碎形",
+    info.name,
+    "closed_fractal",
+    { closedFractalType: typeId, params: p },
+    record,
+    { color, meta: { closedFractalType: typeId, params: p } }
+  );
+}
+
+function createFractal(typeId, record = true) {
+  const info = FRACTAL_TYPES.find((f) => f.id === typeId) || FRACTAL_TYPES[0];
+  const gen = FRACTAL_GENS[typeId] || FRACTAL_GENS.koch;
+  const pts = gen();
+  if (!pts || pts.length < 2) return null;
+
+  const color = nextColor(sceneObjects.length);
+  // point cloud for dense fractals, line for curve-like
+  const isPoints = ["cantor", "sierpinski", "vicsek", "carpet", "tetra_sier", "menger", "barnsley", "julia", "mandelbulb", "ifs_tree", "pyramid"].includes(typeId);
+  let mesh;
+  if (isPoints) {
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.PointsMaterial({ color, size: 0.04, sizeAttenuation: true });
+    mesh = new THREE.Points(geo, mat);
+  } else {
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const mat = new THREE.LineBasicMaterial({ color });
+    mesh = new THREE.Line(geo, mat);
+  }
+  mesh.position.copy(offsetPosition());
+  return addObjectToScene(mesh, "碎形", info.name, "fractal", { fractalType: typeId }, record, { color, meta: { fractalType: typeId } });
+}
+
+/* ---------- 公式產生物件 ---------- */
+function compileExpr(expr, varNames) {
+  return new Function(...varNames,
+    `const {sin,cos,tan,sqrt,pow,abs,exp,log,PI,min,max,floor,ceil,cosh,sinh}=Math; return (${expr});`);
+}
+
+function makeLineMaterial(color, lineStyle) {
+  if (lineStyle === "dashed") {
+    return new THREE.LineDashedMaterial({ color, dashSize: 0.25, gapSize: 0.12, linewidth: 2 });
+  }
+  if (lineStyle === "dotted") {
+    return new THREE.LineDashedMaterial({ color, dashSize: 0.06, gapSize: 0.12, linewidth: 2 });
+  }
+  return new THREE.LineBasicMaterial({ color, linewidth: 2 });
+}
+
+function createCurveFromFormula(params, record = true) {
+  const {
+    xExpr, yExpr, zExpr, tMin, tMax, steps,
+    color: userColor, lineStyle = "solid", animate = false, name: customName,
+  } = params;
+  const fx = compileExpr(xExpr, ["t"]);
+  const fy = compileExpr(yExpr, ["t"]);
+  const fz = compileExpr(zExpr, ["t"]);
+  const pts = [];
+  const n = Math.max(2, Math.floor(steps));
+  for (let i = 0; i <= n; i++) {
+    const t = tMin + ((tMax - tMin) * i) / n;
+    let x = 0, y = 0, z = 0;
+    try { x = fx(t); } catch (e) {}
+    try { y = fy(t); } catch (e) {}
+    try { z = fz(t); } catch (e) {}
+    if (!isFinite(x)) x = 0;
+    if (!isFinite(y)) y = 0;
+    if (!isFinite(z)) z = 0;
+    pts.push(new THREE.Vector3(x, y, z));
+  }
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const color = userColor !== undefined ? userColor : nextColor(sceneObjects.length);
+  const mat = makeLineMaterial(color, lineStyle);
+  const mesh = new THREE.Line(geo, mat);
+  if (lineStyle === "dashed" || lineStyle === "dotted") mesh.computeLineDistances();
+
+  const formulaData = { xExpr, yExpr, zExpr, tMin, tMax, steps, color, lineStyle, animate };
+  const entry = addObjectToScene(
+    mesh, "公式曲線", customName || `曲線 ${sceneObjects.length + 1}`, "curve", formulaData, record, { color, lineStyle }
+  );
+
+  if (animate) {
+    const total = pts.length;
+    geo.setDrawRange(0, 2);
+    const duration = 2.5;
+    const start = performance.now();
+    function animDraw(now) {
+      if (!entry.mesh || !sceneObjects.includes(entry)) return;
+      const t = Math.min(1, (now - start) / (duration * 1000));
+      const current = Math.max(2, Math.floor(2 + t * (total - 2)));
+      geo.setDrawRange(0, current);
+      if (t < 1) requestAnimationFrame(animDraw);
+      else geo.setDrawRange(0, total);
+    }
+    requestAnimationFrame(animDraw);
+  }
+  return entry;
+}
+
+function createSurfaceFromFormula(params, record = true) {
+  const { zExpr, xMin, xMax, yMin, yMax } = params;
+  const fz = compileExpr(zExpr, ["x", "y"]);
+  const nx = Math.max(2, Math.floor(params.nx));
+  const ny = Math.max(2, Math.floor(params.ny));
+  const positions = [];
+  const indices = [];
+  for (let j = 0; j <= ny; j++) {
+    const y = yMin + ((yMax - yMin) * j) / ny;
+    for (let i = 0; i <= nx; i++) {
+      const x = xMin + ((xMax - xMin) * i) / nx;
+      let z = 0;
+      try { z = fz(x, y); } catch (e) { z = 0; }
+      if (!isFinite(z)) z = 0;
+      positions.push(x, z, y);
+    }
+  }
+  const rowLen = nx + 1;
+  for (let j = 0; j < ny; j++) {
+    for (let i = 0; i < nx; i++) {
+      const a = j * rowLen + i, b = a + 1, c = a + rowLen, d = c + 1;
+      indices.push(a, c, b, b, c, d);
+    }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  const color = nextColor(sceneObjects.length);
+  const mat = new THREE.MeshStandardMaterial({ color, side: THREE.DoubleSide, roughness: 0.55, transparent: true, opacity: 0.9 });
+  const mesh = new THREE.Mesh(geo, mat);
+  const wire = new THREE.LineSegments(new THREE.WireframeGeometry(geo), new THREE.LineBasicMaterial({ color: 0x121315, transparent: true, opacity: 0.25 }));
+  mesh.add(wire);
+  return addObjectToScene(mesh, "公式曲面", `曲面 ${sceneObjects.length + 1}`, "surface", params, record);
+}
+
+/* ---------- 路徑動畫系統 ---------- */
+function buildPathPoints(pathParams) {
+  const { xExpr, yExpr, zExpr, tMin, tMax, steps } = pathParams;
+  const fx = compileExpr(xExpr, ["t"]);
+  const fy = compileExpr(yExpr, ["t"]);
+  const fz = compileExpr(zExpr, ["t"]);
+  const pts = [];
+  const n = Math.max(2, Math.floor(steps || 120));
+  for (let i = 0; i <= n; i++) {
+    const t = tMin + ((tMax - tMin) * i) / n;
+    let x = 0, y = 0, z = 0;
+    try { x = fx(t); } catch (e) {}
+    try { y = fy(t); } catch (e) {}
+    try { z = fz(t); } catch (e) {}
+    if (!isFinite(x)) x = 0;
+    if (!isFinite(y)) y = 0;
+    if (!isFinite(z)) z = 0;
+    pts.push(new THREE.Vector3(x, y, z));
+  }
+  return pts;
+}
+
+function createTrajectoryMesh(pts, color = 0xbd8b2a, lineStyle = "dashed") {
+  const geo = new THREE.BufferGeometry().setFromPoints(pts);
+  const mat = makeLineMaterial(color, lineStyle);
+  const mesh = new THREE.Line(geo, mat);
+  if (lineStyle === "dashed" || lineStyle === "dotted") mesh.computeLineDistances();
+  mesh.userData.isTrajectory = true;
+  return mesh;
+}
+
+function assignPathToEntry(entry, pathParams, options = {}) {
+  if (!entry) return;
+  stopPathAnimation(entry);
+  if (entry.trajectoryMesh) {
+    objectsGroup.remove(entry.trajectoryMesh);
+    entry.trajectoryMesh = null;
+  }
+  const pts = buildPathPoints(pathParams);
+  if (pts.length < 2) return;
+
+  entry.path = {
+    ...pathParams,
+    speed: options.speed ?? 1,
+    loop: options.loop !== false,
+    showTrajectory: options.showTrajectory !== false,
+  };
+
+  if (entry.path.showTrajectory) {
+    const traj = createTrajectoryMesh(pts, options.trajColor || 0xbd8b2a, options.trajStyle || "dashed");
+    objectsGroup.add(traj);
+    entry.trajectoryMesh = traj;
+  }
+  if (options.autoStart !== false) startPathAnimation(entry, pts);
+  scheduleAutosave();
+  refreshObjectList();
+  refreshPropsUI();
+}
+
+function startPathAnimation(entry, pts) {
+  if (!entry || !entry.path) return;
+  stopPathAnimation(entry);
+  const points = pts || buildPathPoints(entry.path);
+  if (points.length < 2) return;
+
+  const duration = Math.max(1, (entry.path.tMax - entry.path.tMin) / (entry.path.speed || 1));
+  entry.pathAnim = {
+    points,
+    duration: duration * 1000,
+    startTime: performance.now(),
+    running: true,
+    currentT: entry.path.tMin,
+    currentPos: points[0].clone(),
+  };
+
+  function tick(now) {
+    if (!entry.pathAnim || !entry.pathAnim.running || !sceneObjects.includes(entry)) return;
+    let u = (now - entry.pathAnim.startTime) / entry.pathAnim.duration;
+    if (entry.path.loop) u = u % 1;
+    else if (u >= 1) { u = 1; entry.pathAnim.running = false; }
+    const idx = u * (points.length - 1);
+    const i0 = Math.floor(idx);
+    const i1 = Math.min(i0 + 1, points.length - 1);
+    const frac = idx - i0;
+    const p = new THREE.Vector3().lerpVectors(points[i0], points[i1], frac);
+    entry.mesh.position.copy(p);
+    entry.pathAnim.currentT = entry.path.tMin + u * (entry.path.tMax - entry.path.tMin);
+    entry.pathAnim.currentPos = p.clone();
+    updateSelectedMarker();
+    if (selected === entry) refreshPathCoordUI();
+    if (entry.pathAnim.running) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function stopPathAnimation(entry) {
+  if (entry && entry.pathAnim) {
+    entry.pathAnim.running = false;
+    entry.pathAnim = null;
+  }
+}
+
+function setTrajectoryVisible(entry, visible) {
+  if (!entry) return;
+  entry.trajectoryVisible = visible;
+  if (entry.trajectoryMesh) entry.trajectoryMesh.visible = visible;
+  else if (visible && entry.path) {
+    const pts = buildPathPoints(entry.path);
+    const traj = createTrajectoryMesh(pts);
+    objectsGroup.add(traj);
+    entry.trajectoryMesh = traj;
+  }
+  scheduleAutosave();
+}
+
+/* ---------- 數值屬性控制 ---------- */
+function applyTransformFromNumbers(entry, data) {
+  if (!entry) return;
+  if (data.px !== undefined) entry.mesh.position.x = data.px;
+  if (data.py !== undefined) entry.mesh.position.y = data.py;
+  if (data.pz !== undefined) entry.mesh.position.z = data.pz;
+  if (data.rx !== undefined || data.ry !== undefined || data.rz !== undefined) {
+    const e = new THREE.Euler(
+      THREE.MathUtils.degToRad(data.rx ?? 0),
+      THREE.MathUtils.degToRad(data.ry ?? 0),
+      THREE.MathUtils.degToRad(data.rz ?? 0),
+      "XYZ"
+    );
+    entry.mesh.quaternion.setFromEuler(e);
+  }
+  if (data.sx !== undefined) entry.mesh.scale.x = data.sx;
+  if (data.sy !== undefined) entry.mesh.scale.y = data.sy;
+  if (data.sz !== undefined) entry.mesh.scale.z = data.sz;
+  if (data.color !== undefined && entry.mesh.material && entry.mesh.material.color) {
+    entry.mesh.material.color.setHex(data.color);
+    entry.color = data.color;
+  }
+  updateSelectedMarker();
+  scheduleAutosave();
+  refreshPropsUI();
+}
+
+function getEntryProps(entry) {
+  if (!entry) return null;
+  const p = entry.mesh.position;
+  const e = new THREE.Euler().setFromQuaternion(entry.mesh.quaternion, "XYZ");
+  const s = entry.mesh.scale;
+  let color = 0x942525;
+  if (entry.mesh.material && entry.mesh.material.color) color = entry.mesh.material.color.getHex();
+  return {
+    name: entry.name,
+    kind: entry.kind,
+    px: +p.x.toFixed(3), py: +p.y.toFixed(3), pz: +p.z.toFixed(3),
+    rx: +THREE.MathUtils.radToDeg(e.x).toFixed(1),
+    ry: +THREE.MathUtils.radToDeg(e.y).toFixed(1),
+    rz: +THREE.MathUtils.radToDeg(e.z).toFixed(1),
+    sx: +s.x.toFixed(3), sy: +s.y.toFixed(3), sz: +s.z.toFixed(3),
+    color,
+    meta: entry.meta || {},
+    hasPath: !!entry.path,
+    pathRunning: !!(entry.pathAnim && entry.pathAnim.running),
+  };
+}
+
+/* ---------- 選取 ---------- */
+const raycaster = new THREE.Raycaster();
+const pointerNDC = new THREE.Vector2();
+let downPos = null;
+
+function selectEntry(entry) {
+  selected = entry;
+  if (entry) tcontrol.attach(entry.mesh);
+  else tcontrol.detach();
+  refreshObjectList();
+  refreshSelectionUI();
+  refreshPropsUI();
+}
+
+function pickAt(clientX, clientY) {
+  const rect = renderer.domElement.getBoundingClientRect();
+  pointerNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+  pointerNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
+  raycaster.setFromCamera(pointerNDC, camera);
+  const meshes = sceneObjects.map((e) => e.mesh);
+  const hits = raycaster.intersectObjects(meshes, true);
+  if (hits.length === 0) return null;
+  let obj = hits[0].object;
+  while (obj && !sceneObjects.find((e) => e.mesh === obj)) obj = obj.parent;
+  return sceneObjects.find((e) => e.mesh === obj) || null;
+}
+
+renderer.domElement.addEventListener("pointerdown", (e) => { downPos = { x: e.clientX, y: e.clientY }; });
+renderer.domElement.addEventListener("pointerup", (e) => {
+  if (!downPos) return;
+  const dx = e.clientX - downPos.x, dy = e.clientY - downPos.y;
+  downPos = null;
+  if (Math.hypot(dx, dy) > 6) return;
+  if (tcontrol.dragging) return;
+  selectEntry(pickAt(e.clientX, e.clientY));
+});
+
+/* ---------- 動畫迴圈 ---------- */
+function animate() {
+  requestAnimationFrame(animate);
+  orbit.update();
+  updateAllMarkers();
+  renderer.render(scene, camera);
+}
+resize();
+animate();
+
+/* ---------- Undo / Redo ---------- */
+function undo() {
+  const action = history.pop();
+  if (!action) return;
+  applyReverse(action);
+  redoStack.push(action);
+  refreshUndoRedoButtons();
+}
+function redo() {
+  const action = redoStack.pop();
+  if (!action) return;
+  applyForward(action);
+  history.push(action);
+  refreshUndoRedoButtons();
+}
+function applyReverse(action) {
+  if (action.type === "add") removeEntry(action.entry, false);
+  else if (action.type === "remove") {
+    objectsGroup.add(action.entry.mesh);
+    markersGroup.add(action.entry.marker);
+    if (action.entry.trajectoryMesh) objectsGroup.add(action.entry.trajectoryMesh);
+    sceneObjects.splice(action.index >= 0 ? action.index : sceneObjects.length, 0, action.entry);
+    refreshObjectList();
+  } else if (action.type === "clear") {
+    for (const entry of action.entries) {
+      objectsGroup.add(entry.mesh);
+      markersGroup.add(entry.marker);
+      if (entry.trajectoryMesh) objectsGroup.add(entry.trajectoryMesh);
+      sceneObjects.push(entry);
+    }
+    refreshObjectList();
+  }
+}
+function applyForward(action) {
+  if (action.type === "add") {
+    objectsGroup.add(action.entry.mesh);
+    markersGroup.add(action.entry.marker);
+    if (action.entry.trajectoryMesh) objectsGroup.add(action.entry.trajectoryMesh);
+    sceneObjects.push(action.entry);
+    refreshObjectList();
+  } else if (action.type === "remove") removeEntry(action.entry, false);
+  else if (action.type === "clear") {
+    for (const entry of action.entries) removeEntry(entry, false);
+  }
+}
+
+function clearAll() {
+  if (sceneObjects.length === 0) return;
+  const entries = [...sceneObjects];
+  for (const entry of entries) removeEntry(entry, false);
+  pushHistory({ type: "clear", entries });
+  scheduleAutosave();
+}
+
+/* ---------- 本機儲存 ---------- */
+const STORAGE_KEY = "3dspace-scene-v1";
+let autosaveTimer = null;
+let restoring = false;
+
+function scheduleAutosave() {
+  if (restoring) return;
+  if (autosaveTimer) clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(saveScene, 400);
+}
+
+function serializeScene() {
+  return sceneObjects.map((e) => ({
+    kind: e.kind,
+    name: e.name,
+    color: e.mesh.material && e.mesh.material.color ? e.mesh.material.color.getHex() : (e.color || undefined),
+    position: e.mesh.position.toArray(),
+    quaternion: e.mesh.quaternion.toArray(),
+    scale: e.mesh.scale.toArray(),
+    formula: e.formula,
+    lineStyle: e.lineStyle || "solid",
+    path: e.path || null,
+    trajectoryVisible: e.trajectoryVisible !== false,
+    meta: e.meta || {},
+  }));
+}
+
+function saveScene() {
+  try {
+    const data = {
+      objects: serializeScene(),
+      gridVisible: gridHelper.visible,
+      gridPointsVisible: !!(gridPointsObj && gridPointsObj.visible),
+      showCenters,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (err) {
+    console.warn("三度空間：自動存檔失敗", err);
+  }
+}
+
+function setGridPointsVisible(v) {
+  if (v && !gridPointsObj) {
+    const pts = [];
+    for (let x = -10; x <= 10; x++) for (let z = -10; z <= 10; z++) pts.push(x, 0, z);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+    const mat = new THREE.PointsMaterial({ color: 0xbd8b2a, size: 0.06 });
+    gridPointsObj = new THREE.Points(geo, mat);
+    scene.add(gridPointsObj);
+  }
+  if (gridPointsObj) gridPointsObj.visible = v;
+}
+
+function restoreEntry(saved) {
+  let entry = null;
+  if (saved.kind === "curve" && saved.formula) {
+    entry = createCurveFromFormula({
+      ...saved.formula,
+      color: saved.color,
+      lineStyle: saved.lineStyle || saved.formula.lineStyle || "solid",
+      animate: false,
+      name: saved.name,
+    }, false);
+  } else if (saved.kind === "surface" && saved.formula) {
+    entry = createSurfaceFromFormula(saved.formula, false);
+  } else if (saved.kind === "fractal" && saved.formula && saved.formula.fractalType) {
+    entry = createFractal(saved.formula.fractalType, false);
+  } else if (saved.kind === "closed_fractal" && saved.formula && saved.formula.closedFractalType) {
+    entry = createClosedFractal(saved.formula.closedFractalType, saved.formula.params || {}, false);
+  } else if (CREATORS[saved.kind]) {
+    entry = CREATORS[saved.kind](false);
+  }
+  if (!entry) return;
+  entry.name = saved.name || entry.name;
+  if (saved.position) entry.mesh.position.fromArray(saved.position);
+  if (saved.quaternion) entry.mesh.quaternion.fromArray(saved.quaternion);
+  if (saved.scale) entry.mesh.scale.fromArray(saved.scale);
+  if (saved.color !== undefined && entry.mesh.material && entry.mesh.material.color) {
+    entry.mesh.material.color.setHex(saved.color);
+  }
+  entry.lineStyle = saved.lineStyle || "solid";
+  entry.meta = saved.meta || entry.meta || {};
+
+  if (saved.path) {
+    entry.path = saved.path;
+    entry.trajectoryVisible = saved.trajectoryVisible !== false;
+    if (entry.trajectoryVisible) {
+      const pts = buildPathPoints(saved.path);
+      const traj = createTrajectoryMesh(pts, 0xbd8b2a, "dashed");
+      objectsGroup.add(traj);
+      entry.trajectoryMesh = traj;
+    }
+  }
+}
+
+function loadScene() {
+  let raw = null;
+  try { raw = localStorage.getItem(STORAGE_KEY); } catch (err) { raw = null; }
+  if (!raw) return false;
+  let data = null;
+  try { data = JSON.parse(raw); } catch (err) { return false; }
+  if (!data || !Array.isArray(data.objects)) return false;
+  restoring = true;
+  try {
+    for (const saved of data.objects) restoreEntry(saved);
+    if (typeof data.gridVisible === "boolean") gridHelper.visible = data.gridVisible;
+    if (data.gridPointsVisible) setGridPointsVisible(true);
+    if (typeof data.showCenters === "boolean") showCenters = data.showCenters;
+  } finally {
+    restoring = false;
+  }
+  history = [];
+  redoStack = [];
+  refreshUndoRedoButtons();
+  refreshObjectList();
+  return true;
+}
+
+/* ---------- UI 綁定 ---------- */
+export const API = {
+  create: (kind) => CREATORS[kind] && CREATORS[kind](),
+  createCurve: createCurveFromFormula,
+  createSurface: createSurfaceFromFormula,
+  createFractal,
+  getFractalTypes: () => FRACTAL_TYPES,
+  createClosedFractal,
+  getClosedFractals: () => CLOSED_FRACTALS,
+  deleteSelected: () => { if (selected) removeEntry(selected); },
+  clearAll,
+  undo, redo,
+  setMode: (mode) => { tcontrol.setMode(mode); },
+  setSnap: (on, size) => {
+    tcontrol.setTranslationSnap(on ? size : null);
+    tcontrol.setRotationSnap(on ? THREE.MathUtils.degToRad(15) : null);
+    tcontrol.setScaleSnap(on ? 0.1 : null);
+  },
+  setView,
+  setGridVisible: (v) => { gridHelper.visible = v; scheduleAutosave(); },
+  setGridPoints: (v) => { setGridPointsVisible(v); scheduleAutosave(); },
+  setShowCenters: (v) => { showCenters = v; scheduleAutosave(); },
+  selectByEntry: (entry) => selectEntry(entry),
+  getObjects: () => sceneObjects,
+  getSelected: () => selected,
+  getEntryProps,
+  applyTransform: applyTransformFromNumbers,
+  getInitialState: () => ({
+    gridVisible: gridHelper.visible,
+    gridPointsVisible: !!(gridPointsObj && gridPointsObj.visible),
+    showCenters,
+  }),
+  clearSavedData: () => { try { localStorage.removeItem(STORAGE_KEY); } catch (err) {} },
+
+  getPresets: getAllPresets,
+  getBuiltinPresets: () => BUILTIN_CURVES,
+  saveCustomFormula: (formula) => {
+    customFormulas.push({
+      name: formula.name || `自訂 ${customFormulas.length + 1}`,
+      x: formula.xExpr || formula.x,
+      y: formula.yExpr || formula.y,
+      z: formula.zExpr || formula.z,
+      tMin: formula.tMin ?? 0,
+      tMax: formula.tMax ?? 6.28,
+      steps: formula.steps ?? 120,
+    });
+    saveCustomFormulas();
+    return customFormulas.length - 1;
+  },
+  deleteCustomFormula: (index) => {
+    if (index >= 0 && index < customFormulas.length) {
+      customFormulas.splice(index, 1);
+      saveCustomFormulas();
+    }
+  },
+
+  assignPath: (entry, pathParams, options) => assignPathToEntry(entry, pathParams, options),
+  startPath: (entry) => { if (entry && entry.path) startPathAnimation(entry); },
+  stopPath: (entry) => stopPathAnimation(entry),
+  setTrajectoryVisible: (entry, v) => setTrajectoryVisible(entry, v),
+  removePath: (entry) => {
+    if (!entry) return;
+    stopPathAnimation(entry);
+    if (entry.trajectoryMesh) {
+      objectsGroup.remove(entry.trajectoryMesh);
+      entry.trajectoryMesh = null;
+    }
+    entry.path = null;
+    scheduleAutosave();
+    refreshObjectList();
+    refreshPropsUI();
+  },
+  getPathCoord: (entry) => {
+    if (!entry || !entry.pathAnim) return null;
+    return {
+      t: entry.pathAnim.currentT,
+      x: entry.pathAnim.currentPos.x,
+      y: entry.pathAnim.currentPos.y,
+      z: entry.pathAnim.currentPos.z,
+      running: entry.pathAnim.running,
+    };
+  },
+};
+
+loadScene();
+
+function refreshUndoRedoButtons() {
+  document.dispatchEvent(new CustomEvent("history-changed", {
+    detail: { canUndo: history.length > 0, canRedo: redoStack.length > 0 },
+  }));
+}
+function refreshObjectList() {
+  document.dispatchEvent(new CustomEvent("objects-changed"));
+}
+function refreshSelectionUI() {
+  document.dispatchEvent(new CustomEvent("selection-changed", { detail: { selected } }));
+}
+function refreshPropsUI() {
+  document.dispatchEvent(new CustomEvent("props-changed", { detail: { selected, props: getEntryProps(selected) } }));
+}
+function refreshPathCoordUI() {
+  document.dispatchEvent(new CustomEvent("path-coord", {
+    detail: selected ? API.getPathCoord(selected) : null,
+  }));
+}
+
+window.__APP__ = API;
+
+</script>
+<script>
+(function(){
+  function whenReady(cb){
+    if (window.__APP__) return cb(window.__APP__);
+    let tries = 0;
+    const t = setInterval(() => {
+      tries++;
+      if (window.__APP__) { clearInterval(t); cb(window.__APP__); }
+      else if (tries > 200) clearInterval(t);
+    }, 25);
+  }
+
+  whenReady(function(API){
+    /* 分頁切換 */
+    const tabs = document.querySelectorAll(".tab");
+    const pages = document.querySelectorAll(".tab-page");
+    const panel = document.getElementById("panel");
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        pages.forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.querySelector('.tab-page[data-page="' + tab.dataset.tab + '"]').classList.add("active");
+        panel.classList.remove("collapsed");
+      });
+    });
+
+    let collapsed = false;
+    function setCollapsed(v){
+      collapsed = v;
+      panel.classList.toggle("collapsed", collapsed);
+      document.getElementById("btnMenu").textContent = collapsed ? "展開" : "收合";
+    }
+    document.getElementById("btnMenu").addEventListener("click", () => setCollapsed(!collapsed));
+    document.getElementById("dragHandle").addEventListener("click", () => setCollapsed(!collapsed));
+
+    /* 建立物件 */
+    document.querySelectorAll("[data-create]").forEach(btn => {
+      btn.addEventListener("click", () => API.create(btn.dataset.create));
+    });
+
+    /* ---------- 公式預設 ---------- */
+    const presetSelect = document.getElementById("presetSelect");
+
+    function refreshPresets() {
+      const presets = API.getPresets();
+      presetSelect.innerHTML = '<option value="">— 選擇預設公式 —</option>';
+      const builtinGroup = document.createElement("optgroup");
+      builtinGroup.label = "內建公式（20 種）";
+      const customGroup = document.createElement("optgroup");
+      customGroup.label = "自訂公式";
+      presets.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p.id;
+        opt.textContent = p.name;
+        if (p.isBuiltin) builtinGroup.appendChild(opt);
+        else customGroup.appendChild(opt);
+      });
+      presetSelect.appendChild(builtinGroup);
+      if (customGroup.children.length > 0) presetSelect.appendChild(customGroup);
+    }
+    refreshPresets();
+
+    document.getElementById("btnLoadPreset").addEventListener("click", () => {
+      const id = presetSelect.value;
+      if (!id) return;
+      const presets = API.getPresets();
+      const p = presets.find((x) => x.id === id);
+      if (!p) return;
+      document.getElementById("fx").value = p.x;
+      document.getElementById("fy").value = p.y;
+      document.getElementById("fz").value = p.z;
+      document.getElementById("tMin").value = p.tMin;
+      document.getElementById("tMax").value = p.tMax;
+      document.getElementById("tSteps").value = p.steps;
+    });
+
+    document.getElementById("btnSaveCustom").addEventListener("click", () => {
+      const name = prompt("請輸入自訂公式名稱：", "我的曲線");
+      if (!name) return;
+      API.saveCustomFormula({
+        name,
+        xExpr: document.getElementById("fx").value,
+        yExpr: document.getElementById("fy").value,
+        zExpr: document.getElementById("fz").value,
+        tMin: parseFloat(document.getElementById("tMin").value),
+        tMax: parseFloat(document.getElementById("tMax").value),
+        steps: parseFloat(document.getElementById("tSteps").value),
+      });
+      refreshPresets();
+      alert("已儲存自訂公式：「" + name + "」");
+    });
+
+    document.getElementById("btnDeleteCustom").addEventListener("click", () => {
+      const id = presetSelect.value;
+      if (!id || !id.startsWith("custom-")) {
+        alert("請先選擇一個「自訂公式」再刪除。");
+        return;
+      }
+      const idx = parseInt(id.replace("custom-", ""), 10);
+      if (confirm("確定要刪除這個自訂公式嗎？")) {
+        API.deleteCustomFormula(idx);
+        refreshPresets();
+      }
+    });
+
+    /* 公式產生曲線（含顏色、線型、動畫） */
+    document.getElementById("btnMakeCurve").addEventListener("click", () => {
+      const colorHex = document.getElementById("curveColor").value;
+      const color = parseInt(colorHex.slice(1), 16);
+      API.createCurve({
+        xExpr: document.getElementById("fx").value,
+        yExpr: document.getElementById("fy").value,
+        zExpr: document.getElementById("fz").value,
+        tMin: parseFloat(document.getElementById("tMin").value),
+        tMax: parseFloat(document.getElementById("tMax").value),
+        steps: parseFloat(document.getElementById("tSteps").value),
+        color,
+        lineStyle: document.getElementById("lineStyle").value,
+        animate: document.getElementById("curveAnimate").value === "1",
+      });
+    });
+
+    document.getElementById("btnMakeSurface").addEventListener("click", () => {
+      API.createSurface({
+        zExpr: document.getElementById("fz2").value,
+        xMin: parseFloat(document.getElementById("xMin").value),
+        xMax: parseFloat(document.getElementById("xMax").value),
+        yMin: parseFloat(document.getElementById("yMin").value),
+        yMax: parseFloat(document.getElementById("yMax").value),
+        nx: parseFloat(document.getElementById("surfN").value),
+        ny: parseFloat(document.getElementById("surfN").value),
+      });
+    });
+
+    /* 路徑系統 */
+    let pathLoopOn = true;
+    const pathLoopBtn = document.getElementById("pathLoop");
+    pathLoopBtn.addEventListener("click", () => {
+      pathLoopOn = !pathLoopOn;
+      pathLoopBtn.classList.toggle("on", pathLoopOn);
+    });
+
+    function updatePathStatus() {
+      const sel = API.getSelected();
+      const el = document.getElementById("pathStatus");
+      if (!sel) {
+        el.textContent = "尚未選取物件";
+        el.classList.remove("active");
+        return;
+      }
+      if (sel.path) {
+        el.textContent = "「" + sel.name + "」已設定路徑" + (sel.pathAnim && sel.pathAnim.running ? "（移動中）" : "");
+        el.classList.add("active");
+      } else {
+        el.textContent = "已選取「" + sel.name + "」，可套用路徑";
+        el.classList.remove("active");
+      }
+    }
+
+    document.getElementById("btnAssignPath").addEventListener("click", () => {
+      const sel = API.getSelected();
+      if (!sel) {
+        alert("請先在畫面或物件列表中選取一個物件。");
+        return;
+      }
+      const pathParams = {
+        xExpr: document.getElementById("fx").value,
+        yExpr: document.getElementById("fy").value,
+        zExpr: document.getElementById("fz").value,
+        tMin: parseFloat(document.getElementById("tMin").value),
+        tMax: parseFloat(document.getElementById("tMax").value),
+        steps: parseFloat(document.getElementById("tSteps").value),
+      };
+      API.assignPath(sel, pathParams, {
+        speed: parseFloat(document.getElementById("pathSpeed").value) || 1,
+        loop: pathLoopOn,
+        showTrajectory: document.getElementById("pathShowTraj").value === "1",
+        autoStart: true,
+      });
+      updatePathStatus();
+    });
+
+    document.getElementById("btnStopPath").addEventListener("click", () => {
+      const sel = API.getSelected();
+      if (sel) API.stopPath(sel);
+      updatePathStatus();
+    });
+
+    document.getElementById("btnToggleTraj").addEventListener("click", () => {
+      const sel = API.getSelected();
+      if (!sel || !sel.path) {
+        alert("請先為物件套用路徑。");
+        return;
+      }
+      const next = !(sel.trajectoryVisible !== false);
+      API.setTrajectoryVisible(sel, next);
+      updatePathStatus();
+    });
+
+    document.getElementById("btnRemovePath").addEventListener("click", () => {
+      const sel = API.getSelected();
+      if (sel) API.removePath(sel);
+      updatePathStatus();
+    });
+
+    /* 編輯模式 */
+    const modeButtons = {
+      translate: document.getElementById("modeTranslate"),
+      rotate: document.getElementById("modeRotate"),
+      scale: document.getElementById("modeScale"),
+    };
+    let currentMode = "translate";
+    function setMode(m){
+      currentMode = m;
+      API.setMode(m);
+      Object.entries(modeButtons).forEach(([k, el]) => el.classList.toggle("selected", k === m));
+    }
+    modeButtons.translate.addEventListener("click", () => setMode("translate"));
+    modeButtons.rotate.addEventListener("click", () => setMode("rotate"));
+    modeButtons.scale.addEventListener("click", () => setMode("scale"));
+    setMode("translate");
+
+    let snapOn = false;
+    const snapToggle = document.getElementById("snapToggle");
+    const snapSize = document.getElementById("snapSize");
+    function applySnap(){
+      API.setSnap(snapOn, parseFloat(snapSize.value) || 0.5);
+      snapToggle.classList.toggle("on", snapOn);
+    }
+    snapToggle.addEventListener("click", () => { snapOn = !snapOn; applySnap(); });
+    snapSize.addEventListener("change", applySnap);
+    applySnap();
+
+    document.getElementById("btnUndo").addEventListener("click", API.undo);
+    document.getElementById("btnRedo").addEventListener("click", API.redo);
+    document.getElementById("btnDeleteSel").addEventListener("click", API.deleteSelected);
+    document.getElementById("btnClearAll").addEventListener("click", () => {
+      if (confirm("確定要清除空間中所有物件嗎？")) API.clearAll();
+    });
+
+    document.addEventListener("history-changed", (e) => {
+      document.getElementById("btnUndo").disabled = !e.detail.canUndo;
+      document.getElementById("btnRedo").disabled = !e.detail.canRedo;
+    });
+
+    /* 視角 */
+    document.querySelectorAll("[data-view]").forEach(btn => {
+      btn.addEventListener("click", () => API.setView(btn.dataset.view));
+    });
+
+    /* 空間顯示 */
+    function bindSwitch(id, initial, cb){
+      const el = document.getElementById(id);
+      let on = initial;
+      el.classList.toggle("on", on);
+      el.addEventListener("click", () => {
+        on = !on;
+        el.classList.toggle("on", on);
+        cb(on);
+      });
+    }
+    const initState = API.getInitialState ? API.getInitialState() : {};
+    bindSwitch("toggleGrid", initState.gridVisible !== false, (v) => API.setGridVisible(v));
+    bindSwitch("toggleGridPoints", !!initState.gridPointsVisible, (v) => API.setGridPoints(v));
+    bindSwitch("toggleCenters", initState.showCenters !== false, (v) => API.setShowCenters(v));
+
+    /* 選取狀態 / 物件列表 */
+    const selInfo = document.getElementById("selInfo");
+    const objList = document.getElementById("objList");
+    const btnDeleteSel = document.getElementById("btnDeleteSel");
+
+    function renderList(){
+      const objs = API.getObjects();
+      const sel = API.getSelected();
+      if (objs.length === 0) {
+        objList.innerHTML = '<div class="empty-hint">目前空間中沒有物件，請至「建立」分頁新增。</div>';
+        return;
+      }
+      objList.innerHTML = "";
+      objs.forEach(entry => {
+        const row = document.createElement("div");
+        row.className = "obj-item" + (sel === entry ? " selected" : "");
+        let extra = "";
+        if (entry.path) extra = " 🛤️";
+        if (entry.kind === "curve") extra += " 📈";
+        row.innerHTML = '<span class="name">' + entry.name + extra + '</span>';
+        const selBtn = document.createElement("button");
+        selBtn.textContent = "選取";
+        selBtn.addEventListener("click", () => API.selectByEntry(entry));
+        row.appendChild(selBtn);
+        objList.appendChild(row);
+      });
+    }
+
+    document.addEventListener("objects-changed", renderList);
+    document.addEventListener("selection-changed", (e) => {
+      const entry = e.detail.selected;
+      if (entry) {
+        selInfo.classList.add("show");
+        selInfo.innerHTML = "已選取：<b>" + entry.name + "</b>";
+        btnDeleteSel.disabled = false;
+      } else {
+        selInfo.classList.remove("show");
+        btnDeleteSel.disabled = true;
+      }
+      renderList();
+      updatePathStatus();
+    });
+
+
+    /* 碎形 */
+    const fractalSelect = document.getElementById("fractalSelect");
+    if (fractalSelect && API.getFractalTypes) {
+      API.getFractalTypes().forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f.id;
+        opt.textContent = f.name;
+        fractalSelect.appendChild(opt);
+      });
+    }
+    const btnMakeFractal = document.getElementById("btnMakeFractal");
+    if (btnMakeFractal) {
+      btnMakeFractal.addEventListener("click", () => {
+        const id = fractalSelect.value;
+        if (id) API.createFractal(id);
+      });
+    }
+
+    /* 屬性數值控制 */
+    function fillProps(props) {
+      const empty = document.getElementById("propsEmpty");
+      const form = document.getElementById("propsForm");
+      if (!props) {
+        empty.style.display = "block";
+        form.style.display = "none";
+        return;
+      }
+      empty.style.display = "none";
+      form.style.display = "block";
+      document.getElementById("propName").value = props.name || "";
+      document.getElementById("propPx").value = props.px;
+      document.getElementById("propPy").value = props.py;
+      document.getElementById("propPz").value = props.pz;
+      document.getElementById("propRx").value = props.rx;
+      document.getElementById("propRy").value = props.ry;
+      document.getElementById("propRz").value = props.rz;
+      document.getElementById("propSx").value = props.sx;
+      document.getElementById("propSy").value = props.sy;
+      document.getElementById("propSz").value = props.sz;
+      const hex = "#" + ("000000" + (props.color >>> 0).toString(16)).slice(-6);
+      document.getElementById("propColor").value = hex;
+      let metaText = "類型：" + (props.kind || "");
+      if (props.meta && props.meta.radius) metaText += "　半徑 ≈ " + props.meta.radius;
+      if (props.meta && props.meta.fractalType) metaText += "　碎形：" + props.meta.fractalType;
+      if (props.hasPath) metaText += "　已設路徑" + (props.pathRunning ? "（移動中）" : "");
+      document.getElementById("propMeta").textContent = metaText;
+    }
+
+    document.getElementById("btnApplyProps").addEventListener("click", () => {
+      const sel = API.getSelected();
+      if (!sel) return;
+      const colorHex = document.getElementById("propColor").value;
+      API.applyTransform(sel, {
+        px: parseFloat(document.getElementById("propPx").value),
+        py: parseFloat(document.getElementById("propPy").value),
+        pz: parseFloat(document.getElementById("propPz").value),
+        rx: parseFloat(document.getElementById("propRx").value),
+        ry: parseFloat(document.getElementById("propRy").value),
+        rz: parseFloat(document.getElementById("propRz").value),
+        sx: parseFloat(document.getElementById("propSx").value),
+        sy: parseFloat(document.getElementById("propSy").value),
+        sz: parseFloat(document.getElementById("propSz").value),
+        color: parseInt(colorHex.slice(1), 16),
+      });
+    });
+
+    document.addEventListener("props-changed", (e) => {
+      fillProps(e.detail.props);
+    });
+
+    document.addEventListener("path-coord", (e) => {
+      const el = document.getElementById("pathCoord");
+      if (!el) return;
+      const d = e.detail;
+      if (!d) { el.textContent = "路徑座標：—"; return; }
+      el.textContent = "t=" + d.t.toFixed(3) + "  →  x=" + d.x.toFixed(3) + "  y=" + d.y.toFixed(3) + "  z=" + d.z.toFixed(3) + (d.running ? "  ▶" : "");
+    });
+
+    // initial props
+    fillProps(API.getEntryProps ? API.getEntryProps(API.getSelected()) : null);
+
+
+    /* 封閉碎形（可調參數） */
+    const closedSelect = document.getElementById("closedFractalSelect");
+    const closedParamsDiv = document.getElementById("closedFractalParams");
+    if (closedSelect && API.getClosedFractals) {
+      const list = API.getClosedFractals();
+      list.forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f.id;
+        opt.textContent = f.name;
+        closedSelect.appendChild(opt);
+      });
+      function renderClosedParams() {
+        const f = list.find(x => x.id === closedSelect.value);
+        closedParamsDiv.innerHTML = "";
+        if (!f) return;
+        f.params.forEach(pr => {
+          const wrap = document.createElement("div");
+          wrap.style.marginBottom = "6px";
+          wrap.innerHTML = '<label class="small">' + pr.label + ' <span id="val_' + pr.key + '">' + pr.value + '</span></label>' +
+            '<input type="range" id="cf_' + pr.key + '" min="' + pr.min + '" max="' + pr.max + '" step="' + pr.step + '" value="' + pr.value + '" style="width:100%">';
+          closedParamsDiv.appendChild(wrap);
+          const inp = wrap.querySelector("input");
+          const span = wrap.querySelector("span");
+          inp.addEventListener("input", () => { span.textContent = inp.value; });
+        });
+      }
+      closedSelect.addEventListener("change", renderClosedParams);
+      renderClosedParams();
+    }
+    const btnClosed = document.getElementById("btnMakeClosedFractal");
+    if (btnClosed) {
+      btnClosed.addEventListener("click", () => {
+        const id = closedSelect.value;
+        const f = API.getClosedFractals().find(x => x.id === id);
+        if (!f) return;
+        const params = {};
+        f.params.forEach(pr => {
+          const el = document.getElementById("cf_" + pr.key);
+          if (el) params[pr.key] = parseFloat(el.value);
+        });
+        API.createClosedFractal(id, params);
+      });
+    }
+
+    renderList();
+    updatePathStatus();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

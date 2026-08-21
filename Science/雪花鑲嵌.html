@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#041017" />
+  <title>Snowflake Tessellation — Standalone</title>
+  <style>
+    :root {
+      --ink: #041017;
+      --deep: #061820;
+      --rail: #08212b;
+      --paper: #dff5f3;
+      --muted: #84a5ad;
+      --line: rgba(166, 235, 232, .20);
+      --cyan: #7de5e2;
+      --copper: #bd816a;
+      --ease: cubic-bezier(.23, 1, .32, 1);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; margin: 0; }
+    body { background: var(--ink); color: var(--paper); font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    button, input { font: inherit; }
+    button { color: inherit; cursor: pointer; }
+
+    .app { min-height: 100svh; display: grid; grid-template-columns: minmax(280px, 340px) 1fr; overflow: hidden; }
+    .rail { position: relative; z-index: 2; display: flex; flex-direction: column; min-height: 100svh; padding: clamp(1.4rem, 3vw, 2.5rem); background: linear-gradient(145deg, #0a232e, #061821 60%, #07141c); border-right: 1px solid var(--line); box-shadow: 18px 0 44px rgba(0,0,0,.17); }
+    .rail::before { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .27; background-image: linear-gradient(rgba(182,255,252,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(182,255,252,.025) 1px, transparent 1px); background-size: 24px 24px; mask-image: linear-gradient(#000, transparent 88%); }
+    .rail > * { position: relative; z-index: 1; }
+    .brand { display: flex; align-items: flex-start; gap: .8rem; }
+    .brand-mark { position: relative; width: 45px; height: 45px; flex: 0 0 auto; filter: drop-shadow(0 0 12px rgba(125, 229, 226, .18)); }
+    .brand-mark span { position: absolute; inset: 11px; border: 2px solid var(--cyan); transform: rotate(45deg); }
+    .brand-mark span::before, .brand-mark span::after { content: ""; position: absolute; inset: -7px 13px; border: 2px solid var(--cyan); transform: rotate(30deg); }
+    .brand-mark span::after { transform: rotate(60deg); }
+    .eyebrow { margin: .08rem 0 .4rem; color: var(--muted); font-size: .59rem; font-weight: 750; letter-spacing: .16em; }
+    h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(1.85rem, 3vw, 2.55rem); letter-spacing: -.065em; line-height: .84; }
+    .live { display: inline-flex; align-items: center; gap: .4rem; margin-top: .3rem; color: #c5dcdc; font-size: .58rem; font-weight: 750; letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; }
+    .live i { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 4px rgba(125,229,226,.11), 0 0 12px var(--cyan); }
+    .description { margin: clamp(2.15rem, 5vh, 4rem) 0 1.35rem; max-width: 28rem; color: #c8dcdd; font-size: .86rem; line-height: 1.6; }
+    .readings { display: grid; grid-template-columns: repeat(3,1fr); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .reading { padding: .72rem .35rem .72rem 0; }.reading + .reading { padding-left: .65rem; border-left: 1px solid var(--line); }.reading span { display: block; color: #73979e; font-size: .53rem; font-weight: 750; letter-spacing: .13em; }.reading strong { display: block; margin-top: .25rem; color: #e3fbf9; font-size: .79rem; }
+    .controls { margin-top: 1.5rem; padding: 0 0 1.22rem; border-bottom: 1px solid var(--line); }.controls h2 { display: flex; align-items: center; gap: .46rem; margin: 0 0 1.45rem; color: #abdcdc; font-size: .58rem; font-weight: 750; letter-spacing: .15em; }.controls h2::before { content: "⌘"; color: var(--cyan); font-size: 1rem; line-height: 0; }
+    .control { display: block; margin-bottom: 1.2rem; }.control__top { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: .5rem; color: #b9d1d3; font-size: .69rem; }.control__top output { color: #f0fbfa; font-weight: 650; }
+    input[type="range"] { --fill: 50%; width: 100%; height: 12px; padding: 0; appearance: none; background: transparent; cursor: pointer; }
+    input[type="range"]::-webkit-slider-runnable-track { height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--cyan) var(--fill), rgba(185,224,224,.18) var(--fill)); }
+    input[type="range"]::-moz-range-track { height: 2px; border-radius: 2px; background: linear-gradient(90deg, var(--cyan) var(--fill), rgba(185,224,224,.18) var(--fill)); }
+    input[type="range"]::-webkit-slider-thumb { width: 11px; height: 11px; margin-top: -4.5px; appearance: none; border: 2px solid #06202a; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 3px rgba(125,229,226,.14); }
+    input[type="range"]::-moz-range-thumb { width: 11px; height: 11px; border: 2px solid #06202a; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 0 3px rgba(125,229,226,.14); }
+    .toggle { display: flex; align-items: center; justify-content: space-between; color: #b9d1d3; font-size: .69rem; }.switch { width: 33px; height: 18px; padding: 2px; border: 1px solid rgba(185,224,224,.28); border-radius: 999px; background: transparent; }.switch > span { display: block; width: 12px; height: 12px; border-radius: 50%; background: #7d999c; transition: transform 160ms var(--ease), background 160ms var(--ease); }.switch.on { border-color: rgba(125,229,226,.8); background: rgba(125,229,226,.13); }.switch.on > span { background: var(--cyan); transform: translateX(14px); }
+    .specimen { position: relative; min-height: 128px; overflow: hidden; margin-top: 1.45rem; border: 1px solid rgba(180,239,236,.21); background: radial-gradient(circle at 82% 48%, rgba(125,229,226,.20), transparent 18%), linear-gradient(120deg, #0c2c37, #071b25 70%); }.specimen::before { content: ""; position: absolute; right: -16px; bottom: -28px; width: 145px; height: 145px; opacity: .37; background: repeating-conic-gradient(from 0deg, transparent 0 28deg, rgba(188,249,247,.72) 29deg 30deg); clip-path: polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); }.specimen-content { position: relative; z-index: 1; display: flex; height: 128px; flex-direction: column; justify-content: flex-end; padding: 1rem; }.specimen strong { color: #effefd; font-family: Georgia, "Times New Roman", serif; font-size: 1.65rem; font-weight: 400; letter-spacing: -.05em; line-height: .9; }.specimen small { margin-top: .38rem; color: #9bbfc2; font-size: .59rem; letter-spacing: .10em; text-transform: uppercase; }
+    .footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 1.15rem; }.button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; border: 1px solid rgba(185,224,224,.18); background: rgba(4,17,23,.2); transition: transform 160ms var(--ease), background 160ms var(--ease), border-color 160ms var(--ease); }.button:hover { border-color: rgba(125,229,226,.7); background: rgba(125,229,226,.12); }.button:active { transform: scale(.97); }.reset { padding: .58rem .72rem; color: #bdd4d5; font-size: .65rem; }.reset::before { content: "↻"; color: var(--cyan); font-size: .95rem; }.square { width: 32px; height: 32px; color: var(--cyan); font-size: 1rem; }
+
+    .field { position: relative; display: flex; min-width: 0; min-height: 100svh; flex-direction: column; padding: clamp(1rem, 2.4vw, 2.2rem); background: radial-gradient(circle at 54% 46%, #0c2933 0%, var(--deep) 50%, var(--ink) 100%); }.topbar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0 0 .9rem; }.coordinate { display: flex; flex-wrap: wrap; gap: .55rem; align-items: center; }.coordinate span { color: #678b92; font-size: .56rem; font-weight: 750; letter-spacing: .14em; }.coordinate strong { color: #b8d4d5; font-size: .65rem; font-weight: 550; letter-spacing: .06em; }.actions { display: flex; gap: .5rem; }.action { min-height: 31px; padding: 0 .7rem; color: #c7e5e4; font-size: .62rem; font-weight: 650; }.action.play::before { content: "Ⅱ"; color: var(--cyan); font-size: .8rem; }.action.paused::before { content: "▶"; color: var(--cyan); font-size: .68rem; }.action-icon { width: 31px; color: #c7e5e4; font-size: 1rem; }
+    .viewport { position: relative; flex: 1; min-height: 390px; overflow: hidden; border: 1px solid rgba(177,239,236,.22); background: #061820; isolation: isolate; }.viewport::before { content: ""; position: absolute; z-index: -2; inset: 0; background: radial-gradient(ellipse at 74% 58%, rgba(80,155,154,.14), transparent 38%), radial-gradient(circle at 19% 32%, rgba(125,229,226,.08), transparent 22%), repeating-linear-gradient(0deg, rgba(179,241,239,.025) 0 1px, transparent 1px 5px); }.viewport::after { content: ""; position: absolute; z-index: 3; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 19%, rgba(2,13,19,.16) 67%, rgba(2,13,19,.72) 100%); }
+    canvas { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; cursor: crosshair; }.corner { position: absolute; z-index: 4; display: flex; align-items: center; gap: .5rem; color: #84aeb1; font-size: .51rem; font-weight: 750; letter-spacing: .13em; pointer-events: none; }.corner::after { content: ""; display: block; width: 24px; height: 1px; background: rgba(166,238,235,.6); }.tl { top: .8rem; left: .85rem; }.tr { top: .8rem; right: .85rem; flex-direction: row-reverse; }.bl { bottom: .75rem; left: .85rem; }.br { right: .85rem; bottom: .75rem; flex-direction: row-reverse; }.axis { position: absolute; z-index: 4; color: #789da1; font-size: .48rem; font-weight: 750; letter-spacing: .18em; pointer-events: none; }.axis-x { bottom: 1.15rem; left: 50%; transform: translateX(-50%); }.axis-y { top: 50%; right: .43rem; transform: rotate(90deg); transform-origin: right center; }.selected-note { position: absolute; z-index: 4; top: 57%; left: 55%; display: flex; align-items: center; gap: .42rem; padding: .45rem .55rem; border: 1px solid rgba(125,229,226,.45); background: rgba(4,17,23,.72); color: #c5f8f5; font-size: .57rem; font-weight: 750; letter-spacing: .08em; backdrop-filter: blur(10px); pointer-events: none; }.selected-note i { color: var(--copper); font-style: normal; }
+    .method { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-top: .9rem; }.method-copy { display: flex; align-items: baseline; gap: 1rem; max-width: 36rem; }.method-copy span { color: #678b92; font-size: .56rem; font-weight: 750; letter-spacing: .14em; white-space: nowrap; }.method-copy p { margin: 0; color: #90afb2; font-size: .65rem; line-height: 1.55; }.micro-swatches { display: flex; height: 41px; border: 1px solid rgba(170,231,228,.18); }.micro-swatches i { width: 53px; background: repeating-linear-gradient(60deg, rgba(125,229,226,.24) 0 1px, transparent 1px 5px), #08202a; }.micro-swatches i + i { background: radial-gradient(circle at 35% 35%, rgba(125,229,226,.45), transparent 11%), linear-gradient(130deg, #0a2530, #07151c 68%); }
+    @media (max-width: 850px) { .app { display: block; overflow: visible; }.rail { min-height: auto; padding: 1rem 1rem .95rem; border-right: 0; border-bottom: 1px solid var(--line); }.description { margin: 1.25rem 0 1rem; }.controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 .95rem; margin-top: 1.2rem; padding-bottom: 1rem; }.controls h2, .toggle { grid-column: 1 / -1; }.controls h2 { margin-bottom: .75rem; }.control { margin-bottom: .35rem; }.toggle { margin-top: .55rem; }.specimen, .footer { display: none; }.field { min-height: calc(100svh - 294px); padding: 1rem; }.viewport { min-height: 460px; } }
+    @media (max-width: 560px) { .rail { padding: .9rem; }.brand-mark { width: 38px; height: 38px; }.brand-mark span { inset: 9px; } h1 { font-size: 1.8rem; }.live { display: none; }.controls { grid-template-columns: 1fr; }.field { padding: .65rem; }.topbar { padding: .15rem .1rem .6rem; }.coordinate strong { font-size: .54rem; }.action { padding: 0 .54rem; font-size: .55rem; }.viewport { min-height: 445px; }.tr, .bl, .axis, .selected-note { display: none; }.method-copy { display: block; }.method-copy p { margin-top: .35rem; }.micro-swatches { height: 36px; }.micro-swatches i { width: 40px; } }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; } }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <aside class="rail" aria-label="Tessellation controls">
+      <header class="brand">
+        <div class="brand-mark" aria-hidden="true"><span></span></div>
+        <div><p class="eyebrow">OBSERVATORY / 08</p><h1>Snowflake<br>Tessellation</h1></div>
+        <span class="live"><i></i>Live field</span>
+      </header>
+      <p class="description">A repeating crystal field governed by one rule: every arm returns to six.</p>
+      <section class="readings" aria-label="Tessellation readings">
+        <div class="reading"><span>ORDER</span><strong>06</strong></div>
+        <div class="reading"><span>CELLS</span><strong id="cell-count">—</strong></div>
+        <div class="reading"><span>STATE</span><strong>SYNC</strong></div>
+      </section>
+      <section class="controls" aria-labelledby="calibration">
+        <h2 id="calibration">FIELD CALIBRATION</h2>
+        <label class="control"><span class="control__top"><span>Lattice pressure</span><output id="density-output">6.0</output></span><input id="density" type="range" min="3" max="9" step="1" value="6"></label>
+        <label class="control"><span class="control__top"><span>Arm density</span><output id="branches-output">2 / arm</output></span><input id="branches" type="range" min="1" max="3" step="1" value="2"></label>
+        <label class="control"><span class="control__top"><span>Crystal span</span><output id="span-output">0.94×</output></span><input id="span" type="range" min="0.68" max="1.22" step="0.01" value="0.94"></label>
+        <div class="toggle"><span>Construction grid</span><button id="grid-toggle" class="switch on" type="button" aria-pressed="true" aria-label="Toggle construction grid"><span></span></button></div>
+      </section>
+      <section class="specimen" aria-label="Selected snowflake specimen"><div class="specimen-content"><p class="eyebrow">ACTIVE SPECIMEN</p><strong id="specimen-id">4–4</strong><small>axial / sixfold</small></div></section>
+      <footer class="footer"><button id="reset" class="button reset" type="button">Reset field</button><button id="recenter-rail" class="button square" type="button" aria-label="Recenter field">↗</button></footer>
+    </aside>
+    <section class="field">
+      <header class="topbar"><div class="coordinate"><span>SECTOR</span><strong>∆ 61.4° N / 07.2° W</strong></div><div class="actions"><button id="pause" class="button action play" type="button">Pause drift</button><button id="recenter" class="button action-icon" type="button" aria-label="Recenter field">↻</button></div></header>
+      <div id="viewport" class="viewport">
+        <canvas id="tessellation" aria-label="Interactive snowflake tessellation canvas"></canvas>
+        <div class="corner tl">01</div><div class="corner tr">Y / 680</div><div class="corner bl">X / 1000</div><div class="corner br">FROST / <span id="frost">0.94</span></div>
+        <div class="axis axis-x">REPEAT VECTOR →</div><div class="axis axis-y">SIXFOLD AXIS</div><div class="selected-note"><i>✦</i><span id="note-id">SPECIMEN 4–4 / linked</span></div>
+      </div>
+      <footer class="method"><div class="method-copy"><span>METHOD 01</span><p>Hexagonal spacing allows each ice arm to enter the next field without breaking its rhythm.</p></div><div class="micro-swatches" aria-hidden="true"><i></i><i></i></div></footer>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const canvas = document.getElementById('tessellation');
+      const viewport = document.getElementById('viewport');
+      const ctx = canvas.getContext('2d');
+      const controls = {
+        density: document.getElementById('density'), branches: document.getElementById('branches'), span: document.getElementById('span'), grid: document.getElementById('grid-toggle'), pause: document.getElementById('pause')
+      };
+      const labels = {
+        density: document.getElementById('density-output'), branches: document.getElementById('branches-output'), span: document.getElementById('span-output'), cells: document.getElementById('cell-count'), specimen: document.getElementById('specimen-id'), note: document.getElementById('note-id'), frost: document.getElementById('frost')
+      };
+      const state = { density: 6, branches: 2, span: .94, grid: true, running: true, drift: 0, selected: '4–4', pointer: { x: 0, y: 0 }, cells: [] };
+      const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let cssWidth = 0, cssHeight = 0, drawingFrame = 0;
+
+      function rangeFill(input) { const fill = ((+input.value - +input.min) / (+input.max - +input.min)) * 100; input.style.setProperty('--fill', fill + '%'); }
+      function updateReadouts() { labels.density.textContent = state.density.toFixed(1); labels.branches.textContent = state.branches + ' / arm'; labels.span.textContent = state.span.toFixed(2) + '×'; labels.frost.textContent = state.span.toFixed(2); labels.cells.textContent = String(state.cells.length); labels.specimen.textContent = state.selected; labels.note.textContent = 'SPECIMEN ' + state.selected + ' / linked'; [controls.density, controls.branches, controls.span].forEach(rangeFill); controls.grid.classList.toggle('on', state.grid); controls.grid.setAttribute('aria-pressed', String(state.grid)); controls.pause.textContent = state.running ? 'Pause drift' : 'Resume drift'; controls.pause.classList.toggle('play', state.running); controls.pause.classList.toggle('paused', !state.running); }
+      function resize() { const ratio = Math.min(devicePixelRatio || 1, 2); const bounds = viewport.getBoundingClientRect(); cssWidth = Math.round(bounds.width); cssHeight = Math.round(bounds.height); canvas.width = cssWidth * ratio; canvas.height = cssHeight * ratio; ctx.setTransform(ratio, 0, 0, ratio, 0, 0); buildCells(); draw(); }
+      function buildCells() { const spacing = Math.max(70, cssWidth / (state.density + 1.25)); const yStep = spacing * .8660254; const radius = spacing * state.span * .52; const rows = Math.ceil(cssHeight / yStep) + 3; const cols = Math.ceil(cssWidth / spacing) + 3; state.cells = []; for (let row = -1; row < rows; row++) { const offset = row % 2 ? spacing / 2 : 0; for (let col = -1; col < cols; col++) state.cells.push({ id: `${row + 2}–${col + 2}`, x: col * spacing + offset, y: row * yStep, r: radius }); } updateReadouts(); }
+      function drawLine(x1, y1, x2, y2, style, width = 1, alpha = 1) { ctx.globalAlpha = alpha; ctx.strokeStyle = style; ctx.lineWidth = width; ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke(); }
+      function drawGuide(cell) { ctx.save(); ctx.setLineDash([1.5, 5]); ctx.strokeStyle = 'rgba(164,235,232,.17)'; ctx.lineWidth = .65; ctx.beginPath(); ctx.arc(cell.x, cell.y, cell.r * 1.16, 0, Math.PI * 2); ctx.stroke(); ctx.restore(); }
+      function drawSnowflake(cell, selected) { const branchRatios = state.branches === 1 ? [.59] : state.branches === 2 ? [.42, .7] : [.34, .56, .78]; const { x, y, r } = cell; ctx.save(); ctx.translate(x, y); if (selected) { ctx.save(); ctx.strokeStyle = 'rgba(125,229,226,.63)'; ctx.lineWidth = .9; ctx.setLineDash([3,5]); ctx.beginPath(); ctx.arc(0, 0, r * 1.18, state.drift * .09, Math.PI * 2 + state.drift * .09); ctx.stroke(); ctx.restore(); ctx.shadowColor = '#7de5e2'; ctx.shadowBlur = 12; }
+        for (let arm = 0; arm < 6; arm++) { ctx.save(); ctx.rotate(arm * Math.PI / 3); drawLine(0, 0, 0, -r, selected ? '#dffefd' : 'rgba(218,255,253,.62)', selected ? 1.7 : 1.15); branchRatios.forEach((ratio, index) => { const anchor = -r * ratio, length = r * (.18 - index * .018); drawLine(0, anchor, -length, anchor + length*.95, selected ? '#7de5e2' : 'rgba(151,238,235,.52)', selected ? 1.45 : 1); drawLine(0, anchor, length, anchor + length*.95, selected ? '#7de5e2' : 'rgba(151,238,235,.52)', selected ? 1.45 : 1); }); ctx.fillStyle = selected ? '#bd816a' : 'rgba(189,129,106,.58)'; ctx.beginPath(); ctx.arc(0, -r*.59, selected ? 1.25 : .6, 0, Math.PI*2); ctx.fill(); ctx.restore(); }
+        ctx.fillStyle = selected ? '#bd816a' : 'rgba(225,255,254,.74)'; ctx.beginPath(); ctx.arc(0, 0, selected ? 3.5 : 1.3, 0, Math.PI*2); ctx.fill(); ctx.restore(); }
+      function draw() { if (!cssWidth || !cssHeight) return; ctx.clearRect(0, 0, cssWidth, cssHeight); const px = state.pointer.x * 5 + state.drift; const py = state.pointer.y * 4 - state.drift * .45; ctx.save(); ctx.translate(px, py); if (state.grid) state.cells.forEach(drawGuide); if (state.grid) { ctx.strokeStyle = 'rgba(172,240,238,.12)'; ctx.lineWidth = .6; state.cells.forEach(cell => drawLine(cell.x, cell.y, cell.x + cell.r * 1.38, cell.y - cell.r * .79, 'rgba(172,240,238,.12)', .6)); } state.cells.forEach(cell => drawSnowflake(cell, cell.id === state.selected)); ctx.restore(); }
+      function nearestCell(event) { const rect = canvas.getBoundingClientRect(); const x = event.clientX - rect.left - state.pointer.x * 5 - state.drift; const y = event.clientY - rect.top - state.pointer.y * 4 + state.drift * .45; let nearest = state.cells[0], distance = Infinity; state.cells.forEach(cell => { const d = Math.hypot(cell.x-x, cell.y-y); if (d < distance) { distance = d; nearest = cell; } }); if (nearest && distance < nearest.r * 1.28) { state.selected = nearest.id; updateReadouts(); draw(); } }
+      function animate(time) { if (state.running && !reduceMotion) { state.drift = Math.sin(time / 2400) * 4.5; draw(); } drawingFrame = requestAnimationFrame(animate); }
+      function recenter() { state.drift = 0; state.pointer = {x:0, y:0}; draw(); }
+      function reset() { state.density = 6; state.branches = 2; state.span = .94; state.grid = true; state.running = true; state.selected = '4–4'; controls.density.value = '6'; controls.branches.value = '2'; controls.span.value = '.94'; buildCells(); recenter(); }
+      [controls.density, controls.branches, controls.span].forEach(input => input.addEventListener('input', () => { state[input.id] = +input.value; buildCells(); draw(); }));
+      controls.grid.addEventListener('click', () => { state.grid = !state.grid; updateReadouts(); draw(); });
+      controls.pause.addEventListener('click', () => { state.running = !state.running; updateReadouts(); });
+      document.getElementById('reset').addEventListener('click', reset); document.getElementById('recenter').addEventListener('click', recenter); document.getElementById('recenter-rail').addEventListener('click', recenter);
+      canvas.addEventListener('click', nearestCell); canvas.addEventListener('mousemove', event => { const rect = canvas.getBoundingClientRect(); state.pointer = { x: (event.clientX - rect.left) / rect.width - .5, y: (event.clientY - rect.top) / rect.height - .5 }; if (!state.running || reduceMotion) draw(); }); canvas.addEventListener('mouseleave', () => { state.pointer = {x:0,y:0}; if (!state.running || reduceMotion) draw(); });
+      new ResizeObserver(resize).observe(viewport); resize(); drawingFrame = requestAnimationFrame(animate); window.addEventListener('beforeunload', () => cancelAnimationFrame(drawingFrame));
+    })();
+  </script>
+</body>
+</html>
