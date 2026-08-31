@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>色鑑 - 行動版</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&display=swap');
+
+        :root {
+            --bg-color: #121315;
+            --primary-color: #fcfbfa;
+            --accent-red: #942525;
+            --accent-gold: #bd8b2a;
+            --panel-bg: #1a1c23;
+            --header-height: 56px;
+            --nav-height: 60px;
+            --btn-size: 40px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            font-family: 'Noto Serif TC', serif;
+            margin: 0;
+            padding: 0;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            height: var(--header-height);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            background: rgba(18, 19, 21, 0.97);
+            border-bottom: 1px solid var(--accent-gold);
+            z-index: 10;
+            gap: 6px;
+        }
+
+        header .brand {
+            display: flex;
+            align-items: baseline;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        header .brand h1 {
+            color: var(--accent-gold);
+            font-size: 1.5rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: 2px;
+            text-shadow: 0 0 12px rgba(189, 139, 42, 0.25);
+        }
+
+        header .brand small {
+            color: #888;
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
+            font-weight: 400;
+            display: none;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .header-btn {
+            width: var(--btn-size);
+            height: var(--btn-size);
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #aaa;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 0;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        .header-btn:active {
+            transform: scale(0.92);
+        }
+
+        .header-btn.active {
+            color: var(--accent-gold);
+            background: rgba(189, 139, 42, 0.15);
+            border-color: var(--accent-gold);
+        }
+
+        .header-btn .tooltip {
+            display: none;
+            position: absolute;
+            bottom: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: #eee;
+            font-size: 0.6rem;
+            padding: 2px 10px;
+            border-radius: 10px;
+            white-space: nowrap;
+            font-family: 'Noto Serif TC', serif;
+            letter-spacing: 0.5px;
+            border: 1px solid #333;
+            pointer-events: none;
+        }
+
+        .header-btn:hover .tooltip {
+            display: block;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            background: #000;
+            touch-action: none;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+        }
+
+        #cursorInfo {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: var(--accent-gold);
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            border: 1px solid var(--accent-gold);
+            pointer-events: none;
+            z-index: 5;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(4px);
+            transition: opacity 0.3s;
+            min-height: 28px;
+        }
+
+        nav.bottom-nav {
+            height: var(--nav-height);
+            flex-shrink: 0;
+            background: var(--panel-bg);
+            border-top: 1px solid var(--accent-gold);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 20;
+            box-sizing: border-box;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            cursor: pointer;
+            flex: 1;
+            padding: 4px 0;
+            transition: color 0.2s;
+            touch-action: manipulation;
+            position: relative;
+        }
+
+        .nav-item span {
+            font-size: 0.6rem;
+            color: #888;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--accent-gold);
+        }
+        .nav-item.active span {
+            color: var(--accent-gold);
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+
+        .modal-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 72vh;
+            background: var(--panel-bg);
+            border-top: 2px solid var(--accent-gold);
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.9);
+            transition: bottom 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            padding: 16px 18px;
+            padding-bottom: calc(16px + env(safe-area-inset-bottom));
+        }
+
+        .modal-sheet.open {
+            bottom: var(--nav-height);
+        }
+
+        .modal-sheet .drag-handle {
+            width: 40px;
+            height: 4px;
+            background: #444;
+            border-radius: 4px;
+            margin: 0 auto 12px auto;
+            flex-shrink: 0;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed var(--accent-gold);
+            padding-bottom: 10px;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: var(--accent-gold);
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            font-size: 1.4rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            touch-action: manipulation;
+            opacity: 0.7;
+        }
+        .close-modal:active {
+            opacity: 1;
+        }
+
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-body::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+        /* 色彩面板：控制項與色碼固定，只有色塊清單滾動 */
+        #colorsModal .modal-body {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 0;
+        }
+        .color-code-display {
+            flex-shrink: 0;
+            min-height: 34px;
+            margin-top: 8px;
+            padding: 7px 10px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 6px;
+            background: #202229;
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        #colorsModal #topColors {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+            align-content: start;
+        }
+        .color-sort-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            flex-shrink: 0;
+            margin-top: 8px;
+        }
+        .color-sort-controls button {
+            padding: 7px 4px;
+            border: 1px solid var(--accent-gold);
+            border-radius: 6px;
+            background: #2a2d35;
+            color: #fff;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 0.78rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        .color-sort-controls button.active {
+            background: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+        }
+
+        /* ─── 統一按鈕樣式 ─── */
+        .action-btn {
+            background-color: var(--accent-red);
+            color: var(--primary-color);
+            border: 1px solid var(--accent-gold);
+            padding: 12px 14px;
+            font-family: 'Noto Serif TC', serif;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+            touch-action: manipulation;
+            transition: all 0.2s;
+            text-align: center;
+            flex: 1;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+        .action-btn.gold {
+            background: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+            border: none;
+        }
+
+        .btn-sm {
+            padding: 10px 12px;
+            font-size: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--accent-gold);
+            background: #2a2d35;
+            color: #fff;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-family: 'Noto Serif TC', serif;
+            display: inline-block;
+            text-align: center;
+            flex: 1;
+            transition: all 0.2s;
+        }
+        .btn-sm:active {
+            transform: scale(0.97);
+        }
+        .btn-sm.gold {
+            background: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+            border: none;
+        }
+
+        .flex-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .flex-row .action-btn,
+        .flex-row .btn-sm {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        input[type="file"],
+        input[type="number"],
+        input[type="text"] {
+            font-size: 0.95rem;
+            color: var(--primary-color);
+            background: #2a2d35;
+            border: 1px solid var(--accent-gold);
+            padding: 10px 12px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-top: 4px;
+            font-family: 'Noto Serif TC', serif;
+        }
+        input[type="file"] {
+            padding: 8px;
+            background: transparent;
+            border-color: #555;
+        }
+        input::file-selector-button {
+            background: var(--accent-gold);
+            color: #121315;
+            border: none;
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Noto Serif TC', serif;
+        }
+
+        label {
+            font-size: 0.8rem;
+            color: #aaa;
+            display: block;
+            margin-top: 12px;
+            letter-spacing: 0.3px;
+        }
+        label:first-of-type {
+            margin-top: 0;
+        }
+
+        .color-list,
+        .favorite-list {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            list-style: none;
+            padding: 0;
+            margin: 6px 0 0 0;
+        }
+
+        /* 色彩分析色塊：DOM 順序即為左至右、由上而下 */
+        #topColors.color-grid {
+            display: grid;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 7px;
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 0 0;
+        }
+
+        .color-item {
+            display: block;
+            min-width: 0;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            padding: 0;
+            background: #2a2d35;
+            border: 1px solid #444;
+            border-radius: 6px;
+            overflow: hidden;
+            cursor: pointer;
+            font-size: 0.68rem;
+            transition: transform 0.15s, border-color 0.15s;
+            touch-action: manipulation;
+        }
+        .color-item:active,
+        .color-item.revealed {
+            border-color: var(--accent-gold);
+            transform: scale(0.97);
+        }
+        .color-item .color-box {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+            border: 0;
+            border-radius: 0;
+        }
+        .color-item .color-meta {
+            display: block;
+            min-height: 18px;
+            padding: 2px 3px;
+            color: #aaa;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .color-item .color-code {
+            display: none;
+            color: var(--accent-gold);
+        }
+        .color-item.revealed .color-code {
+            display: inline;
+        }
+        .color-item .color-count {
+            display: none;
+        }
+        .color-item.gradient-selected {
+            border: 2px solid var(--accent-gold);
+            box-shadow: 0 0 0 1px rgba(189, 139, 42, 0.35);
+        }
+        .color-panel-gradient-selection {
+            margin-top: 8px;
+            padding: 8px;
+            background: #202229;
+            border: 1px solid var(--accent-gold);
+            border-radius: 6px;
+        }
+        .panel-subtitle {
+            color: var(--accent-gold);
+            font-size: 0.75rem;
+            margin-bottom: 6px;
+        }
+        .color-panel-gradient-colors {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        .color-panel-gradient-chip {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            cursor: pointer;
+            position: relative;
+        }
+        .color-panel-gradient-chip::after {
+            content: attr(data-color);
+            position: absolute;
+            top: 34px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 2;
+            padding: 2px 4px;
+            color: #fff;
+            background: #000;
+            border: 1px solid var(--accent-gold);
+            border-radius: 3px;
+            font-size: 0.62rem;
+            white-space: nowrap;
+        }
+        .color-panel-gradient-chip.revealed::after {
+            display: block;
+        }
+
+        .color-box {
+            width: 26px;
+            height: 26px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .color-item .del-btn {
+            background: none;
+            border: none;
+            color: #777;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 0 4px;
+            touch-action: manipulation;
+        }
+        .color-item .del-btn:active {
+            color: #fff;
+        }
+
+        .toolbar-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 6px 0 10px 0;
+        }
+
+        .toolbar-grid button {
+            background-color: #2a2d35;
+            border: 1px solid var(--accent-gold);
+            color: var(--primary-color);
+            padding: 8px 6px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-family: 'Noto Serif TC', serif;
+            transition: all 0.15s;
+        }
+        .toolbar-grid button:active {
+            transform: scale(0.96);
+        }
+        .toolbar-grid button.active {
+            background-color: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+            border-color: var(--accent-gold);
+        }
+
+        .pagination {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 14px;
+        }
+
+        .pagination button {
+            background-color: #2a2d35;
+            border: 1px solid var(--accent-gold);
+            color: var(--primary-color);
+            padding: 4px 10px;
+            font-size: 0.75rem;
+            border-radius: 6px;
+            cursor: pointer;
+            touch-action: manipulation;
+            min-width: 32px;
+            font-family: 'Noto Serif TC', serif;
+        }
+        .pagination button:active {
+            transform: scale(0.93);
+        }
+        .pagination button.active {
+            background-color: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+        }
+
+        .gradient-preview {
+            width: 100%;
+            height: 60px;
+            border: 1px solid var(--accent-gold);
+            margin-top: 12px;
+            border-radius: 8px;
+            background: #222;
+            transition: background 0.3s;
+        }
+
+        #favImagesContainer {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 4px 0 10px 0;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+        }
+        #favImagesContainer::-webkit-scrollbar {
+            height: 4px;
+        }
+        #favImagesContainer::-webkit-scrollbar-thumb {
+            background: var(--accent-gold);
+            border-radius: 4px;
+        }
+
+        .fav-img-wrap {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid transparent;
+            transition: border-color 0.2s;
+            cursor: pointer;
+        }
+        .fav-img-wrap:active {
+            border-color: var(--accent-gold);
+        }
+        .fav-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .fav-img-wrap .del-btn {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            border: 1px solid var(--accent-gold);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            touch-action: manipulation;
+            padding: 0;
+        }
+        .fav-img-wrap .del-btn:active {
+            background: var(--accent-red);
+        }
+
+        .fav-grad-item {
+            background: #2a2d35;
+            padding: 10px 12px;
+            border-radius: 8px;
+            margin-top: 6px;
+            border: 1px solid var(--accent-gold);
+        }
+        .fav-grad-item .head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+        .fav-grad-item .head span {
+            font-size: 0.85rem;
+            color: var(--accent-gold);
+            font-weight: 700;
+        }
+        .fav-grad-item .head .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .fav-grad-item .head .actions button {
+            padding: 2px 12px;
+            font-size: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            touch-action: manipulation;
+            font-family: 'Noto Serif TC', serif;
+        }
+        .fav-grad-item .head .actions .load-btn {
+            background: var(--accent-gold);
+            color: #121315;
+            font-weight: 700;
+        }
+        .fav-grad-item .head .actions .del-btn {
+            background: #555;
+            color: #fff;
+        }
+        .fav-grad-item .grad-bar {
+            height: 22px;
+            border-radius: 4px;
+        }
+
+        #gradientSelection .gc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2a2d35;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            border: 1px solid #444;
+        }
+        #gradientSelection .gc-item .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        #gradientSelection .gc-item .left .box {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex-shrink: 0;
+        }
+        #gradientSelection .gc-item .left .hex {
+            font-size: 0.8rem;
+        }
+        #gradientSelection .gc-item .rm-btn {
+            background: #555;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 2px 10px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+        #gradientSelection .gc-item .rm-btn:active {
+            background: var(--accent-red);
+        }
+
+        @media (max-width: 420px) {
+            #topColors.color-grid {
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+                grid-auto-rows: calc((100vw - 77px) / 8);
+                align-items: start;
+            }
+            .color-item {
+                width: 100%;
+                height: calc((100vw - 77px) / 8);
+                aspect-ratio: auto;
+                padding: 0;
+                min-width: 0;
+                min-height: 0;
+                flex: none;
+            }
+            .color-item .color-box {
+                width: 100%;
+                height: 100%;
+                min-height: 0;
+            }
+            :root {
+                --header-height: 50px;
+                --btn-size: 36px;
+            }
+            header .brand h1 {
+                font-size: 1.3rem;
+            }
+            .header-btn {
+                font-size: 1.1rem;
+            }
+            .modal-sheet {
+                padding: 12px 14px;
+                height: 70vh;
+            }
+            .color-item {
+                font-size: 0.7rem;
+                padding: 4px 8px;
+                min-width: 80px;
+                flex: 1 1 40%;
+            }
+            .color-box {
+                width: 20px;
+                height: 20px;
+            }
+            .nav-item {
+                font-size: 1rem;
+            }
+            .nav-item span {
+                font-size: 0.5rem;
+            }
+            #cursorInfo {
+                font-size: 0.65rem;
+                padding: 3px 12px;
+                top: 8px;
+            }
+            .action-btn,
+            .btn-sm {
+                font-size: 0.9rem;
+                padding: 10px 10px;
+            }
+        }
+
+        @media (min-width: 600px) {
+            header .brand small {
+                display: inline;
+            }
+            .modal-sheet {
+                max-width: 480px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-radius: 20px 20px 0 0;
+            }
+            .modal-sheet.open {
+                bottom: var(--nav-height);
+            }
+        }
+
+        .text-muted {
+            color: #777;
+            font-size: 0.8rem;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .status-error {
+            color: #e57373 !important;
+            border-color: #e57373 !important;
+        }
+        .status-success {
+            color: #7cb342 !important;
+            border-color: #7cb342 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <h1>色鑑</h1>
+            <small>· 行動版</small>
+        </div>
+        <div class="header-controls">
+            <button id="modePanBtn" class="header-btn active" title="手勢平移">
+                ✋
+                <span class="tooltip">平移</span>
+            </button>
+            <button id="modeZoomBoxBtn" class="header-btn" title="框選放大">
+                🔍
+                <span class="tooltip">放大</span>
+            </button>
+            <button id="resetZoomBtn" class="header-btn" title="重置畫面">
+                ⟳
+                <span class="tooltip">重置</span>
+            </button>
+            <button id="quickAddFavBtn" class="header-btn" title="收藏此圖片" style="display:none;">
+                ⭐
+                <span class="tooltip">收藏</span>
+            </button>
+        </div>
+    </header>
+
+    <div class="canvas-container" id="canvasContainer">
+        <div id="cursorInfo">✋ 拖曳平移</div>
+        <canvas id="imageCanvas"></canvas>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item" data-target="uploadModal">
+            📁<span>載入</span>
+        </button>
+        <button class="nav-item" data-target="colorsModal">
+            🎨<span>色彩</span>
+        </button>
+        <button class="nav-item" data-target="gradientModal">
+            🌈<span>漸層</span>
+        </button>
+        <button class="nav-item" data-target="favModal">
+            ❤️<span>收藏</span>
+        </button>
+    </nav>
+
+    <!-- 載入面板 -->
+    <div id="uploadModal" class="modal-sheet">
+        <div class="drag-handle"></div>
+        <div class="modal-header">
+            <h3>📁 載入圖像</h3>
+            <button class="close-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <label>選擇本地圖片：</label>
+            <input type="file" id="upload" accept="image/*">
+
+            <hr style="border-color:#333; margin:18px 0;">
+
+            <label style="margin-top:0;">📦 資料備份與還原</label>
+            <button id="exportAllBtn" class="action-btn gold">📤 完整備份 (JSON)</button>
+            <button id="importAllBtn" class="action-btn">📥 還原備份</button>
+            <input type="file" id="importFile" accept=".json" style="display:none;">
+
+            <p style="color:#555; font-size:0.7rem; margin-top:14px; text-align:center;">
+                備份包含：圖片、收藏顏色、收藏圖片、收藏漸層
+            </p>
+        </div>
+    </div>
+
+    <!-- 色彩面板 -->
+    <div id="colorsModal" class="modal-sheet">
+        <div class="drag-handle"></div>
+        <div class="modal-header">
+            <h3>🎨 色彩分析</h3>
+            <button class="close-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <button id="reanalyzeBtn" class="action-btn gold">⚡ 重新分析前 200 色</button>
+            <button id="addColorBtn" class="action-btn" style="display:none; margin-top:8px;">⭐ 將選取顏色加入最愛</button>
+            <div id="colorCodeDisplay" class="color-code-display">點擊色塊查看色碼</div>
+            <button id="toggleGradientPickBtn" class="btn-sm" style="margin-top:8px; width:100%;">🌈 選漸層色</button>
+            <div id="colorPanelGradientSelection" class="color-panel-gradient-selection" style="display:none;">
+                <div class="panel-subtitle">已加入漸層色</div>
+                <div id="colorPanelGradientColors" class="color-panel-gradient-colors"></div>
+            </div>
+            <div id="colorSortControls" class="color-sort-controls">
+                <button id="sortFreqBtn" class="active" type="button">常用度</button>
+                <button id="sortHueBtn" type="button">色相</button>
+                <button id="sortHexBtn" type="button">色碼</button>
+            </div>
+
+            <ul id="topColors" class="color-list color-grid"></ul>
+            <div id="paginationContainer" class="pagination" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- 漸層面板 -->
+    <div id="gradientModal" class="modal-sheet">
+        <div class="drag-handle"></div>
+        <div class="modal-header">
+            <h3>🌈 漸層產生器</h3>
+            <button class="close-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <div style="flex:1; min-width:80px;">
+                    <label style="margin-top:0;">顏色上限</label>
+                    <input type="number" id="maxGradientColors" value="4" min="2" max="8">
+                </div>
+                <div style="flex:2; min-width:120px;">
+                    <label style="margin-top:0;">名稱</label>
+                    <input type="text" id="gradientName" placeholder="例如：秋日夕陽">
+                </div>
+            </div>
+
+            <label style="margin-top:12px;">已選取色彩（點擊下方色塊加入）</label>
+            <div id="gradientSelection" style="min-height:40px;"></div>
+
+            <div class="flex-row">
+                <button id="generateGradientBtn" class="action-btn gold">✨ 預覽</button>
+                <button id="saveFavGradientBtn" class="action-btn gold">💾 收藏</button>
+            </div>
+            <div class="flex-row">
+                <button id="exportCurrentGradientBtn" class="btn-sm gold">📤 匯出當前漸層</button>
+                <button id="importGradientBtn" class="btn-sm">📥 匯入漸層</button>
+                <input type="file" id="importGradientFile" accept=".json" style="display:none;">
+            </div>
+            <div id="gradientPreview" class="gradient-preview"></div>
+        </div>
+    </div>
+
+    <!-- 收藏面板 -->
+    <div id="favModal" class="modal-sheet">
+        <div class="drag-handle"></div>
+        <div class="modal-header">
+            <h3>❤️ 我的收藏</h3>
+            <button class="close-modal">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="flex-row" style="margin-bottom:8px;">
+                <button id="exportFavColorsBtn" class="btn-sm gold">📤 匯出最愛顏色</button>
+                <button id="exportFavGradientsBtn" class="btn-sm gold">📤 匯出漸層</button>
+                <button id="importFavGradientsBtn" class="btn-sm">📥 匯入漸層</button>
+                <input type="file" id="importFavGradientsFile" accept=".json" style="display:none;">
+            </div>
+            <label style="margin-top:0;">🖼️ 收藏圖片</label>
+            <div id="favImagesContainer"></div>
+
+            <label style="margin-top:16px;">🎨 收藏顏色</label>
+            <ul id="favColors" class="favorite-list"></ul>
+
+            <label style="margin-top:16px;">🌈 收藏漸層</label>
+            <div id="favGradientsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ─── DOM refs ───
+            const modals = document.querySelectorAll('.modal-sheet');
+            const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+            const upload = document.getElementById('upload');
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
+            const canvasContainer = document.getElementById('canvasContainer');
+            const cursorInfo = document.getElementById('cursorInfo');
+
+            const topColorsList = document.getElementById('topColors');
+            const paginationContainer = document.getElementById('paginationContainer');
+            const favColorsList = document.getElementById('favColors');
+            const favImagesContainer = document.getElementById('favImagesContainer');
+            const favGradientsContainer = document.getElementById('favGradientsContainer');
+            const addColorBtn = document.getElementById('addColorBtn');
+            const quickAddFavBtn = document.getElementById('quickAddFavBtn');
+            const gradientSelection = document.getElementById('gradientSelection');
+            const generateGradientBtn = document.getElementById('generateGradientBtn');
+            const saveFavGradientBtn = document.getElementById('saveFavGradientBtn');
+            const gradientPreview = document.getElementById('gradientPreview');
+            const maxGradientColorsInput = document.getElementById('maxGradientColors');
+            const gradientNameInput = document.getElementById('gradientName');
+
+            const modePanBtn = document.getElementById('modePanBtn');
+            const modeZoomBoxBtn = document.getElementById('modeZoomBoxBtn');
+            const resetZoomBtn = document.getElementById('resetZoomBtn');
+            const reanalyzeBtn = document.getElementById('reanalyzeBtn');
+            const colorCodeDisplay = document.getElementById('colorCodeDisplay');
+
+            const toggleGradientPickBtn = document.getElementById('toggleGradientPickBtn');
+            const colorPanelGradientSelection = document.getElementById('colorPanelGradientSelection');
+            const colorPanelGradientColors = document.getElementById('colorPanelGradientColors');
+            const sortFreqBtn = document.getElementById('sortFreqBtn');
+            const sortHueBtn = document.getElementById('sortHueBtn');
+            const sortHexBtn = document.getElementById('sortHexBtn');
+
+            const exportAllBtn = document.getElementById('exportAllBtn');
+            const importAllBtn = document.getElementById('importAllBtn');
+            const importFile = document.getElementById('importFile');
+
+            const exportCurrentGradientBtn = document.getElementById('exportCurrentGradientBtn');
+            const importGradientBtn = document.getElementById('importGradientBtn');
+            const importGradientFile = document.getElementById('importGradientFile');
+            const exportFavColorsBtn = document.getElementById('exportFavColorsBtn');
+            const exportFavGradientsBtn = document.getElementById('exportFavGradientsBtn');
+            const importFavGradientsBtn = document.getElementById('importFavGradientsBtn');
+            const importFavGradientsFile = document.getElementById('importFavGradientsFile');
+
+            // ─── State ───
+            let currentHex = null;
+            let currentImgDataUrl = null;
+            let currentFileName = '';
+            let selectedGradientColors = [];
+            let maxGradientLimit = 4;
+            let interactionMode = 'pan';
+            let gradientPickMode = false;
+            let loadTimeout = null;
+
+            let originalImg = new Image();
+            let scale = 1,
+                offsetX = 0,
+                offsetY = 0;
+            let isDragging = false,
+                startX = 0,
+                startY = 0;
+            let isSelecting = false,
+                selectStartX = 0,
+                selectStartY = 0,
+                selectEndX = 0,
+                selectEndY = 0;
+
+            let allAnalyzedColors = [];
+            let currentSortMode = 'frequency';
+            let currentPerPage = 200;
+            let currentActivePage = 1;
+
+            // ─── Modal toggle ───
+            function closeAllModals() {
+                modals.forEach(m => m.classList.remove('open'));
+                navItems.forEach(n => n.classList.remove('active'));
+            }
+
+            navItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const targetId = item.getAttribute('data-target');
+                    const targetModal = document.getElementById(targetId);
+                    const isOpen = targetModal.classList.contains('open');
+                    closeAllModals();
+                    if (!isOpen) {
+                        targetModal.classList.add('open');
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            document.querySelectorAll('.close-modal').forEach(btn => {
+                btn.addEventListener('click', closeAllModals);
+            });
+
+            // 將圖片壓縮成收藏縮圖，避免原始高解析度 data URL 撐爆 localStorage
+            function createFavoriteImageDataUrl(dataUrl) {
+                try {
+                    const source = (typeof originalImg !== 'undefined' && originalImg.src === dataUrl)
+                        ? originalImg
+                        : new Image();
+                    if (source !== originalImg) source.src = dataUrl;
+                    if (!source.complete || !source.naturalWidth || !source.naturalHeight) return dataUrl;
+
+                    const maxSide = 640;
+                    const ratio = Math.min(1, maxSide / Math.max(source.naturalWidth, source.naturalHeight));
+                    const width = Math.max(1, Math.round(source.naturalWidth * ratio));
+                    const height = Math.max(1, Math.round(source.naturalHeight * ratio));
+                    const thumbCanvas = document.createElement('canvas');
+                    thumbCanvas.width = width;
+                    thumbCanvas.height = height;
+                    const thumbCtx = thumbCanvas.getContext('2d');
+                    thumbCtx.drawImage(source, 0, 0, width, height);
+                    return thumbCanvas.toDataURL('image/jpeg', 0.82);
+                } catch (err) {
+                    console.warn('圖片壓縮失敗，改用原始圖片資料：', err);
+                    return dataUrl;
+                }
+            }
+
+            // ─── Image loading with timeout ───
+            function loadImageAndReset(dataUrl, fileName) {
+                if (!dataUrl) {
+                    showStatus('❌ 無效的圖片資料', 'error');
+                    return;
+                }
+
+                if (loadTimeout) {
+                    clearTimeout(loadTimeout);
+                    loadTimeout = null;
+                }
+
+                currentFileName = fileName || '圖片';
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                originalImg.onload = null;
+                originalImg.onerror = null;
+                originalImg = new Image();
+
+                loadTimeout = setTimeout(() => {
+                    showStatus('⚠️ 圖片載入逾時，請檢查檔案', 'error');
+                    quickAddFavBtn.style.display = 'none';
+                }, 8000);
+
+                originalImg.onload = function() {
+                    if (loadTimeout) {
+                        clearTimeout(loadTimeout);
+                        loadTimeout = null;
+                    }
+                    const rect = canvasContainer.getBoundingClientRect();
+                    canvas.width = rect.width || canvasContainer.clientWidth || window.innerWidth;
+                    canvas.height = rect.height || canvasContainer.clientHeight || (window.innerHeight - 56 - 60);
+                    if (canvas.width === 0) canvas.width = 400;
+                    if (canvas.height === 0) canvas.height = 400;
+
+                    resetView();
+                    analyzeColorsFromCurrentView();
+                    quickAddFavBtn.style.display = 'block';
+                    // 先保留目前圖片資料，並以壓縮版本作為下次開啟的快取
+                    currentImgDataUrl = dataUrl;
+                    try {
+                        localStorage.setItem('shijian_last_image', createFavoriteImageDataUrl(dataUrl));
+                    } catch (err) {
+                        console.warn('無法儲存上次圖片，可能是瀏覽器儲存空間不足：', err);
+                    }
+                    showStatus('✅ 已載入: ' + currentFileName, 'success');
+                    setTimeout(() => {
+                        showStatus(interactionMode === 'pan' ? '✋ 拖曳平移' : '🔍 拖曳框選放大', 'normal');
+                    }, 2500);
+                };
+
+                originalImg.onerror = function() {
+                    if (loadTimeout) {
+                        clearTimeout(loadTimeout);
+                        loadTimeout = null;
+                    }
+                    showStatus('❌ 圖片載入失敗，請確認檔案格式', 'error');
+                    quickAddFavBtn.style.display = 'none';
+                };
+
+                originalImg.src = dataUrl;
+            }
+
+            function showStatus(msg, type) {
+                cursorInfo.innerText = msg;
+                cursorInfo.classList.remove('status-error', 'status-success');
+                if (type === 'error') {
+                    cursorInfo.classList.add('status-error');
+                } else if (type === 'success') {
+                    cursorInfo.classList.add('status-success');
+                } else {
+                    cursorInfo.style.color = 'var(--accent-gold)';
+                }
+            }
+
+            // ─── 檔案上傳 ───
+            upload.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const fileName = file.name;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const dataUrl = event.target.result;
+                    loadImageAndReset(dataUrl, fileName);
+                    closeAllModals();
+                    upload.value = '';
+                };
+                reader.onerror = function() {
+                    showStatus('❌ 讀取檔案失敗', 'error');
+                    upload.value = '';
+                };
+                reader.readAsDataURL(file);
+            });
+
+            // ─── Canvas rendering ───
+            function resetView() {
+                if (!originalImg.complete || !originalImg.src) return;
+                const w = canvas.width || canvasContainer.clientWidth;
+                const h = canvas.height || canvasContainer.clientHeight;
+                if (w === 0 || h === 0) return;
+                scale = Math.min(w / originalImg.width, h / originalImg.height);
+                offsetX = (w - originalImg.width * scale) / 2;
+                offsetY = (h - originalImg.height * scale) / 2;
+                redrawCanvas();
+            }
+
+            function redrawCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.save();
+                ctx.translate(offsetX, offsetY);
+                ctx.scale(scale, scale);
+                ctx.drawImage(originalImg, 0, 0);
+                ctx.restore();
+
+                if (isSelecting && interactionMode === 'zoomBox') {
+                    const left = Math.min(selectStartX, selectEndX);
+                    const top = Math.min(selectStartY, selectEndY);
+                    ctx.strokeStyle = '#bd8b2a';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([6, 4]);
+                    ctx.strokeRect(left, top, Math.abs(selectEndX - selectStartX), Math.abs(selectEndY - selectStartY));
+                    ctx.setLineDash([]);
+                }
+            }
+
+            // ─── Interaction ───
+            function getEventPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
+
+            function handleStart(e) {
+                if (!originalImg.src) return;
+                const pos = getEventPos(e);
+                if (interactionMode === 'pan') {
+                    isDragging = true;
+                    startX = pos.x - offsetX;
+                    startY = pos.y - offsetY;
+                } else {
+                    isSelecting = true;
+                    selectStartX = selectEndX = pos.x;
+                    selectStartY = selectEndY = pos.y;
+                }
+                e.preventDefault();
+            }
+
+            function handleMove(e) {
+                if (!originalImg.src) return;
+                const pos = getEventPos(e);
+                if (interactionMode === 'pan' && isDragging) {
+                    offsetX = pos.x - startX;
+                    offsetY = pos.y - startY;
+                    redrawCanvas();
+                    e.preventDefault();
+                    return;
+                }
+                if (interactionMode === 'zoomBox' && isSelecting) {
+                    selectEndX = pos.x;
+                    selectEndY = pos.y;
+                    redrawCanvas();
+                    e.preventDefault();
+                    return;
+                }
+                if (!isDragging && !isSelecting) {
+                    const imgX = Math.floor((pos.x - offsetX) / scale);
+                    const imgY = Math.floor((pos.y - offsetY) / scale);
+                    if (imgX >= 0 && imgY >= 0 && imgX < originalImg.width && imgY < originalImg.height) {
+                        const tempCanvas = document.createElement('canvas');
+                        tempCanvas.width = originalImg.width;
+                        tempCanvas.height = originalImg.height;
+                        const tempCtx = tempCanvas.getContext('2d');
+                        tempCtx.drawImage(originalImg, 0, 0);
+                        const pixel = tempCtx.getImageData(imgX, imgY, 1, 1).data;
+                        currentHex = '#' + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1);
+                        cursorInfo.innerText = currentHex;
+                        cursorInfo.classList.remove('status-error', 'status-success');
+                        cursorInfo.style.color = 'var(--accent-gold)';
+                        addColorBtn.style.display = 'block';
+                    } else {
+                        const modeText = interactionMode === 'pan' ? '✋ 拖曳平移' : '🔍 拖曳框選放大';
+                        if (cursorInfo.innerText !== modeText) {
+                            showStatus(modeText, 'normal');
+                        }
+                    }
+                }
+            }
+
+            function handleEnd() {
+                if (interactionMode === 'pan') {
+                    isDragging = false;
+                } else if (interactionMode === 'zoomBox' && isSelecting) {
+                    isSelecting = false;
+                    const left = Math.min(selectStartX, selectEndX);
+                    const top = Math.min(selectStartY, selectEndY);
+                    const w = Math.abs(selectEndX - selectStartX);
+                    const h = Math.abs(selectEndY - selectStartY);
+                    if (w > 10 && h > 10) {
+                        const zf = Math.min(canvas.width / w, canvas.height / h);
+                        const cx = left + w / 2;
+                        const cy = top + h / 2;
+                        offsetX = zf * (offsetX - cx) + canvas.width / 2;
+                        offsetY = zf * (offsetY - cy) + canvas.height / 2;
+                        scale *= zf;
+                    }
+                    redrawCanvas();
+                }
+            }
+
+            canvas.addEventListener('mousedown', handleStart);
+            canvas.addEventListener('mousemove', handleMove);
+            window.addEventListener('mouseup', handleEnd);
+            canvas.addEventListener('touchstart', handleStart, { passive: false });
+            canvas.addEventListener('touchmove', handleMove, { passive: false });
+            window.addEventListener('touchend', handleEnd);
+
+            // ─── Mode buttons ───
+            function setMode(mode) {
+                interactionMode = mode;
+                modePanBtn.classList.toggle('active', mode === 'pan');
+                modeZoomBoxBtn.classList.toggle('active', mode === 'zoomBox');
+                showStatus(mode === 'pan' ? '✋ 拖曳平移' : '🔍 拖曳框選放大', 'normal');
+            }
+
+            modePanBtn.addEventListener('click', () => setMode('pan'));
+            modeZoomBoxBtn.addEventListener('click', () => setMode('zoomBox'));
+            resetZoomBtn.addEventListener('click', resetView);
+
+            // ─── Color analysis ───
+            function hexToHSL(hex) {
+                let r = parseInt(hex.slice(1, 3), 16) / 255;
+                let g = parseInt(hex.slice(3, 5), 16) / 255;
+                let b = parseInt(hex.slice(5, 7), 16) / 255;
+                let max = Math.max(r, g, b),
+                    min = Math.min(r, g, b);
+                let h, s, l = (max + min) / 2;
+                if (max === min) h = s = 0;
+                else {
+                    let d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max) {
+                        case r:
+                            h = (g - b) / d + (g < b ? 6 : 0);
+                            break;
+                        case g:
+                            h = (b - r) / d + 2;
+                            break;
+                        case b:
+                            h = (r - g) / d + 4;
+                            break;
+                    }
+                    h /= 6;
+                }
+                return { h: h * 360, s: s * 100, l: l * 100 };
+            }
+
+            function analyzeColorsFromCurrentView() {
+                if (!originalImg.complete || !originalImg.src) return;
+                try {
+                    const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    const colorCounts = {};
+                    for (let i = 0; i < imgData.length; i += 16) {
+                        const r = imgData[i],
+                            g = imgData[i + 1],
+                            b = imgData[i + 2],
+                            a = imgData[i + 3];
+                        if (a < 255 || (r + g + b < 90)) continue;
+                        const hex = '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                        colorCounts[hex] = (colorCounts[hex] || 0) + 1;
+                    }
+                    let colorArray = Object.keys(colorCounts).map(hex => ({ hex, count: colorCounts[hex] }));
+                    colorArray.sort((a, b) => b.count - a.count);
+                    // 只保留出現頻率最高的前 200 色；網格 DOM 順序即為左至右、由上而下
+                    allAnalyzedColors = colorArray.slice(0, 200);
+                    renderColorPage(1);
+                } catch (e) {
+                    console.warn('分析色彩失敗', e);
+                }
+            }
+
+            reanalyzeBtn.addEventListener('click', () => {
+                analyzeColorsFromCurrentView();
+                // 分析完成後保持目前色彩面板開啟，不切換到其他面板
+            });
+
+            function updateSortButtons(activeBtn) {
+                [sortFreqBtn, sortHueBtn, sortHexBtn].forEach(btn => btn.classList.toggle('active', btn === activeBtn));
+            }
+            sortFreqBtn.addEventListener('click', () => {
+                currentSortMode = 'frequency';
+                updateSortButtons(sortFreqBtn);
+                renderColorPage(1);
+            });
+            sortHueBtn.addEventListener('click', () => {
+                currentSortMode = 'hue';
+                updateSortButtons(sortHueBtn);
+                renderColorPage(1);
+            });
+            sortHexBtn.addEventListener('click', () => {
+                currentSortMode = 'hex';
+                updateSortButtons(sortHexBtn);
+                renderColorPage(1);
+            });
+
+            // 只有啟用此模式後，點擊色塊才會加入漸層
+            toggleGradientPickBtn.addEventListener('click', () => {
+                gradientPickMode = !gradientPickMode;
+                toggleGradientPickBtn.classList.toggle('gold', gradientPickMode);
+                toggleGradientPickBtn.textContent = gradientPickMode ? '🌈 結束選漸層色' : '🌈 選漸層色';
+                toggleGradientPickBtn.setAttribute('aria-pressed', String(gradientPickMode));
+                renderColorPage(1);
+            });
+
+            // ─── Render color grid ───
+            function renderColorPage(page) {
+                currentActivePage = page;
+                topColorsList.innerHTML = '';
+                paginationContainer.innerHTML = '';
+                if (allAnalyzedColors.length === 0) {
+                    topColorsList.innerHTML = '<p class="text-muted" style="padding:12px 0;">此區域無有效色彩</p>';
+                    return;
+                }
+                let displayColors = [...allAnalyzedColors];
+                if (currentSortMode === 'hue') {
+                    displayColors.sort((a, b) => hexToHSL(a.hex).h - hexToHSL(b.hex).h);
+                } else if (currentSortMode === 'hex') {
+                    displayColors.sort((a, b) => a.hex.localeCompare(b.hex));
+                }
+                const startIndex = (page - 1) * currentPerPage;
+                const pageItems = displayColors.slice(startIndex, startIndex + currentPerPage);
+                pageItems.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'color-item';
+                    if (selectedGradientColors.includes(item.hex)) li.classList.add('gradient-selected');
+                    li.innerHTML = `
+                        <span class="color-box" style="background:${item.hex};"></span>
+                    `;
+                    li.addEventListener('click', () => {
+                        currentHex = item.hex;
+                        colorCodeDisplay.textContent = item.hex;
+                        addColorBtn.style.display = 'block';
+                        if (gradientPickMode) {
+                            addToGradientSelection(item.hex);
+                            li.classList.toggle('gradient-selected', selectedGradientColors.includes(item.hex));
+                        }
+                    });
+                    topColorsList.appendChild(li);
+                });
+            }
+
+            // ─── Add current color to fav ───
+            addColorBtn.addEventListener('click', () => {
+                if (!currentHex) return;
+                let favs = JSON.parse(localStorage.getItem('shijian_fav_colors') || '[]');
+                if (!favs.includes(currentHex)) {
+                    favs.push(currentHex);
+                    localStorage.setItem('shijian_fav_colors', JSON.stringify(favs));
+                    loadFavorites();
+                    showStatus('⭐ 已收藏 ' + currentHex, 'success');
+                    setTimeout(() => {
+                        showStatus(interactionMode === 'pan' ? '✋ 拖曳平移' : '🔍 拖曳框選放大', 'normal');
+                    }, 1500);
+                } else {
+                    alert('已收藏過此顏色');
+                }
+            });
+
+            // ─── 更新收藏圖片 UI ───
+            function updateFavImagesUI() {
+                const favImgs = JSON.parse(localStorage.getItem('shijian_fav_images') || '[]');
+                favImagesContainer.innerHTML = favImgs.length === 0 ? '<p class="text-muted">尚無收藏圖片</p>' : '';
+                favImgs.forEach((imgUrl, index) => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'fav-img-wrap';
+                    wrap.innerHTML = `
+                        <img src="${imgUrl}" alt="收藏圖片">
+                        <button class="del-btn" data-idx="${index}">✕</button>
+                    `;
+                    wrap.querySelector('.del-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const i = parseInt(e.target.dataset.idx);
+                        let f = JSON.parse(localStorage.getItem('shijian_fav_images') || '[]');
+                        f.splice(i, 1);
+                        localStorage.setItem('shijian_fav_images', JSON.stringify(f));
+                        updateFavImagesUI();
+                        loadFavorites();
+                    });
+                    wrap.addEventListener('click', () => {
+                        currentImgDataUrl = imgUrl;
+                        localStorage.setItem('shijian_last_image', currentImgDataUrl);
+                        loadImageAndReset(currentImgDataUrl, '收藏圖片');
+                        closeAllModals();
+                    });
+                    favImagesContainer.appendChild(wrap);
+                });
+            }
+
+            // ─── Quick add image to fav (星星按鈕) ───
+            quickAddFavBtn.addEventListener('click', function() {
+                if (!currentImgDataUrl) {
+                    alert('⚠️ 請先載入圖片');
+                    showStatus('⚠️ 請先載入圖片', 'error');
+                    return;
+                }
+                let favImgs = JSON.parse(localStorage.getItem('shijian_fav_images') || '[]');
+                const favoriteImage = createFavoriteImageDataUrl(currentImgDataUrl);
+                if (favImgs.includes(favoriteImage) || favImgs.includes(currentImgDataUrl)) {
+                    alert('📌 此圖片已在收藏中');
+                    showStatus('📌 已收藏過此圖片', 'normal');
+                    return;
+                }
+                favImgs.push(favoriteImage);
+                try {
+                    localStorage.setItem('shijian_fav_images', JSON.stringify(favImgs));
+                } catch (err) {
+                    alert('❌ 收藏失敗：瀏覽器儲存空間不足，請先刪除部分收藏圖片');
+                    showStatus('❌ 收藏失敗：儲存空間不足', 'error');
+                    return;
+                }
+                // 立即更新收藏圖片 UI
+                updateFavImagesUI();
+                // 同時更新其他收藏區（顏色、漸層）保持同步
+                loadFavorites();
+                alert('⭐ 已成功收藏此圖片！');
+                showStatus('⭐ 已收藏此圖片', 'success');
+                setTimeout(() => {
+                    showStatus(interactionMode === 'pan' ? '✋ 拖曳平移' : '🔍 拖曳框選放大', 'normal');
+                }, 1500);
+            });
+
+            // ─── Gradient ───
+            maxGradientColorsInput.addEventListener('change', (e) => {
+                let val = Math.min(Math.max(parseInt(e.target.value) || 2, 2), 8);
+                maxGradientLimit = val;
+                maxGradientColorsInput.value = val;
+                if (selectedGradientColors.length > maxGradientLimit) {
+                    selectedGradientColors = selectedGradientColors.slice(0, maxGradientLimit);
+                    renderGradientSelection();
+                }
+            });
+
+            function addToGradientSelection(color) {
+                if (selectedGradientColors.length >= maxGradientLimit) {
+                    alert('已達顏色上限 (' + maxGradientLimit + ' 色)');
+                    return;
+                }
+                if (selectedGradientColors.includes(color)) {
+                    alert('已加入此顏色');
+                    return;
+                }
+                selectedGradientColors.push(color);
+                renderGradientSelection();
+                renderColorPage(1);
+            }
+
+            function renderColorPanelGradientSelection() {
+                colorPanelGradientColors.innerHTML = '';
+                colorPanelGradientSelection.style.display = selectedGradientColors.length ? 'block' : 'none';
+                selectedGradientColors.forEach((color, idx) => {
+                    const chip = document.createElement('button');
+                    chip.type = 'button';
+                    chip.className = 'color-panel-gradient-chip';
+                    chip.style.background = color;
+                    chip.dataset.color = color;
+                    chip.title = color + '（點擊顯示色碼，再點擊移除）';
+                    chip.addEventListener('click', () => {
+                        if (!chip.classList.toggle('revealed')) return;
+                        setTimeout(() => {
+                            if (chip.classList.contains('revealed')) {
+                                chip.classList.remove('revealed');
+                                selectedGradientColors.splice(idx, 1);
+                                renderGradientSelection();
+                                renderColorPage(1);
+                            }
+                        }, 1200);
+                    });
+                    colorPanelGradientColors.appendChild(chip);
+                });
+            }
+
+            function renderGradientSelection() {
+                gradientSelection.innerHTML = '';
+                renderColorPanelGradientSelection();
+                if (selectedGradientColors.length === 0) {
+                    gradientSelection.innerHTML = '<p class="text-muted">點擊色彩分析面板的「選漸層色」後，再點擊色塊加入</p>';
+                    return;
+                }
+                selectedGradientColors.forEach((color, idx) => {
+                    const div = document.createElement('div');
+                    div.className = 'gc-item';
+                    div.innerHTML = `
+                        <div class="left">
+                            <span class="box" style="background:${color};"></span>
+                            <span class="hex">${color}</span>
+                        </div>
+                        <button class="rm-btn" data-idx="${idx}">✕</button>
+                    `;
+                    div.querySelector('.rm-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const i = parseInt(e.target.dataset.idx);
+                        selectedGradientColors.splice(i, 1);
+                        renderGradientSelection();
+                    });
+                    gradientSelection.appendChild(div);
+                });
+            }
+
+            generateGradientBtn.addEventListener('click', () => {
+                if (selectedGradientColors.length < 2) {
+                    alert('至少選取 2 個顏色');
+                    return;
+                }
+                gradientPreview.style.background = `linear-gradient(to bottom, ${selectedGradientColors.join(', ')})`;
+            });
+
+            saveFavGradientBtn.addEventListener('click', () => {
+                if (selectedGradientColors.length < 2) {
+                    alert('至少選取 2 個顏色');
+                    return;
+                }
+                const name = gradientNameInput.value.trim() || '漸層 ' + new Date().toLocaleDateString();
+                let gradients = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                const existing = gradients.find(g => g.name === name);
+                if (existing) {
+                    if (!confirm(`名稱「${name}」已存在，是否覆蓋？`)) {
+                        return;
+                    }
+                    gradients = gradients.filter(g => g.name !== name);
+                }
+                gradients.push({ name, colors: [...selectedGradientColors] });
+                localStorage.setItem('shijian_fav_gradients', JSON.stringify(gradients));
+                loadFavorites();
+                alert('💾 漸層已收藏' + (existing ? ' (已覆蓋)' : ''));
+            });
+
+            // ─── 匯出當前漸層 ───
+            exportCurrentGradientBtn.addEventListener('click', () => {
+                if (selectedGradientColors.length < 2) {
+                    alert('請先選取至少 2 個顏色');
+                    return;
+                }
+                const name = gradientNameInput.value.trim() || '未命名漸層';
+                const data = { name, colors: selectedGradientColors };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `漸層_${name}.json`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            importGradientBtn.addEventListener('click', () => importGradientFile.click());
+            importGradientFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const data = JSON.parse(ev.target.result);
+                        if (data.colors && Array.isArray(data.colors) && data.colors.length >= 2) {
+                            selectedGradientColors = data.colors.slice(0, maxGradientLimit);
+                            gradientNameInput.value = data.name || '匯入漸層';
+                            renderGradientSelection();
+                            generateGradientBtn.click();
+                            alert('✅ 漸層已匯入');
+                        } else {
+                            alert('❌ 無效的漸層資料');
+                        }
+                    } catch (err) {
+                        alert('❌ 檔案格式錯誤');
+                    }
+                };
+                reader.readAsText(file);
+                importGradientFile.value = '';
+            });
+
+            // ─── Favorites 完整載入 ───
+            function loadFavorites() {
+                // Colors
+                const favs = JSON.parse(localStorage.getItem('shijian_fav_colors') || '[]');
+                favColorsList.innerHTML = favs.length === 0 ? '<p class="text-muted">尚無收藏顏色</p>' : '';
+                favs.forEach((color, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'color-item';
+                    li.innerHTML = `
+                        <span class="color-box" style="background:${color};"></span>
+                        <span style="flex:1;">${color}</span>
+                        <button class="del-btn" data-idx="${index}">✕</button>
+                    `;
+                    li.querySelector('.del-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const i = parseInt(e.target.dataset.idx);
+                        let f = JSON.parse(localStorage.getItem('shijian_fav_colors') || '[]');
+                        f.splice(i, 1);
+                        localStorage.setItem('shijian_fav_colors', JSON.stringify(f));
+                        loadFavorites();
+                    });
+                    li.addEventListener('click', () => addToGradientSelection(color));
+                    favColorsList.appendChild(li);
+                });
+
+                // Images - 使用獨立函數
+                updateFavImagesUI();
+
+                // Gradients
+                const favGradients = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                favGradientsContainer.innerHTML = favGradients.length === 0 ? '<p class="text-muted">尚無收藏漸層</p>' :
+                '';
+                favGradients.forEach((grad, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'fav-grad-item';
+                    div.innerHTML = `
+                        <div class="head">
+                            <span>${grad.name}</span>
+                            <div class="actions">
+                                <button class="load-btn" data-idx="${index}">載入</button>
+                                <button class="del-btn" data-idx="${index}">✕</button>
+                            </div>
+                        </div>
+                        <div class="grad-bar" style="background:linear-gradient(to right, ${grad.colors.join(', ')});"></div>
+                    `;
+                    div.querySelector('.load-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const i = parseInt(e.target.dataset.idx);
+                        const g = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                        if (g[i]) {
+                            selectedGradientColors = [...g[i].colors];
+                            gradientNameInput.value = g[i].name;
+                            renderGradientSelection();
+                            generateGradientBtn.click();
+                            closeAllModals();
+                            document.querySelector('[data-target="gradientModal"]').click();
+                        }
+                    });
+                    div.querySelector('.del-btn').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const i = parseInt(e.target.dataset.idx);
+                        let f = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                        f.splice(i, 1);
+                        localStorage.setItem('shijian_fav_gradients', JSON.stringify(f));
+                        loadFavorites();
+                    });
+                    favGradientsContainer.appendChild(div);
+                });
+            }
+
+            // ─── 收藏面板中匯出最愛顏色 ───
+            exportFavColorsBtn.addEventListener('click', () => {
+                const colors = JSON.parse(localStorage.getItem('shijian_fav_colors') || '[]');
+                if (colors.length === 0) {
+                    alert('尚無最愛顏色');
+                    return;
+                }
+                const blob = new Blob([JSON.stringify(colors, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = '最愛顏色_' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            // ─── 收藏面板中匯出/匯入漸層 ───
+            exportFavGradientsBtn.addEventListener('click', () => {
+                const gradients = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                if (gradients.length === 0) {
+                    alert('尚無收藏漸層');
+                    return;
+                }
+                const blob = new Blob([JSON.stringify(gradients, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = '收藏漸層_' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            importFavGradientsBtn.addEventListener('click', () => importFavGradientsFile.click());
+            importFavGradientsFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    try {
+                        const imported = JSON.parse(ev.target.result);
+                        if (!Array.isArray(imported)) {
+                            alert('❌ 格式錯誤：須為陣列');
+                            return;
+                        }
+                        let existing = JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]');
+                        let added = 0,
+                            skipped = 0;
+                        imported.forEach(g => {
+                            if (!g.name || !g.colors || !Array.isArray(g.colors) || g.colors.length < 2) {
+                                skipped++;
+                                return;
+                            }
+                            const dup = existing.find(e => e.name === g.name);
+                            if (dup) {
+                                if (confirm(`名稱「${g.name}」已存在，是否覆蓋？`)) {
+                                    existing = existing.filter(e => e.name !== g.name);
+                                    existing.push({ name: g.name, colors: g.colors });
+                                    added++;
+                                } else {
+                                    skipped++;
+                                }
+                            } else {
+                                existing.push({ name: g.name, colors: g.colors });
+                                added++;
+                            }
+                        });
+                        localStorage.setItem('shijian_fav_gradients', JSON.stringify(existing));
+                        loadFavorites();
+                        alert(`✅ 匯入完成！新增 ${added} 個，略過 ${skipped} 個`);
+                    } catch (err) {
+                        alert('❌ 檔案格式錯誤');
+                    }
+                };
+                reader.readAsText(file);
+                importFavGradientsFile.value = '';
+            });
+
+            // ─── Export / Import 完整備份 ───
+            exportAllBtn.addEventListener('click', () => {
+                const data = {
+                    lastImage: localStorage.getItem('shijian_last_image'),
+                    favColors: JSON.parse(localStorage.getItem('shijian_fav_colors') || '[]'),
+                    favImages: JSON.parse(localStorage.getItem('shijian_fav_images') || '[]'),
+                    favGradients: JSON.parse(localStorage.getItem('shijian_fav_gradients') || '[]')
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = '色鑑_備份_' + new Date().toISOString().slice(0, 10) + '.json';
+                a.click();
+                URL.revokeObjectURL(a.href);
+            });
+
+            importAllBtn.addEventListener('click', () => importFile.click());
+            importFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const d = JSON.parse(event.target.result);
+                        if (d.favColors) localStorage.setItem('shijian_fav_colors', JSON.stringify(d.favColors));
+                        if (d.favImages) localStorage.setItem('shijian_fav_images', JSON.stringify(d.favImages));
+                        if (d.favGradients) localStorage.setItem('shijian_fav_gradients', JSON.stringify(d.favGradients));
+                        if (d.lastImage) {
+                            localStorage.setItem('shijian_last_image', d.lastImage);
+                            currentImgDataUrl = d.lastImage;
+                            loadImageAndReset(currentImgDataUrl, '備份還原');
+                        }
+                        loadFavorites();
+                        alert('✅ 還原成功！');
+                        closeAllModals();
+                    } catch (err) {
+                        alert('❌ 檔案格式錯誤');
+                    }
+                };
+                reader.readAsText(file);
+                importFile.value = '';
+            });
+
+            // ─── Restore last image on load ───
+            window.addEventListener('load', () => {
+                const savedImage = localStorage.getItem('shijian_last_image');
+                if (savedImage) {
+                    currentImgDataUrl = savedImage;
+                    loadImageAndReset(savedImage, '上次開啟');
+                }
+                loadFavorites();
+                setMode('pan');
+                setTimeout(() => {
+                    const rect = canvasContainer.getBoundingClientRect();
+                    canvas.width = rect.width || window.innerWidth;
+                    canvas.height = rect.height || (window.innerHeight - 56 - 60);
+                    if (originalImg.complete && originalImg.src) resetView();
+                }, 100);
+            });
+
+            // ─── Handle resize ───
+            let resizeTimer;
+            window.addEventListener('resize', () => {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(() => {
+                    if (originalImg.complete && originalImg.src) {
+                        const rect = canvasContainer.getBoundingClientRect();
+                        canvas.width = rect.width || window.innerWidth;
+                        canvas.height = rect.height || (window.innerHeight - 56 - 60);
+                        resetView();
+                    }
+                }, 200);
+            });
+
+            // ─── Expose for inline onclick ───
+            window.addToGradientSelection = addToGradientSelection;
+            window.loadFavorites = loadFavorites;
+
+        })();
+    </script>
+</body>
+</html>
