@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>立體碎形 · 3D Fractal Generator</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;500;600;700&display=swap');
+
+  :root{
+    --ink:#121315;            /* 墨玄 */
+    --vermilion:#942525;      /* 硃砂紅 */
+    --gold:#bd8b2a;           /* 耀日金 */
+    --jade-white:#fcfbfa;     /* 玉盤白 */
+    --bg-panel: rgba(18,19,21,0.86);
+    --panel-border: rgba(252,251,250,0.14);
+    --text-main: var(--jade-white);
+    --text-dim: rgba(252,251,250,0.6);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%; overflow:hidden;
+    background:var(--ink);
+    font-family:'Inter','Noto Serif TC',serif;
+    color:var(--text-main);
+    -webkit-tap-highlight-color: transparent;
+  }
+  #stage{ position:fixed; inset:0; touch-action:none; }
+
+  /* ---- Title / hero mark ---- */
+  #hero{
+    position:fixed; top:0; left:0; right:0;
+    padding:20px 22px 0 22px;
+    pointer-events:none;
+    z-index:5;
+    display:flex; align-items:baseline; gap:12px;
+    background:linear-gradient(to bottom, rgba(18,19,21,0.85), transparent);
+  }
+  #hero h1{
+    font-family:'Noto Serif TC', serif;
+    font-weight:900;
+    font-size:clamp(20px, 4.6vw, 28px);
+    letter-spacing:0.04em;
+    margin:0;
+    color:var(--jade-white);
+    border-bottom:2px solid var(--gold);
+    padding-bottom:2px;
+  }
+  #hero span.sub{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    font-size:14px;
+    color:var(--gold);
+    letter-spacing:0.03em;
+    padding-bottom:4px;
+  }
+  #leafCount{
+    position:fixed; top:22px; right:22px; z-index:5;
+    font-family:'Inter',sans-serif; font-size:12px; letter-spacing:0.06em;
+    color:var(--gold); text-align:right; pointer-events:none;
+  }
+  #leafCount b{ font-family:'Noto Serif TC',serif; font-size:19px; display:block; color:var(--jade-white); font-weight:700;}
+
+  /* ---- Control panel ---- */
+  #panelToggle{
+    position:fixed; z-index:20; right:16px; bottom:16px;
+    width:56px; height:56px; border-radius:50%;
+    background:linear-gradient(135deg, var(--vermilion), var(--gold));
+    border:none; color:var(--jade-white); font-size:24px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 22px rgba(148,37,37,0.5), 0 0 0 1px rgba(252,251,250,0.15) inset;
+    cursor:pointer;
+  }
+  #panel{
+    position:fixed; z-index:15; right:16px; bottom:84px;
+    width:min(360px, calc(100vw - 32px));
+    max-height:calc(100vh - 140px);
+    overflow-y:auto;
+    background:var(--bg-panel);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border:1px solid var(--panel-border);
+    border-radius:18px;
+    padding:20px 20px 24px 20px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.55);
+    transition: transform 0.35s cubic-bezier(.3,1.4,.4,1), opacity 0.3s;
+  }
+  #panel.hidden{ transform:translateY(20px) scale(0.96); opacity:0; pointer-events:none; }
+
+  .group{ margin-bottom:18px; }
+  .group:last-child{ margin-bottom:0; }
+  .group-label{
+    font-family:'Noto Serif TC',serif; font-weight:700; font-size:13.5px; letter-spacing:0.08em;
+    color:var(--gold); margin-bottom:10px;
+    display:flex; align-items:center; gap:7px;
+  }
+  .group-label::before{ content:''; width:6px; height:6px; border-radius:50%; background:var(--vermilion); }
+
+  .row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .row:last-child{ margin-bottom:0; }
+  .row label{ font-size:15px; color:var(--text-main); font-family:'Noto Serif TC',serif; white-space:nowrap; }
+  .row .val{ font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; color:var(--gold); min-width:38px; text-align:right; }
+
+  input[type=range]{
+    -webkit-appearance:none; appearance:none;
+    width:100%; height:8px; border-radius:8px;
+    background: linear-gradient(90deg, var(--vermilion), var(--gold));
+    outline:none; margin:0 10px; cursor:pointer;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; width:26px; height:26px; border-radius:50%;
+    background:var(--jade-white); border:3px solid var(--vermilion);
+    box-shadow:0 0 8px rgba(0,0,0,0.4); cursor:pointer;
+  }
+  input[type=range]::-moz-range-thumb{
+    width:26px; height:26px; border-radius:50%; background:var(--jade-white);
+    border:3px solid var(--vermilion); box-shadow:0 0 8px rgba(0,0,0,0.4); cursor:pointer;
+  }
+  .sliderRow{ display:flex; align-items:center; }
+
+  .segbtns{ display:flex; gap:8px; }
+  #typeBtns button{ flex:1 1 30%; font-size:13px; padding:12px 6px; }
+  .segbtns button{
+    flex:1; padding:12px 8px; border-radius:10px; border:1px solid var(--panel-border);
+    background:rgba(252,251,250,0.05); color:var(--text-dim);
+    font-family:'Noto Serif TC',serif; font-size:14px; cursor:pointer;
+    transition:all 0.2s;
+  }
+  .segbtns button.active{
+    background:linear-gradient(135deg, var(--vermilion), var(--gold));
+    color:var(--jade-white); border-color:transparent;
+    box-shadow:0 4px 14px rgba(148,37,37,0.4);
+  }
+
+  #resetBtn{
+    width:100%; margin-top:6px; padding:14px; border-radius:12px; border:1px solid var(--panel-border);
+    background:rgba(252,251,250,0.06); color:var(--text-main); font-family:'Noto Serif TC',serif;
+    font-size:15px; cursor:pointer;
+  }
+  #resetBtn:active{ background:rgba(252,251,250,0.12); }
+
+  #hint{
+    position:fixed; left:22px; bottom:22px; z-index:5;
+    font-size:13px; color:var(--gold); font-family:'Cormorant Garamond',serif; font-style:italic;
+    pointer-events:none; opacity:0.85;
+  }
+  @media (max-width:520px){
+    #hint{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage"></div>
+
+<div id="hero">
+  <h1 id="heroTitle">八面體碎形</h1>
+  <span class="sub" id="heroSub">Octahedral Flake Fractal</span>
+</div>
+<div id="leafCount">葉片數 LEAVES<b id="leafNum">0</b></div>
+<div id="hint">拖曳旋轉視角 · 滾輪縮放</div>
+
+<button id="panelToggle">⚙</button>
+<div id="panel">
+
+  <div class="group">
+    <div class="group-label">碎形類型 Fractal Type</div>
+    <div class="segbtns" id="typeBtns" style="flex-wrap:wrap;">
+      <button data-type="octahedron" class="active">八面體碎形</button>
+      <button data-type="menger">門格海綿</button>
+      <button data-type="sierpinski">謝爾賓斯基四面體</button>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">結構 Structure</div>
+    <div class="row">
+      <label>遞迴深度 Depth</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="depth" min="0" max="6" step="1" value="4">
+      </div>
+      <span class="val" id="depthVal">4</span>
+    </div>
+    <div class="row">
+      <label>基準半徑 Radius</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="radius" min="1" max="3" step="0.1" value="2">
+      </div>
+      <span class="val" id="radiusVal">2.0</span>
+    </div>
+    <div class="row">
+      <label>縮小間隙 Gap Shrink</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="childScale" min="0.7" max="1.0" step="0.01" value="0.92">
+      </div>
+      <span class="val" id="childScaleVal">0.92</span>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">明亮色彩 Bright Color</div>
+    <div class="row"><label style="margin-bottom:4px;">配色模式 Palette</label></div>
+    <div class="segbtns" id="paletteBtns">
+      <button data-mode="rainbow" class="active">彩虹 Rainbow</button>
+      <button data-mode="depth">漸層 Gradient</button>
+      <button data-mode="neon">霓虹 Neon</button>
+    </div>
+    <div class="row" style="margin-top:12px;">
+      <label>色相偏移 Hue Shift</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="hue" min="0" max="360" step="1" value="200">
+      </div>
+      <span class="val" id="hueVal">200°</span>
+    </div>
+    <div class="row">
+      <label>飽和度 Saturation</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="sat" min="40" max="100" step="1" value="95">
+      </div>
+      <span class="val" id="satVal">95%</span>
+    </div>
+    <div class="row">
+      <label>亮度 Lightness</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="light" min="35" max="75" step="1" value="58">
+      </div>
+      <span class="val" id="lightVal">58%</span>
+    </div>
+    <div class="row">
+      <label>光暈強度 Glow Bloom</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="bloom" min="0" max="2.5" step="0.05" value="1.3">
+      </div>
+      <span class="val" id="bloomVal">1.3</span>
+    </div>
+  </div>
+
+  <div class="group">
+    <div class="group-label">動態與顯示 Motion / Display</div>
+    <div class="row">
+      <label>自轉速度 Auto Rotate</label>
+      <div class="sliderRow" style="flex:1; margin-left:10px;">
+        <input type="range" id="rotate" min="0" max="100" step="1" value="35">
+      </div>
+      <span class="val" id="rotateVal">35</span>
+    </div>
+    <div class="row" style="margin-bottom:4px;"><label>顯示模式 Render Mode</label></div>
+    <div class="segbtns" id="renderBtns">
+      <button data-mode="solid" class="active">實體 Solid</button>
+      <button data-mode="wire">線框 Wire</button>
+    </div>
+  </div>
+
+  <button id="resetBtn">重置參數 Reset Parameters</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+(function(){
+  var stage = document.getElementById('stage');
+
+  // ---------- Renderer / Scene / Camera ----------
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x121315);
+  scene.fog = new THREE.FogExp2(0x121315, 0.012);
+
+  var camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 500);
+
+  var renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  stage.appendChild(renderer.domElement);
+
+  // ---------- Hand-rolled orbit controls (no addon dependency) ----------
+  var camState = { theta: 0.7, phi: 1.05, dist: 15 };
+  var target = new THREE.Vector3(0,0,0);
+  function updateCameraFromState(){
+    var p = camState.phi;
+    p = Math.max(0.15, Math.min(Math.PI-0.15, p));
+    camState.phi = p;
+    camState.dist = Math.max(2.5, Math.min(60, camState.dist));
+    var x = camState.dist * Math.sin(p) * Math.cos(camState.theta);
+    var y = camState.dist * Math.cos(p);
+    var z = camState.dist * Math.sin(p) * Math.sin(camState.theta);
+    camera.position.set(x,y,z).add(target);
+    camera.lookAt(target);
+  }
+  updateCameraFromState();
+
+  var pointers = {}; // id -> {x,y}
+  var lastSingle = null;
+  var lastPinchDist = null;
+
+  function pointerDist(){
+    var ids = Object.keys(pointers);
+    if(ids.length < 2) return null;
+    var a = pointers[ids[0]], b = pointers[ids[1]];
+    return Math.hypot(a.x-b.x, a.y-b.y);
+  }
+
+  renderer.domElement.style.touchAction = 'none';
+  renderer.domElement.addEventListener('pointerdown', function(e){
+    pointers[e.pointerId] = { x:e.clientX, y:e.clientY };
+    if(Object.keys(pointers).length === 1){ lastSingle = { x:e.clientX, y:e.clientY }; }
+    if(Object.keys(pointers).length === 2){ lastPinchDist = pointerDist(); }
+    renderer.domElement.setPointerCapture && renderer.domElement.setPointerCapture(e.pointerId);
+  });
+  renderer.domElement.addEventListener('pointermove', function(e){
+    if(!pointers[e.pointerId]) return;
+    pointers[e.pointerId] = { x:e.clientX, y:e.clientY };
+    var ids = Object.keys(pointers);
+    if(ids.length === 1 && lastSingle){
+      var dx = e.clientX - lastSingle.x;
+      var dy = e.clientY - lastSingle.y;
+      camState.theta -= dx * 0.006;
+      camState.phi   -= dy * 0.006;
+      lastSingle = { x:e.clientX, y:e.clientY };
+      updateCameraFromState();
+    } else if(ids.length === 2){
+      var d = pointerDist();
+      if(lastPinchDist && d){
+        camState.dist *= (lastPinchDist / d);
+        updateCameraFromState();
+      }
+      lastPinchDist = d;
+    }
+  });
+  function releasePointer(e){
+    delete pointers[e.pointerId];
+    var ids = Object.keys(pointers);
+    if(ids.length === 1){ lastSingle = { x: pointers[ids[0]].x, y: pointers[ids[0]].y }; lastPinchDist = null; }
+    if(ids.length === 0){ lastSingle = null; lastPinchDist = null; }
+  }
+  renderer.domElement.addEventListener('pointerup', releasePointer);
+  renderer.domElement.addEventListener('pointercancel', releasePointer);
+  renderer.domElement.addEventListener('pointerleave', function(e){ if(Object.keys(pointers).length<=1) releasePointer(e); });
+  renderer.domElement.addEventListener('wheel', function(e){
+    e.preventDefault();
+    camState.dist *= (1 + e.deltaY * 0.001);
+    updateCameraFromState();
+  }, { passive:false });
+
+  // subtle starfield backdrop for depth
+  (function starfield(){
+    var N = 900;
+    var pos = new Float32Array(N*3);
+    for(var i=0;i<N;i++){
+      var r = 60 + Math.random()*140;
+      var theta = Math.random()*Math.PI*2;
+      var phi = Math.acos(2*Math.random()-1);
+      pos[i*3]   = r*Math.sin(phi)*Math.cos(theta);
+      pos[i*3+1] = r*Math.sin(phi)*Math.sin(theta);
+      pos[i*3+2] = r*Math.cos(phi);
+    }
+    var starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    var starMat = new THREE.PointsMaterial({ color:0xffffff, size:0.6, transparent:true, opacity:0.55, sizeAttenuation:true });
+    scene.add(new THREE.Points(starGeo, starMat));
+  })();
+
+  // ---------- Fractal group ----------
+  var flakeGroup = new THREE.Group();
+  scene.add(flakeGroup);
+  var solidMesh = null, glowMesh = null, wireMesh = null;
+  var leafData = []; // {center:[x,y,z], radius, pathHash}
+
+  var GEOMS = {};
+  (function prepGeoms(){
+    var defs = {
+      octahedron: new THREE.OctahedronGeometry(1, 0),
+      sierpinski: new THREE.TetrahedronGeometry(1, 0),
+      menger: new THREE.BoxGeometry(2, 2, 2)
+    };
+    for(var key in defs){
+      var g = defs[key];
+      var ng = g.index ? g.toNonIndexed() : g;
+      GEOMS[key] = {
+        pos: ng.attributes.position.array,
+        norm: ng.attributes.normal.array,
+        count: ng.attributes.position.array.length / 3
+      };
+    }
+  })();
+
+  var DEPTH_CONFIG = {
+    octahedron: { min:0, max:6, def:4 },
+    sierpinski: { min:0, max:7, def:5 },
+    menger:     { min:0, max:4, def:3 }
+  };
+  var TYPE_LABEL = {
+    octahedron: { zh:'八面體碎形', en:'Octahedral Flake Fractal' },
+    menger:     { zh:'門格海綿碎形', en:'Menger Sponge Fractal' },
+    sierpinski: { zh:'謝爾賓斯基四面體碎形', en:'Sierpinski Tetrahedron Fractal' }
+  };
+
+  var T = 1/Math.sqrt(3);
+  var TETRA_DIRS = [ [T,T,T], [-T,-T,T], [-T,T,-T], [T,-T,-T] ];
+  var OCTA_DIRS = [ [1,0,0],[-1,0,0], [0,1,0],[0,-1,0], [0,0,1],[0,0,-1] ];
+
+  var params = {
+    fractalType: 'octahedron',
+    depth: 4,
+    radius: 2.0,
+    childScale: 0.92, // "gap shrink" — cosmetic per-instance shrink, does not affect subdivision math
+    palette: 'rainbow',
+    hue: 200,
+    sat: 95,
+    light: 58,
+    bloom: 1.3,
+    rotate: 35,
+    render: 'solid'
+  };
+
+  function hashPath(path){
+    var h = 0;
+    for(var i=0;i<path.length;i++){
+      h = (h * 7 + (path[i]+1) * 13) % 997;
+    }
+    return (h % 997) / 997;
+  }
+
+  // Octahedron flake / Sierpinski tetrahedron share the same recursive rule:
+  // each child sits at half-radius along one of the parent's vertex directions
+  // (a midpoint-subdivision fractal) — only the direction set & branching factor differ.
+  function generateVertexFlake(dirs, depth, radius, center, path, out){
+    if(depth === 0){
+      out.push({ center: center.slice(), radius: radius, pathHash: hashPath(path) });
+      return;
+    }
+    var childRadius = radius * 0.5;
+    for(var i=0;i<dirs.length;i++){
+      var d = dirs[i];
+      var childCenter = [
+        center[0] + d[0]*childRadius,
+        center[1] + d[1]*childRadius,
+        center[2] + d[2]*childRadius
+      ];
+      generateVertexFlake(dirs, depth-1, childRadius, childCenter, path.concat(i), out);
+    }
+  }
+
+  // Menger sponge: subdivide a cube into a 3x3x3 grid of child cubes,
+  // keeping the 8 corners + 12 edges and discarding the center + 6 face-centers.
+  function generateMenger(depth, halfSize, center, path, out){
+    if(depth === 0){
+      out.push({ center: center.slice(), radius: halfSize, pathHash: hashPath(path) });
+      return;
+    }
+    var childHalf = halfSize / 3;
+    var idx = 0;
+    for(var dx=-1; dx<=1; dx++){
+      for(var dy=-1; dy<=1; dy++){
+        for(var dz=-1; dz<=1; dz++){
+          var zeros = (dx===0?1:0)+(dy===0?1:0)+(dz===0?1:0);
+          if(zeros >= 2) continue; // skip the center cube and the 6 face-center cubes
+          var childCenter = [
+            center[0] + dx*childHalf*2,
+            center[1] + dy*childHalf*2,
+            center[2] + dz*childHalf*2
+          ];
+          generateMenger(depth-1, childHalf, childCenter, path.concat(idx), out);
+          idx++;
+        }
+      }
+    }
+  }
+
+  function generateFlake(){
+    leafData = [];
+    if(params.fractalType === 'octahedron'){
+      generateVertexFlake(OCTA_DIRS, params.depth, params.radius, [0,0,0], [], leafData);
+    } else if(params.fractalType === 'sierpinski'){
+      generateVertexFlake(TETRA_DIRS, params.depth, params.radius, [0,0,0], [], leafData);
+    } else {
+      generateMenger(params.depth, params.radius, [0,0,0], [], leafData);
+    }
+  }
+
+  function colorForLeaf(leaf){
+    var hueShift = params.hue;
+    var h, s = params.sat/100, l = params.light/100;
+    if(params.palette === 'rainbow'){
+      h = (leaf.pathHash*360 + hueShift) % 360;
+    } else if(params.palette === 'depth'){
+      var d = Math.hypot(leaf.center[0], leaf.center[1], leaf.center[2]);
+      var norm = Math.min(d / (params.radius*1.6 + 0.001), 1);
+      h = (hueShift + norm*140) % 360;
+    } else {
+      h = (hueShift + (leaf.pathHash-0.5)*30 + 360) % 360;
+      s = Math.min(1, s + 0.05);
+      l = Math.min(0.72, l + leaf.pathHash*0.12);
+    }
+    var c = new THREE.Color();
+    c.setHSL(h/360, s, l);
+    return c;
+  }
+
+  function buildMergedGeometry(scaleMultiplier){
+    var g = GEOMS[params.fractalType];
+    var basePos = g.pos, baseNorm = g.norm, vertCount = g.count;
+    var total = leafData.length;
+    var positions = new Float32Array(total*vertCount*3);
+    var normals   = new Float32Array(total*vertCount*3);
+    var colors    = new Float32Array(total*vertCount*3);
+    for(var li=0; li<total; li++){
+      var leaf = leafData[li];
+      var col = colorForLeaf(leaf);
+      var r = leaf.radius * params.childScale * scaleMultiplier;
+      var base = li*vertCount*3;
+      for(var v=0; v<vertCount; v++){
+        var vi = v*3;
+        positions[base+vi]   = basePos[vi]*r + leaf.center[0];
+        positions[base+vi+1] = basePos[vi+1]*r + leaf.center[1];
+        positions[base+vi+2] = basePos[vi+2]*r + leaf.center[2];
+        normals[base+vi]   = baseNorm[vi];
+        normals[base+vi+1] = baseNorm[vi+1];
+        normals[base+vi+2] = baseNorm[vi+2];
+        colors[base+vi]   = col.r;
+        colors[base+vi+1] = col.g;
+        colors[base+vi+2] = col.b;
+      }
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions,3));
+    geo.setAttribute('normal', new THREE.BufferAttribute(normals,3));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors,3));
+    return geo;
+  }
+
+  function updateColorsOnGeometry(geo){
+    var vertCount = GEOMS[params.fractalType].count;
+    var colorAttr = geo.attributes.color;
+    var total = leafData.length;
+    for(var li=0; li<total; li++){
+      var col = colorForLeaf(leafData[li]);
+      var base = li*vertCount*3;
+      for(var v=0; v<vertCount; v++){
+        var vi = v*3;
+        colorAttr.array[base+vi]   = col.r;
+        colorAttr.array[base+vi+1] = col.g;
+        colorAttr.array[base+vi+2] = col.b;
+      }
+    }
+    colorAttr.needsUpdate = true;
+  }
+
+  function disposeMesh(m){
+    if(!m) return;
+    flakeGroup.remove(m);
+    if(m.geometry) m.geometry.dispose();
+    if(m.material) m.material.dispose();
+  }
+
+  function rebuildGeometry(){
+    disposeMesh(solidMesh); solidMesh = null;
+    disposeMesh(glowMesh); glowMesh = null;
+
+    var solidGeo = buildMergedGeometry(1.0);
+    var solidMat = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      wireframe: params.render === 'wire'
+    });
+    solidMesh = new THREE.Mesh(solidGeo, solidMat);
+    flakeGroup.add(solidMesh);
+
+    var glowGeo = buildMergedGeometry(1.28);
+    var glowMat = new THREE.MeshBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      opacity: Math.min(0.55, params.bloom * 0.22),
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.BackSide
+    });
+    glowMesh = new THREE.Mesh(glowGeo, glowMat);
+    flakeGroup.add(glowMesh);
+  }
+
+  function rebuildFlake(){
+    generateFlake();
+    document.getElementById('leafNum').textContent = leafData.length.toLocaleString();
+    rebuildGeometry();
+  }
+
+  function recolor(){
+    if(solidMesh) updateColorsOnGeometry(solidMesh.geometry);
+    if(glowMesh) updateColorsOnGeometry(glowMesh.geometry);
+  }
+
+  function updateGlowStrength(){
+    if(glowMesh) glowMesh.material.opacity = Math.min(0.55, params.bloom * 0.22);
+  }
+
+  function updateRenderMode(){
+    if(solidMesh) solidMesh.material.wireframe = (params.render === 'wire');
+    if(glowMesh) glowMesh.visible = (params.render !== 'wire');
+  }
+
+  // ---------- UI bindings ----------
+  function bindSlider(id, key, fmt, onChange){
+    var el = document.getElementById(id);
+    var out = document.getElementById(id+'Val');
+    el.addEventListener('input', function(){
+      var v = parseFloat(el.value);
+      params[key] = v;
+      out.textContent = fmt ? fmt(v) : v;
+      onChange && onChange(v);
+    });
+  }
+
+  bindSlider('depth','depth', function(v){return v;}, rebuildFlake);
+  bindSlider('radius','radius', function(v){return v.toFixed(1);}, rebuildFlake);
+  bindSlider('childScale','childScale', function(v){return v.toFixed(2);}, rebuildGeometry);
+  bindSlider('hue','hue', function(v){return v+'°';}, recolor);
+  bindSlider('sat','sat', function(v){return v+'%';}, recolor);
+  bindSlider('light','light', function(v){return v+'%';}, recolor);
+  bindSlider('bloom','bloom', function(v){return v.toFixed(2);}, updateGlowStrength);
+  bindSlider('rotate','rotate', function(v){return v;}, function(){});
+
+  var typeBtns = document.querySelectorAll('#typeBtns button');
+  for(var ti=0; ti<typeBtns.length; ti++){
+    typeBtns[ti].addEventListener('click', function(){
+      for(var j=0;j<typeBtns.length;j++) typeBtns[j].classList.remove('active');
+      this.classList.add('active');
+      params.fractalType = this.dataset.type;
+
+      var cfg = DEPTH_CONFIG[params.fractalType];
+      var depthEl = document.getElementById('depth');
+      depthEl.min = cfg.min; depthEl.max = cfg.max; depthEl.value = cfg.def;
+      params.depth = cfg.def;
+      document.getElementById('depthVal').textContent = cfg.def;
+
+      var label = TYPE_LABEL[params.fractalType];
+      document.getElementById('heroTitle').textContent = label.zh;
+      document.getElementById('heroSub').textContent = label.en;
+
+      rebuildFlake();
+    });
+  }
+
+  var paletteBtns = document.querySelectorAll('#paletteBtns button');
+  for(var pi=0; pi<paletteBtns.length; pi++){
+    paletteBtns[pi].addEventListener('click', function(){
+      for(var j=0;j<paletteBtns.length;j++) paletteBtns[j].classList.remove('active');
+      this.classList.add('active');
+      params.palette = this.dataset.mode;
+      recolor();
+    });
+  }
+
+  var renderBtns = document.querySelectorAll('#renderBtns button');
+  for(var ri=0; ri<renderBtns.length; ri++){
+    renderBtns[ri].addEventListener('click', function(){
+      for(var j=0;j<renderBtns.length;j++) renderBtns[j].classList.remove('active');
+      this.classList.add('active');
+      params.render = this.dataset.mode;
+      updateRenderMode();
+    });
+  }
+
+  document.getElementById('panelToggle').addEventListener('click', function(){
+    document.getElementById('panel').classList.toggle('hidden');
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    var defaults = { fractalType:'octahedron', depth:4, radius:2.0, childScale:0.92, palette:'rainbow', hue:200, sat:95, light:58, bloom:1.3, rotate:35, render:'solid' };
+    for(var k in defaults) params[k] = defaults[k];
+    var depthEl = document.getElementById('depth');
+    depthEl.min = DEPTH_CONFIG.octahedron.min; depthEl.max = DEPTH_CONFIG.octahedron.max;
+    depthEl.value = 4; document.getElementById('depthVal').textContent = 4;
+    document.getElementById('radius').value = 2.0; document.getElementById('radiusVal').textContent = '2.0';
+    document.getElementById('childScale').value = 0.92; document.getElementById('childScaleVal').textContent = '0.92';
+    document.getElementById('hue').value = 200; document.getElementById('hueVal').textContent = '200°';
+    document.getElementById('sat').value = 95; document.getElementById('satVal').textContent = '95%';
+    document.getElementById('light').value = 58; document.getElementById('lightVal').textContent = '58%';
+    document.getElementById('bloom').value = 1.3; document.getElementById('bloomVal').textContent = '1.3';
+    document.getElementById('rotate').value = 35; document.getElementById('rotateVal').textContent = 35;
+    for(var j1=0;j1<typeBtns.length;j1++) typeBtns[j1].classList.toggle('active', typeBtns[j1].dataset.type==='octahedron');
+    document.getElementById('heroTitle').textContent = TYPE_LABEL.octahedron.zh;
+    document.getElementById('heroSub').textContent = TYPE_LABEL.octahedron.en;
+    for(var j2=0;j2<paletteBtns.length;j2++) paletteBtns[j2].classList.toggle('active', paletteBtns[j2].dataset.mode==='rainbow');
+    for(var j3=0;j3<renderBtns.length;j3++) renderBtns[j3].classList.toggle('active', renderBtns[j3].dataset.mode==='solid');
+    rebuildFlake();
+  });
+
+  // ---------- Resize ----------
+  window.addEventListener('resize', function(){
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ---------- Animate ----------
+  var lastT = performance.now();
+  function animate(now){
+    requestAnimationFrame(animate);
+    var dt = Math.min(0.05, (now - lastT) / 1000);
+    lastT = now;
+    var speed = params.rotate/100 * 0.6;
+    flakeGroup.rotation.y += dt * speed;
+    flakeGroup.rotation.x += dt * speed * 0.35;
+    renderer.render(scene, camera);
+  }
+
+  rebuildFlake();
+  requestAnimationFrame(animate);
+})();
+</script>
+</body>
+</html>

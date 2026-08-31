@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>曼德球 — Mandelbulb</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        /* 完全沿用原有設計系統，僅微調標題 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #121315;
+            font-family: 'Noto Serif TC', 'Inter', serif;
+            color: #fcfbfa;
+            touch-action: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #gl {
+            display: block;
+            width: 100%;
+            height: 100%;
+            touch-action: none;
+            opacity: 0;
+            animation: fadeIn 1.8s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        #topBar {
+            position: fixed;
+            top: 18px;
+            left: 24px;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        #topBar h1 {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            font-size: clamp(16px, 2.8vw, 28px);
+            letter-spacing: 0.06em;
+            color: #fcfbfa;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.7);
+            opacity: 0.7;
+            margin: 0;
+            line-height: 1.2;
+        }
+        #topBar .sub {
+            font-size: clamp(10px, 1.2vw, 14px);
+            font-weight: 300;
+            opacity: 0.35;
+            letter-spacing: 0.04em;
+            font-family: 'Inter', sans-serif;
+            margin-left: 4px;
+        }
+        @media (max-width: 480px) {
+            #topBar { top: 12px; left: 14px; }
+            #topBar .sub { display: none; }
+        }
+        #fps {
+            position: fixed;
+            right: 18px;
+            top: 18px;
+            z-index: 10;
+            font-family: 'Inter', monospace;
+            font-size: clamp(11px, 1.2vw, 15px);
+            font-weight: 300;
+            color: rgba(252, 251, 250, 0.3);
+            letter-spacing: 0.04em;
+            pointer-events: none;
+            text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6);
+        }
+        #bottomRight {
+            position: fixed;
+            right: 18px;
+            bottom: 24px;
+            z-index: 20;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .ctrl-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            border: 1px solid rgba(189, 139, 42, 0.3);
+            background: rgba(18, 19, 21, 0.65);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #bd8b2a;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+            touch-action: manipulation;
+            line-height: 1;
+            padding: 0;
+        }
+        .ctrl-btn:hover {
+            border-color: #bd8b2a;
+            background: rgba(189, 139, 42, 0.12);
+            transform: scale(1.05);
+        }
+        .ctrl-btn:active { transform: scale(0.92); }
+        .ctrl-btn .badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #942525;
+            border: 1.5px solid #121315;
+            transition: opacity 0.3s;
+        }
+        .ctrl-btn .badge.hidden { opacity: 0; }
+        #fullscreenBtn { font-size: 22px; }
+        @media (max-width: 480px) {
+            #bottomRight { right: 14px; bottom: 16px; gap: 10px; }
+            .ctrl-btn { width: 48px; height: 48px; font-size: 20px; }
+            #fullscreenBtn { font-size: 18px; }
+        }
+
+        /* 面板樣式（與之前相同，僅移除 c.w 行） */
+        #panel {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(380px, 92vw);
+            max-height: 100vh;
+            z-index: 30;
+            background: rgba(14, 15, 18, 0.88);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border-left: 1px solid rgba(189, 139, 42, 0.15);
+            box-shadow: -8px 0 48px rgba(0, 0, 0, 0.6);
+            padding: 20px 20px 28px;
+            overflow-y: auto;
+            transform: translateX(105%);
+            transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: none;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+        #panel.open {
+            transform: translateX(0);
+            pointer-events: auto;
+        }
+        #panel::-webkit-scrollbar { width: 3px; }
+        #panel::-webkit-scrollbar-track { background: transparent; }
+        #panel::-webkit-scrollbar-thumb { background: rgba(189, 139, 42, 0.3); border-radius: 6px; }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(189, 139, 42, 0.15);
+        }
+        .panel-header h2 {
+            font-family: 'Noto Serif TC', serif;
+            font-weight: 600;
+            font-size: clamp(17px, 2.2vw, 22px);
+            letter-spacing: 0.06em;
+            color: #fcfbfa;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .panel-header h2 span { font-size: 0.7em; opacity: 0.4; font-weight: 300; }
+        .panel-header .close-btn {
+            background: none;
+            border: none;
+            color: rgba(252, 251, 250, 0.3);
+            font-size: 26px;
+            cursor: pointer;
+            padding: 4px 8px;
+            transition: color 0.2s;
+            line-height: 1;
+        }
+        .panel-header .close-btn:hover { color: #fcfbfa; }
+
+        .param-group { margin-bottom: 16px; }
+        .param-group .group-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: rgba(252, 251, 250, 0.25);
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            padding-bottom: 6px;
+        }
+        .row {
+            display: grid;
+            grid-template-columns: 58px 1fr 48px;
+            gap: 8px;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: clamp(13px, 1.4vw, 15px);
+        }
+        .row label {
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            color: rgba(252, 251, 250, 0.6);
+            font-size: 0.9em;
+            letter-spacing: 0.02em;
+        }
+        .row input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 3px;
+            border-radius: 4px;
+            background: rgba(252, 251, 250, 0.12);
+            outline: none;
+            transition: background 0.2s;
+            cursor: pointer;
+            touch-action: none;
+        }
+        .row input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #bd8b2a;
+            cursor: pointer;
+            border: 2px solid rgba(18, 19, 21, 0.6);
+            box-shadow: 0 0 12px rgba(189, 139, 42, 0.15);
+            transition: all 0.15s;
+            touch-action: none;
+        }
+        .row input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); background: #d4a03a; }
+        .row input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #bd8b2a;
+            cursor: pointer;
+            border: 2px solid rgba(18, 19, 21, 0.6);
+            touch-action: none;
+        }
+        .row input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.2); }
+        .row output {
+            text-align: right;
+            font-family: 'Inter', monospace;
+            font-size: 0.8em;
+            font-weight: 400;
+            color: rgba(252, 251, 250, 0.5);
+            min-width: 32px;
+            letter-spacing: 0.02em;
+        }
+
+        .row-auto {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin: 8px 0 4px;
+            padding: 6px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .row-auto .toggle-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: clamp(13px, 1.3vw, 15px);
+            color: rgba(252, 251, 250, 0.7);
+        }
+        .row-auto .toggle-wrap .switch {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .row-auto .toggle-wrap .switch.active {
+            background: rgba(189, 139, 42, 0.45);
+            border-color: rgba(189, 139, 42, 0.2);
+        }
+        .row-auto .toggle-wrap .switch .knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #5a5a5a;
+            transition: all 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+        }
+        .row-auto .toggle-wrap .switch.active .knob {
+            left: 20px;
+            background: #bd8b2a;
+        }
+        .row-auto .speed-label {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.75em;
+            color: rgba(252, 251, 250, 0.25);
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+        .row-auto input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 3px;
+            border-radius: 4px;
+            background: rgba(252, 251, 250, 0.08);
+            outline: none;
+            cursor: pointer;
+            touch-action: none;
+        }
+        .row-auto input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #942525;
+            cursor: pointer;
+            border: 2px solid rgba(18, 19, 21, 0.5);
+            transition: all 0.15s;
+            touch-action: none;
+        }
+        .row-auto input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); background: #b02e2e; }
+        .row-auto input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #942525;
+            cursor: pointer;
+            border: 2px solid rgba(18, 19, 21, 0.5);
+            touch-action: none;
+        }
+        .row-auto output {
+            font-family: 'Inter', monospace;
+            font-size: 0.75em;
+            color: rgba(252, 251, 250, 0.3);
+            min-width: 28px;
+            text-align: right;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 8px;
+            margin: 14px 0 8px;
+            flex-wrap: wrap;
+        }
+        .btn-row button {
+            flex: 1;
+            min-width: 72px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(255, 255, 255, 0.02);
+            color: rgba(252, 251, 250, 0.6);
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(12px, 1.2vw, 14px);
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            touch-action: manipulation;
+            text-align: center;
+        }
+        .btn-row button:hover {
+            background: rgba(189, 139, 42, 0.06);
+            border-color: rgba(189, 139, 42, 0.15);
+            color: #fcfbfa;
+        }
+        .btn-row button:active { transform: scale(0.96); }
+        .btn-row button.primary {
+            border-color: rgba(189, 139, 42, 0.15);
+            color: #bd8b2a;
+        }
+        .btn-row button.primary:hover {
+            background: rgba(189, 139, 42, 0.08);
+            border-color: rgba(189, 139, 42, 0.3);
+        }
+        .btn-row button.danger {
+            border-color: rgba(148, 37, 37, 0.15);
+            color: #942525;
+        }
+        .btn-row button.danger:hover {
+            background: rgba(148, 37, 37, 0.08);
+            border-color: rgba(148, 37, 37, 0.3);
+        }
+
+        .hint {
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            font-family: 'Inter', sans-serif;
+            font-size: clamp(10px, 1vw, 12px);
+            font-weight: 300;
+            color: rgba(252, 251, 250, 0.2);
+            line-height: 1.6;
+            letter-spacing: 0.02em;
+        }
+        .hint .key { color: rgba(252, 251, 250, 0.3); font-weight: 400; }
+
+        @media (max-width: 500px) {
+            #panel { padding: 16px 14px 22px; width: 94vw; }
+            .row { grid-template-columns: 44px 1fr 40px; gap: 6px; font-size: 13px; }
+            .row label { font-size: 0.8em; }
+            .row input[type="range"]::-webkit-slider-thumb { width: 18px; height: 18px; }
+            .row-auto .toggle-wrap .switch { width: 36px; height: 20px; }
+            .row-auto .toggle-wrap .switch .knob { width: 14px; height: 14px; }
+            .row-auto .toggle-wrap .switch.active .knob { left: 18px; }
+            .btn-row button { padding: 8px 10px; font-size: 12px; min-width: 56px; }
+        }
+        @media (max-width: 380px) {
+            .row { grid-template-columns: 36px 1fr 34px; gap: 4px; font-size: 11px; }
+            .row output { font-size: 0.7em; min-width: 24px; }
+            #panel { padding: 12px 10px 18px; }
+        }
+        #panel { scrollbar-width: thin; scrollbar-color: rgba(189, 139, 42, 0.15) transparent; }
+        #panel.open~#bottomRight .ctrl-btn { pointer-events: none; }
+        .accent-dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #942525;
+            margin-right: 6px;
+            vertical-align: middle;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Canvas -->
+    <canvas id="gl"></canvas>
+
+    <!-- 頂部標題 -->
+    <div id="topBar">
+        <h1>
+            <span class="accent-dot"></span>
+            曼德球
+            <span class="sub">Mandelbulb</span>
+        </h1>
+    </div>
+
+    <!-- FPS -->
+    <div id="fps">—</div>
+
+    <!-- 右下按鈕 -->
+    <div id="bottomRight">
+        <button id="fullscreenBtn" class="ctrl-btn" aria-label="全螢幕" title="全螢幕">
+            <span style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">⛶</span>
+        </button>
+        <button id="togglePanel" class="ctrl-btn" aria-label="切換控制面板">
+            <span style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">⚙</span>
+            <span class="badge" id="panelBadge"></span>
+        </button>
+    </div>
+
+    <!-- 控制面板 (移除 c.w) -->
+    <div id="panel" role="dialog" aria-label="曼德球參數控制">
+        <div class="panel-header">
+            <h2>
+                <span style="opacity:0.5;font-weight:300;">✦</span>
+                參數控制
+                <span>·</span>
+                <span style="font-size:0.55em;opacity:0.25;font-weight:300;font-family:'Inter',sans-serif;">Mandelbulb</span>
+            </h2>
+            <button class="close-btn" id="closePanel" aria-label="關閉面板">✕</button>
+        </div>
+
+        <div class="param-group">
+            <div class="group-label">分形參數</div>
+            <div class="row"><label>c.x</label><input id="cx" type="range" min="-1" max="1" step="0.001" value="0.50"><output></output></div>
+            <div class="row"><label>c.y</label><input id="cy" type="range" min="-1" max="1" step="0.001" value="0.50"><output></output></div>
+            <div class="row"><label>c.z</label><input id="cz" type="range" min="-1" max="1" step="0.001" value="0.50"><output></output></div>
+            <!-- c.w 已移除 -->
+            <div class="row"><label>幂次</label><input id="power" type="range" min="2" max="8" step="1" value="2"><output></output></div>
+            <div class="row"><label>迭代</label><input id="iters" type="range" min="4" max="24" step="1" value="12"><output></output></div>
+            <div class="row"><label>細節</label><input id="detail" type="range" min="40" max="160" step="1" value="100"><output></output></div>
+            <div class="row"><label>色調</label><input id="color" type="range" min="0" max="6.28" step="0.01" value="0.8"><output></output></div>
+        </div>
+
+        <div class="param-group">
+            <div class="group-label">動畫控制</div>
+            <div class="row-auto">
+                <div class="toggle-wrap">
+                    <span style="font-size:0.85em;opacity:0.5;">⟳</span>
+                    <div class="switch active" id="autoToggle" role="button" tabindex="0" aria-label="自動旋轉開關">
+                        <div class="knob"></div>
+                    </div>
+                    <span style="font-size:0.85em;">自動旋轉</span>
+                </div>
+                <input id="rotateSpeed" type="range" min="0.02" max="1.0" step="0.01" value="0.25">
+                <output id="speedOut">0.25</output>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="primary" id="resetBtn">↺ 重置視角</button>
+            <button class="danger" id="pauseBtn">⏸ 暫停</button>
+        </div>
+
+        <div class="hint">
+            <span class="key">↔ 拖曳</span> 旋轉 &nbsp;·&nbsp; <span class="key">雙指捏合</span> 縮放 &nbsp;·&nbsp; <span class="key">滾輪</span> 縮放 &nbsp;·&nbsp; <span class="key">⚙</span> 開關面板
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  WebGL2 曼德球 (Mandelbulb) 渲染核心
+        // ================================================================
+
+        const canvas = document.getElementById('gl');
+        const gl = canvas.getContext('webgl2', { antialias: false, alpha: false });
+        if (!gl) {
+            document.body.innerHTML = '<div style="padding:30px;color:#fcfbfa;font-family:system-ui;">需要支援 WebGL 2 的瀏覽器。</div>';
+            throw new Error('WebGL2 unavailable');
+        }
+
+        // ---- Shader (Mandelbulb DE) ----
+        const vs = `#version 300 es
+        in vec2 a_pos;
+        void main(){ gl_Position=vec4(a_pos,0.0,1.0); }
+        `;
+
+        const fs = `#version 300 es
+        precision highp float;
+        out vec4 outColor;
+        uniform vec2 u_res;
+        uniform float u_time;
+        uniform vec3 u_c;          // 現在只使用 xyz
+        uniform float u_power;
+        uniform int u_iters;
+        uniform float u_detail;
+        uniform float u_yaw;
+        uniform float u_pitch;
+        uniform float u_zoom;
+        uniform float u_colorShift;
+
+        // ---- Mandelbulb 距離估計 ----
+        float mandelbulbDE(vec3 p, out float trap, out float escaped) {
+            vec3 z = p;
+            float dr = 1.0;
+            float r = 0.0;
+            trap = 10.0;
+            escaped = 0.0;
+            float n = u_power;
+            for (int i = 0; i < 32; i++) {
+                if (i >= u_iters) break;
+                r = length(z);
+                trap = min(trap, min(min(abs(z.x), abs(z.y)), abs(z.z)));
+                if (r > 8.0) { escaped = float(i); break; }
+
+                // 球坐標變換
+                float theta = atan(z.y, z.x);
+                float phi = acos(z.z / r);
+                float rn = pow(r, n);
+                dr = n * pow(r, n - 1.0) * dr + 1.0;
+
+                z = vec3(rn * sin(phi * n) * cos(theta * n),
+                         rn * sin(phi * n) * sin(theta * n),
+                         rn * cos(phi * n));
+                z += u_c;
+            }
+            r = length(z);
+            float d = 0.5 * log(max(r, 1.000001)) * r / dr;
+            return max(d, 0.00008);
+        }
+
+        float mapScene(vec3 p, out float trap, out float esc) {
+            return mandelbulbDE(p, trap, esc);
+        }
+
+        // ---- 法線 ----
+        vec3 getNormal(vec3 p) {
+            float e = 0.00035;
+            float a,b,c,d;
+            float dx = mapScene(p+vec3(e,0,0), a,b) - mapScene(p-vec3(e,0,0), c,d);
+            float dy = mapScene(p+vec3(0,e,0), a,b) - mapScene(p-vec3(0,e,0), c,d);
+            float dz = mapScene(p+vec3(0,0,e), a,b) - mapScene(p-vec3(0,0,e), c,d);
+            return normalize(vec3(dx,dy,dz));
+        }
+
+        mat2 rot(float a){ float c=cos(a), s=sin(a); return mat2(c,-s,s,c); }
+
+        // ---- 調色盤 (同前) ----
+        vec3 palette(float t) {
+            vec3 a = vec3(.5,.5,.5);
+            vec3 b = vec3(.5,.5,.5);
+            vec3 c = vec3(1.,1.,1.);
+            vec3 d = vec3(0.00,.33,.67);
+            return a + b*cos(6.28318*(c*t+d));
+        }
+
+        void main() {
+            vec2 uv = (gl_FragCoord.xy - 0.5 * u_res) / u_res.y;
+            vec3 ro = vec3(0.0, 0.0, 3.4 / u_zoom);
+            vec3 rd = normalize(vec3(uv, -1.65));
+
+            ro.yz = rot(u_pitch) * ro.yz;
+            ro.xz = rot(u_yaw) * ro.xz;
+            rd.yz = rot(u_pitch) * rd.yz;
+            rd.xz = rot(u_yaw) * rd.xz;
+
+            float t = 0.0, trap = 0.0, esc = 0.0;
+            bool hit = false;
+            vec3 hp = vec3(0);
+            float htrap = 0.0, hesc = 0.0;
+
+            int maxSteps = int(80.0 + u_detail * 1.4);
+            for (int i = 0; i < 320; i++) {
+                if (i >= maxSteps) break;
+                vec3 p = ro + rd * t;
+                float tr, ex;
+                float d = mapScene(p, tr, ex);
+                if (d < 0.0007) {
+                    hit = true; hp = p; htrap = tr; hesc = ex; break;
+                }
+                t += d * 0.72;
+                if (t > 7.0) break;
+            }
+
+            vec3 col = vec3(0);
+            if (hit) {
+                vec3 n = getNormal(hp);
+                vec3 l = normalize(vec3(-0.5, 0.8, 1.0));
+                float diff = max(dot(n, l), 0.0);
+                float rim = pow(1.0 - max(dot(n, -rd), 0.0), 2.5);
+                float ao = clamp(1.0 - 0.12 * length(hp), 0.35, 1.0);
+
+                float v = fract(htrap * 8.0 + hesc * 0.055 + u_colorShift + u_time * 0.012);
+                vec3 base = palette(v);
+                col = base * (0.22 + 0.88 * diff) * ao;
+                col += vec3(1.0, .65, .9) * 0.45 * rim;
+                col += 0.08 * palette(v + 0.17);
+            }
+
+            col = pow(max(col, 0.0), vec3(0.88));
+            float vign = 1.0 - 0.22 * dot(uv, uv);
+            col *= vign;
+            outColor = vec4(col, 1.0);
+        }
+        `;
+
+        function compile(type, src) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, src);
+            gl.compileShader(s);
+            if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+                const log = gl.getShaderInfoLog(s);
+                gl.deleteShader(s);
+                throw new Error(log);
+            }
+            return s;
+        }
+
+        const prog = gl.createProgram();
+        gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
+        gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, fs));
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+            throw new Error(gl.getProgramInfoLog(prog));
+        }
+        gl.useProgram(prog);
+
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(prog, 'a_pos');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+        // Uniform 位置 (u_c 改為 vec3)
+        const U = {};
+        ['u_res', 'u_time', 'u_c', 'u_power', 'u_iters', 'u_detail',
+            'u_yaw', 'u_pitch', 'u_zoom', 'u_colorShift'
+        ].forEach(n => U[n] = gl.getUniformLocation(prog, n));
+
+        // ---- DOM 參考 (移除 cw) ----
+        const ids = ['cx', 'cy', 'cz', 'power', 'iters', 'detail', 'color'];
+        const el = {};
+        ids.forEach(id => el[id] = document.getElementById(id));
+
+        function syncLabels() {
+            ids.forEach(id => {
+                const out = el[id].nextElementSibling;
+                if (out) out.value = el[id].value;
+            });
+        }
+        ids.forEach(id => el[id].addEventListener('input', syncLabels));
+        syncLabels();
+
+        // ---- 狀態 ----
+        let yaw = 0.45,
+            pitch = -0.15,
+            zoom = 0.9;
+        let autoRotate = true;
+        let rotateSpeed = 0.25;
+        let animPaused = false;
+        const pointers = {};
+
+        // ---- 面板控制 ----
+        const panel = document.getElementById('panel');
+        const toggleBtn = document.getElementById('togglePanel');
+        const closeBtn = document.getElementById('closePanel');
+        const badge = document.getElementById('panelBadge');
+        let panelOpen = false;
+
+        function openPanel() {
+            panelOpen = true;
+            panel.classList.add('open');
+            badge.classList.add('hidden');
+            toggleBtn.style.borderColor = 'rgba(189,139,42,0.6)';
+        }
+
+        function closePanel() {
+            panelOpen = false;
+            panel.classList.remove('open');
+            badge.classList.remove('hidden');
+            toggleBtn.style.borderColor = 'rgba(189,139,42,0.3)';
+        }
+
+        function togglePanel() { panelOpen ? closePanel() : openPanel(); }
+        toggleBtn.addEventListener('click', togglePanel);
+        closeBtn.addEventListener('click', closePanel);
+
+        // ---- 全螢幕 ----
+        const fsBtn = document.getElementById('fullscreenBtn');
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen?.() || document.documentElement.webkitRequestFullscreen?.();
+            } else {
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+            }
+        });
+        document.addEventListener('fullscreenchange', updateFSIcon);
+        document.addEventListener('webkitfullscreenchange', updateFSIcon);
+
+        function updateFSIcon() {
+            const isFS = !!(document.fullscreenElement || document.webkitFullscreenElement);
+            fsBtn.innerHTML = '<span style="filter:drop-shadow(0 2px 8px rgba(0,0,0,0.3));">⛶</span>';
+        }
+
+        // ---- 自動旋轉開關 ----
+        const autoToggle = document.getElementById('autoToggle');
+        const speedSlider = document.getElementById('rotateSpeed');
+        const speedOut = document.getElementById('speedOut');
+
+        autoToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            autoRotate = !autoRotate;
+            this.classList.toggle('active', autoRotate);
+            if (autoRotate && animPaused) {
+                animPaused = false;
+                document.getElementById('pauseBtn').textContent = '⏸ 暫停';
+            }
+        });
+        autoToggle.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                autoToggle.click();
+            }
+        });
+
+        speedSlider.addEventListener('input', function() {
+            rotateSpeed = parseFloat(this.value);
+            speedOut.value = rotateSpeed.toFixed(2);
+        });
+
+        // ---- 暫停 ----
+        const pauseBtn = document.getElementById('pauseBtn');
+        pauseBtn.addEventListener('click', function() {
+            animPaused = !animPaused;
+            this.textContent = animPaused ? '▶ 繼續' : '⏸ 暫停';
+        });
+
+        // ---- 重置視角與參數 ----
+        document.getElementById('resetBtn').addEventListener('click', function() {
+            yaw = 0.45;
+            pitch = -0.15;
+            zoom = 0.9;
+            el.cx.value = '0.50';
+            el.cy.value = '0.50';
+            el.cz.value = '0.50';
+            el.power.value = '2';
+            el.iters.value = '12';
+            el.detail.value = '100';
+            el.color.value = '0.8';
+            syncLabels();
+            autoRotate = true;
+            autoToggle.classList.add('active');
+            animPaused = false;
+            pauseBtn.textContent = '⏸ 暫停';
+            closePanel();
+        });
+
+        // ---- 多指交互 (旋轉+縮放) ----
+        canvas.addEventListener('pointerdown', (e) => {
+            pointers[e.pointerId] = { x: e.clientX, y: e.clientY };
+            canvas.setPointerCapture(e.pointerId);
+        });
+
+        canvas.addEventListener('pointermove', (e) => {
+            if (!pointers[e.pointerId]) return;
+            const p = pointers[e.pointerId];
+            const dx = e.clientX - p.x;
+            const dy = e.clientY - p.y;
+
+            const ids2 = Object.keys(pointers);
+            if (ids2.length === 1) {
+                yaw += dx * 0.006;
+                pitch += dy * 0.006;
+                pitch = Math.max(-1.45, Math.min(1.45, pitch));
+                p.x = e.clientX;
+                p.y = e.clientY;
+            } else if (ids2.length === 2) {
+                const p1 = pointers[ids2[0]];
+                const p2 = pointers[ids2[1]];
+                const distOld = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+                p.x = e.clientX;
+                p.y = e.clientY;
+                const p1b = pointers[ids2[0]];
+                const p2b = pointers[ids2[1]];
+                const distNew = Math.hypot(p1b.x - p2b.x, p1b.y - p2b.y);
+                if (distOld > 0.1) {
+                    const scale = distNew / distOld;
+                    zoom *= Math.max(0.5, Math.min(2.0, scale));
+                    zoom = Math.max(0.35, Math.min(2.8, zoom));
+                }
+            }
+        });
+
+        canvas.addEventListener('pointerup', (e) => { delete pointers[e.pointerId]; });
+        canvas.addEventListener('pointercancel', (e) => { delete pointers[e.pointerId]; });
+
+        // ---- 滾輪縮放 ----
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoom *= Math.exp(-e.deltaY * 0.001);
+            zoom = Math.max(0.35, Math.min(2.8, zoom));
+        }, { passive: false });
+
+        // ---- Resize ----
+        function resize() {
+            const dpr = Math.min(devicePixelRatio || 1, 1.5);
+            const w = Math.floor(innerWidth * dpr);
+            const h = Math.floor(innerHeight * dpr);
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+                gl.viewport(0, 0, w, h);
+            }
+        }
+
+        // ---- 渲染循環 ----
+        let startTime = performance.now();
+        let frames = 0,
+            lastFpsTime = performance.now();
+        let lastFrameTime = 0;
+
+        function render(now) {
+            resize();
+
+            const dt = lastFrameTime ? Math.min((now - lastFrameTime) / 1000, 0.05) : 0.016;
+            lastFrameTime = now;
+
+            if (!animPaused && autoRotate) {
+                yaw += dt * rotateSpeed * 0.6;
+            }
+
+            const time = animPaused ? 0 : (now - startTime) * 0.001;
+
+            // 取得 c 的三個分量
+            const c = [
+                parseFloat(el.cx.value),
+                parseFloat(el.cy.value),
+                parseFloat(el.cz.value)
+            ];
+
+            gl.uniform2f(U.u_res, canvas.width, canvas.height);
+            gl.uniform1f(U.u_time, time);
+            gl.uniform3f(U.u_c, c[0], c[1], c[2]);  // 使用 vec3
+            gl.uniform1f(U.u_power, parseFloat(el.power.value));
+            gl.uniform1i(U.u_iters, parseInt(el.iters.value, 10));
+            gl.uniform1f(U.u_detail, parseFloat(el.detail.value));
+            gl.uniform1f(U.u_yaw, yaw);
+            gl.uniform1f(U.u_pitch, pitch);
+            gl.uniform1f(U.u_zoom, zoom);
+            gl.uniform1f(U.u_colorShift, parseFloat(el.color.value));
+
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+            frames++;
+            if (now - lastFpsTime > 700) {
+                const fps = Math.round(frames * 1000 / (now - lastFpsTime));
+                document.getElementById('fps').textContent = fps + ' fps';
+                frames = 0;
+                lastFpsTime = now;
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        requestAnimationFrame(() => { requestAnimationFrame(render); });
+
+        window.addEventListener('resize', resize);
+        closePanel(); // 初始關閉面板
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && panelOpen) closePanel();
+        });
+
+        // 雙擊重置視角
+        let lastTap = 0;
+        canvas.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            yaw = 0.45;
+            pitch = -0.15;
+            zoom = 0.9;
+        });
+        canvas.addEventListener('touchstart', (e) => {
+            const now = Date.now();
+            if (now - lastTap < 400 && e.touches.length === 1) {
+                e.preventDefault();
+                yaw = 0.45;
+                pitch = -0.15;
+                zoom = 0.9;
+                lastTap = 0;
+            } else {
+                lastTap = now;
+            }
+        }, { passive: false });
+
+        console.log('✦ 曼德球 (Mandelbulb) 已啟動 ✦');
+    </script>
+</body>
+</html>

@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>曼德博盒子 · Mandelbox</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Inter:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#121315;      /* 墨玄 */
+    --cinnabar:#942525; /* 硃砂紅 */
+    --gold:#bd8b2a;      /* 耀日金 */
+    --jade:#fcfbfa;      /* 玉盤白 */
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--ink); color:var(--jade);
+    font-family:'Inter','Noto Serif TC',serif;
+    overflow:hidden;
+    touch-action:none;
+  }
+  canvas{
+    position:fixed; inset:0; width:100%; height:100%; display:block;
+  }
+
+  h1{
+    font-family:'Noto Serif TC','Cormorant Garamond',serif;
+    font-weight:700; letter-spacing:.12em;
+    font-size:clamp(20px,4.5vw,28px);
+    margin:0 0 4px 0; color:var(--jade);
+  }
+  .sub{
+    font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:var(--gold); font-size:clamp(13px,3vw,16px); letter-spacing:.08em;
+    margin:0 0 14px 0;
+  }
+
+  #toggleBtn{
+    position:fixed; top:18px; right:18px; z-index:20;
+    width:52px; height:52px; border-radius:50%;
+    background:rgba(18,19,21,0.85); border:1px solid var(--gold);
+    color:var(--gold); font-size:24px; line-height:1;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; backdrop-filter:blur(6px);
+  }
+
+  #panel{
+    position:fixed; top:0; left:0; height:100%; z-index:15;
+    width:min(340px,86vw);
+    background:linear-gradient(180deg, rgba(18,19,21,0.97), rgba(18,19,21,0.93));
+    border-right:1px solid rgba(189,139,42,0.35);
+    padding:22px 20px 30px 20px;
+    overflow-y:auto;
+    transform:translateX(0);
+    transition:transform .28s ease;
+  }
+  #panel.hidden{ transform:translateX(-105%); }
+
+  .group{
+    margin-bottom:20px; padding-bottom:16px;
+    border-bottom:1px solid rgba(252,251,250,0.10);
+  }
+  .group:last-child{ border-bottom:none; }
+
+  label{
+    display:flex; justify-content:space-between; align-items:baseline;
+    font-size:16px; font-weight:600; margin-bottom:8px;
+    color:var(--jade);
+  }
+  label .val{
+    font-family:'Cormorant Garamond',serif; color:var(--gold);
+    font-size:15px; min-width:44px; text-align:right;
+  }
+
+  input[type=range]{
+    width:100%; height:34px; -webkit-appearance:none; appearance:none;
+    background:transparent; margin:2px 0 0 0;
+  }
+  input[type=range]::-webkit-slider-runnable-track{
+    height:6px; border-radius:3px;
+    background:linear-gradient(90deg, var(--cinnabar), var(--gold));
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:26px; height:26px; border-radius:50%;
+    background:var(--jade); border:3px solid var(--gold);
+    margin-top:-10px; cursor:pointer;
+  }
+  input[type=range]::-moz-range-track{
+    height:6px; border-radius:3px;
+    background:linear-gradient(90deg, var(--cinnabar), var(--gold));
+  }
+  input[type=range]::-moz-range-thumb{
+    width:26px; height:26px; border-radius:50%;
+    background:var(--jade); border:3px solid var(--gold); cursor:pointer;
+  }
+
+  .row2{ display:flex; gap:10px; }
+  .swatch{
+    flex:1; height:44px; border-radius:10px; border:2px solid rgba(252,251,250,0.25);
+    cursor:pointer; padding:0; -webkit-appearance:none; appearance:none; background:none;
+  }
+  input[type=color]{ flex:1; min-width:0; width:100%; height:44px; border-radius:10px; border:2px solid rgba(252,251,250,0.25); background:none; cursor:pointer; }
+
+  input[type=text]{
+    width:100%; padding:12px 14px; font-size:15px;
+    font-family:'Inter',sans-serif; color:var(--jade);
+    background:rgba(252,251,250,0.06); border:1px solid rgba(252,251,250,0.25);
+    border-radius:10px; margin-bottom:10px;
+  }
+  input[type=text]::placeholder{ color:rgba(252,251,250,0.4); }
+
+  #presetList{ margin-top:10px; display:flex; flex-direction:column; gap:8px; }
+  .preset-item{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(252,251,250,0.05); border:1px solid rgba(252,251,250,0.15);
+    border-radius:10px; padding:8px 10px;
+  }
+  .preset-item .pname{
+    flex:1; font-size:15px; font-family:'Noto Serif TC',serif;
+    color:var(--jade); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .preset-item button{
+    border:none; background:none; cursor:pointer;
+    width:38px; height:38px; border-radius:8px;
+    font-size:16px; display:flex; align-items:center; justify-content:center;
+  }
+  .preset-item .loadBtn{ color:var(--gold); background:rgba(189,139,42,0.15); }
+  .preset-item .delBtn{ color:var(--cinnabar); background:rgba(148,37,37,0.15); }
+  .empty-note{ font-size:13px; color:rgba(252,251,250,0.4); font-family:'Noto Serif TC',serif; padding:4px 2px; }
+
+  button.action{
+    width:100%; padding:14px; font-size:16px; font-weight:600;
+    font-family:'Noto Serif TC',serif; letter-spacing:.06em;
+    border-radius:12px; border:1px solid var(--gold);
+    background:rgba(189,139,42,0.12); color:var(--gold);
+    cursor:pointer; margin-top:6px;
+  }
+  button.action:active{ background:rgba(189,139,42,0.28); }
+  button.action.alt{ border-color:var(--cinnabar); color:var(--jade); background:rgba(148,37,37,0.18); }
+
+  .hint{
+    font-size:13px; line-height:1.6; color:rgba(252,251,250,0.6);
+    font-family:'Noto Serif TC',serif;
+  }
+
+  #hud{
+    position:fixed; bottom:14px; left:50%; transform:translateX(-50%);
+    z-index:10; font-family:'Cormorant Garamond',serif; font-style:italic;
+    color:rgba(252,251,250,0.55); font-size:13px; letter-spacing:.05em;
+    pointer-events:none; text-align:center;
+  }
+
+  @media (max-width:480px){
+    #panel{ width:88vw; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="glcanvas"></canvas>
+
+<button id="toggleBtn" aria-label="開關控制面板">☰</button>
+
+<div id="panel">
+  <h1>曼德博盒子</h1>
+  <p class="sub">Mandelbox · Distance Estimator Renderer</p>
+
+  <div class="group">
+    <label>縮放係數 Scale <span class="val" id="v-scale">-1.50</span></label>
+    <input type="range" id="scale" min="-3" max="3" step="0.01" value="-1.5">
+    <label>最小半徑 Min Radius <span class="val" id="v-minr">0.50</span></label>
+    <input type="range" id="minr" min="0.1" max="1.2" step="0.01" value="0.5">
+    <label>固定半徑 Fixed Radius <span class="val" id="v-fixr">1.00</span></label>
+    <input type="range" id="fixr" min="0.5" max="2.5" step="0.01" value="1.0">
+    <label>迭代次數 Iterations <span class="val" id="v-iter">12</span></label>
+    <input type="range" id="iter" min="1" max="16" step="1" value="12">
+  </div>
+
+  <div class="group">
+    <label>光暈強度 Glow <span class="val" id="v-glow">0.60</span></label>
+    <input type="range" id="glow" min="0" max="1.5" step="0.01" value="0.6">
+    <label>視野 FOV <span class="val" id="v-fov">1.35</span></label>
+    <input type="range" id="fov" min="0.7" max="2.2" step="0.01" value="1.35">
+  </div>
+
+  <div class="group">
+    <label style="margin-bottom:10px;">主體漸層 · 近 → 中 → 遠</label>
+    <div class="row2">
+      <input type="color" id="colorA" value="#942525">
+      <input type="color" id="colorB" value="#bd8b2a">
+      <input type="color" id="colorC" value="#fcfbfa">
+    </div>
+    <label style="margin:14px 0 8px 0;">漸層分佈 Gradient Spread <span class="val" id="v-spread">1.00</span></label>
+    <input type="range" id="spread" min="0.3" max="2.5" step="0.01" value="1.0">
+
+    <label style="margin:14px 0 8px 0;">高光色 Specular</label>
+    <div class="row2">
+      <input type="color" id="colorSpec" value="#fcfbfa">
+    </div>
+    <label style="margin:14px 0 8px 0;">光暈色 Glow</label>
+    <div class="row2">
+      <input type="color" id="colorGlow" value="#bd8b2a">
+    </div>
+    <label style="margin:14px 0 8px 0;">背景色 · 天 / 地</label>
+    <div class="row2">
+      <input type="color" id="bgSky" value="#0d0e10">
+      <input type="color" id="bgGround" value="#030304">
+    </div>
+  </div>
+
+  <div class="group">
+    <label>自動旋轉 Auto Rotate <span class="val" id="v-rot">開</span></label>
+    <input type="range" id="rotspeed" min="0" max="1" step="0.01" value="0.15">
+    <button class="action" id="resetBtn">重置視角 Reset Camera</button>
+    <button class="action alt" id="presetBtn">經典參數 Classic Preset</button>
+  </div>
+
+  <div class="group">
+    <label style="margin-bottom:10px;">設定管理 Presets</label>
+    <div class="row2">
+      <input type="text" id="presetName" placeholder="設定名稱…" maxlength="24">
+    </div>
+    <button class="action" id="savePresetBtn">儲存目前設定 Save</button>
+    <div id="presetList"></div>
+
+    <div class="row2" style="margin-top:14px;">
+      <button class="action alt" id="exportBtn">匯出 Export</button>
+      <button class="action alt" id="importBtn">匯入 Import</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none;">
+  </div>
+
+  <p class="hint">拖曳畫面旋轉視角，捲動或雙指縮放。可分別調整主體三色漸層、漸層分佈、高光色、光暈色、以及天／地背景色，共七組獨立色彩。可將目前設定儲存為具名項目、隨時載入或刪除，也能將所有設定匯出成檔案，或從檔案匯入。此渲染器依序執行：相機 → 射線 → 光線步進 → 距離估計 → 曼德博盒子迭代（方形折疊 → 球形折疊 → 縮放）→ 距離 → 光照。</p>
+</div>
+
+<div id="hud">拖曳旋轉 · 捲動縮放</div>
+
+<script>
+(function(){
+  const canvas = document.getElementById('glcanvas');
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) {
+    document.body.innerHTML = '<div style="padding:40px;color:#fcfbfa;font-family:sans-serif;">此裝置不支援 WebGL，無法顯示渲染畫面。</div>';
+    return;
+  }
+
+  // ---------------- Vertex Shader : fullscreen quad ----------------
+  const vsSource = `
+    attribute vec2 aPos;
+    void main(){ gl_Position = vec4(aPos, 0.0, 1.0); }
+  `;
+
+  // ---------------- Fragment Shader : full pipeline ----------------
+  const fsSource = `
+    precision highp float;
+
+    uniform vec2  uResolution;
+    uniform vec3  uCamPos;
+    uniform vec3  uCamTarget;
+    uniform float uFov;
+    uniform float uScale;
+    uniform float uMinRadius2;
+    uniform float uFixedRadius2;
+    uniform int   uIterations;
+    uniform vec3  uColorA;
+    uniform vec3  uColorB;
+    uniform vec3  uColorC;
+    uniform float uSpread;
+    uniform vec3  uColorSpec;
+    uniform vec3  uColorGlow;
+    uniform vec3  uBgSky;
+    uniform vec3  uBgGround;
+    uniform float uGlow;
+
+    #define MAX_STEPS 110
+    #define MAX_ITER 16
+    #define EPS 0.0007
+    #define MAX_DIST 60.0
+
+    /* ---------- Mandelbox Iteration : Box Fold ---------- */
+    void boxFold(inout vec3 z){
+      z = clamp(z, -1.0, 1.0) * 2.0 - z;
+    }
+
+    /* ---------- Mandelbox Iteration : Sphere Fold ---------- */
+    void sphereFold(inout vec3 z, inout float dr){
+      float r2 = dot(z, z);
+      if (r2 < uMinRadius2){
+        float t = uFixedRadius2 / uMinRadius2;
+        z *= t; dr *= t;
+      } else if (r2 < uFixedRadius2){
+        float t = uFixedRadius2 / r2;
+        z *= t; dr *= t;
+      }
+    }
+
+    /* ---------- Distance Estimator (drives Box Fold -> Sphere Fold -> Scale) ---------- */
+    float mandelboxDE(vec3 pos){
+      vec3 z = pos;
+      float dr = 1.0;
+      for (int i = 0; i < MAX_ITER; i++){
+        if (i >= uIterations) break;
+        boxFold(z);
+        sphereFold(z, dr);
+        /* ---- Scale ---- */
+        z = z * uScale + pos;
+        dr = dr * abs(uScale) + 1.0;
+      }
+      /* ---- Distance ---- */
+      return length(z) / abs(dr);
+    }
+
+    /* ---------- Ray Marching ---------- */
+    float rayMarch(vec3 ro, vec3 rd, out int stepsOut){
+      float t = 0.0;
+      stepsOut = MAX_STEPS;
+      for (int i = 0; i < MAX_STEPS; i++){
+        vec3 p = ro + rd * t;
+        float d = mandelboxDE(p);
+        if (d < EPS * max(1.0, t * 0.5)){ stepsOut = i; return t; }
+        t += d * 0.85;
+        if (t > MAX_DIST){ stepsOut = i; break; }
+      }
+      return -1.0;
+    }
+
+    vec3 calcNormal(vec3 p){
+      vec2 e = vec2(0.0015, 0.0);
+      return normalize(vec3(
+        mandelboxDE(p + e.xyy) - mandelboxDE(p - e.xyy),
+        mandelboxDE(p + e.yxy) - mandelboxDE(p - e.yxy),
+        mandelboxDE(p + e.yyx) - mandelboxDE(p - e.yyx)
+      ));
+    }
+
+    /* ---------- Camera ---------- */
+    mat3 buildCamera(vec3 ro, vec3 target){
+      vec3 fwd = normalize(target - ro);
+      vec3 right = normalize(cross(fwd, vec3(0.0, 1.0, 0.0)));
+      vec3 up = normalize(cross(right, fwd));
+      return mat3(right, up, fwd);
+    }
+
+    /* ---------- Lighting ---------- */
+    vec3 gradient3(float f){
+      float h = clamp(f, 0.0, 1.0);
+      return h < 0.5 ? mix(uColorA, uColorB, h * 2.0) : mix(uColorB, uColorC, (h - 0.5) * 2.0);
+    }
+
+    vec3 lighting(vec3 p, vec3 n, vec3 rd, int steps){
+      vec3 lightDir = normalize(vec3(0.5, 0.8, -0.4));
+      float diff = max(dot(n, lightDir), 0.0);
+      float ao = 1.0 - float(steps) / float(MAX_STEPS);
+      vec3 ref = reflect(rd, n);
+      float spec = pow(max(dot(ref, lightDir), 0.0), 28.0);
+      float mixF = clamp(length(p) * 0.22 * uSpread, 0.0, 1.0);
+      vec3 base = gradient3(mixF);
+      vec3 col = base * (diff * 0.75 + 0.22) * (0.35 + 0.65 * ao);
+      col += uColorSpec * spec * 0.6;
+      col += uColorGlow * uGlow * (1.0 - ao) * 0.7;
+      return col;
+    }
+
+    void main(){
+      /* ---------- Camera + Ray ---------- */
+      vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
+      mat3 cam = buildCamera(uCamPos, uCamTarget);
+      vec3 rd = cam * normalize(vec3(uv, uFov));
+      vec3 ro = uCamPos;
+
+      int steps;
+      float t = rayMarch(ro, rd, steps);
+
+      vec3 col;
+      if (t > 0.0){
+        vec3 p = ro + rd * t;
+        vec3 n = calcNormal(p);
+        col = lighting(p, n, rd, steps);
+      } else {
+        float g = 0.5 + 0.5 * rd.y;
+        vec3 bg = mix(uBgGround, uBgSky, g);
+        bg += uColorGlow * 0.015 * (float(steps) / float(MAX_STEPS));
+        col = bg;
+      }
+      col = pow(clamp(col, 0.0, 1.0), vec3(0.4545));
+      gl_FragColor = vec4(col, 1.0);
+    }
+  `;
+
+  function compile(type, src){
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src);
+    gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)){
+      console.error(gl.getShaderInfoLog(s));
+      throw new Error('Shader compile failed');
+    }
+    return s;
+  }
+
+  const vs = compile(gl.VERTEX_SHADER, vsSource);
+  const fs = compile(gl.FRAGMENT_SHADER, fsSource);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.error(gl.getProgramInfoLog(prog));
+    throw new Error('Program link failed');
+  }
+  gl.useProgram(prog);
+
+  const quad = new Float32Array([-1,-1, 1,-1, -1,1, 1,-1, 1,1, -1,1]);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, quad, gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'aPos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const U = {};
+  ['uResolution','uCamPos','uCamTarget','uFov','uScale','uMinRadius2','uFixedRadius2','uIterations',
+   'uColorA','uColorB','uColorC','uSpread','uColorSpec','uColorGlow','uBgSky','uBgGround','uGlow']
+    .forEach(name => U[name] = gl.getUniformLocation(prog, name));
+
+  // ---------------- Orbit Camera state ----------------
+  let yaw = 0.7, pitch = 0.35, dist = 4.2;
+  const target = [0,0,0];
+
+  function camPos(){
+    const cp = Math.cos(pitch), sp = Math.sin(pitch);
+    const cy = Math.cos(yaw), sy = Math.sin(yaw);
+    return [
+      target[0] + dist * cp * sy,
+      target[1] + dist * sp,
+      target[2] + dist * cp * cy
+    ];
+  }
+
+  // ---------------- Pointer / touch controls ----------------
+  let dragging = false, lastX = 0, lastY = 0;
+  let pinchDist0 = null, distAtPinch = 0;
+
+  function pointerDown(x, y){ dragging = true; lastX = x; lastY = y; }
+  function pointerMove(x, y){
+    if (!dragging) return;
+    const dx = x - lastX, dy = y - lastY;
+    yaw -= dx * 0.005;
+    pitch = Math.max(-1.4, Math.min(1.4, pitch - dy * 0.005));
+    lastX = x; lastY = y;
+  }
+  function pointerUp(){ dragging = false; }
+
+  canvas.addEventListener('mousedown', e => pointerDown(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => pointerMove(e.clientX, e.clientY));
+  window.addEventListener('mouseup', pointerUp);
+
+  canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1){
+      pointerDown(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2){
+      dragging = false;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchDist0 = Math.hypot(dx, dy);
+      distAtPinch = dist;
+    }
+  }, {passive:true});
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 1){
+      pointerMove(e.touches[0].clientX, e.touches[0].clientY);
+    } else if (e.touches.length === 2 && pinchDist0){
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const d = Math.hypot(dx, dy);
+      dist = Math.max(1.2, Math.min(14, distAtPinch * (pinchDist0 / d)));
+    }
+  }, {passive:false});
+  canvas.addEventListener('touchend', () => { dragging = false; pinchDist0 = null; });
+
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    dist = Math.max(1.2, Math.min(14, dist * (1 + e.deltaY * 0.001)));
+  }, {passive:false});
+
+  // ---------------- UI bindings ----------------
+  const params = {
+    scale: -1.5, minr: 0.5, fixr: 1.0, iter: 12,
+    glow: 0.6, fov: 1.35, rotspeed: 0.15, spread: 1.0,
+    colorA: [0.580, 0.145, 0.145],
+    colorB: [0.741, 0.545, 0.165],
+    colorC: [0.988, 0.984, 0.980],
+    colorSpec: [0.988, 0.984, 0.980],
+    colorGlow: [0.741, 0.545, 0.165],
+    bgSky: [0.051, 0.055, 0.063],
+    bgGround: [0.012, 0.012, 0.016]
+  };
+
+  function hexToRgb01(hex){
+    const v = hex.replace('#','');
+    return [
+      parseInt(v.substr(0,2),16)/255,
+      parseInt(v.substr(2,2),16)/255,
+      parseInt(v.substr(4,2),16)/255
+    ];
+  }
+
+  function bindSlider(id, key, valId, fmt, onChange){
+    const el = document.getElementById(id);
+    const valEl = document.getElementById(valId);
+    el.addEventListener('input', () => {
+      const v = parseFloat(el.value);
+      params[key] = v;
+      valEl.textContent = fmt(v);
+      if (onChange) onChange(v);
+    });
+  }
+
+  bindSlider('scale','scale','v-scale', v => v.toFixed(2));
+  bindSlider('minr','minr','v-minr', v => v.toFixed(2));
+  bindSlider('fixr','fixr','v-fixr', v => v.toFixed(2));
+  bindSlider('iter','iter','v-iter', v => Math.round(v).toString());
+  bindSlider('glow','glow','v-glow', v => v.toFixed(2));
+  bindSlider('fov','fov','v-fov', v => v.toFixed(2));
+  bindSlider('rotspeed','rotspeed','v-rot', v => v > 0 ? '開 ' + v.toFixed(2) : '關');
+  bindSlider('spread','spread','v-spread', v => v.toFixed(2));
+
+  [
+    ['colorA','colorA'], ['colorB','colorB'], ['colorC','colorC'],
+    ['colorSpec','colorSpec'], ['colorGlow','colorGlow'],
+    ['bgSky','bgSky'], ['bgGround','bgGround']
+  ].forEach(([id, key]) => {
+    document.getElementById(id).addEventListener('input', e => {
+      params[key] = hexToRgb01(e.target.value);
+    });
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    yaw = 0.7; pitch = 0.35; dist = 4.2;
+  });
+
+  // ---------------- Settings snapshot / apply ----------------
+  const CONTROL_IDS = ['scale','minr','fixr','iter','glow','fov','rotspeed','spread',
+                        'colorA','colorB','colorC','colorSpec','colorGlow','bgSky','bgGround'];
+
+  function getCurrentSettings(){
+    const data = {};
+    CONTROL_IDS.forEach(id => { data[id] = document.getElementById(id).value; });
+    return data;
+  }
+
+  function applySettings(data){
+    Object.keys(data).forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = data[id];
+      el.dispatchEvent(new Event('input'));
+    });
+  }
+
+  document.getElementById('presetBtn').addEventListener('click', () => {
+    applySettings({ scale: -1.5, minr: 0.5, fixr: 1.0, iter: 12 });
+  });
+
+  // ---------------- Preset storage (localStorage) ----------------
+  const STORAGE_KEY = 'mandelbox_presets_v1';
+
+  function loadPresetsFromStorage(){
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+    catch(e){ return []; }
+  }
+  function savePresetsToStorage(list){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)); }
+    catch(e){ console.warn('無法儲存設定至本機儲存空間', e); }
+  }
+
+  function renderPresetList(){
+    const list = loadPresetsFromStorage();
+    const container = document.getElementById('presetList');
+    container.innerHTML = '';
+    if (list.length === 0){
+      container.innerHTML = '<div class="empty-note">尚無已儲存的設定</div>';
+      return;
+    }
+    list.forEach((preset, idx) => {
+      const row = document.createElement('div');
+      row.className = 'preset-item';
+
+      const name = document.createElement('div');
+      name.className = 'pname';
+      name.textContent = preset.name;
+
+      const loadBtn = document.createElement('button');
+      loadBtn.className = 'loadBtn';
+      loadBtn.textContent = '載入';
+      loadBtn.setAttribute('aria-label', '載入設定：' + preset.name);
+      loadBtn.addEventListener('click', () => applySettings(preset.data));
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delBtn';
+      delBtn.textContent = '✕';
+      delBtn.setAttribute('aria-label', '刪除設定：' + preset.name);
+      delBtn.addEventListener('click', () => {
+        const cur = loadPresetsFromStorage();
+        cur.splice(idx, 1);
+        savePresetsToStorage(cur);
+        renderPresetList();
+      });
+
+      row.appendChild(name);
+      row.appendChild(loadBtn);
+      row.appendChild(delBtn);
+      container.appendChild(row);
+    });
+  }
+
+  document.getElementById('savePresetBtn').addEventListener('click', () => {
+    const nameInput = document.getElementById('presetName');
+    const name = nameInput.value.trim() || ('設定 ' + new Date().toLocaleString('zh-TW'));
+    const list = loadPresetsFromStorage();
+    list.push({ name, data: getCurrentSettings() });
+    savePresetsToStorage(list);
+    nameInput.value = '';
+    renderPresetList();
+  });
+
+  document.getElementById('exportBtn').addEventListener('click', () => {
+    const payload = {
+      type: 'mandelbox-settings',
+      version: 1,
+      current: getCurrentSettings(),
+      presets: loadPresetsFromStorage()
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'mandelbox-settings.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const payload = JSON.parse(reader.result);
+        if (payload.presets && Array.isArray(payload.presets)){
+          const existing = loadPresetsFromStorage();
+          savePresetsToStorage(existing.concat(payload.presets));
+          renderPresetList();
+        }
+        if (payload.current){
+          applySettings(payload.current);
+        }
+      } catch(err){
+        alert('匯入失敗，檔案格式不正確。');
+      }
+      e.target.value = '';
+    };
+    reader.readAsText(file);
+  });
+
+  renderPresetList();
+
+  const toggleBtn = document.getElementById('toggleBtn');
+  const panel = document.getElementById('panel');
+  toggleBtn.addEventListener('click', () => panel.classList.toggle('hidden'));
+
+  // ---------------- Resize ----------------
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = window.innerWidth * dpr;
+    canvas.height = window.innerHeight * dpr;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // ---------------- Render loop ----------------
+  function frame(){
+    if (params.rotspeed > 0 && !dragging) yaw += params.rotspeed * 0.01;
+
+    const cp = camPos();
+    gl.uniform2f(U.uResolution, canvas.width, canvas.height);
+    gl.uniform3f(U.uCamPos, cp[0], cp[1], cp[2]);
+    gl.uniform3f(U.uCamTarget, target[0], target[1], target[2]);
+    gl.uniform1f(U.uFov, params.fov);
+    gl.uniform1f(U.uScale, params.scale);
+    gl.uniform1f(U.uMinRadius2, params.minr * params.minr);
+    gl.uniform1f(U.uFixedRadius2, params.fixr * params.fixr);
+    gl.uniform1i(U.uIterations, Math.round(params.iter));
+    gl.uniform3f(U.uColorA, params.colorA[0], params.colorA[1], params.colorA[2]);
+    gl.uniform3f(U.uColorB, params.colorB[0], params.colorB[1], params.colorB[2]);
+    gl.uniform3f(U.uColorC, params.colorC[0], params.colorC[1], params.colorC[2]);
+    gl.uniform1f(U.uSpread, params.spread);
+    gl.uniform3f(U.uColorSpec, params.colorSpec[0], params.colorSpec[1], params.colorSpec[2]);
+    gl.uniform3f(U.uColorGlow, params.colorGlow[0], params.colorGlow[1], params.colorGlow[2]);
+    gl.uniform3f(U.uBgSky, params.bgSky[0], params.bgSky[1], params.bgSky[2]);
+    gl.uniform3f(U.uBgGround, params.bgGround[0], params.bgGround[1], params.bgGround[2]);
+    gl.uniform1f(U.uGlow, params.glow);
+
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
