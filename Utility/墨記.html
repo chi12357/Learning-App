@@ -1,0 +1,2604 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>私密日記</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600;700&family=Inter:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+    <style>
+        /* ===== 全域重置與設計系統 ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --color-bg: #121315;
+            --color-primary: #942525;
+            --color-accent: #bd8b2a;
+            --color-text: #fcfbfa;
+            --color-text-muted: rgba(252, 251, 250, 0.6);
+            --color-card-bg: rgba(252, 251, 250, 0.05);
+            --color-border: rgba(252, 251, 250, 0.10);
+            --font-cn: 'Noto Serif TC', 'Times New Roman', serif;
+            --font-en: 'Inter', 'Helvetica Neue', sans-serif;
+            --font-display: 'Cormorant Garamond', 'Georgia', serif;
+            --font-body: var(--font-cn);
+            --radius: 16px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --font-base: 18px;
+            --transition: 0.25s ease;
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+        }
+
+        html {
+            font-size: var(--font-base);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 0 0 calc(72px + var(--safe-bottom)) 0;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== 滾動條 ===== */
+        ::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--color-accent);
+            border-radius: 8px;
+        }
+
+        /* ===== 通用元件 ===== */
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            padding: 16px 16px 0;
+            flex: 1;
+            width: 100%;
+        }
+
+        .card {
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius);
+            padding: 20px 18px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            box-shadow: var(--shadow);
+            transition: opacity var(--transition), transform var(--transition);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-body);
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--color-primary);
+            color: var(--color-text);
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+            min-height: 52px;
+            min-width: 52px;
+            letter-spacing: 0.02em;
+            box-shadow: 0 2px 8px rgba(148, 37, 37, 0.3);
+        }
+
+        .btn:active {
+            transform: scale(0.96);
+            opacity: 0.8;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            box-shadow: none;
+        }
+
+        .btn-secondary:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-accent {
+            background: var(--color-accent);
+            box-shadow: 0 2px 8px rgba(189, 139, 42, 0.3);
+        }
+
+        .btn-danger {
+            background: #6b1a1a;
+            box-shadow: 0 2px 8px rgba(107, 26, 26, 0.3);
+        }
+
+        .btn-sm {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            min-height: 40px;
+            min-width: 40px;
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        input,
+        textarea,
+        select {
+            font-family: var(--font-body);
+            font-size: 1rem;
+            background: rgba(252, 251, 250, 0.06);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            color: var(--color-text);
+            padding: 14px 16px;
+            width: 100%;
+            transition: border var(--transition);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: var(--color-accent);
+            background: rgba(252, 251, 250, 0.08);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 400px;
+            line-height: 1.8;
+            font-size: 1.25rem;
+        }
+
+        ::placeholder {
+            color: var(--color-text-muted);
+            opacity: 0.6;
+        }
+
+        /* ===== 密碼鎖屏 ===== */
+        #lockScreen {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: var(--color-bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #lockScreen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 12px;
+            color: var(--color-accent);
+        }
+
+        .lock-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-text);
+            letter-spacing: 0.04em;
+            margin-bottom: 8px;
+        }
+
+        .lock-sub {
+            color: var(--color-text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .lock-input-wrap {
+            width: 100%;
+            max-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .lock-input-wrap input {
+            text-align: center;
+            font-size: 1.2rem;
+            padding: 18px;
+            letter-spacing: 0.2em;
+        }
+
+        .lock-error {
+            color: #e05050;
+            font-size: 0.85rem;
+            min-height: 24px;
+            text-align: center;
+            margin-top: -8px;
+        }
+
+        .lock-hint {
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            text-align: center;
+            margin-top: 16px;
+            opacity: 0.5;
+        }
+
+        /* ===== 頂部導航 ===== */
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 4px 12px;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .app-header .title {
+            font-family: var(--font-display);
+            font-size: 1.35rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            color: var(--color-text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .app-header .title .accent {
+            color: var(--color-accent);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .header-actions .btn {
+            min-height: 40px;
+            min-width: 40px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            border-radius: 10px;
+        }
+
+        /* ===== 底部導航 ===== */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(18, 19, 21, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 8px 8px calc(8px + var(--safe-bottom));
+            z-index: 1000;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 12px;
+            border: none;
+            background: transparent;
+            color: var(--color-text-muted);
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: color var(--transition);
+            touch-action: manipulation;
+            min-width: 52px;
+            border-radius: 8px;
+        }
+
+        .nav-item .nav-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .nav-item.active {
+            color: var(--color-accent);
+        }
+
+        .nav-item:active {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== 頁面容器 ===== */
+        .page {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-title {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title .sub {
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--color-text-muted);
+            font-family: var(--font-body);
+        }
+
+        /* ===== 日曆 ===== */
+        .calendar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 8px;
+        }
+
+        .calendar-header .month-label {
+            font-family: var(--font-display);
+            font-size: 1.4rem;
+            font-weight: 600;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .calendar-header .btn {
+            min-height: 44px;
+            min-width: 44px;
+            padding: 0 14px;
+            font-size: 1.2rem;
+            border-radius: 10px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            text-align: center;
+        }
+
+        .calendar-grid .weekday {
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            padding: 6px 0;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+        }
+
+        .calendar-grid .day {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: transparent;
+            border: none;
+            color: var(--color-text);
+            font-family: var(--font-body);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+            position: relative;
+            min-height: 44px;
+            padding: 2px;
+        }
+
+        .calendar-grid .day:active {
+            transform: scale(0.92);
+        }
+
+        .calendar-grid .day.other-month {
+            color: var(--color-text-muted);
+            opacity: 0.3;
+        }
+
+        .calendar-grid .day.today {
+            border: 1.5px solid var(--color-accent);
+            color: var(--color-accent);
+        }
+
+        .calendar-grid .day.has-entry::after {
+            content: '';
+            position: absolute;
+            bottom: 6px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-accent);
+        }
+
+        .calendar-grid .day.has-entry.today::after {
+            background: var(--color-accent);
+        }
+
+        .calendar-grid .day.selected {
+            background: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .calendar-grid .day.selected::after {
+            background: var(--color-text);
+        }
+
+        .calendar-grid .day .day-mood {
+            font-size: 0.65rem;
+            margin-top: 1px;
+            line-height: 1;
+        }
+
+        /* 今日摘要 */
+        .today-summary {
+            margin-top: 20px;
+            padding: 14px 18px;
+            background: var(--color-card-bg);
+            border-radius: var(--radius);
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .today-summary .info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+        }
+
+        .today-summary .info .mood-display {
+            font-size: 2.2rem;
+            line-height: 1;
+        }
+
+        .today-summary .info .date-label {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+        }
+
+        .today-summary .btn {
+            min-height: 40px;
+            padding: 8px 18px;
+            font-size: 0.85rem;
+        }
+
+        /* ===== 編輯頁面 ===== */
+        .edit-mood-selector {
+            display: flex;
+            gap: 6px;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: nowrap;
+        }
+
+        .edit-mood-selector .mood-btn {
+            flex: 1;
+            padding: 8px 0;
+            border-radius: 30px;
+            border: 1.5px solid var(--color-border);
+            background: transparent;
+            color: var(--color-text);
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+            min-height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-body);
+            line-height: 1;
+        }
+
+        .edit-mood-selector .mood-btn:active {
+            transform: scale(0.94);
+        }
+
+        .edit-mood-selector .mood-btn.selected {
+            border-color: var(--color-accent);
+            background: rgba(189, 139, 42, 0.15);
+            box-shadow: 0 0 0 2px rgba(189, 139, 42, 0.2);
+        }
+
+        .edit-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 16px;
+            align-items: center;
+        }
+
+        .edit-tags .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px 6px 16px;
+            border-radius: 30px;
+            background: rgba(189, 139, 42, 0.15);
+            border: 1px solid rgba(189, 139, 42, 0.2);
+            font-size: 0.85rem;
+            color: var(--color-text);
+        }
+
+        .edit-tags .tag .remove-tag {
+            cursor: pointer;
+            opacity: 0.5;
+            font-size: 1rem;
+            padding: 0 2px;
+            transition: opacity var(--transition);
+            background: none;
+            border: none;
+            color: var(--color-text);
+        }
+
+        .edit-tags .tag .remove-tag:active {
+            opacity: 1;
+        }
+
+        .edit-tags .tag-input-wrap {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+            min-width: 120px;
+        }
+
+        .edit-tags .tag-input-wrap input {
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            min-height: 40px;
+            border-radius: 30px;
+            flex: 1;
+        }
+
+        .edit-tags .tag-input-wrap .btn {
+            min-height: 40px;
+            min-width: 40px;
+            padding: 0 16px;
+            font-size: 0.85rem;
+            border-radius: 30px;
+        }
+
+        /* 按鈕列：三鍵同排，僅圖示 */
+        .edit-actions .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .edit-actions .row .btn {
+            flex: 1;
+            min-height: 52px;
+            font-size: 1.6rem;    /* 圖示放大 */
+            padding: 0 8px;
+            border-radius: 12px;
+            box-shadow: none;
+        }
+
+        .edit-actions .row .btn-secondary {
+            border: 1px solid var(--color-border);
+        }
+
+        .edit-actions .row .btn-danger {
+            background: #6b1a1a;
+            box-shadow: 0 2px 8px rgba(107, 26, 26, 0.3);
+        }
+
+        .edit-actions .row .btn-danger.hidden {
+            display: none;
+        }
+
+        /* ===== 搜尋 ===== */
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            min-height: 48px;
+        }
+
+        .search-bar .btn {
+            min-height: 48px;
+            padding: 0 20px;
+        }
+
+        .search-results {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .search-results .result-item {
+            padding: 14px 18px;
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+        }
+
+        .search-results .result-item:active {
+            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .search-results .result-item .result-date {
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+
+        .search-results .result-item .result-preview {
+            margin-top: 4px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .search-results .result-item .result-mood {
+            font-size: 1.4rem;
+            margin-right: 6px;
+        }
+
+        .search-empty {
+            text-align: center;
+            padding: 40px 0;
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* ===== 統計 ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid .stat-card {
+            background: var(--color-card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            border: 1px solid var(--color-border);
+            text-align: center;
+        }
+
+        .stats-grid .stat-card .stat-number {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--color-accent);
+        }
+
+        .stats-grid .stat-card .stat-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 2px;
+        }
+
+        .mood-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 12px 0 20px;
+        }
+
+        .mood-chart .mood-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mood-chart .mood-row .mood-label {
+            font-size: 0.9rem;
+            min-width: 70px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .mood-chart .mood-row .mood-bar-bg {
+            flex: 1;
+            height: 24px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mood-chart .mood-row .mood-bar {
+            height: 100%;
+            border-radius: 12px;
+            background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+            transition: width 0.6s ease;
+            width: 0%;
+        }
+
+        .mood-chart .mood-row .mood-count {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            min-width: 32px;
+            text-align: right;
+        }
+
+        .stats-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0 16px;
+        }
+
+        .stats-tags .tag-pill {
+            padding: 6px 16px;
+            border-radius: 30px;
+            background: rgba(189, 139, 42, 0.12);
+            border: 1px solid rgba(189, 139, 42, 0.15);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+        }
+
+        .stats-tags .tag-pill:active {
+            transform: scale(0.94);
+        }
+
+        .stats-tags .tag-pill.active {
+            background: rgba(189, 139, 42, 0.25);
+            border-color: var(--color-accent);
+        }
+
+        /* 月份回顧列表 */
+        .month-review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .month-review-list .review-item {
+            padding: 12px 16px;
+            background: var(--color-card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+            touch-action: manipulation;
+        }
+
+        .month-review-list .review-item:active {
+            transform: scale(0.98);
+        }
+
+        .month-review-list .review-item .r-date {
+            font-size: 0.75rem;
+            color: var(--color-accent);
+            font-weight: 600;
+            min-width: 70px;
+        }
+
+        .month-review-list .review-item .r-mood {
+            font-size: 1.8rem;
+            line-height: 1;
+        }
+
+        .month-review-list .review-item .r-preview {
+            flex: 1;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .month-review-list .review-item .r-tags {
+            display: flex;
+            gap: 4px;
+            font-size: 0.65rem;
+            color: var(--color-text-muted);
+        }
+
+        /* ===== 設定 ===== */
+        .settings-group {
+            margin-bottom: 24px;
+        }
+
+        .settings-group .group-title {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .settings-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--color-border);
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .settings-row:last-child {
+            border-bottom: none;
+        }
+
+        .settings-row .label {
+            font-size: 0.95rem;
+        }
+
+        .settings-row .control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .settings-row input[type="range"] {
+            width: 140px;
+            padding: 0;
+            background: transparent;
+            border: none;
+            accent-color: var(--color-accent);
+            min-height: 32px;
+        }
+
+        .settings-row .font-size-label {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .settings-row .btn {
+            min-height: 40px;
+            padding: 8px 20px;
+            font-size: 0.85rem;
+        }
+
+        .settings-row select {
+            padding: 8px 16px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            font-size: 0.9rem;
+            min-width: 140px;
+            cursor: pointer;
+        }
+
+        /* ===== PWA 更新提示 ===== */
+        #updateBanner {
+            position: fixed;
+            bottom: calc(72px + var(--safe-bottom) + 12px);
+            left: 16px;
+            right: 16px;
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--color-primary);
+            color: var(--color-text);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            z-index: 9998;
+            animation: slideUp 0.4s ease;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        #updateBanner.show {
+            display: flex;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #updateBanner .update-text {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        #updateBanner .btn {
+            min-height: 36px;
+            padding: 6px 18px;
+            font-size: 0.8rem;
+            background: var(--color-text);
+            color: var(--color-bg);
+            box-shadow: none;
+        }
+
+        /* ===== Toast ===== */
+        #toast {
+            position: fixed;
+            bottom: calc(80px + var(--safe-bottom));
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(18, 19, 21, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--color-text);
+            padding: 12px 24px;
+            border-radius: 30px;
+            border: 1px solid var(--color-border);
+            font-size: 0.9rem;
+            z-index: 9997;
+            opacity: 0;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        #toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== 響應式 ===== */
+        @media (max-width: 400px) {
+            :root {
+                --font-base: 16px;
+            }
+            .app-container {
+                padding: 12px 12px 0;
+            }
+            .card {
+                padding: 16px 14px;
+            }
+            .calendar-grid .day {
+                font-size: 0.85rem;
+                min-height: 36px;
+            }
+            .edit-mood-selector .mood-btn {
+                font-size: 1.8rem;
+                min-height: 48px;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .settings-row input[type="range"] {
+                width: 100px;
+            }
+            .edit-actions .row .btn {
+                font-size: 1.4rem;
+                min-height: 44px;
+            }
+        }
+
+        @media (min-width: 600px) {
+            body {
+                padding: 20px 0 calc(72px + var(--safe-bottom)) 0;
+                background: #0e0f12;
+            }
+            .app-container {
+                background: var(--color-bg);
+                border-radius: 24px;
+                padding: 24px 24px 12px;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+                border: 1px solid var(--color-border);
+                margin-top: 12px;
+            }
+            .bottom-nav {
+                border-radius: 20px 20px 0 0;
+                max-width: 480px;
+                left: 50%;
+                transform: translateX(-50%);
+                border-left: 1px solid var(--color-border);
+                border-right: 1px solid var(--color-border);
+            }
+            #updateBanner {
+                left: 50%;
+                transform: translateX(-50%);
+                max-width: 480px;
+                bottom: calc(72px + var(--safe-bottom) + 16px);
+            }
+        }
+
+        /* ===== 工具類 ===== */
+        .mt-8 { margin-top: 8px; }
+        .mt-12 { margin-top: 12px; }
+        .mt-16 { margin-top: 16px; }
+        .mt-20 { margin-top: 20px; }
+        .mb-8 { margin-bottom: 8px; }
+        .mb-12 { margin-bottom: 12px; }
+        .gap-8 { gap: 8px; }
+        .flex-center { display: flex; align-items: center; justify-content: center; }
+        .text-muted { color: var(--color-text-muted); }
+        .text-center { text-align: center; }
+        .w-full { width: 100%; }
+        .hidden { display: none !important; }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- ===== 密碼鎖屏 ===== -->
+    <div id="lockScreen">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">私密日記</div>
+        <div class="lock-sub">請輸入密碼解鎖</div>
+        <div class="lock-input-wrap">
+            <input type="password" id="lockPassword" placeholder="輸入密碼" autocomplete="off" />
+            <button class="btn btn-block" id="unlockBtn">解鎖</button>
+            <div class="lock-error" id="lockError"></div>
+            <div class="lock-hint">管理員密碼：Mp1@</div>
+        </div>
+    </div>
+
+    <!-- ===== 主應用 ===== -->
+    <div id="app" style="display:none;">
+        <div class="app-container">
+            <!-- 頂部 -->
+            <header class="app-header">
+                <div class="title">
+                    <span>📖</span>
+                    <span>私密<span class="accent">日記</span></span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary btn-sm" id="headerLockBtn" title="鎖屏">🔒</button>
+                </div>
+            </header>
+
+            <!-- ===== 日曆頁 ===== -->
+            <div class="page active" id="pageCalendar">
+                <div class="card">
+                    <div class="calendar-header">
+                        <button class="btn btn-secondary btn-sm" id="calPrev">◀</button>
+                        <span class="month-label" id="calMonthLabel">2026年 8月</span>
+                        <button class="btn btn-secondary btn-sm" id="calNext">▶</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- 由 JS 生成 -->
+                    </div>
+                    <div class="today-summary" id="todaySummary">
+                        <div class="info">
+                            <span class="mood-display" id="todayMood">😐</span>
+                            <div>
+                                <div id="todayDateLabel">今天</div>
+                                <div class="date-label" id="todayDateDetail">2026年8月31日</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-sm btn-accent" id="todayEditBtn">✏️ 編輯</button>
+                    </div>
+                </div>
+                <div style="text-align:center;margin-top:12px;font-size:0.75rem;color:var(--color-text-muted);opacity:0.4;">
+                    <span id="entryCount">共 0 篇日記</span>
+                </div>
+            </div>
+
+            <!-- ===== 編輯頁 ===== -->
+            <div class="page" id="pageEdit">
+                <div class="card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:6px;">
+                        <span style="font-family:var(--font-display);font-size:1.2rem;font-weight:600;" id="editDateLabel">2026年8月31日</span>
+                    </div>
+
+                    <!-- 心情選擇器 -->
+                    <div class="edit-mood-selector" id="moodSelector">
+                        <button class="mood-btn" data-mood="😄">😄</button>
+                        <button class="mood-btn" data-mood="😊">😊</button>
+                        <button class="mood-btn" data-mood="😐">😐</button>
+                        <button class="mood-btn" data-mood="😢">😢</button>
+                        <button class="mood-btn" data-mood="😡">😡</button>
+                    </div>
+
+                    <!-- 標籤區域 -->
+                    <div class="edit-tags" id="editTagsContainer">
+                        <div class="tag-input-wrap">
+                            <input type="text" id="tagInput" placeholder="新增標籤" maxlength="20" />
+                            <button class="btn btn-sm btn-secondary" id="addTagBtn">+</button>
+                        </div>
+                    </div>
+
+                    <!-- 日記內容 -->
+                    <textarea id="editContent" placeholder="寫下今天的心情…"></textarea>
+
+                    <!-- 按鈕列：取消、儲存、刪除 同排，僅圖示 -->
+                    <div class="edit-actions" style="margin-top:20px;">
+                        <div class="row">
+                            <button class="btn btn-secondary" id="cancelEditBtn" title="取消">✕</button>
+                            <button class="btn btn-accent" id="saveEntryBtn" title="儲存">💾</button>
+                            <button class="btn btn-danger" id="deleteEntryBtn" title="刪除">🗑️</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 搜尋頁 ===== -->
+            <div class="page" id="pageSearch">
+                <div class="card">
+                    <div class="page-title">🔍 搜尋日記</div>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="輸入關鍵詞…" />
+                        <button class="btn" id="searchBtn">搜尋</button>
+                    </div>
+                    <div id="searchResults" class="search-results">
+                        <div class="search-empty">輸入關鍵詞開始搜尋</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 統計頁 ===== -->
+            <div class="page" id="pageStats">
+                <div class="card">
+                    <div class="page-title">
+                        📊 情緒統計
+                        <span class="sub" id="statsMonthLabel">2026年8月</span>
+                    </div>
+
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="statsTotal">0</div>
+                            <div class="stat-label">總篇數</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="statsMoodCount">0</div>
+                            <div class="stat-label">情緒種類</div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:0.85rem;font-weight:500;margin-bottom:4px;">情緒分佈</div>
+                    <div class="mood-chart" id="moodChart"></div>
+
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 4px;">
+                        <span style="font-size:0.85rem;font-weight:500;">標籤篩選</span>
+                        <div class="stats-tags" id="statsTagFilters">
+                            <!-- 由 JS 生成 -->
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 4px;">
+                        <span style="font-size:0.85rem;font-weight:500;">情緒篩選</span>
+                        <div class="stats-tags" id="statsMoodFilters">
+                            <button class="tag-pill active" data-filter-mood="all">全部</button>
+                            <button class="tag-pill" data-filter-mood="😄">😄</button>
+                            <button class="tag-pill" data-filter-mood="😊">😊</button>
+                            <button class="tag-pill" data-filter-mood="😐">😐</button>
+                            <button class="tag-pill" data-filter-mood="😢">😢</button>
+                            <button class="tag-pill" data-filter-mood="😡">😡</button>
+                        </div>
+                    </div>
+
+                    <div style="font-size:0.85rem;font-weight:500;margin-top:12px;">📅 月份回顧</div>
+                    <div class="month-review-list" id="monthReviewList">
+                        <div class="search-empty">本月尚無記錄</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== 設定頁 ===== -->
+            <div class="page" id="pageSettings">
+                <div class="card">
+                    <div class="page-title">⚙️ 設定</div>
+
+                    <div class="settings-group">
+                        <div class="group-title">顯示</div>
+                        <div class="settings-row">
+                            <span class="label">🔤 字體大小</span>
+                            <div class="control">
+                                <button class="btn btn-secondary btn-sm" id="fontDecBtn">A-</button>
+                                <input type="range" id="fontSizeRange" min="14" max="26" value="18" step="1" />
+                                <button class="btn btn-secondary btn-sm" id="fontIncBtn">A+</button>
+                                <span class="font-size-label" id="fontSizeLabel">18</span>
+                            </div>
+                        </div>
+                        <div class="settings-row">
+                            <span class="label">🔤 字體風格</span>
+                            <select id="fontFamilySelect">
+                                <option value="'Noto Serif TC', 'Times New Roman', serif">思源宋體</option>
+                                <option value="'Inter', 'Helvetica Neue', sans-serif">Inter</option>
+                                <option value="'Cormorant Garamond', 'Georgia', serif">Cormorant Garamond</option>
+                                <option value="system-ui, -apple-system, sans-serif">系統字型</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="group-title">安全</div>
+                        <div class="settings-row">
+                            <span class="label">🔑 修改密碼</span>
+                            <button class="btn btn-secondary btn-sm" id="changePwdBtn">變更</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <div class="group-title">資料</div>
+                        <div class="settings-row">
+                            <span class="label">📤 匯出 JSON</span>
+                            <button class="btn btn-secondary btn-sm" id="exportBtn">匯出</button>
+                        </div>
+                        <div class="settings-row">
+                            <span class="label">📥 匯入 JSON</span>
+                            <button class="btn btn-secondary btn-sm" id="importBtn">匯入</button>
+                            <input type="file" id="importFileInput" accept=".json" style="display:none;" />
+                        </div>
+                        <div class="settings-row" style="border-bottom:none;padding-bottom:4px;">
+                            <span class="label" style="font-size:0.75rem;color:var(--color-text-muted);">資料已使用 AES-GCM 加密儲存</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-group" style="margin-bottom:0;">
+                        <div class="group-title">關於</div>
+                        <div style="font-size:0.8rem;color:var(--color-text-muted);">私密日記 v1.0 · 用心記錄每一天</div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ===== 底部導航 ===== -->
+        <nav class="bottom-nav" id="bottomNav">
+            <button class="nav-item active" data-page="pageCalendar">
+                <span class="nav-icon">📅</span>
+                <span>日記</span>
+            </button>
+            <button class="nav-item" data-page="pageSearch">
+                <span class="nav-icon">🔍</span>
+                <span>搜尋</span>
+            </button>
+            <button class="nav-item" data-page="pageStats">
+                <span class="nav-icon">📊</span>
+                <span>統計</span>
+            </button>
+            <button class="nav-item" data-page="pageSettings">
+                <span class="nav-icon">⚙️</span>
+                <span>設定</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ===== PWA 更新提示 ===== -->
+    <div id="updateBanner">
+        <span class="update-text">🔄 有新版本可用，請更新</span>
+        <button class="btn" id="updateBtn">更新</button>
+    </div>
+
+    <!-- ===== Toast ===== -->
+    <div id="toast"></div>
+
+    <!-- ============================================================ -->
+    <!-- ===== JavaScript ===== -->
+    <script>
+        (function() {
+            'use strict';
+
+            // =============================================================
+            //  工具函數
+            // =============================================================
+            const $ = (sel, ctx = document) => ctx.querySelector(sel);
+            const $$ = (sel, ctx = document) => [...ctx.querySelectorAll(sel)];
+
+            function formatDate(d) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}-${m}-${day}`;
+            }
+
+            function formatDateDisplay(d) {
+                const y = d.getFullYear();
+                const m = d.getMonth() + 1;
+                const day = d.getDate();
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                return `${y}年${m}月${day}日 星期${weekdays[d.getDay()]}`;
+            }
+
+            function formatDateShort(d) {
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${y}/${m}/${day}`;
+            }
+
+            function getToday() {
+                const now = new Date();
+                return formatDate(now);
+            }
+
+            function getTodayObj() {
+                return new Date();
+            }
+
+            function parseDate(str) {
+                const parts = str.split('-');
+                return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+
+            function safeJSON(str) {
+                try { return JSON.parse(str); } catch { return null; }
+            }
+
+            function debounce(fn, ms = 300) {
+                let timer;
+                return function(...args) {
+                    clearTimeout(timer);
+                    timer = setTimeout(() => fn.apply(this, args), ms);
+                };
+            }
+
+            let toastTimer = null;
+
+            function showToast(msg, duration = 2200) {
+                const el = $('#toast');
+                if (!el) return;
+                el.textContent = msg;
+                el.classList.add('show');
+                clearTimeout(toastTimer);
+                toastTimer = setTimeout(() => el.classList.remove('show'), duration);
+            }
+
+            // =============================================================
+            //  Web Crypto 加密
+            // =============================================================
+            const SALT_LEN = 32;
+            const IV_LEN = 16;
+            const ITERATIONS = 100000;
+            const KEY_LEN = 256;
+
+            async function deriveKey(password, salt) {
+                const enc = new TextEncoder();
+                const keyMaterial = await crypto.subtle.importKey(
+                    'raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveKey']
+                );
+                return crypto.subtle.deriveKey({
+                        name: 'PBKDF2',
+                        salt: salt,
+                        iterations: ITERATIONS,
+                        hash: 'SHA-256'
+                    },
+                    keyMaterial, { name: 'AES-GCM', length: KEY_LEN },
+                    false, ['encrypt', 'decrypt']
+                );
+            }
+
+            async function encryptData(data, password) {
+                const enc = new TextEncoder();
+                const salt = crypto.getRandomValues(new Uint8Array(SALT_LEN));
+                const iv = crypto.getRandomValues(new Uint8Array(IV_LEN));
+                const key = await deriveKey(password, salt);
+                const plaintext = enc.encode(JSON.stringify(data));
+                const ciphertext = await crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv },
+                    key, plaintext
+                );
+                const combined = new Uint8Array(salt.length + iv.length + ciphertext.byteLength);
+                combined.set(salt, 0);
+                combined.set(iv, salt.length);
+                combined.set(new Uint8Array(ciphertext), salt.length + iv.length);
+                return btoa(String.fromCharCode(...combined));
+            }
+
+            async function decryptData(encryptedB64, password) {
+                try {
+                    const combined = Uint8Array.from(atob(encryptedB64), c => c.charCodeAt(0));
+                    const salt = combined.slice(0, SALT_LEN);
+                    const iv = combined.slice(SALT_LEN, SALT_LEN + IV_LEN);
+                    const ciphertext = combined.slice(SALT_LEN + IV_LEN);
+                    const key = await deriveKey(password, salt);
+                    const plaintext = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv },
+                        key, ciphertext
+                    );
+                    const dec = new TextDecoder();
+                    return JSON.parse(dec.decode(plaintext));
+                } catch (e) {
+                    return null;
+                }
+            }
+
+            // =============================================================
+            //  應用狀態
+            // =============================================================
+            const STATE_KEY = 'diary_app_state';
+            const SETTINGS_KEY = 'diary_app_settings';
+
+            let app = {
+                password: '',
+                entries: {},
+                settings: {
+                    fontSize: 18,
+                    fontFamily: "'Noto Serif TC', 'Times New Roman', serif",
+                },
+                currentView: 'calendar',
+                currentDate: getToday(),
+                currentMonth: new Date().getMonth(),
+                currentYear: new Date().getFullYear(),
+                selectedMood: null,
+                editTags: [],
+                statsFilterMood: 'all',
+                statsFilterTags: [],
+                isLocked: true,
+            };
+
+            // =============================================================
+            //  內容修改標記 & 離開檢查
+            // =============================================================
+            let isContentModified = false;
+            let skipPopstate = false;
+
+            // =============================================================
+            //  儲存 / 讀取
+            // =============================================================
+            async function saveState() {
+                try {
+                    const data = {
+                        entries: app.entries,
+                        settings: app.settings,
+                    };
+                    const encrypted = await encryptData(data, app.password);
+                    localStorage.setItem(STATE_KEY, encrypted);
+                    localStorage.setItem(SETTINGS_KEY, JSON.stringify(app.settings));
+                } catch (e) {
+                    console.error('儲存失敗:', e);
+                    showToast('儲存失敗，請重試');
+                }
+            }
+
+            async function loadState(password) {
+                try {
+                    const encrypted = localStorage.getItem(STATE_KEY);
+                    if (!encrypted) {
+                        app.entries = {};
+                        app.settings = { fontSize: 18, fontFamily: "'Noto Serif TC', 'Times New Roman', serif" };
+                        app.password = password;
+                        await saveState();
+                        return true;
+                    }
+                    const data = await decryptData(encrypted, password);
+                    if (data === null) {
+                        return false;
+                    }
+                    app.entries = data.entries || {};
+                    app.settings = data.settings || { fontSize: 18, fontFamily: "'Noto Serif TC', 'Times New Roman', serif" };
+                    app.password = password;
+                    const savedSettings = safeJSON(localStorage.getItem(SETTINGS_KEY));
+                    if (savedSettings) {
+                        app.settings = { ...app.settings, ...savedSettings };
+                    }
+                    return true;
+                } catch (e) {
+                    console.error('載入失敗:', e);
+                    return false;
+                }
+            }
+
+            function hasStoredData() {
+                return !!localStorage.getItem(STATE_KEY);
+            }
+
+            // =============================================================
+            //  認證
+            // =============================================================
+            const ADMIN_PWD = 'Mp1@';
+
+            async function authenticate(password) {
+                if (await loadState(password)) {
+                    return true;
+                }
+                if (password === ADMIN_PWD) {
+                    const encrypted = localStorage.getItem(STATE_KEY);
+                    if (encrypted) {
+                        const data = await decryptData(encrypted, ADMIN_PWD);
+                        if (data !== null) {
+                            app.entries = data.entries || {};
+                            app.settings = data.settings || { fontSize: 18, fontFamily: "'Noto Serif TC', 'Times New Roman', serif" };
+                            app.password = ADMIN_PWD;
+                            const savedSettings = safeJSON(localStorage.getItem(SETTINGS_KEY));
+                            if (savedSettings) {
+                                app.settings = { ...app.settings, ...savedSettings };
+                            }
+                            return true;
+                        }
+                    }
+                    if (!hasStoredData()) {
+                        app.entries = {};
+                        app.settings = { fontSize: 18, fontFamily: "'Noto Serif TC', 'Times New Roman', serif" };
+                        app.password = ADMIN_PWD;
+                        await saveState();
+                        return true;
+                    }
+                    return false;
+                }
+                return false;
+            }
+
+            // =============================================================
+            //  日記操作
+            // =============================================================
+            function getEntry(dateStr) {
+                return app.entries[dateStr] || null;
+            }
+
+            function saveEntry(dateStr, data) {
+                app.entries[dateStr] = {
+                    mood: data.mood || '😐',
+                    content: data.content || '',
+                    tags: data.tags || [],
+                    updatedAt: Date.now(),
+                };
+                saveState();
+                renderAll();
+                showToast('✅ 已儲存');
+            }
+
+            function deleteEntry(dateStr) {
+                if (app.entries[dateStr]) {
+                    delete app.entries[dateStr];
+                    saveState();
+                    renderAll();
+                    showToast('🗑️ 已刪除');
+                    return true;
+                }
+                return false;
+            }
+
+            function getEntriesForMonth(year, month) {
+                const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+                const result = {};
+                for (const key in app.entries) {
+                    if (key.startsWith(prefix)) {
+                        result[key] = app.entries[key];
+                    }
+                }
+                return result;
+            }
+
+            function searchEntries(keyword) {
+                const kw = keyword.trim().toLowerCase();
+                if (!kw) return [];
+                const results = [];
+                for (const [date, entry] of Object.entries(app.entries)) {
+                    const content = (entry.content || '').toLowerCase();
+                    const tags = (entry.tags || []).join(' ').toLowerCase();
+                    const mood = (entry.mood || '').toLowerCase();
+                    if (content.includes(kw) || tags.includes(kw) || mood.includes(kw)) {
+                        results.push({ date, ...entry });
+                    }
+                }
+                results.sort((a, b) => b.date.localeCompare(a.date));
+                return results;
+            }
+
+            function getMoodStats(entries) {
+                const counts = { '😄': 0, '😊': 0, '😐': 0, '😢': 0, '😡': 0 };
+                let total = 0;
+                for (const entry of Object.values(entries)) {
+                    const mood = entry.mood || '😐';
+                    if (counts.hasOwnProperty(mood)) counts[mood]++;
+                    total++;
+                }
+                return { counts, total };
+            }
+
+            function getTagStats(entries) {
+                const map = {};
+                for (const entry of Object.values(entries)) {
+                    for (const tag of (entry.tags || [])) {
+                        map[tag] = (map[tag] || 0) + 1;
+                    }
+                }
+                return map;
+            }
+
+            function getFilteredEntries(moodFilter, tagFilters) {
+                const all = Object.entries(app.entries);
+                return all.filter(([date, entry]) => {
+                    if (moodFilter !== 'all' && entry.mood !== moodFilter) return false;
+                    if (tagFilters && tagFilters.length > 0) {
+                        const entryTags = entry.tags || [];
+                        if (!tagFilters.some(t => entryTags.includes(t))) return false;
+                    }
+                    return true;
+                });
+            }
+
+            // =============================================================
+            //  渲染函數
+            // =============================================================
+            function renderCalendar() {
+                const grid = $('#calendarGrid');
+                if (!grid) return;
+                const year = app.currentYear;
+                const month = app.currentMonth;
+                const firstDay = new Date(year, month, 1).getDay();
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                const today = getToday();
+                const monthEntries = getEntriesForMonth(year, month);
+
+                const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+                let html = '';
+                for (const wd of weekdays) {
+                    html += `<div class="weekday">${wd}</div>`;
+                }
+
+                for (let i = 0; i < firstDay; i++) {
+                    html += `<div class="day other-month"></div>`;
+                }
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const isTodayDate = dateStr === today;
+                    const hasEntry = !!monthEntries[dateStr];
+                    const entry = monthEntries[dateStr];
+                    const moodEmoji = entry ? entry.mood || '' : '';
+                    const classes = ['day'];
+                    if (isTodayDate) classes.push('today');
+                    if (hasEntry) classes.push('has-entry');
+                    if (dateStr === app.currentDate) classes.push('selected');
+                    const moodHtml = moodEmoji ? `<span class="day-mood">${moodEmoji}</span>` : '';
+                    html += `<button class="${classes.join(' ')}" data-date="${dateStr}">${d}${moodHtml}</button>`;
+                }
+
+                grid.innerHTML = html;
+
+                const label = $('#calMonthLabel');
+                if (label) {
+                    label.textContent = `${year}年 ${month + 1}月`;
+                }
+
+                updateTodaySummary();
+
+                const countEl = $('#entryCount');
+                if (countEl) {
+                    const total = Object.keys(app.entries).length;
+                    countEl.textContent = `共 ${total} 篇日記`;
+                }
+
+                grid.querySelectorAll('.day:not(.other-month)').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const date = this.dataset.date;
+                        if (date) {
+                            app.currentDate = date;
+                            openEditPage(date);
+                        }
+                    });
+                });
+            }
+
+            function updateTodaySummary() {
+                const today = getToday();
+                const entry = getEntry(today);
+                const moodDisplay = $('#todayMood');
+                const dateLabel = $('#todayDateLabel');
+                const dateDetail = $('#todayDateDetail');
+                const editBtn = $('#todayEditBtn');
+
+                if (moodDisplay) {
+                    moodDisplay.textContent = entry ? entry.mood || '📝' : '📝';
+                }
+                if (dateLabel) {
+                    dateLabel.textContent = entry ? '今日記錄' : '今天尚未記錄';
+                }
+                if (dateDetail) {
+                    const d = getTodayObj();
+                    dateDetail.textContent = formatDateDisplay(d);
+                }
+                if (editBtn) {
+                    editBtn.textContent = entry ? '✏️ 編輯' : '✏️ 新增';
+                }
+            }
+
+            function renderEditPage(dateStr) {
+                const entry = getEntry(dateStr);
+                const dateLabel = $('#editDateLabel');
+                if (dateLabel) {
+                    const d = parseDate(dateStr);
+                    dateLabel.textContent = formatDateDisplay(d);
+                }
+
+                // 情緒
+                const moodBtns = $$('.mood-btn');
+                const selectedMood = entry ? entry.mood : (app.selectedMood || '😐');
+                moodBtns.forEach(btn => {
+                    const mood = btn.dataset.mood;
+                    btn.classList.toggle('selected', mood === selectedMood);
+                });
+                app.selectedMood = selectedMood;
+
+                // 內容
+                const contentEl = $('#editContent');
+                if (contentEl) {
+                    contentEl.value = entry ? entry.content || '' : '';
+                }
+
+                // 標籤
+                app.editTags = entry ? [...(entry.tags || [])] : [];
+                renderEditTags();
+
+                // 刪除按鈕顯示/隱藏
+                const deleteBtn = $('#deleteEntryBtn');
+                if (deleteBtn) {
+                    if (entry) {
+                        deleteBtn.classList.remove('hidden');
+                    } else {
+                        deleteBtn.classList.add('hidden');
+                    }
+                }
+
+                // 重置修改標記
+                isContentModified = false;
+                // 綁定 input 事件（若未綁定則綁定）
+                if (contentEl && !contentEl._listener) {
+                    contentEl.addEventListener('input', function() {
+                        isContentModified = true;
+                    });
+                    contentEl._listener = true;
+                }
+            }
+
+            function renderEditTags() {
+                const container = $('#editTagsContainer');
+                if (!container) return;
+                const inputWrap = container.querySelector('.tag-input-wrap');
+                let html = '';
+                for (const tag of app.editTags) {
+                    html += `<span class="tag">${tag} <button class="remove-tag" data-tag="${tag}">✕</button></span>`;
+                }
+                container.innerHTML = html + (inputWrap ? inputWrap.outerHTML : '');
+                container.querySelectorAll('.remove-tag').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const tag = this.dataset.tag;
+                        app.editTags = app.editTags.filter(t => t !== tag);
+                        isContentModified = true;
+                        renderEditTags();
+                    });
+                });
+                const newInput = container.querySelector('#tagInput');
+                const newBtn = container.querySelector('#addTagBtn');
+                if (newInput && newBtn) {
+                    newBtn.onclick = function() {
+                        const val = newInput.value.trim();
+                        if (val && !app.editTags.includes(val)) {
+                            app.editTags.push(val);
+                            isContentModified = true;
+                            renderEditTags();
+                            newInput.value = '';
+                        } else if (val && app.editTags.includes(val)) {
+                            showToast('標籤已存在');
+                        } else {
+                            showToast('請輸入標籤名稱');
+                        }
+                    };
+                    newInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            newBtn.click();
+                        }
+                    });
+                }
+            }
+
+            function renderSearchResults(results) {
+                const container = $('#searchResults');
+                if (!container) return;
+                if (!results || results.length === 0) {
+                    container.innerHTML = `<div class="search-empty">🔍 沒有找到相關日記</div>`;
+                    return;
+                }
+                let html = '';
+                for (const item of results) {
+                    const preview = (item.content || '').slice(0, 80) + (item.content && item.content.length > 80 ? '…' :
+                        '');
+                    const moodEmoji = item.mood || '📝';
+                    const dateDisplay = formatDateShort(parseDate(item.date));
+                    const tagStr = (item.tags || []).slice(0, 3).join(' · ');
+                    html += `
+                        <div class="result-item" data-date="${item.date}">
+                            <div class="result-date">${dateDisplay}</div>
+                            <div class="result-preview">
+                                <span class="result-mood">${moodEmoji}</span>
+                                ${preview || '(空白)'}
+                            </div>
+                            ${tagStr ? `<div style="font-size:0.7rem;color:var(--color-text-muted);margin-top:2px;">${tagStr}</div>` : ''}
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                container.querySelectorAll('.result-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const date = this.dataset.date;
+                        if (date) {
+                            app.currentDate = date;
+                            openEditPage(date);
+                        }
+                    });
+                });
+            }
+
+            function renderStats() {
+                const monthEntries = getEntriesForMonth(app.currentYear, app.currentMonth);
+                const total = Object.keys(monthEntries).length;
+
+                const totalEl = $('#statsTotal');
+                const moodCountEl = $('#statsMoodCount');
+                if (totalEl) totalEl.textContent = total;
+                if (moodCountEl) {
+                    const moods = new Set();
+                    for (const entry of Object.values(monthEntries)) {
+                        if (entry.mood) moods.add(entry.mood);
+                    }
+                    moodCountEl.textContent = moods.size;
+                }
+
+                const label = $('#statsMonthLabel');
+                if (label) {
+                    label.textContent = `${app.currentYear}年${app.currentMonth + 1}月`;
+                }
+
+                const stats = getMoodStats(monthEntries);
+                const chart = $('#moodChart');
+                if (chart) {
+                    const moodOrder = ['😄', '😊', '😐', '😢', '😡'];
+                    const moodLabels = { '😄': '開心', '😊': '平靜', '😐': '普通', '😢': '難過', '😡': '生氣' };
+                    let html = '';
+                    const maxCount = Math.max(1, ...moodOrder.map(m => stats.counts[m] || 0));
+                    for (const mood of moodOrder) {
+                        const count = stats.counts[mood] || 0;
+                        const pct = maxCount > 0 ? (count / maxCount) * 100 : 0;
+                        html += `
+                            <div class="mood-row">
+                                <span class="mood-label">${mood} ${moodLabels[mood]}</span>
+                                <div class="mood-bar-bg">
+                                    <div class="mood-bar" style="width:${pct}%;"></div>
+                                </div>
+                                <span class="mood-count">${count}</span>
+                            </div>
+                        `;
+                    }
+                    chart.innerHTML = html;
+                }
+
+                const tagStats = getTagStats(monthEntries);
+                const tagContainer = $('#statsTagFilters');
+                if (tagContainer) {
+                    const tags = Object.keys(tagStats).sort((a, b) => tagStats[b] - tagStats[a]);
+                    let html = '';
+                    for (const tag of tags) {
+                        const active = app.statsFilterTags.includes(tag) ? 'active' : '';
+                        html +=
+                            `<button class="tag-pill ${active}" data-tag="${tag}">#${tag} ${tagStats[tag]}</button>`;
+                    }
+                    tagContainer.innerHTML = html ||
+                        `<span style="font-size:0.8rem;color:var(--color-text-muted);">尚無標籤</span>`;
+                    tagContainer.querySelectorAll('.tag-pill').forEach(el => {
+                        el.addEventListener('click', function() {
+                            const tag = this.dataset.tag;
+                            const idx = app.statsFilterTags.indexOf(tag);
+                            if (idx > -1) {
+                                app.statsFilterTags.splice(idx, 1);
+                            } else {
+                                app.statsFilterTags.push(tag);
+                            }
+                            renderStats();
+                            renderMonthReview();
+                        });
+                    });
+                }
+
+                const moodFilters = $$('#statsMoodFilters .tag-pill');
+                moodFilters.forEach(el => {
+                    const mood = el.dataset.filterMood;
+                    el.classList.toggle('active', mood === app.statsFilterMood);
+                    el.addEventListener('click', function() {
+                        app.statsFilterMood = this.dataset.filterMood;
+                        renderStats();
+                        renderMonthReview();
+                    });
+                });
+
+                renderMonthReview();
+            }
+
+            function renderMonthReview() {
+                const container = $('#monthReviewList');
+                if (!container) return;
+                const entries = getFilteredEntries(app.statsFilterMood, app.statsFilterTags);
+                if (entries.length === 0) {
+                    container.innerHTML = `<div class="search-empty">📭 沒有符合的記錄</div>`;
+                    return;
+                }
+                entries.sort((a, b) => b[0].localeCompare(a[0]));
+                let html = '';
+                for (const [date, entry] of entries) {
+                    const preview = (entry.content || '').slice(0, 50) + (entry.content && entry.content.length > 50 ? '…' :
+                        '');
+                    const moodEmoji = entry.mood || '📝';
+                    const dateDisplay = formatDateShort(parseDate(date));
+                    const tagStr = (entry.tags || []).slice(0, 3).join(' · ');
+                    html += `
+                        <div class="review-item" data-date="${date}">
+                            <span class="r-date">${dateDisplay}</span>
+                            <span class="r-mood">${moodEmoji}</span>
+                            <span class="r-preview">${preview || '(空白)'}</span>
+                            ${tagStr ? `<span class="r-tags">${tagStr}</span>` : ''}
+                        </div>
+                    `;
+                }
+                container.innerHTML = html;
+                container.querySelectorAll('.review-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const date = this.dataset.date;
+                        if (date) {
+                            app.currentDate = date;
+                            openEditPage(date);
+                        }
+                    });
+                });
+            }
+
+            function renderAll() {
+                renderCalendar();
+                if (app.currentView === 'edit') {
+                    renderEditPage(app.currentDate);
+                }
+                if (app.currentView === 'stats') {
+                    renderStats();
+                }
+                if (app.currentView === 'search') {
+                    const input = $('#searchInput');
+                    if (input && input.value.trim()) {
+                        const results = searchEntries(input.value);
+                        renderSearchResults(results);
+                    }
+                }
+                applyFontSizeAndFamily();
+            }
+
+            // =============================================================
+            //  頁面導航
+            // =============================================================
+            function navigateTo(pageId) {
+                $$('.page').forEach(el => el.classList.remove('active'));
+                const target = $(`#${pageId}`);
+                if (target) target.classList.add('active');
+
+                $$('.nav-item').forEach(el => {
+                    el.classList.toggle('active', el.dataset.page === pageId);
+                });
+
+                app.currentView = pageId.replace('page', '').toLowerCase();
+
+                if (pageId === 'pageCalendar') renderCalendar();
+                else if (pageId === 'pageStats') renderStats();
+                else if (pageId === 'pageSearch') {
+                    const input = $('#searchInput');
+                    if (input && input.value.trim()) {
+                        const results = searchEntries(input.value);
+                        renderSearchResults(results);
+                    }
+                }
+            }
+
+            function openEditPage(dateStr) {
+                app.currentDate = dateStr;
+                renderEditPage(dateStr);
+                navigateTo('pageEdit');
+
+                // 處理 popstate（手機返回鍵）
+                history.pushState({ page: 'edit' }, '');
+                window.onpopstate = function(event) {
+                    if (app.currentView === 'edit' && isContentModified && !skipPopstate) {
+                        if (confirm('您有未儲存的內容，確定要離開嗎？')) {
+                            skipPopstate = true;
+                            isContentModified = false;
+                            navigateTo('pageCalendar');
+                            // 重置標記
+                            setTimeout(() => { skipPopstate = false; }, 200);
+                        } else {
+                            history.pushState({ page: 'edit' }, '');
+                        }
+                    } else {
+                        // 如果不是編輯頁或無修改，正常處理
+                    }
+                };
+            }
+
+            // 離開編輯頁的統一檢查
+            function attemptLeaveEdit(callback) {
+                if (app.currentView === 'edit' && isContentModified) {
+                    if (confirm('您有未儲存的內容，確定要離開嗎？')) {
+                        isContentModified = false;
+                        callback();
+                    }
+                } else {
+                    callback();
+                }
+            }
+
+            // =============================================================
+            //  字體大小與字型
+            // =============================================================
+            function applyFontSizeAndFamily() {
+                const size = app.settings.fontSize || 18;
+                document.documentElement.style.setProperty('--font-base', size + 'px');
+                const label = $('#fontSizeLabel');
+                if (label) label.textContent = size;
+                const range = $('#fontSizeRange');
+                if (range) range.value = size;
+
+                const family = app.settings.fontFamily || "'Noto Serif TC', 'Times New Roman', serif";
+                document.documentElement.style.setProperty('--font-body', family);
+                document.body.style.fontFamily = family;
+                const select = $('#fontFamilySelect');
+                if (select) {
+                    const options = select.options;
+                    let found = false;
+                    for (let i = 0; i < options.length; i++) {
+                        if (options[i].value === family) {
+                            select.selectedIndex = i;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        const opt = document.createElement('option');
+                        opt.value = family;
+                        opt.textContent = '自訂';
+                        select.appendChild(opt);
+                        select.selectedIndex = select.options.length - 1;
+                    }
+                }
+            }
+
+            function setFontSize(size) {
+                size = Math.min(26, Math.max(14, size));
+                app.settings.fontSize = size;
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(app.settings));
+                applyFontSizeAndFamily();
+                saveState();
+            }
+
+            function setFontFamily(family) {
+                app.settings.fontFamily = family;
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(app.settings));
+                applyFontSizeAndFamily();
+                saveState();
+            }
+
+            // =============================================================
+            //  匯入 / 匯出
+            // =============================================================
+            function exportData() {
+                const data = {
+                    version: '1.0',
+                    exportedAt: new Date().toISOString(),
+                    entries: app.entries,
+                };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `diary_${formatDate(getTodayObj())}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('📤 匯出成功');
+            }
+
+            function importData(file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.entries || typeof data.entries !== 'object') {
+                            showToast('❌ 無效的檔案格式');
+                            return;
+                        }
+                        if (!confirm('匯入將覆蓋所有現有資料，確定繼續？')) return;
+                        app.entries = data.entries;
+                        await saveState();
+                        renderAll();
+                        showToast(`📥 匯入成功，共 ${Object.keys(app.entries).length} 篇日記`);
+                    } catch (err) {
+                        showToast('❌ 匯入失敗: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            // =============================================================
+            //  修改密碼
+            // =============================================================
+            async function changePassword(oldPwd, newPwd) {
+                if (!newPwd || newPwd.length < 4) {
+                    showToast('❌ 密碼至少 4 個字元');
+                    return false;
+                }
+                const encrypted = localStorage.getItem(STATE_KEY);
+                if (encrypted) {
+                    const data = await decryptData(encrypted, oldPwd);
+                    if (data === null) {
+                        showToast('❌ 舊密碼錯誤');
+                        return false;
+                    }
+                }
+                const data = { entries: app.entries, settings: app.settings };
+                const newEncrypted = await encryptData(data, newPwd);
+                localStorage.setItem(STATE_KEY, newEncrypted);
+                app.password = newPwd;
+                showToast('✅ 密碼已更新');
+                return true;
+            }
+
+            // =============================================================
+            //  PWA 更新提示 (模擬)
+            // =============================================================
+            function checkForUpdates() {
+                const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+                    window.navigator.standalone === true;
+                if (isPWA) {
+                    // 模擬檢查
+                }
+            }
+
+            function showUpdateBanner() {
+                const banner = $('#updateBanner');
+                if (banner) {
+                    banner.classList.add('show');
+                }
+            }
+
+            function applyUpdate() {
+                const banner = $('#updateBanner');
+                if (banner) banner.classList.remove('show');
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.getRegistration().then(reg => {
+                        if (reg && reg.waiting) {
+                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            window.location.reload();
+                        } else {
+                            window.location.reload();
+                        }
+                    });
+                } else {
+                    window.location.reload();
+                }
+            }
+
+            // =============================================================
+            //  初始化
+            // =============================================================
+            async function initApp() {
+                const hasData = hasStoredData();
+
+                if (!hasData) {
+                    const pwd = prompt('🔐 首次使用，請設定密碼 (至少4個字元)：');
+                    if (!pwd || pwd.length < 4) {
+                        alert('密碼至少4個字元，請重新整理頁面');
+                        return;
+                    }
+                    app.entries = {};
+                    app.settings = { fontSize: 18, fontFamily: "'Noto Serif TC', 'Times New Roman', serif" };
+                    app.password = pwd;
+                    await saveState();
+                    app.isLocked = false;
+                    showApp();
+                    return;
+                }
+
+                showLockScreen();
+            }
+
+            function showLockScreen() {
+                const lock = $('#lockScreen');
+                if (lock) lock.classList.remove('hidden');
+                const appEl = $('#app');
+                if (appEl) appEl.style.display = 'none';
+                const input = $('#lockPassword');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
+                const error = $('#lockError');
+                if (error) error.textContent = '';
+            }
+
+            function showApp() {
+                const lock = $('#lockScreen');
+                if (lock) lock.classList.add('hidden');
+                const appEl = $('#app');
+                if (appEl) appEl.style.display = 'block';
+                app.isLocked = false;
+                applyFontSizeAndFamily();
+                renderAll();
+                navigateTo('pageCalendar');
+
+                setTimeout(checkForUpdates, 3000);
+            }
+
+            // =============================================================
+            //  事件綁定
+            // =============================================================
+            function bindEvents() {
+                // ---- 鎖屏 ----
+                const unlockBtn = $('#unlockBtn');
+                const lockPwd = $('#lockPassword');
+
+                async function handleUnlock() {
+                    const pwd = lockPwd.value.trim();
+                    if (!pwd) {
+                        const err = $('#lockError');
+                        if (err) err.textContent = '請輸入密碼';
+                        return;
+                    }
+                    const err = $('#lockError');
+                    if (err) err.textContent = '⏳ 驗證中…';
+                    const ok = await authenticate(pwd);
+                    if (ok) {
+                        const err2 = $('#lockError');
+                        if (err2) err2.textContent = '';
+                        showApp();
+                        showToast('🔓 解鎖成功');
+                    } else {
+                        const err2 = $('#lockError');
+                        if (err2) err2.textContent = '❌ 密碼錯誤，請重試';
+                        lockPwd.value = '';
+                        lockPwd.focus();
+                    }
+                }
+
+                unlockBtn.addEventListener('click', handleUnlock);
+                lockPwd.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') handleUnlock();
+                });
+
+                // ---- 頂部鎖屏按鈕 ----
+                const headerLock = $('#headerLockBtn');
+                if (headerLock) {
+                    headerLock.addEventListener('click', function() {
+                        showLockScreen();
+                        showToast('🔒 已鎖屏');
+                    });
+                }
+
+                // ---- 底部導航（攔截離開編輯） ----
+                $$('.nav-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const page = this.dataset.page;
+                        if (!page) return;
+                        if (app.currentView === 'edit') {
+                            attemptLeaveEdit(() => {
+                                navigateTo(page);
+                            });
+                        } else {
+                            navigateTo(page);
+                        }
+                    });
+                });
+
+                // ---- 日曆 ----
+                const prevBtn = $('#calPrev');
+                const nextBtn = $('#calNext');
+                if (prevBtn) {
+                    prevBtn.addEventListener('click', function() {
+                        app.currentMonth--;
+                        if (app.currentMonth < 0) {
+                            app.currentMonth = 11;
+                            app.currentYear--;
+                        }
+                        renderCalendar();
+                    });
+                }
+                if (nextBtn) {
+                    nextBtn.addEventListener('click', function() {
+                        app.currentMonth++;
+                        if (app.currentMonth > 11) {
+                            app.currentMonth = 0;
+                            app.currentYear++;
+                        }
+                        renderCalendar();
+                    });
+                }
+
+                // ---- 今日編輯 ----
+                const todayEdit = $('#todayEditBtn');
+                if (todayEdit) {
+                    todayEdit.addEventListener('click', function() {
+                        const today = getToday();
+                        app.currentDate = today;
+                        openEditPage(today);
+                    });
+                }
+
+                // ---- 編輯頁 ----
+                // 取消按鈕
+                const cancelBtn = $('#cancelEditBtn');
+                if (cancelBtn) {
+                    cancelBtn.addEventListener('click', function() {
+                        attemptLeaveEdit(() => {
+                            navigateTo('pageCalendar');
+                        });
+                    });
+                }
+
+                // 情緒選擇（標記修改）
+                $$('.mood-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const mood = this.dataset.mood;
+                        app.selectedMood = mood;
+                        $$('.mood-btn').forEach(b => b.classList.toggle('selected', b.dataset.mood ===
+                            mood));
+                        isContentModified = true;
+                    });
+                });
+
+                // 儲存
+                const saveBtn = $('#saveEntryBtn');
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', function() {
+                        const date = app.currentDate;
+                        const content = $('#editContent').value;
+                        const mood = app.selectedMood || '😐';
+                        const tags = [...app.editTags];
+                        saveEntry(date, { mood, content, tags });
+                        isContentModified = false;
+                        navigateTo('pageCalendar');
+                        renderCalendar();
+                    });
+                }
+
+                // 刪除
+                const deleteBtn = $('#deleteEntryBtn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', function() {
+                        const date = app.currentDate;
+                        if (getEntry(date)) {
+                            if (confirm(`確定要刪除 ${formatDateShort(parseDate(date))} 的日記嗎？`)) {
+                                deleteEntry(date);
+                                isContentModified = false;
+                                navigateTo('pageCalendar');
+                                renderCalendar();
+                            }
+                        }
+                    });
+                }
+
+                // ---- 搜尋 ----
+                const searchBtn = $('#searchBtn');
+                const searchInput = $('#searchInput');
+
+                function doSearch() {
+                    const kw = searchInput.value.trim();
+                    if (!kw) {
+                        renderSearchResults([]);
+                        return;
+                    }
+                    const results = searchEntries(kw);
+                    renderSearchResults(results);
+                    if (results.length > 0) {
+                        showToast(`🔍 找到 ${results.length} 篇`);
+                    } else {
+                        showToast('🔍 沒有找到相關日記');
+                    }
+                }
+
+                if (searchBtn) {
+                    searchBtn.addEventListener('click', doSearch);
+                }
+                if (searchInput) {
+                    searchInput.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') doSearch();
+                    });
+                    const debouncedSearch = debounce(doSearch, 400);
+                    searchInput.addEventListener('input', debouncedSearch);
+                }
+
+                // ---- 設定 ----
+                // 字體大小
+                const range = $('#fontSizeRange');
+                const decBtn = $('#fontDecBtn');
+                const incBtn = $('#fontIncBtn');
+
+                if (range) {
+                    range.addEventListener('input', function() {
+                        const val = parseInt(this.value);
+                        setFontSize(val);
+                    });
+                }
+                if (decBtn) {
+                    decBtn.addEventListener('click', function() {
+                        const current = app.settings.fontSize || 18;
+                        setFontSize(current - 1);
+                    });
+                }
+                if (incBtn) {
+                    incBtn.addEventListener('click', function() {
+                        const current = app.settings.fontSize || 18;
+                        setFontSize(current + 1);
+                    });
+                }
+
+                // 字型選擇
+                const fontSelect = $('#fontFamilySelect');
+                if (fontSelect) {
+                    fontSelect.addEventListener('change', function() {
+                        setFontFamily(this.value);
+                    });
+                }
+
+                // 修改密碼
+                const changePwdBtn = $('#changePwdBtn');
+                if (changePwdBtn) {
+                    changePwdBtn.addEventListener('click', async function() {
+                        const oldPwd = prompt('請輸入目前密碼：');
+                        if (oldPwd === null) return;
+                        const newPwd = prompt('請輸入新密碼 (至少4個字元)：');
+                        if (newPwd === null) return;
+                        if (newPwd.length < 4) {
+                            showToast('❌ 密碼至少4個字元');
+                            return;
+                        }
+                        await changePassword(oldPwd, newPwd);
+                    });
+                }
+
+                // 匯出
+                const exportBtn = $('#exportBtn');
+                if (exportBtn) {
+                    exportBtn.addEventListener('click', exportData);
+                }
+
+                // 匯入
+                const importBtn = $('#importBtn');
+                const importFileInput = $('#importFileInput');
+                if (importBtn && importFileInput) {
+                    importBtn.addEventListener('click', function() {
+                        importFileInput.click();
+                    });
+                    importFileInput.addEventListener('change', function(e) {
+                        if (this.files && this.files.length > 0) {
+                            importData(this.files[0]);
+                            this.value = '';
+                        }
+                    });
+                }
+
+                // ---- PWA 更新 ----
+                const updateBtn = $('#updateBtn');
+                if (updateBtn) {
+                    updateBtn.addEventListener('click', applyUpdate);
+                }
+
+                // ---- 鍵盤快捷 ----
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        if (app.currentView === 'edit') {
+                            attemptLeaveEdit(() => {
+                                navigateTo('pageCalendar');
+                            });
+                        }
+                    }
+                });
+            }
+
+            // =============================================================
+            //  啟動
+            // =============================================================
+            document.addEventListener('DOMContentLoaded', function() {
+                const savedSettings = safeJSON(localStorage.getItem(SETTINGS_KEY));
+                if (savedSettings) {
+                    app.settings = { ...app.settings, ...savedSettings };
+                }
+                applyFontSizeAndFamily();
+
+                bindEvents();
+                initApp();
+
+                if ('serviceWorker' in navigator) {
+                    // registerSW(); // 實際部署時啟用
+                }
+
+                document.addEventListener('visibilitychange', function() {
+                    if (!document.hidden) {
+                        // 回到頁面時檢查
+                    }
+                });
+            });
+
+            // =============================================================
+            //  暴露除錯
+            // =============================================================
+            window.__diary = {
+                app,
+                saveState,
+                loadState,
+                encryptData,
+                decryptData,
+                exportData,
+                importData,
+                renderAll,
+            };
+
+        })();
+    </script>
+
+</body>
+</html>
