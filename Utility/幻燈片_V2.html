@@ -1,0 +1,2071 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>相簿播放器</title>
+<meta name="theme-color" content="#121315">
+<link rel="manifest" id="manifest-link">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<link rel="icon" href="data:image/png;base64,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">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="相簿播放器">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#121315;          /* 墨玄 */
+    --surface:#1b1c1f;
+    --surface-2:#26272b;
+    --text:#fcfbfa;        /* 玉盤白 */
+    --text-dim:#b3b0a8;
+    --accent:#bd8b2a;      /* 耀日金 */
+    --accent-soft:rgba(189,139,42,.18);
+    --accent2:#942525;     /* 硃砂紅 */
+    --accent2-soft:rgba(148,37,37,.22);
+    --ctrl-size:72px;
+    --radius:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; width:100%; height:100%;
+    background:var(--bg); color:var(--text);
+    font-family:"Noto Serif TC","PingFang TC","Microsoft JhengHei",serif;
+    overscroll-behavior:none;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+  }
+  .ctrl-btn .lb, .info, #support-note, .status, input[type=range]{
+    font-family:"Inter","Noto Sans TC",sans-serif;
+  }
+  #app{
+    position:fixed; inset:0; width:100%; height:100dvh; min-height:100svh;
+    overflow:hidden;
+  }
+
+  /* ---------- Start screen ---------- */
+  #start-screen{
+    position:absolute; inset:0; min-height:100%; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start; gap:24px;
+    padding:max(24px, calc(18px + env(safe-area-inset-top))) 20px max(24px, calc(18px + env(safe-area-inset-bottom)));
+    text-align:center; background:var(--bg); overflow-y:auto; overscroll-behavior:contain;
+  }
+  #start-screen h1{
+    font-size:clamp(28px,5vw,44px); font-weight:900; margin:0 0 4px;
+    letter-spacing:.06em; color:var(--accent);
+    font-family:"Cormorant Garamond","Noto Serif TC",serif;
+  }
+  #start-screen p.sub{ color:var(--text-dim); margin:0 0 12px; font-size:clamp(16px,2.4vw,20px); }
+  .picker-row{
+    display:grid; grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:14px; width:min(760px, 100%); align-items:stretch;
+  }
+  .big-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:8px; min-width:180px; min-height:120px; padding:18px 22px;
+    background:var(--surface); border:2px solid var(--surface-2);
+    border-radius:var(--radius); color:var(--text); cursor:pointer;
+    font-family:inherit; font-size:18px; font-weight:700;
+    transition:border-color .15s, transform .1s, background .15s;
+  }
+  .picker-row .big-btn{
+    width:100%; min-width:0; height:132px; min-height:132px; padding:16px 12px;
+  }
+  .big-btn:hover{ border-color:var(--accent); }
+  .big-btn:active{ transform:scale(.97); background:var(--surface-2); }
+  .big-btn .icon{ font-size:40px; line-height:1; }
+  .big-btn .status{
+    display:block; width:100%; min-width:0; font-size:14px; font-weight:400;
+    color:var(--text-dim); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .picker-row .big-btn.ready .status{ color:var(--text-dim); }
+  .big-btn.ready{ border-color:var(--accent); background:var(--accent-soft); }
+
+  .option-row{ display:flex; flex-wrap:wrap; gap:16px; justify-content:center; align-items:center; margin-top:4px; }
+  .option-group{
+    display:flex; align-items:center; gap:10px; background:var(--surface);
+    padding:12px 18px; border-radius:999px; font-size:17px;
+  }
+  .option-group label{ color:var(--text-dim); }
+  .toggle-pair{ display:flex; border-radius:999px; overflow:hidden; border:2px solid var(--surface-2); }
+  .toggle-pair button{
+    border:none; background:transparent; color:var(--text-dim); padding:8px 18px;
+    font-family:inherit; font-size:16px; font-weight:700; cursor:pointer;
+  }
+  .toggle-pair button.active{ background:var(--accent); color:var(--bg); }
+  input[type=range]{ width:140px; accent-color:var(--accent); }
+
+  #start-action{
+    margin-top:10px; padding:20px 56px; font-size:24px; font-weight:900;
+    background:var(--accent); color:var(--bg); border:none; border-radius:999px;
+    cursor:pointer; box-shadow:0 6px 24px rgba(201,162,39,.35);
+  }
+  #start-action:disabled{ background:var(--surface-2); color:var(--text-dim); box-shadow:none; cursor:not-allowed; }
+  #start-action:active:not(:disabled){ transform:scale(.98); }
+
+  #support-note{ font-size:13px; color:var(--text-dim); max-width:520px; }
+
+  /* ---------- Stage ---------- */
+  #stage{ position:absolute; inset:0; display:none; background:#000; }
+  #photo-container{ position:absolute; inset:0; overflow:hidden; }
+  .layer-wrap{ position:absolute; inset:0; transform-origin:center center; }
+  .layer{
+    position:absolute; top:0; left:0; will-change:transform, opacity;
+    opacity:0; transition:opacity 1s ease;
+    max-width:none; max-height:none;
+  }
+  .layer.visible{ opacity:1; }
+  #empty-note{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    color:var(--text-dim); font-size:20px; text-align:center; padding:24px;
+  }
+  #screen-off-overlay{
+    position:absolute; inset:0; background:#000; opacity:0; pointer-events:none;
+    transition:opacity 1.2s ease; z-index:30;
+  }
+  #screen-off-overlay.visible{ opacity:1; pointer-events:auto; }
+
+  /* ---------- Overlay controls ---------- */
+  #controls-overlay{
+    position:absolute; inset:0; pointer-events:none;
+    opacity:1; transition:opacity .4s ease;
+  }
+  #controls-overlay.hidden{ opacity:0; }
+  #top-bar{
+    position:absolute; top:0; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:calc(18px + env(safe-area-inset-top)) 20px 18px; pointer-events:none;
+    background:linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+  }
+  #top-bar .info{ font-size:15px; color:var(--text-dim); pointer-events:none; }
+  #top-bar .info b{ color:var(--text); }
+  #top-bar .top-actions{ display:flex; align-items:center; gap:10px; pointer-events:auto; }
+  #gear-btn, #close-app-btn{ pointer-events:auto; }
+  #close-app-btn{ background:var(--accent2); border-color:rgba(255,255,255,.28); }
+  #close-app-btn .lb{ color:var(--text); }
+
+  #bottom-bar{
+    position:absolute; left:0; right:0; bottom:0;
+    display:flex; align-items:center; justify-content:center; gap:14px;
+    padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+    background:linear-gradient(to top, rgba(0,0,0,.7), transparent);
+    pointer-events:auto; flex-wrap:wrap;
+  }
+  .ctrl-btn{
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    width:var(--ctrl-size); height:var(--ctrl-size); border-radius:50%;
+    background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.18);
+    color:var(--text); cursor:pointer; gap:2px;
+  }
+  .ctrl-btn:active{ background:rgba(255,255,255,.16); transform:scale(.95); }
+  .ctrl-btn .ic{ font-size:26px; line-height:1; display:flex; align-items:center; justify-content:center; }
+  .ctrl-btn .ic svg{ width:1em; height:1em; display:block; }
+  .ctrl-btn .lb{ font-size:11px; color:var(--text-dim); }
+  .ctrl-btn.primary{ width:calc(var(--ctrl-size) + 18px); height:calc(var(--ctrl-size) + 18px); background:var(--accent); border:none; }
+  .ctrl-btn.primary .ic{ font-size:32px; color:var(--bg); }
+  .ctrl-btn.primary .lb{ color:rgba(18,19,21,.75); }
+  .ctrl-btn.on{ background:var(--accent-soft); border-color:var(--accent); }
+  .ctrl-btn.filled{ background:var(--accent); border-color:var(--accent); }
+  .ctrl-btn.filled .ic{ color:var(--bg); }
+  .ctrl-btn.filled .lb{ color:rgba(18,19,21,.75); }
+
+  #progress-track{
+    position:absolute; bottom:0; left:0; right:0; height:4px;
+    background:rgba(255,255,255,.12); pointer-events:none;
+  }
+  #progress-fill{ height:100%; width:0%; background:var(--accent); }
+
+  /* ---------- Settings panel ---------- */
+  #settings-panel{
+    position:absolute; inset:0; min-height:100%; background:rgba(0,0,0,.72);
+    display:none; align-items:center; justify-content:center; z-index:20;
+    padding:max(12px, calc(12px + env(safe-area-inset-top))) 12px max(16px, calc(16px + env(safe-area-inset-bottom)));
+    overflow-y:auto;
+  }
+  #settings-card{
+    background:var(--surface); border-radius:20px; padding:28px 26px;
+    width:min(460px, 100%); max-height:calc(100dvh - 28px); overflow-y:auto;
+    display:flex; flex-direction:column; gap:20px;
+  }
+  #settings-card h2{ margin:0; font-size:22px; }
+  .settings-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; font-size:17px; }
+  .settings-row .val{ color:var(--accent); font-weight:700; min-width:48px; text-align:right; }
+  .settings-btn-row{ display:flex; gap:12px; flex-wrap:wrap; }
+  .settings-btn-row .big-btn{ min-width:0; flex:1; min-height:88px; padding:12px; }
+  #close-settings{
+    align-self:center; margin-top:6px; padding:12px 30px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--bg); font-weight:900;
+    font-size:17px; cursor:pointer; font-family:inherit;
+  }
+
+  /* Playlist panels - add safe-area top padding */
+  #playlist-panel, #playlist-edit-panel{
+    position:absolute; inset:0; min-height:100%; background:rgba(0,0,0,.72);
+    display:none; align-items:flex-start; justify-content:center; z-index:25;
+    padding:max(12px, calc(12px + env(safe-area-inset-top))) 12px max(20px, calc(20px + env(safe-area-inset-bottom)));
+    overflow-y:auto; overscroll-behavior:contain;
+  }
+  #playlist-card, #playlist-edit-card{
+    background:var(--surface); border-radius:20px; padding:24px 20px;
+    width:min(560px, 100%); max-height:calc(100dvh - 24px); overflow-y:auto;
+    display:flex; flex-direction:column; gap:16px; color:var(--text); margin:0;
+  }
+  #playlist-card h2, #playlist-edit-card h2{ margin:0; font-size:22px; }
+  #playlist-edit-card h3{ margin:8px 0 0; font-size:16px; color:var(--text-dim); font-weight:500; }
+  .panel-hint{ margin:0; font-size:14px; color:var(--text-dim); line-height:1.6; }
+  #close-playlist-panel, #close-playlist-edit{
+    align-self:center; margin-top:6px; padding:12px 30px; border-radius:999px;
+    border:none; background:var(--accent); color:var(--bg); font-weight:900;
+    font-size:17px; cursor:pointer; font-family:inherit;
+  }
+  .small-btn{
+    padding:8px 16px; border-radius:999px; border:1.5px solid var(--surface-2);
+    background:transparent; color:var(--text); font-family:inherit; font-size:14px;
+    cursor:pointer;
+  }
+  .wide-btn{ width:100%; min-height:64px; flex-direction:row; gap:10px; }
+  .wide-btn .icon{ font-size:24px; }
+
+  .playlist-item{
+    background:var(--surface-2); border-radius:14px; padding:14px 16px;
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    flex-wrap:wrap;
+  }
+  .playlist-item + .playlist-item{ margin-top:10px; }
+  .playlist-item .meta{ flex:1; min-width:160px; }
+  .playlist-item .meta .name{ font-size:18px; font-weight:700; }
+  .playlist-item .meta .count{ font-size:13px; color:var(--text-dim); }
+  .playlist-item .actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .playlist-empty{ color:var(--text-dim); font-size:15px; text-align:center; padding:12px; }
+
+  .dir-list{ display:flex; flex-direction:column; gap:8px; }
+  .dir-row{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface-2); border-radius:10px; padding:10px 14px; font-size:15px;
+  }
+  .dir-row .dir-remove{
+    border:none; background:transparent; color:var(--accent2); font-size:20px;
+    cursor:pointer; line-height:1; padding:0 4px;
+  }
+  .dir-row .actions{ display:flex; align-items:center; gap:8px; }
+  .dir-row-pending{
+    background:transparent; border:1.5px dashed var(--accent); color:var(--text-dim);
+  }
+  .dir-list-empty{ color:var(--text-dim); font-size:14px; padding:6px 2px; }
+
+  @media (min-width:700px){
+    #playlist-panel, #playlist-edit-panel{ align-items:center; overflow:hidden; padding:20px; }
+    #playlist-card, #playlist-edit-card{ max-height:calc(100dvh - 40px); }
+  }
+  @media (max-width:520px){
+    :root{ --ctrl-size:60px; }
+    #start-screen{ gap:18px; padding-left:10px; padding-right:10px; }
+    .picker-row{ gap:8px; width:100%; }
+    .picker-row .big-btn{ height:112px; min-height:112px; padding:10px 5px; gap:5px; font-size:15px; }
+    .picker-row .big-btn .icon{ font-size:30px; }
+    .picker-row .big-btn .status{ font-size:11px; }
+    .ctrl-btn .lb{ display:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===================== START SCREEN ===================== -->
+  <div id="start-screen">
+    <h1>相簿播放器</h1>
+    <p class="sub">選好相片和音樂資料夾，就可以開始播放</p>
+
+    <div class="picker-row">
+      <button class="big-btn" id="open-playlists-btn">
+        <span class="icon">📚</span>
+        <span>選清單</span>
+        <span class="status" id="playlist-status">尚未使用清單</span>
+      </button>
+      <button class="big-btn" id="pick-photos">
+        <span class="icon">🖼️</span>
+        <span>選相片</span>
+        <span class="status" id="photo-status">尚未選擇</span>
+      </button>
+      <button class="big-btn" id="pick-photos-library" style="display:none;">
+        <span class="icon">📷</span>
+        <span>選相片</span>
+        <span class="status" id="photo-library-status">尚未選擇</span>
+      </button>
+      <button class="big-btn" id="pick-music">
+        <span class="icon">🎵</span>
+        <span>選音樂</span>
+        <span class="status" id="music-status">尚未選擇</span>
+      </button>
+    </div>
+
+    <button id="start-action" disabled>播放</button>
+
+    <div class="option-row">
+      <div class="option-group">
+        <label>順序</label>
+        <div class="toggle-pair" id="order-toggle">
+          <button data-mode="sequential" class="active">循序</button>
+          <button data-mode="random">隨機</button>
+        </div>
+      </div>
+      <div class="option-group">
+        <label>秒數</label>
+        <input type="range" id="duration-range" min="3" max="100" value="8">
+        <span id="duration-label">8 秒</span>
+      </div>
+      <div class="option-group">
+        <label>放大</label>
+        <input type="range" id="zoom-range" min="100" max="300" step="10" value="100">
+        <span id="zoom-label">100%</span>
+      </div>
+      <div class="option-group">
+        <label>先看原圖</label>
+        <div class="toggle-pair" id="original-toggle">
+          <button data-val="off" class="active">關閉</button>
+          <button data-val="on">開啟</button>
+        </div>
+      </div>
+      <div class="option-group">
+        <label>高畫質</label>
+        <div class="toggle-pair" id="hq-toggle">
+          <button data-val="off" class="active">關閉</button>
+          <button data-val="on">開啟</button>
+        </div>
+      </div>
+    </div>
+
+    <p id="support-note"></p>
+
+    <!-- hidden fallback inputs for browsers without File System Access API -->
+    <input type="file" id="photo-input-fallback" webkitdirectory multiple style="display:none">
+    <input type="file" id="photo-library-input" accept="image/*" multiple style="display:none">
+    <input type="file" id="music-input-fallback" webkitdirectory multiple style="display:none">
+  </div>
+
+  <!-- ===================== STAGE ===================== -->
+  <div id="stage">
+    <div id="photo-container">
+      <div class="layer-wrap" id="layer-wrap-a"><img class="layer" id="layer-a"></div>
+      <div class="layer-wrap" id="layer-wrap-b"><img class="layer" id="layer-b"></div>
+      <div id="empty-note" style="display:none;">這個資料夾裡沒有找到相片</div>
+    </div>
+    <div id="screen-off-overlay"></div>
+    <audio id="audio-player"></audio>
+
+    <div id="controls-overlay">
+      <div id="top-bar">
+        <div class="info"><b id="counter-text">0 / 0</b></div>
+        <div class="top-actions">
+          <button class="ctrl-btn" id="gear-btn"><span class="ic">⚙️</span><span class="lb">設定</span></button>
+          <button class="ctrl-btn" id="close-app-btn" title="停止播放並返回首頁"><span class="ic">✕</span><span class="lb">關閉 App</span></button>
+        </div>
+      </div>
+      <div id="bottom-bar">
+        <button class="ctrl-btn" id="prev-btn"><span class="ic">⏮</span><span class="lb">上張</span></button>
+        <button class="ctrl-btn primary" id="play-btn"><span class="ic"><svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" aria-hidden="true"><path id="play-icon-path" d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg></span><span class="lb">暫停</span></button>
+        <button class="ctrl-btn" id="next-btn"><span class="ic">⏭</span><span class="lb">下張</span></button>
+        <button class="ctrl-btn" id="order-btn"><span class="ic">🔀</span><span class="lb" id="order-lb">隨機</span></button>
+        <button class="ctrl-btn" id="mute-btn"><span class="ic" id="mute-icon">🔊</span><span class="lb">音樂</span></button>
+        <button class="ctrl-btn" id="fullscreen-btn"><span class="ic">⛶</span><span class="lb">全螢幕</span></button>
+      </div>
+      <div id="progress-track"><div id="progress-fill"></div></div>
+    </div>
+
+    <!-- Settings panel reachable during playback -->
+    <div id="settings-panel">
+      <div id="settings-card">
+        <h2>設定</h2>
+        <div class="settings-row">
+          <label>秒數</label>
+          <input type="range" id="duration-range-2" min="3" max="100" value="8">
+          <span class="val" id="duration-label-2">8 秒</span>
+        </div>
+        <div class="settings-row">
+          <label>順序</label>
+          <div class="toggle-pair" id="order-toggle-2">
+            <button data-mode="sequential">循序</button>
+            <button data-mode="random">隨機</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>放大</label>
+          <input type="range" id="zoom-range-2" min="100" max="300" step="10" value="100">
+          <span class="val" id="zoom-label-2">100%</span>
+        </div>
+        <div class="settings-row">
+          <label>先看原圖</label>
+          <div class="toggle-pair" id="original-toggle-2">
+            <button data-val="off" class="active">關閉</button>
+            <button data-val="on">開啟</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>高畫質</label>
+          <div class="toggle-pair" id="hq-toggle-2">
+            <button data-val="off" class="active">關閉</button>
+            <button data-val="on">開啟</button>
+          </div>
+        </div>
+        <div class="settings-row">
+          <label>音量</label>
+          <input type="range" id="volume-range" min="0" max="100" value="70">
+          <span class="val" id="volume-label">70%</span>
+        </div>
+        <div class="settings-row">
+          <label>自動關閉</label>
+          <div class="toggle-pair" id="screen-off-toggle">
+            <button data-val="0" class="active">從不</button>
+            <button data-val="15">15分</button>
+            <button data-val="30">30分</button>
+            <button data-val="60">60分</button>
+          </div>
+        </div>
+        <div class="settings-btn-row">
+          <button class="big-btn" id="reselect-photos"><span class="icon">🖼️</span><span>換相片</span></button>
+          <button class="big-btn" id="reselect-photos-library" style="display:none;"><span class="icon">📷</span><span>換相片</span></button>
+          <button class="big-btn" id="reselect-music"><span class="icon">🎵</span><span>換音樂</span></button>
+          <button class="big-btn" id="open-playlists-btn-2" style="display:none;"><span class="icon">📚</span><span>播放清單</span></button>
+        </div>
+        <button id="close-settings">關閉</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PLAYLISTS ===================== -->
+  <div id="playlist-panel">
+    <div id="playlist-card">
+      <h2>播放清單</h2>
+      <p class="panel-hint">一個清單可以包含好幾個相片／音樂資料夾，播放時會把它們合併在一起輪流播放。（需要瀏覽器支援資料夾授權，例如電腦版 Chrome / Edge）</p>
+      <div id="playlist-list"></div>
+      <div class="settings-btn-row">
+        <button class="big-btn" id="new-playlist-btn"><span class="icon">➕</span><span>新增</span></button>
+        <button class="big-btn" id="import-playlist-btn"><span class="icon">📥</span><span>匯入</span></button>
+      </div>
+      <button id="close-playlist-panel">關閉</button>
+    </div>
+    <input type="file" id="playlist-import-input" accept="application/json,.json" style="display:none">
+  </div>
+
+  <div id="playlist-edit-panel">
+    <div id="playlist-edit-card">
+      <div class="settings-row">
+        <h2 id="playlist-edit-title">清單內容</h2>
+        <button id="rename-playlist-btn" class="small-btn">改名</button>
+      </div>
+      <h3>相片資料夾</h3>
+      <div id="playlist-photo-dirs" class="dir-list"></div>
+      <button class="big-btn wide-btn" id="add-photo-dir-btn"><span class="icon">🖼️</span><span>新增相片</span></button>
+      <h3>音樂資料夾</h3>
+      <div id="playlist-music-dirs" class="dir-list"></div>
+      <button class="big-btn wide-btn" id="add-music-dir-btn"><span class="icon">🎵</span><span>新增音樂</span></button>
+      <div class="settings-btn-row">
+        <button class="big-btn" id="use-playlist-btn"><span class="icon">▶️</span><span>使用</span></button>
+        <button class="big-btn" id="export-playlist-btn"><span class="icon">📤</span><span>匯出</span></button>
+        <button class="big-btn" id="delete-playlist-btn"><span class="icon">🗑️</span><span>刪除</span></button>
+      </div>
+      <button id="close-playlist-edit">返回</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------------------------------------------------------
+     Build the Web App Manifest at runtime
+  --------------------------------------------------------------- */
+  (function setupManifest(){
+    try{
+      const icon192 = "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";
+      const icon512 = "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";
+      const scopeUrl = new URL('.', location.href).href;
+      const manifest = {
+        name: '相簿播放器',
+        short_name: '相簿播放器',
+        description: '全螢幕相片與音樂投影播放器',
+        start_url: location.href,
+        scope: scopeUrl,
+        display: 'standalone',
+        orientation: 'any',
+        background_color: '#121315',
+        theme_color: '#121315',
+        icons: [
+          { src: 'data:image/png;base64,' + icon192, sizes: '192x192', type: 'image/png', purpose: 'any maskable' },
+          { src: 'data:image/png;base64,' + icon512, sizes: '512x512', type: 'image/png', purpose: 'any maskable' },
+        ],
+      };
+      const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+      const link = document.getElementById('manifest-link');
+      if (link) link.href = URL.createObjectURL(blob);
+    }catch(e){ /* manifest is a nice-to-have; ignore failures */ }
+  })();
+
+  /* ---------------------------------------------------------------
+     Feature detection
+  --------------------------------------------------------------- */
+  const HAS_FS_ACCESS = 'showDirectoryPicker' in window;
+  const PHOTO_EXT = ['jpg','jpeg','png','gif','webp','bmp','heic','heif'];
+  const MUSIC_EXT = ['mp3','wav','m4a','aac','ogg','flac'];
+
+  const supportNote = document.getElementById('support-note');
+  supportNote.textContent = HAS_FS_ACCESS
+    ? '此瀏覽器支援自動記住資料夾，下次開啟可直接繼續播放。'
+    : '此瀏覽器需要用「照片圖庫」選取相片：進入相簿後可以多選或全選，但無法整個相簿一鍵匯入，這是系統的限制。每次開啟需要重新選取，但會自動接續上次播放的位置。';
+
+  if (!HAS_FS_ACCESS){
+    document.getElementById('pick-photos').style.display = 'none';
+    document.getElementById('pick-photos-library').style.display = '';
+    document.getElementById('reselect-photos').style.display = 'none';
+    document.getElementById('reselect-photos-library').style.display = '';
+  }
+  // 播放清單本身使用 IndexedDB 保存，沒有資料夾 API 時仍可查看、匯入與保留清單。
+  document.getElementById('open-playlists-btn').style.display = '';
+  document.getElementById('open-playlists-btn-2').style.display = '';
+
+  /* ---------------------------------------------------------------
+     Tiny IndexedDB helper. Two stores:
+     - 'handles': the single last-used photo/music folder (quick resume)
+     - 'playlists': named playlists, each holding several folder handles
+  --------------------------------------------------------------- */
+  const DB_NAME = 'slideshow-app-db';
+  const STORE = 'handles';
+  const PLAYLIST_STORE = 'playlists';
+  function idbOpen(){
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 2);
+      req.onupgradeneeded = (e) => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE);
+        if (!db.objectStoreNames.contains(PLAYLIST_STORE)) db.createObjectStore(PLAYLIST_STORE, { keyPath: 'id' });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbSet(key, value){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(value, key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbGet(key){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).get(key);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGetAllPlaylists(){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readonly');
+      const req = tx.objectStore(PLAYLIST_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGetPlaylist(id){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readonly');
+      const req = tx.objectStore(PLAYLIST_STORE).get(id);
+      req.onsuccess = () => resolve(req.result || null);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbPutPlaylist(playlist){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).put(playlist);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error || new Error('IndexedDB transaction aborted'));
+    });
+  }
+  async function idbDeletePlaylist(id){
+    const db = await idbOpen();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  /* ---------------------------------------------------------------
+     localStorage progress (plain JSON, works for both browser paths)
+  --------------------------------------------------------------- */
+  const PROGRESS_KEY = 'slideshow_progress_v1';
+  function saveProgress(partial){
+    const cur = loadProgress() || {};
+    const next = Object.assign(cur, partial);
+    localStorage.setItem(PROGRESS_KEY, JSON.stringify(next));
+  }
+  function loadProgress(){
+    try{
+      const raw = localStorage.getItem(PROGRESS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  /* Settings (duration / order / volume / zoom) persist independently of
+     which photo folder is loaded, so they carry over every time the app
+     is reopened, per the user's request for the zoom level to stick. */
+  const SETTINGS_KEY = 'slideshow_settings_v1';
+  function saveSettings(){
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify({
+      duration: state.duration, orderMode: state.orderMode,
+      volume: state.volume, zoom: state.zoom,
+      showOriginalFirst: state.showOriginalFirst,
+      highQualityZoom: state.highQualityZoom,
+      screenOffMinutes: state.screenOffMinutes,
+    }));
+  }
+  function loadSettings(){
+    try{
+      const raw = localStorage.getItem(SETTINGS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    }catch(e){ return null; }
+  }
+
+  /* ---------------------------------------------------------------
+     App state
+  --------------------------------------------------------------- */
+  const state = {
+    photoFiles: [],      // [{name, getFile(): Promise<File>}]
+    musicFiles: [],
+    photoOrder: [],       // array of indices
+    musicOrder: [],
+    photoPos: 0,
+    musicPos: 0,
+    orderMode: 'sequential', // 'sequential' | 'random'
+    duration: 8,           // seconds per photo
+    volume: 0.7,
+    zoom: 1.0,             // extra zoom on top of screen-cover fit (1.0 - 3.0)
+    showOriginalFirst: false, // show the whole photo before zooming in
+    highQualityZoom: false,   // re-render zoomed photos through canvas for sharper upscaling
+    screenOffMinutes: 0,      // 0 = never; app-controlled screen-off overrides system timeout
+    wakeLockSentinel: null,
+    manualScale: 1, manualX: 0, manualY: 0, // manual pinch/drag adjustment while paused
+    muted: false,
+    playing: false,
+    photoDirLabel: '',
+    musicDirLabel: '',
+    photoDirKey: '',       // fallback-matching key (name+count)
+    musicDirKey: '',
+    savedPhotoHandle: null, // detected saved handle, not yet loaded/permitted
+    savedMusicHandle: null,
+    activePlaylistId: null, // set when the current photo/music set came from a playlist
+    savedPlaylistId: null,  // stored in progress for next launch
+    currentObjectUrl: null,
+    activeLayer: 'a',
+    timerHandle: null,
+    timerStartedAt: 0,
+    timerRemainingMs: 0,
+    pendingAction: null,   // fn to re-run when resuming from pause
+    panAnim: null,
+  };
+
+  const ORIGINAL_VIEW_MS = 2500; // how long to show the un-zoomed photo first
+
+  /* ---------------------------------------------------------------
+     File wrapping helpers
+  --------------------------------------------------------------- */
+  function wrapHandleFile(name, handle){
+    return { name, getFile: () => handle.getFile() };
+  }
+  function wrapRawFile(name, file){
+    return { name, getFile: () => Promise.resolve(file) };
+  }
+
+  async function scanDirHandle(dirHandle, exts){
+    const out = [];
+    async function walk(handle, prefix){
+      for await (const [name, entry] of handle.entries()){
+        if (entry.kind === 'file'){
+          const ext = name.split('.').pop().toLowerCase();
+          if (exts.includes(ext)) out.push(wrapHandleFile(prefix + name, entry));
+        } else if (entry.kind === 'directory'){
+          await walk(entry, prefix + name + '/');
+        }
+      }
+    }
+    await walk(dirHandle, '');
+    out.sort((a,b) => a.name.localeCompare(b.name, 'zh-Hant'));
+    return out;
+  }
+
+  function scanFileList(fileList, exts){
+    const out = [];
+    for (const file of fileList){
+      const relPath = file.webkitRelativePath || file.name;
+      const ext = file.name.split('.').pop().toLowerCase();
+      if (exts.includes(ext)) out.push(wrapRawFile(relPath, file));
+    }
+    out.sort((a,b) => a.name.localeCompare(b.name, 'zh-Hant'));
+    return out;
+  }
+
+  function folderKeyFromFiles(files){
+    return files.length + ':' + (files[0] ? files[0].name : '') + ':' + (files[files.length-1] ? files[files.length-1].name : '');
+  }
+
+  /* ---------------------------------------------------------------
+     Order building
+  --------------------------------------------------------------- */
+  function shuffle(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function buildOrder(n, mode){
+    const idx = Array.from({length:n}, (_,i)=>i);
+    return mode === 'random' ? shuffle(idx) : idx;
+  }
+
+  /* ---------------------------------------------------------------
+     UI: Start screen wiring
+  --------------------------------------------------------------- */
+  const photoStatusEl = document.getElementById('photo-status');
+  const musicStatusEl = document.getElementById('music-status');
+  const pickPhotosBtn = document.getElementById('pick-photos');
+  const pickMusicBtn = document.getElementById('pick-music');
+  const startActionBtn = document.getElementById('start-action');
+  const photoFallbackInput = document.getElementById('photo-input-fallback');
+  const musicFallbackInput = document.getElementById('music-input-fallback');
+  const orderToggle = document.getElementById('order-toggle');
+  const durationRange = document.getElementById('duration-range');
+  const durationLabel = document.getElementById('duration-label');
+  const zoomRange = document.getElementById('zoom-range');
+  const zoomLabel = document.getElementById('zoom-label');
+
+  let pendingResume = null; // saved progress object, if usable
+
+  function updateStartButton(){
+    const hasFiles = state.photoFiles.length > 0;
+    const hasSavedHandle = !!state.savedPhotoHandle;
+    const hasSavedPlaylist = !!state.savedPlaylistId;
+    startActionBtn.disabled = !(hasFiles || hasSavedHandle || hasSavedPlaylist);
+  }
+
+  function setOrderModeUI(mode){
+    state.orderMode = mode;
+    [orderToggle, document.getElementById('order-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+    });
+    document.getElementById('order-lb').textContent = mode === 'random' ? '隨機' : '循序';
+    const orderBtn = document.getElementById('order-btn');
+    if (orderBtn) orderBtn.classList.toggle('filled', mode === 'random');
+  }
+
+  orderToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setOrderModeUI(btn.dataset.mode);
+    saveSettings();
+  });
+
+  durationRange.addEventListener('input', () => {
+    state.duration = parseInt(durationRange.value, 10);
+    durationLabel.textContent = state.duration + ' 秒';
+    document.getElementById('duration-range-2').value = state.duration;
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    saveSettings();
+  });
+
+  function setZoomUI(zoom){
+    state.zoom = zoom;
+    const pct = Math.round(zoom * 100);
+    zoomRange.value = pct;
+    zoomLabel.textContent = pct + '%';
+    document.getElementById('zoom-range-2').value = pct;
+    document.getElementById('zoom-label-2').textContent = pct + '%';
+  }
+  zoomRange.addEventListener('input', () => {
+    setZoomUI(parseInt(zoomRange.value, 10) / 100);
+    saveSettings();
+    if (stageEl.style.display === 'block') layoutAndPan(currentVisibleLayer());
+  });
+
+  function setOriginalFirstUI(on){
+    state.showOriginalFirst = !!on;
+    [document.getElementById('original-toggle'), document.getElementById('original-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', (b.dataset.val === 'on') === state.showOriginalFirst));
+    });
+  }
+  [document.getElementById('original-toggle'), document.getElementById('original-toggle-2')].forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      setOriginalFirstUI(btn.dataset.val === 'on');
+      saveSettings();
+    });
+  });
+
+  function setHqZoomUI(on){
+    state.highQualityZoom = !!on;
+    [document.getElementById('hq-toggle'), document.getElementById('hq-toggle-2')].forEach(group => {
+      group.querySelectorAll('button').forEach(b => b.classList.toggle('active', (b.dataset.val === 'on') === state.highQualityZoom));
+    });
+  }
+  [document.getElementById('hq-toggle'), document.getElementById('hq-toggle-2')].forEach(group => {
+    group.addEventListener('click', (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      setHqZoomUI(btn.dataset.val === 'on');
+      saveSettings();
+      if (stageEl.style.display === 'block') layoutAndPan(currentVisibleLayer());
+    });
+  });
+
+  function setScreenOffUI(minutes){
+    state.screenOffMinutes = minutes;
+    document.getElementById('screen-off-toggle').querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', parseInt(b.dataset.val, 10) === minutes);
+    });
+  }
+  document.getElementById('screen-off-toggle').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    setScreenOffUI(parseInt(btn.dataset.val, 10));
+    saveSettings();
+    scheduleScreenOff();
+  });
+
+  /* Restore last-used settings (duration/order/volume/zoom) so they
+     carry over across sessions regardless of which folder is loaded. */
+  (function applySavedSettings(){
+    const s = loadSettings();
+    if (!s) return;
+    if (s.duration) { state.duration = s.duration; durationRange.value = s.duration; durationLabel.textContent = s.duration + ' 秒'; }
+    if (s.orderMode) setOrderModeUI(s.orderMode);
+    if (typeof s.volume === 'number') state.volume = s.volume;
+    if (typeof s.zoom === 'number') setZoomUI(s.zoom);
+    if (typeof s.showOriginalFirst === 'boolean') setOriginalFirstUI(s.showOriginalFirst);
+    if (typeof s.highQualityZoom === 'boolean') setHqZoomUI(s.highQualityZoom);
+    if (typeof s.screenOffMinutes === 'number') setScreenOffUI(s.screenOffMinutes);
+  })();
+
+  async function choosePhotoFolder(){
+    if (HAS_FS_ACCESS){
+      try{
+        const opts = { id: 'photos', mode: 'read' };
+        const prevPhotoDir = await idbGet('photoDir');
+        if (prevPhotoDir) opts.startIn = prevPhotoDir;
+        const dirHandle = await window.showDirectoryPicker(opts);
+        await idbSet('photoDir', dirHandle);
+        // clear any playlist reference
+        state.activePlaylistId = null;
+        state.savedPlaylistId = null;
+        saveProgress({ activePlaylistId: null });
+        await loadPhotosFromHandle(dirHandle);
+      }catch(err){ /* user cancelled */ }
+    } else {
+      photoFallbackInput.click();
+    }
+  }
+  async function chooseMusicFolder(){
+    if (HAS_FS_ACCESS){
+      try{
+        const opts = { id: 'music', mode: 'read' };
+        const prevMusicDir = await idbGet('musicDir');
+        if (prevMusicDir) opts.startIn = prevMusicDir;
+        const dirHandle = await window.showDirectoryPicker(opts);
+        await idbSet('musicDir', dirHandle);
+        await loadMusicFromHandle(dirHandle);
+      }catch(err){ /* user cancelled */ }
+    } else {
+      musicFallbackInput.click();
+    }
+  }
+
+  async function loadPhotosFromHandle(dirHandle){
+    const files = await scanDirHandle(dirHandle, PHOTO_EXT);
+    state.photoFiles = files;
+    state.photoDirLabel = dirHandle.name;
+    state.photoDirKey = folderKeyFromFiles(files);
+    // clear playlist associations
+    state.activePlaylistId = null;
+    state.savedPlaylistId = null;
+    saveProgress({ activePlaylistId: null });
+    photoStatusEl.textContent = files.length ? (dirHandle.name + '（' + files.length + ' 張）') : '找不到相片';
+    pickPhotosBtn.classList.toggle('ready', files.length > 0);
+    document.getElementById('playlist-status').textContent = '尚未使用清單';
+    document.getElementById('open-playlists-btn').classList.remove('ready');
+    updateStartButton();
+  }
+  async function loadMusicFromHandle(dirHandle){
+    const files = await scanDirHandle(dirHandle, MUSIC_EXT);
+    state.musicFiles = files;
+    state.musicDirLabel = dirHandle.name;
+    state.musicDirKey = folderKeyFromFiles(files);
+    musicStatusEl.textContent = files.length ? (dirHandle.name + '（' + files.length + ' 首）') : '找不到音樂';
+    pickMusicBtn.classList.toggle('ready', files.length > 0);
+  }
+
+  /* Combine every folder in a playlist into one photo set and one
+     music set. Each entry needs a fresh read-permission check since
+     permissions aren't guaranteed to persist between sessions. */
+  async function usePlaylist(playlist){
+    const photoFiles = [];
+    for (const entry of playlist.photoDirs){
+      try{
+        const perm = await entry.handle.requestPermission({ mode:'read' });
+        if (perm !== 'granted') continue;
+        const files = await scanDirHandle(entry.handle, PHOTO_EXT);
+        files.forEach(f => photoFiles.push({ name: entry.name + '/' + f.name, getFile: f.getFile }));
+      }catch(e){ /* skip folders we can't access */ }
+    }
+    const musicFiles = [];
+    for (const entry of playlist.musicDirs){
+      try{
+        const perm = await entry.handle.requestPermission({ mode:'read' });
+        if (perm !== 'granted') continue;
+        const files = await scanDirHandle(entry.handle, MUSIC_EXT);
+        files.forEach(f => musicFiles.push({ name: entry.name + '/' + f.name, getFile: f.getFile }));
+      }catch(e){ /* skip folders we can't access */ }
+    }
+    state.photoFiles = photoFiles;
+    state.musicFiles = musicFiles;
+    state.photoDirLabel = playlist.name;
+    state.musicDirLabel = playlist.name;
+    state.photoDirKey = 'playlist:' + playlist.id;
+    state.musicDirKey = 'playlist:' + playlist.id;
+    state.activePlaylistId = playlist.id;
+    state.savedPlaylistId = playlist.id;
+    state.savedPhotoHandle = null;
+    state.savedMusicHandle = null;
+    // reset order and position
+    state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+    state.photoPos = 0;
+    if (state.musicFiles.length){
+      state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+      state.musicPos = 0;
+    }
+    // Update UI
+    const photoLabel = photoFiles.length ? ('清單「' + playlist.name + '」（' + photoFiles.length + ' 張）') : '這個清單沒有相片';
+    const musicLabel = musicFiles.length ? ('清單「' + playlist.name + '」（' + musicFiles.length + ' 首）') : '（沒有音樂）';
+    photoStatusEl.textContent = photoLabel;
+    musicStatusEl.textContent = musicLabel;
+    document.getElementById('playlist-status').textContent = playlist.name;
+    pickPhotosBtn.classList.toggle('ready', photoFiles.length > 0);
+    pickMusicBtn.classList.toggle('ready', musicFiles.length > 0);
+    updateStartButton();
+
+    // Save progress with playlist id
+    persistNow();
+  }
+
+  pickPhotosBtn.addEventListener('click', choosePhotoFolder);
+  pickMusicBtn.addEventListener('click', chooseMusicFolder);
+
+  const photoLibraryInput = document.getElementById('photo-library-input');
+  const photoLibraryStatusEl = document.getElementById('photo-library-status');
+  document.getElementById('pick-photos-library').addEventListener('click', () => photoLibraryInput.click());
+  function applyPhotoLibrarySelection(){
+    const files = scanFileList(photoLibraryInput.files, PHOTO_EXT);
+    state.photoFiles = files;
+    state.photoDirLabel = '照片圖庫';
+    state.photoDirKey = 'photo-library|' + folderKeyFromFiles(files);
+    // clear playlist
+    state.activePlaylistId = null;
+    state.savedPlaylistId = null;
+    saveProgress({ activePlaylistId: null });
+    const label = files.length ? ('已選 ' + files.length + ' 張相片') : '找不到相片';
+    photoStatusEl.textContent = label;
+    photoLibraryStatusEl.textContent = label;
+    pickPhotosBtn.classList.toggle('ready', files.length > 0);
+    document.getElementById('pick-photos-library').classList.toggle('ready', files.length > 0);
+    document.getElementById('playlist-status').textContent = '尚未使用清單';
+    document.getElementById('open-playlists-btn').classList.remove('ready');
+    updateStartButton();
+    if (stageEl.style.display === 'block' && files.length > 0){
+      state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+      state.photoPos = 0;
+      showPhoto(state.photoOrder[0]);
+      persistNow();
+    }
+  }
+  photoLibraryInput.addEventListener('change', applyPhotoLibrarySelection);
+  const reselectPhotosLibraryBtn = document.getElementById('reselect-photos-library');
+  if (reselectPhotosLibraryBtn){
+    reselectPhotosLibraryBtn.addEventListener('click', () => photoLibraryInput.click());
+  }
+
+  photoFallbackInput.addEventListener('change', () => {
+    const files = scanFileList(photoFallbackInput.files, PHOTO_EXT);
+    state.photoFiles = files;
+    const folderName = photoFallbackInput.files[0] ? photoFallbackInput.files[0].webkitRelativePath.split('/')[0] : '相片資料夾';
+    state.photoDirLabel = folderName;
+    state.photoDirKey = folderName + '|' + folderKeyFromFiles(files);
+    state.activePlaylistId = null;
+    state.savedPlaylistId = null;
+    saveProgress({ activePlaylistId: null });
+    photoStatusEl.textContent = files.length ? (folderName + '（' + files.length + ' 張）') : '找不到相片';
+    pickPhotosBtn.classList.toggle('ready', files.length > 0);
+    document.getElementById('playlist-status').textContent = '尚未使用清單';
+    document.getElementById('open-playlists-btn').classList.remove('ready');
+    updateStartButton();
+  });
+  musicFallbackInput.addEventListener('change', () => {
+    const files = scanFileList(musicFallbackInput.files, MUSIC_EXT);
+    state.musicFiles = files;
+    const folderName = musicFallbackInput.files[0] ? musicFallbackInput.files[0].webkitRelativePath.split('/')[0] : '音樂資料夾';
+    state.musicDirLabel = folderName;
+    state.musicDirKey = folderName + '|' + folderKeyFromFiles(files);
+    musicStatusEl.textContent = files.length ? (folderName + '（' + files.length + ' 首）') : '找不到音樂';
+    pickMusicBtn.classList.toggle('ready', files.length > 0);
+  });
+
+  /* ---------------------------------------------------------------
+     Restore session: load saved playlist or folder handles
+  --------------------------------------------------------------- */
+  async function restoreSession(){
+    const progress = loadProgress();
+    if (!progress) {
+      // Still try to detect handles (existing behavior)
+      await detectSavedHandles();
+      return;
+    }
+    // Check if there is a saved playlist ID
+    if (progress.activePlaylistId) {
+      const pl = await idbGetPlaylist(progress.activePlaylistId);
+      if (pl) {
+        state.savedPlaylistId = progress.activePlaylistId;
+        // Update UI to show playlist info, but do not load files yet
+        photoStatusEl.textContent = '播放清單：「' + pl.name + '」 (點「播放」繼續)';
+        musicStatusEl.textContent = '清單：「' + pl.name + '」';
+        pickPhotosBtn.classList.add('ready');
+        pickMusicBtn.classList.add('ready');
+        document.getElementById('playlist-status').textContent = pl.name;
+        document.getElementById('open-playlists-btn').classList.add('ready');
+        updateStartButton();
+        return;
+      } else {
+        // Playlist no longer exists, clear it
+        progress.activePlaylistId = null;
+        saveProgress({ activePlaylistId: null });
+      }
+    }
+    // No playlist, try folder handles
+    await detectSavedHandles();
+  }
+
+  async function detectSavedHandles(){
+    if (!HAS_FS_ACCESS) return;
+    const photoHandle = await idbGet('photoDir');
+    if (!photoHandle) return;
+    state.savedPhotoHandle = photoHandle;
+    state.savedMusicHandle = await idbGet('musicDir');
+    photoStatusEl.textContent = photoHandle.name + '（按播放即可繼續）';
+    pickPhotosBtn.classList.add('ready');
+    if (state.savedMusicHandle){
+      musicStatusEl.textContent = state.savedMusicHandle.name + '（按播放即可繼續）';
+      pickMusicBtn.classList.add('ready');
+    }
+    updateStartButton();
+  }
+  restoreSession();
+
+  /* For fallback (no FS Access), check if a previous progress record
+     exists so we can offer resume once folders are (re)selected. */
+  function maybeApplySavedProgressForFallback(){
+    if (HAS_FS_ACCESS) return;
+    const progress = loadProgress();
+    if (!progress) return;
+    if (progress.photoDirKey && progress.photoDirKey === state.photoDirKey){
+      pendingResume = progress;
+    }
+  }
+
+  startActionBtn.addEventListener('click', async () => {
+    // Priority: saved playlist
+    if (state.savedPlaylistId) {
+      const pl = await idbGetPlaylist(state.savedPlaylistId);
+      if (pl) {
+        await usePlaylist(pl);
+        beginPlayback(false);
+        return;
+      } else {
+        state.savedPlaylistId = null;
+        saveProgress({ activePlaylistId: null });
+        updateStartButton();
+      }
+    }
+
+    // Then: saved folder handle (if any)
+    if (state.photoFiles.length === 0 && state.savedPhotoHandle){
+      try{
+        const perm = await state.savedPhotoHandle.requestPermission({ mode:'read' });
+        if (perm !== 'granted'){ alert('需要授權才能讀取資料夾'); return; }
+        await loadPhotosFromHandle(state.savedPhotoHandle);
+        if (state.savedMusicHandle){
+          await state.savedMusicHandle.requestPermission({ mode:'read' });
+          await loadMusicFromHandle(state.savedMusicHandle);
+        }
+      }catch(err){ console.error(err); return; }
+    }
+    if (state.photoFiles.length === 0) return;
+
+    maybeApplySavedProgressForFallback();
+    const progress = loadProgress();
+    const resumable = !!pendingResume || (!!progress && progress.photoDirKey === state.photoDirKey);
+    if (resumable && !pendingResume) pendingResume = progress;
+    beginPlayback(resumable);
+  });
+
+  /* ---------------------------------------------------------------
+     Playback engine
+  --------------------------------------------------------------- */
+  const stageEl = document.getElementById('stage');
+  const startScreenEl = document.getElementById('start-screen');
+  const layerA = document.getElementById('layer-a');
+  const layerB = document.getElementById('layer-b');
+  const emptyNote = document.getElementById('empty-note');
+  const audioEl = document.getElementById('audio-player');
+  const counterText = document.getElementById('counter-text');
+  const progressFill = document.getElementById('progress-fill');
+  const playBtn = document.getElementById('play-btn');
+  const playIconPath = document.getElementById('play-icon-path');
+  const PLAY_ICON_D = 'M8 5v14l11-7z';
+  const PAUSE_ICON_D = 'M6 5h4v14H6zM14 5h4v14h-4z';
+  const muteBtn = document.getElementById('mute-btn');
+  const muteIcon = document.getElementById('mute-icon');
+
+  function currentVisibleLayer(){
+    return state.activeLayer === 'a' ? layerA : layerB;
+  }
+
+  function beginPlayback(useResume){
+    if (state.photoFiles.length === 0) return;
+
+    if (useResume && pendingResume){
+      state.orderMode = pendingResume.orderMode || state.orderMode;
+      state.duration = pendingResume.duration || state.duration;
+      state.volume = (typeof pendingResume.volume === 'number') ? pendingResume.volume : state.volume;
+      state.photoOrder = (pendingResume.photoOrder && pendingResume.photoOrder.length === state.photoFiles.length)
+        ? pendingResume.photoOrder : buildOrder(state.photoFiles.length, state.orderMode);
+      state.photoPos = Math.min(pendingResume.photoPos || 0, state.photoOrder.length - 1);
+      if (state.musicFiles.length){
+        state.musicOrder = (pendingResume.musicOrder && pendingResume.musicOrder.length === state.musicFiles.length)
+          ? pendingResume.musicOrder : buildOrder(state.musicFiles.length, state.orderMode);
+        state.musicPos = Math.min(pendingResume.musicPos || 0, state.musicOrder.length - 1);
+      }
+    } else {
+      // Ensure order arrays are built (if not already)
+      if (state.photoOrder.length !== state.photoFiles.length) {
+        state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+        state.photoPos = 0;
+      }
+      if (state.musicFiles.length && state.musicOrder.length !== state.musicFiles.length) {
+        state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+        state.musicPos = 0;
+      }
+    }
+
+    setOrderModeUI(state.orderMode);
+    document.getElementById('duration-range-2').value = state.duration;
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    document.getElementById('volume-range').value = Math.round(state.volume * 100);
+    document.getElementById('volume-label').textContent = Math.round(state.volume * 100) + '%';
+    setZoomUI(state.zoom);
+    audioEl.volume = state.volume;
+
+    startScreenEl.style.display = 'none';
+    stageEl.style.display = 'block';
+
+    if (!document.fullscreenElement && document.documentElement.requestFullscreen){
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+
+    state.playing = true;
+    showPhoto(state.photoOrder[state.photoPos]);
+    if (state.musicFiles.length){
+      playMusicTrack(state.musicOrder[state.musicPos], useResume ? (pendingResume.musicTime || 0) : 0);
+    }
+    persistNow();
+    resetControlsHideTimer();
+  }
+
+  function persistNow(extra){
+    saveProgress(Object.assign({
+      photoDirKey: state.photoDirKey,
+      musicDirKey: state.musicDirKey,
+      photoOrder: state.photoOrder,
+      musicOrder: state.musicOrder,
+      photoPos: state.photoPos,
+      musicPos: state.musicPos,
+      musicTime: audioEl.currentTime || 0,
+      orderMode: state.orderMode,
+      duration: state.duration,
+      volume: state.volume,
+      activePlaylistId: state.activePlaylistId,
+    }, extra || {}));
+  }
+  setInterval(() => { if (state.playing) persistNow(); }, 5000);
+
+  /* ---- Photo display + directional pan ---- */
+  /* Fit the whole photo within the screen (letterboxed if needed),
+     centered, with no cropping and no pan — used for the optional
+     "show original first" preview. */
+  function fitContain(img){
+    if (state.panAnim){ state.panAnim.cancel(); state.panAnim = null; }
+    const cw = window.innerWidth, ch = window.innerHeight;
+    const nw = img.naturalWidth, nh = img.naturalHeight;
+    if (!nw || !nh) return;
+    const scale = Math.min(cw / nw, ch / nh);
+    const drawW = nw * scale, drawH = nh * scale;
+    img.style.width = drawW + 'px';
+    img.style.height = drawH + 'px';
+    img.style.left = ((cw - drawW) / 2) + 'px';
+    img.style.top = ((ch - drawH) / 2) + 'px';
+    img.style.transform = 'translate(0px,0px)';
+  }
+
+  /* Crossfade the given image url onto whichever layer is currently
+     hidden, laying it out either as the full "original" (mode:
+     'contain') or the cover+zoom pan ('zoom'). Returns how long this
+     frame should stay on screen. */
+  async function renderFrame(url, mode){
+    const incoming = state.activeLayer === 'a' ? layerB : layerA;
+    const outgoing = state.activeLayer === 'a' ? layerA : layerB;
+
+    await new Promise((resolve) => {
+      incoming.onload = resolve;
+      incoming.src = url;
+    });
+    incoming._masterNW = incoming.naturalWidth;
+    incoming._masterNH = incoming.naturalHeight;
+    incoming._masterCanvas = null; // cleared so HQ redraw rebuilds from this fresh pristine bitmap
+    resetManualAdjust(incoming);
+
+    let slotMs;
+    if (mode === 'contain'){
+      fitContain(incoming);
+      slotMs = ORIGINAL_VIEW_MS;
+    } else {
+      slotMs = layoutAndPan(incoming);
+    }
+
+    incoming.classList.add('visible');
+    outgoing.classList.remove('visible');
+    state.activeLayer = state.activeLayer === 'a' ? 'b' : 'a';
+
+    return slotMs;
+  }
+
+  async function showPhoto(fileIndex){
+    const fileObj = state.photoFiles[fileIndex];
+    if (!fileObj) return;
+    let file;
+    try{ file = await fileObj.getFile(); }
+    catch(err){ console.error(err); return; }
+
+    const url = URL.createObjectURL(file);
+    if (state.currentObjectUrl) URL.revokeObjectURL(state.currentObjectUrl);
+    state.currentObjectUrl = url;
+
+    counterText.textContent = (state.photoPos + 1) + ' / ' + state.photoOrder.length;
+
+    const wantsOriginalFirst = state.showOriginalFirst && (state.zoom || 1) > 1.02;
+
+    if (wantsOriginalFirst){
+      await renderFrame(url, 'contain');
+      if (state.playing) scheduleTimer(ORIGINAL_VIEW_MS, () => switchToZoomed(url));
+    } else {
+      const slotMs = await renderFrame(url, 'zoom');
+      if (state.playing) scheduleNextPhoto(slotMs);
+    }
+  }
+
+  async function switchToZoomed(url){
+    const slotMs = await renderFrame(url, 'zoom');
+    if (state.playing) scheduleNextPhoto(slotMs);
+  }
+
+  /* Fit the photo so it covers the whole screen (whichever dimension is
+     the tighter constraint is matched exactly, the other overflows),
+     then apply the user's extra zoom on top, always keeping aspect
+     ratio. If the result overflows only one axis, pan smoothly across
+     that axis (left->right for width, bottom->top for height). If it
+     overflows both axes (typically once zoom is increased), sweep in
+     a "Z" / boustrophedon pattern: left->right, step up, right->left,
+     step up, and so on, until the whole photo has been shown. */
+  /* Keep a detached, never-mutated copy of the photo's pristine pixels
+     so repeated high-quality redraws (zoom slider drags, window
+     resizes) always resample from the original file, not from an
+     already-processed canvas output (which would compound blur). */
+  function getMasterCanvas(img){
+    if (img._masterCanvas) return img._masterCanvas;
+    const c = document.createElement('canvas');
+    c.width = img._masterNW || img.naturalWidth;
+    c.height = img._masterNH || img.naturalHeight;
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    img._masterCanvas = c;
+    return c;
+  }
+
+  /* Re-render the photo through a canvas with high-quality smoothing at
+     the exact on-screen pixel size (accounting for device pixel ratio),
+     instead of letting the browser stretch the original bitmap via CSS.
+     This can look noticeably sharper once zoomed in, though it can only
+     resample existing detail — it can't invent resolution the source
+     photo doesn't have. */
+  function applyHighQualityRender(img, targetW, targetH){
+    try{
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const outW = Math.min(Math.round(targetW * dpr), 2400);
+      const outH = Math.min(Math.round(targetH * dpr), 2400);
+      if (outW < 4 || outH < 4) return;
+      const master = getMasterCanvas(img);
+      const canvas = document.createElement('canvas');
+      canvas.width = outW; canvas.height = outH;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(master, 0, 0, outW, outH);
+      img.src = canvas.toDataURL('image/png');
+    } catch(e){ /* canvas unavailable or failed; keep the normal rendering */ }
+  }
+
+  function layoutAndPan(img){
+    if (state.panAnim){ state.panAnim.cancel(); state.panAnim = null; }
+    const cw = window.innerWidth, ch = window.innerHeight;
+    const nw = img._masterNW || img.naturalWidth, nh = img._masterNH || img.naturalHeight;
+    const configuredMs = state.duration * 1000;
+    if (!nw || !nh) return configuredMs;
+
+    const coverScale = Math.max(cw / nw, ch / nh);
+    const scale = coverScale * (state.zoom || 1);
+    const drawW = nw * scale, drawH = nh * scale;
+    img.style.width = drawW + 'px';
+    img.style.height = drawH + 'px';
+    img.style.left = '0px';
+    img.style.top = '0px';
+
+    if (state.highQualityZoom) applyHighQualityRender(img, drawW, drawH);
+
+    const overflowX = Math.max(0, drawW - cw);
+    const overflowY = Math.max(0, drawH - ch);
+
+    if (overflowX <= 4 && overflowY <= 4){
+      img.style.transform = 'translate(0px,0px)';
+      return configuredMs;
+    }
+
+    const rows = overflowY > 4 ? Math.max(2, Math.ceil(drawH / ch)) : 1;
+
+    // Build the raster path: viewX (0..overflowX) sweeps left/right per
+    // row, viewY (overflowY..0) steps from bottom row to top row.
+    const waypoints = [];
+    for (let i = 0; i < rows; i++){
+      const y = rows > 1 ? overflowY * (1 - i / (rows - 1)) : 0;
+      const xStart = i % 2 === 0 ? 0 : overflowX;
+      const xEnd   = i % 2 === 0 ? overflowX : 0;
+      if (i === 0) waypoints.push({ x:xStart, y });
+      waypoints.push({ x:xEnd, y });
+      if (i < rows - 1){
+        const yNext = overflowY * (1 - (i+1) / (rows - 1));
+        waypoints.push({ x:xEnd, y:yNext });
+      }
+    }
+    // drop zero-length duplicate points (e.g. a row with no horizontal overflow)
+    const pts = [waypoints[0]];
+    for (let i = 1; i < waypoints.length; i++){
+      const prev = pts[pts.length - 1];
+      if (Math.abs(waypoints[i].x - prev.x) > 0.5 || Math.abs(waypoints[i].y - prev.y) > 0.5) pts.push(waypoints[i]);
+    }
+
+    if (pts.length < 2){
+      img.style.transform = 'translate(' + (-pts[0].x) + 'px,' + (-pts[0].y) + 'px)';
+      return configuredMs;
+    }
+
+    const dist = [0];
+    for (let i = 1; i < pts.length; i++){
+      dist.push(dist[i-1] + Math.abs(pts[i].x - pts[i-1].x) + Math.abs(pts[i].y - pts[i-1].y));
+    }
+    const total = dist[dist.length - 1] || 1;
+    const keyframes = pts.map((p, i) => ({
+      transform: 'translate(' + (-p.x) + 'px,' + (-p.y) + 'px)',
+      offset: dist[i] / total,
+    }));
+    keyframes[0].offset = 0;
+    keyframes[keyframes.length - 1].offset = 1;
+
+    // Keep the pan speed roughly constant no matter how much the zoom
+    // level increases the distance to travel: the "每張秒數" setting
+    // defines the pace (screen-widths per second), not a hard deadline.
+    // A photo that needs more distance to fully reveal gets more time
+    // instead of panning faster.
+    const baseAnimMs = Math.max(configuredMs - 900, 400);
+    const pacePxPerSec = (8 * Math.min(cw, ch)) / (state.duration || 8);
+    const neededMs = (total / pacePxPerSec) * 1000;
+    const animMs = Math.max(baseAnimMs, neededMs);
+
+    state.panAnim = img.animate(keyframes, { duration: animMs, easing: 'linear', fill: 'forwards' });
+    return animMs + 900;
+  }
+
+  window.addEventListener('resize', () => {
+    const activeImg = currentVisibleLayer();
+    if (activeImg.src) layoutAndPan(activeImg);
+  });
+
+  /* Generic pending-action timer: whatever should happen next (switch
+     to the zoomed view, or advance to the next photo) is stored as
+     state.pendingAction so pause/resume can re-run the same step
+     rather than always assuming "advance to next photo". */
+  function scheduleTimer(ms, action){
+    clearTimeout(state.timerHandle);
+    state.timerStartedAt = Date.now();
+    state.timerRemainingMs = ms;
+    state.pendingAction = action;
+    animateProgressBar(ms);
+    state.timerHandle = setTimeout(action, ms);
+  }
+  function scheduleNextPhoto(ms){
+    scheduleTimer(ms, () => advancePhoto(1));
+  }
+
+  let progressRAF = null;
+  function animateProgressBar(totalMs){
+    cancelAnimationFrame(progressRAF);
+    const start = performance.now();
+    function step(now){
+      if (!state.playing) return;
+      const elapsed = now - start;
+      const pct = Math.min(100, (elapsed/totalMs)*100);
+      progressFill.style.width = pct + '%';
+      if (pct < 100) progressRAF = requestAnimationFrame(step);
+    }
+    progressRAF = requestAnimationFrame(step);
+  }
+
+  function advancePhoto(dir){
+    if (state.photoOrder.length === 0) return;
+    clearTimeout(state.timerHandle);
+    state.photoPos = (state.photoPos + dir + state.photoOrder.length) % state.photoOrder.length;
+    showPhoto(state.photoOrder[state.photoPos]);
+    persistNow();
+  }
+
+  /* ---- Music ---- */
+  async function playMusicTrack(fileIndex, startAt){
+    const fileObj = state.musicFiles[fileIndex];
+    if (!fileObj) return;
+    const file = await fileObj.getFile();
+    const url = URL.createObjectURL(file);
+    audioEl.src = url;
+    audioEl.volume = state.muted ? 0 : state.volume;
+    audioEl.currentTime = startAt || 0;
+    if (state.playing){
+      audioEl.play().catch(()=>{ /* needs a user gesture on some browsers */ });
+    }
+  }
+  audioEl.addEventListener('ended', () => {
+    if (state.musicOrder.length === 0) return;
+    state.musicPos = (state.musicPos + 1) % state.musicOrder.length;
+    playMusicTrack(state.musicOrder[state.musicPos], 0);
+    persistNow();
+  });
+
+  /* ---- Transport controls ---- */
+  function setPlaying(playing){
+    state.playing = playing;
+    playIconPath.setAttribute('d', playing ? PAUSE_ICON_D : PLAY_ICON_D);
+    playBtn.querySelector('.lb').textContent = playing ? '暫停' : '播放';
+    if (playing){
+      const remaining = Math.max(state.timerRemainingMs - (Date.now() - state.timerStartedAt), 200);
+      if (state.pendingAction) scheduleTimer(remaining, state.pendingAction);
+      if (state.panAnim) state.panAnim.play();
+      if (audioEl.src) audioEl.play().catch(()=>{});
+      acquireWakeLock();
+      scheduleScreenOff();
+      resetManualAdjust(currentVisibleLayer());
+    } else {
+      clearTimeout(state.timerHandle);
+      state.timerRemainingMs = Math.max(state.timerRemainingMs - (Date.now() - state.timerStartedAt), 0);
+      cancelAnimationFrame(progressRAF);
+      if (state.panAnim) state.panAnim.pause();
+      audioEl.pause();
+      clearTimeout(screenOffTimer);
+    }
+    persistNow();
+  }
+
+  function closeApp(){
+    // 先保存目前進度，再停止計時、動畫、音樂與喚醒鎖。
+    persistNow({ appClosed: true });
+    state.playing = false;
+    clearTimeout(state.timerHandle);
+    state.timerHandle = null;
+    state.pendingAction = null;
+    cancelAnimationFrame(progressRAF);
+    if (state.panAnim){ state.panAnim.cancel(); state.panAnim = null; }
+    audioEl.pause();
+    audioEl.currentTime = 0;
+    audioEl.removeAttribute('src');
+    audioEl.load();
+    clearTimeout(screenOffTimer);
+    if (typeof releaseWakeLock === 'function') releaseWakeLock();
+    screenOffOverlay.classList.remove('visible');
+    stageEl.style.display = 'none';
+    startScreenEl.style.display = 'flex';
+    if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen().catch(() => {});
+  }
+
+  playBtn.addEventListener('click', () => setPlaying(!state.playing));
+  document.getElementById('close-app-btn').addEventListener('click', closeApp);
+  document.getElementById('prev-btn').addEventListener('click', () => advancePhoto(-1));
+  document.getElementById('next-btn').addEventListener('click', () => advancePhoto(1));
+
+  document.getElementById('order-btn').addEventListener('click', () => {
+    const newMode = state.orderMode === 'random' ? 'sequential' : 'random';
+    applyOrderMode(newMode);
+  });
+  function applyOrderMode(mode){
+    state.orderMode = mode;
+    setOrderModeUI(mode);
+    // rebuild order arrays but keep the currently shown item first
+    const curPhoto = state.photoOrder[state.photoPos];
+    state.photoOrder = buildOrder(state.photoFiles.length, mode);
+    state.photoPos = Math.max(0, state.photoOrder.indexOf(curPhoto));
+    if (state.musicFiles.length){
+      const curMusic = state.musicOrder[state.musicPos];
+      state.musicOrder = buildOrder(state.musicFiles.length, mode);
+      state.musicPos = Math.max(0, state.musicOrder.indexOf(curMusic));
+    }
+    persistNow();
+  }
+
+  muteBtn.addEventListener('click', () => {
+    state.muted = !state.muted;
+    audioEl.volume = state.muted ? 0 : state.volume;
+    muteIcon.textContent = state.muted ? '🔇' : '🔊';
+    muteBtn.classList.toggle('on', state.muted);
+  });
+
+  document.getElementById('fullscreen-btn').addEventListener('click', () => {
+    if (!document.fullscreenElement){
+      document.documentElement.requestFullscreen().catch(()=>{});
+    } else {
+      document.exitFullscreen().catch(()=>{});
+    }
+  });
+
+  /* ---- Settings panel ---- */
+  const settingsPanel = document.getElementById('settings-panel');
+  document.getElementById('gear-btn').addEventListener('click', () => {
+    settingsPanel.style.display = 'flex';
+    setPlaying(false);
+  });
+  document.getElementById('close-settings').addEventListener('click', () => {
+    settingsPanel.style.display = 'none';
+    setPlaying(true);
+  });
+  document.getElementById('duration-range-2').addEventListener('input', (e) => {
+    state.duration = parseInt(e.target.value, 10);
+    document.getElementById('duration-label-2').textContent = state.duration + ' 秒';
+    durationRange.value = state.duration;
+    durationLabel.textContent = state.duration + ' 秒';
+    saveSettings();
+  });
+  document.getElementById('order-toggle-2').addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    applyOrderMode(btn.dataset.mode);
+    saveSettings();
+  });
+  document.getElementById('volume-range').addEventListener('input', (e) => {
+    state.volume = parseInt(e.target.value, 10) / 100;
+    document.getElementById('volume-label').textContent = Math.round(state.volume*100) + '%';
+    if (!state.muted) audioEl.volume = state.volume;
+    saveSettings();
+  });
+  document.getElementById('zoom-range-2').addEventListener('input', (e) => {
+    setZoomUI(parseInt(e.target.value, 10) / 100);
+    saveSettings();
+    layoutAndPan(currentVisibleLayer());
+  });
+  document.getElementById('reselect-photos').addEventListener('click', async () => {
+    await choosePhotoFolder();
+    state.photoOrder = buildOrder(state.photoFiles.length, state.orderMode);
+    state.photoPos = 0;
+    showPhoto(state.photoOrder[0]);
+    persistNow();
+  });
+  document.getElementById('reselect-music').addEventListener('click', async () => {
+    await chooseMusicFolder();
+    state.musicOrder = buildOrder(state.musicFiles.length, state.orderMode);
+    state.musicPos = 0;
+    playMusicTrack(state.musicOrder[0], 0);
+    persistNow();
+  });
+
+  /* ---- Playlists: named groups of several photo/music folders ----
+         Each playlist stores folder entries with both name and path.
+         Export includes path; import reads path if present.         */
+  const playlistPanel = document.getElementById('playlist-panel');
+  const playlistEditPanel = document.getElementById('playlist-edit-panel');
+  const playlistListEl = document.getElementById('playlist-list');
+  let editingPlaylistId = null;
+
+  function openPlaylistPanel(){
+    settingsPanel.style.display = 'none';
+    refreshPlaylistList();
+    playlistPanel.style.display = 'flex';
+  }
+  function closePlaylistPanel(){ playlistPanel.style.display = 'none'; }
+
+  function updatePlaylistButtonSummary(playlists){
+    const button = document.getElementById('open-playlists-btn');
+    const status = document.getElementById('playlist-status');
+    if (!button || !status) return;
+    button.style.display = '';
+    const activeId = state.activePlaylistId || state.savedPlaylistId;
+    const active = activeId ? playlists.find(pl => pl.id === activeId) : null;
+    status.textContent = active ? active.name : '尚未使用清單';
+    button.classList.toggle('ready', !!active);
+  }
+
+  async function refreshPlaylistList(){
+    try {
+      const playlists = (await idbGetAllPlaylists()).sort((a, b) =>
+        (b.createdAt || 0) - (a.createdAt || 0) || String(b.id).localeCompare(String(a.id))
+      );
+      updatePlaylistButtonSummary(playlists);
+      playlistListEl.innerHTML = '';
+      if (playlists.length === 0){
+        playlistListEl.innerHTML = '<p class="playlist-empty">還沒有任何播放清單</p>';
+        return;
+      }
+      playlists.forEach(pl => {
+        const row = document.createElement('div');
+        row.className = 'playlist-item';
+        row.innerHTML =
+          '<div class="meta"><div class="name"></div><div class="count"></div></div>' +
+          '<div class="actions">' +
+            '<button class="small-btn" data-act="use">使用</button>' +
+            '<button class="small-btn" data-act="view">查看</button>' +
+          '</div>';
+        row.querySelector('.name').textContent = pl.name;
+        row.querySelector('.count').textContent =
+          '相片資料夾 ' + (pl.photoDirs || []).length + ' 個，音樂資料夾 ' + (pl.musicDirs || []).length + ' 個';
+        row.querySelector('[data-act="use"]').addEventListener('click', async () => {
+          if ((pl.photoDirs || []).length === 0){
+            const pending = pl.pendingPhotoNames || [];
+            alert(pending.length > 0
+              ? '這個清單裡的相片資料夾還沒有連結，請先「查看」把它們連結起來。'
+              : '這個清單還沒有加入任何相片資料夾，請先「查看」新增。');
+            openPlaylistEdit(pl.id);
+            return;
+          }
+          await usePlaylist(pl);
+          // Start playback immediately
+          beginPlayback(false);
+          closePlaylistPanel();
+        });
+        row.querySelector('[data-act="view"]').addEventListener('click', () => openPlaylistEdit(pl.id));
+        playlistListEl.appendChild(row);
+      });
+    } catch (err) {
+      console.error('Failed to load playlists:', err);
+      playlistListEl.innerHTML = '<p class="playlist-empty">載入清單失敗，請檢查瀏覽器儲存權限。</p>';
+    }
+  }
+
+  async function openPlaylistEdit(id){
+    editingPlaylistId = id;
+    playlistPanel.style.display = 'none';
+    await renderPlaylistEdit();
+    playlistEditPanel.style.display = 'flex';
+  }
+  function closePlaylistEdit(){
+    playlistEditPanel.style.display = 'none';
+    editingPlaylistId = null;
+    openPlaylistPanel();
+  }
+
+  /* pending entries are now objects: { name, path } */
+  function renderDirRows(container, pl, kind){
+    container.innerHTML = '';
+    const dirs = kind === 'photo' ? pl.photoDirs : pl.musicDirs;
+    const pending = kind === 'photo' ? (pl.pendingPhotoNames || []) : (pl.pendingMusicNames || []);
+    if (dirs.length === 0 && pending.length === 0){
+      container.innerHTML = '<p class="dir-list-empty">尚未加入' + (kind === 'photo' ? '相片' : '音樂') + '資料夾</p>';
+      return;
+    }
+    dirs.forEach((d, i) => {
+      const row = document.createElement('div');
+      row.className = 'dir-row';
+      row.innerHTML = '<span></span><button class="dir-remove" title="移除">×</button>';
+      row.querySelector('span').textContent = d.name;
+      row.querySelector('.dir-remove').addEventListener('click', async () => {
+        dirs.splice(i, 1);
+        await idbPutPlaylist(pl);
+        renderPlaylistEdit();
+      });
+      container.appendChild(row);
+    });
+    pending.forEach((p, i) => {
+      const row = document.createElement('div');
+      row.className = 'dir-row dir-row-pending';
+      const label = p.path && p.path !== p.name ? p.name + ' (路徑: ' + p.path + ')' : p.name;
+      row.innerHTML =
+        '<span>' + '「' + label + '」尚未連結' + '</span>' +
+        '<span class="actions"><button class="small-btn" data-a="link">選擇資料夾</button><button class="dir-remove" title="移除提醒">×</button></span>';
+      row.querySelector('[data-a="link"]').addEventListener('click', async () => {
+        try{
+          const handle = await window.showDirectoryPicker({ id: 'playlist-' + kind + 's', mode:'read' });
+          pending.splice(i, 1);
+          dirs.push({ name: handle.name, handle });
+          await idbPutPlaylist(pl);
+          renderPlaylistEdit();
+        }catch(e){ /* user cancelled */ }
+      });
+      row.querySelector('.dir-remove').addEventListener('click', async () => {
+        pending.splice(i, 1);
+        await idbPutPlaylist(pl);
+        renderPlaylistEdit();
+      });
+      container.appendChild(row);
+    });
+  }
+
+  async function renderPlaylistEdit(){
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl){ closePlaylistEdit(); return; }
+    document.getElementById('playlist-edit-title').textContent = pl.name;
+    renderDirRows(document.getElementById('playlist-photo-dirs'), pl, 'photo');
+    renderDirRows(document.getElementById('playlist-music-dirs'), pl, 'music');
+  }
+
+  document.getElementById('open-playlists-btn').addEventListener('click', openPlaylistPanel);
+  document.getElementById('open-playlists-btn-2').addEventListener('click', openPlaylistPanel);
+  document.getElementById('close-playlist-panel').addEventListener('click', closePlaylistPanel);
+  document.getElementById('close-playlist-edit').addEventListener('click', closePlaylistEdit);
+
+  document.getElementById('new-playlist-btn').addEventListener('click', async () => {
+    const name = prompt('請輸入新播放清單的名稱：', '我的清單');
+    if (!name) return;
+    const pl = { id: 'pl_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8), name: name.trim() || '我的清單', createdAt: Date.now(), photoDirs: [], musicDirs: [], pendingPhotoNames: [], pendingMusicNames: [] };
+    try {
+      await idbPutPlaylist(pl);
+      await openPlaylistEdit(pl.id);
+    } catch (err) {
+      alert('儲存清單失敗，請確認瀏覽器允許儲存資料。');
+      console.error(err);
+    }
+  });
+
+  document.getElementById('rename-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    const name = prompt('重新命名這個清單：', pl.name);
+    if (!name) return;
+    pl.name = name.trim() || pl.name;
+    try {
+      await idbPutPlaylist(pl);
+      renderPlaylistEdit();
+    } catch (err) {
+      alert('重新命名失敗，請檢查儲存權限。');
+      console.error(err);
+    }
+  });
+
+  document.getElementById('add-photo-dir-btn').addEventListener('click', async () => {
+    try{
+      const handle = await window.showDirectoryPicker({ id: 'playlist-photos', mode: 'read' });
+      const pl = await idbGetPlaylist(editingPlaylistId);
+      pl.photoDirs.push({ name: handle.name, handle });
+      // also remove any pending entry with the same name (case-insensitive match)
+      if (pl.pendingPhotoNames) {
+        const idx = pl.pendingPhotoNames.findIndex(p => p.name.toLowerCase() === handle.name.toLowerCase());
+        if (idx !== -1) pl.pendingPhotoNames.splice(idx, 1);
+      }
+      await idbPutPlaylist(pl);
+      renderPlaylistEdit();
+    }catch(e){ /* user cancelled */ }
+  });
+  document.getElementById('add-music-dir-btn').addEventListener('click', async () => {
+    try{
+      const handle = await window.showDirectoryPicker({ id: 'playlist-music', mode: 'read' });
+      const pl = await idbGetPlaylist(editingPlaylistId);
+      pl.musicDirs.push({ name: handle.name, handle });
+      if (pl.pendingMusicNames) {
+        const idx = pl.pendingMusicNames.findIndex(p => p.name.toLowerCase() === handle.name.toLowerCase());
+        if (idx !== -1) pl.pendingMusicNames.splice(idx, 1);
+      }
+      await idbPutPlaylist(pl);
+      renderPlaylistEdit();
+    }catch(e){ /* user cancelled */ }
+  });
+
+  document.getElementById('use-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    if (pl.photoDirs.length === 0){
+      const pending = pl.pendingPhotoNames || [];
+      if (pending.length > 0){
+        alert('相片資料夾「' + pending.map(p => p.name).join('、') + '」還沒有連結，請先按下方的「選擇資料夾」把它們連結起來，才能使用這個清單。');
+      } else {
+        alert('這個清單還沒有加入任何相片資料夾，請先按「新增相片」。');
+      }
+      return;
+    }
+    await usePlaylist(pl);
+    // start playback
+    beginPlayback(false);
+    playlistEditPanel.style.display = 'none';
+    editingPlaylistId = null;
+  });
+
+  document.getElementById('delete-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    if (!confirm('確定要刪除播放清單「' + pl.name + '」嗎？（不會刪除實際的相片或音樂檔案）')) return;
+    const db = await idbOpen();
+    await new Promise((resolve) => {
+      const tx = db.transaction(PLAYLIST_STORE, 'readwrite');
+      tx.objectStore(PLAYLIST_STORE).delete(editingPlaylistId);
+      tx.oncomplete = resolve;
+    });
+    closePlaylistEdit();
+  });
+
+  /* Export: include path info (name is used as path since we can't get real FS path) */
+  document.getElementById('export-playlist-btn').addEventListener('click', async () => {
+    const pl = await idbGetPlaylist(editingPlaylistId);
+    if (!pl) return;
+    const photoDirs = pl.photoDirs.map(d => ({ name: d.name, path: d.name }));
+    const musicDirs = pl.musicDirs.map(d => ({ name: d.name, path: d.name }));
+    const manifest = {
+      name: pl.name,
+      photoDirs: photoDirs,
+      musicDirs: musicDirs,
+    };
+    const blob = new Blob([JSON.stringify(manifest, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = pl.name + '.playlist.json';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  });
+
+  /* Import: accept both old format (string arrays) and new format (object arrays with name/path) */
+  document.getElementById('import-playlist-btn').addEventListener('click', () => {
+    document.getElementById('playlist-import-input').click();
+  });
+  document.getElementById('playlist-import-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try{
+      const text = await file.text();
+      const manifest = JSON.parse(text);
+
+      // Normalize photoDirs and musicDirs to an array of { name, path }
+      function normalizeEntries(raw, fallbackName) {
+        if (!raw || !Array.isArray(raw)) return [];
+        return raw.map(item => {
+          if (typeof item === 'string') {
+            return { name: item, path: item };
+          }
+          if (item && typeof item === 'object') {
+            return { name: item.name || fallbackName || '未命名', path: item.path || item.name || fallbackName || '未命名' };
+          }
+          return { name: String(item), path: String(item) };
+        });
+      }
+
+      const photoEntries = normalizeEntries(manifest.photoDirs || manifest.photoDirNames, '相片資料夾');
+      const musicEntries = normalizeEntries(manifest.musicDirs || manifest.musicDirNames, '音樂資料夾');
+
+      const pl = {
+        id: 'pl_' + Date.now(),
+        name: (manifest.name || '匯入的清單'),
+        photoDirs: [],
+        musicDirs: [],
+        pendingPhotoNames: photoEntries,
+        pendingMusicNames: musicEntries,
+      };
+      await idbPutPlaylist(pl);
+      await openPlaylistEdit(pl.id);
+    }catch(err){
+      alert('匯入失敗，檔案格式不正確。');
+    }
+    e.target.value = '';
+  });
+
+  /* ---- Auto-hide controls ---- */
+  const controlsOverlay = document.getElementById('controls-overlay');
+  let hideTimer = null;
+  function resetControlsHideTimer(){
+    controlsOverlay.classList.remove('hidden');
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      if (settingsPanel.style.display !== 'flex') controlsOverlay.classList.add('hidden');
+    }, 4000);
+  }
+  ['mousemove','touchstart','click'].forEach(evt => {
+    stageEl.addEventListener(evt, () => { resetControlsHideTimer(); scheduleScreenOff(); });
+  });
+
+  /* ---- Screen Wake Lock + app-controlled screen-off timer ----
+     The Wake Lock API stops the SYSTEM from turning the screen off
+     while playing. On top of that, this app can dim to black on its
+     own schedule (state.screenOffMinutes), which effectively
+     replaces reliance on the phone's own screen-timeout setting —
+     tapping anywhere wakes it back up without losing the current
+     photo/music position. */
+  async function acquireWakeLock(){
+    try{
+      if ('wakeLock' in navigator){
+        state.wakeLockSentinel = await navigator.wakeLock.request('screen');
+      }
+    }catch(e){ /* not supported, or permission denied; ignore */ }
+  }
+  function releaseWakeLock(){
+    if (state.wakeLockSentinel){
+      state.wakeLockSentinel.release().catch(()=>{});
+      state.wakeLockSentinel = null;
+    }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && state.playing) acquireWakeLock();
+  });
+
+  const screenOffOverlay = document.getElementById('screen-off-overlay');
+  let screenOffTimer = null;
+  function scheduleScreenOff(){
+    clearTimeout(screenOffTimer);
+    if (state.screenOffMinutes > 0 && state.playing){
+      screenOffTimer = setTimeout(turnScreenOff, state.screenOffMinutes * 60000);
+    }
+  }
+  function turnScreenOff(){
+    screenOffOverlay.classList.add('visible');
+    releaseWakeLock();
+  }
+  function wakeScreenOn(){
+    if (screenOffOverlay.classList.contains('visible')){
+      screenOffOverlay.classList.remove('visible');
+      if (state.playing) acquireWakeLock();
+      scheduleScreenOff();
+      resetControlsHideTimer();
+    }
+  }
+  screenOffOverlay.addEventListener('click', wakeScreenOn);
+  screenOffOverlay.addEventListener('touchstart', wakeScreenOn);
+
+  /* ---- Manual pinch-zoom / drag while paused ----
+     Layered on top of (not replacing) the automatic pan: manual
+     adjustment applies to the layer's wrapper div, leaving the img's
+     own WAAPI-driven transform untouched. Resets whenever a new
+     photo is shown or playback resumes. */
+  function wrapperFor(img){
+    return img === layerA ? document.getElementById('layer-wrap-a') : document.getElementById('layer-wrap-b');
+  }
+  function applyManualTransform(img){
+    const wrap = wrapperFor(img);
+    wrap.style.transform = 'translate(' + state.manualX + 'px,' + state.manualY + 'px) scale(' + state.manualScale + ')';
+  }
+  function resetManualAdjust(img){
+    state.manualScale = 1; state.manualX = 0; state.manualY = 0;
+    if (img) applyManualTransform(img);
+  }
+
+  (function setupManualGestures(){
+    const container = document.getElementById('photo-container');
+    let dragging = false, lastX = 0, lastY = 0;
+    let pinchStartDist = 0, pinchStartScale = 1;
+
+    function dist(t0, t1){ return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
+
+    container.addEventListener('wheel', (e) => {
+      if (state.playing) return;
+      e.preventDefault();
+      const img = currentVisibleLayer();
+      const delta = e.deltaY > 0 ? -0.1 : 0.1;
+      state.manualScale = Math.min(4, Math.max(1, state.manualScale + delta));
+      applyManualTransform(img);
+    }, { passive:false });
+
+    container.addEventListener('mousedown', (e) => {
+      if (state.playing || state.manualScale <= 1) return;
+      dragging = true; lastX = e.clientX; lastY = e.clientY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      const img = currentVisibleLayer();
+      state.manualX += e.clientX - lastX;
+      state.manualY += e.clientY - lastY;
+      lastX = e.clientX; lastY = e.clientY;
+      applyManualTransform(img);
+    });
+    window.addEventListener('mouseup', () => { dragging = false; });
+
+    container.addEventListener('touchstart', (e) => {
+      if (state.playing) return;
+      if (e.touches.length === 2){
+        pinchStartDist = dist(e.touches[0], e.touches[1]);
+        pinchStartScale = state.manualScale;
+      } else if (e.touches.length === 1 && state.manualScale > 1){
+        dragging = true; lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+      }
+    }, { passive:true });
+    container.addEventListener('touchmove', (e) => {
+      if (state.playing) return;
+      const img = currentVisibleLayer();
+      if (e.touches.length === 2 && pinchStartDist > 0){
+        e.preventDefault();
+        const ratio = dist(e.touches[0], e.touches[1]) / pinchStartDist;
+        state.manualScale = Math.min(4, Math.max(1, pinchStartScale * ratio));
+        applyManualTransform(img);
+      } else if (e.touches.length === 1 && dragging){
+        e.preventDefault();
+        state.manualX += e.touches[0].clientX - lastX;
+        state.manualY += e.touches[0].clientY - lastY;
+        lastX = e.touches[0].clientX; lastY = e.touches[0].clientY;
+        applyManualTransform(img);
+      }
+    }, { passive:false });
+    container.addEventListener('touchend', () => { dragging = false; pinchStartDist = 0; });
+  })();
+
+  /* ---- Keyboard shortcuts (desktop) ---- */
+  document.addEventListener('keydown', (e) => {
+    if (stageEl.style.display !== 'block') return;
+    if (e.code === 'Space'){ e.preventDefault(); setPlaying(!state.playing); }
+    else if (e.code === 'ArrowRight'){ advancePhoto(1); }
+    else if (e.code === 'ArrowLeft'){ advancePhoto(-1); }
+    else if (e.key === 'f' || e.key === 'F'){ document.getElementById('fullscreen-btn').click(); }
+    else if (e.key === 'm' || e.key === 'M'){ muteBtn.click(); }
+  });
+
+  /* ---- Refresh the saved-playlist summary once all playlist functions exist ---- */
+  refreshPlaylistList();
+
+  /* ---- Save progress before leaving ---- */
+  window.addEventListener('beforeunload', () => persistNow());
+
+})();
+</script>
+</body>
+</html>
