@@ -1,0 +1,19 @@
+{
+  "name": "鷹視 Hawk Eye — Object Detection",
+  "short_name": "鷹視",
+  "description": "手機即時物體辨識 AI Vision App",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0e0a",
+  "theme_color": "#0a0e0a",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='24' fill='%230a0e0a'/%3E%3Cpath d='M12 72 L60 84 L96 36 L132 84 L180 72 L144 120 L96 168 L48 120 Z' fill='none' stroke='%2300e676' stroke-width='6' stroke-linejoin='round'/%3E%3Ccircle cx='96' cy='96' r='15' fill='%2300e676'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
